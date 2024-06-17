@@ -1,0 +1,112 @@
+/* No seu arquivo styles.css ou dentro de uma tag <style> em conheca.html */
+.main-nav {
+    position: fixed; /* Fixa o menu no lugar */
+    top: 0; /* Alinha o topo do menu com o topo da página */
+    right: 0; /* Alinha o menu à direita */
+    width: fit-content; /* Define a largura do menu */
+    height: fit-content; /* Altura total da tela */
+    background: #fff; /* Define uma cor de fundo, se necessário */
+    display: flex;
+    flex-direction: column;
+    grid-template-columns:0;
+    /* duas colunas */
+    grid-template-rows:0;
+    /* duas linhas */
+    min-height: fit-content;
+    /* altura mínima do viewport */
+    background-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    /* Sombra para ressaltar o menu */
+}
+
+.nav-item {
+    font-size: 1.25em;
+}
+
+.main-nav .nav-item {
+    display: block; /* Empilha os itens verticalmente */
+    color: #000; /* Cor do texto */
+    background-color: transparent; /* Fundo transparente para cada item */
+    border-bottom: 1px solid #ccc; /* Borda inferior para separar os itens */
+    text-align: left; /* Alinha o texto à esquerda */
+    padding: 10px 15px; /* Espaçamento interno para cada item */
+}
+
+/* Ajusta o tamanho e espaçamento dos ícones, se necessário */
+.main-nav .nav-item .icon-nav {
+    width: 24px;
+    height: auto;
+    margin-bottom: 5px; /* Espaço abaixo do ícone */
+}
+
+/* Remove a estilização do link para se adaptar ao menu lateral */
+.main-nav .nav-item a {
+    text-decoration: none; /* Remove sublinhado */
+    color: inherit; /* Herda a cor do texto do pai */
+}
+
+.icon-nav-logo {
+    width: 15vh;
+    height: auto;
+    margin-left: 3vh;
+}
+
+main {
+    margin-right: 27vh;
+}
+
+/* seções */
+.introducao, .sobre, .projetos, .contato {
+    padding: 50px;
+    text-align: center;
+}
+
+.introducao h1, .sobre h2, .projetos h2 {
+    margin-bottom: 20px;
+}
+
+.sobre img, .projetos .projeto img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+/* Adicione efeitos ao passar o mouse sobre os elementos */
+a:hover, button:hover, .projeto:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+}
+
+.hamburger-menu {
+    display: none; /* Escondido por padrão */
+    cursor: pointer;
+    text-align: center;
+    margin-top: 3vh;
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 767px) {
+    .main-nav {
+        position: static; /* Não fixa o menu */
+        width: auto; /* A largura é determinada pelo conteúdo */
+        height: auto; /* A altura é determinada pelo conteúdo */
+    }
+    .main-nav .nav-item {
+        border: none; /* Remove a borda em telas menores */
+        text-align: center; /* Centraliza o texto em telas menores */
+    }
+    main {
+        margin-right: 0;
+    }
+    .hamburger-menu {
+        display: block;
+    }
+    .main-nav {
+        display: none; /* Escondido por padrão */
+    }
+    .icon-nav-logo {
+        width: 15vh;
+        height: auto;
+        margin-left: 0;
+    }
+}

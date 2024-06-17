@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Century+Gothic:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+:root {
+    --cor-preta-logo: #000000;
+    /* Cor 1: Preto */
+    --cor-vermelho-rosa-logo: #ff0d28;
+    /* Cor 2: Vermelho/ Rosa */
+    --cor-amarelo-vivo-logo: #eef10b;
+    /* Cor 3: Amarelo Vivo */
+    --cor-azul-claro-escuro: #99c2d1;
+    --cor-amarelo-vivo-escuro: #ccba0a;
+    --cor-amarelo-claro-escuro: #cccc66;
+    --cor-vermelho-rosa-escuro: #cc2633;
+    --cor-branca: #ffffff;
+    --cor-amarelo-claro: #ffff80;
+    --cor-azul-claro: #b3e5fc;
+    --fonte-principal: 'Century Gothic', 'Roboto', sans-serif;
+    /* Incluímos uma fonte de fallback aqui */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Century Gothic', 'Roboto', sans-serif;
+    background-color: var(--cor-branca);
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+    /* altura mínima do viewport */
+}
+
+.header {
+    flex-basis: 50%;
+    /* Ajuste conforme necessário */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    /* ou o gradiente que deseja para o cabeçalho */
+}
+
+.main-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* duas colunas */
+    grid-template-rows: 1fr 1fr;
+    /* duas linhas */
+    width: 50%;
+    min-height: 100vh;
+    /* altura mínima do viewport */
+    background-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    /* Sombra para ressaltar o menu */
+}
+
+.nav-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex-direction: column;
+    /* Se necessário, ajuste o padding para dar um pouco mais de espaço */
+    padding: 20px;
+    font-size: 3.25em;
+    /* Aumentar o tamanho da fonte; ajuste conforme necessário */
+    color: var(--cor-preta-logo);
+    /* Cor de texto mais escura para melhor contraste */
+    border-right: 1px solid var(--cor-branca);
+    /* Borda entre os itens do menu */
+    transition: filter 0.3s;
+    /* Transição suave para o efeito de filtro */
+}
+
+.nav-item:last-child {
+    border-right: none;
+    /* Remove a borda do último item para evitar uma borda dupla */
+}
+
+.nav-item:hover {
+    filter: brightness(85%);
+    /* Diminui o brilho para 85%, tornando o item mais escuro */
+}
+
+/* Adicionando ícones usando uma biblioteca como FontAwesome */
+.nav-item .icon {
+    font-size: 10vh;
+    /* Tamanho do ícone */
+    margin-right: 4vh;
+    /* Espaço entre o ícone e o texto */
+}
+
+/* Exemplo de gradiente para os itens do menu */
+#home {
+    background: var(--cor-branca);
+}
+
+#sobre {
+    background: linear-gradient(to bottom right, var(--cor-azul-claro), var(--cor-amarelo-vivo-escuro));
+}
+
+#hospitais {
+    background: linear-gradient(to bottom right, var(--cor-amarelo-vivo-logo), var(--cor-amarelo-claro-escuro));
+}
+
+#parceiros {
+    background: linear-gradient(to bottom right, var(--cor-amarelo-claro), var(--cor-azul-claro-escuro));
+}
+
+#contato {
+    background: linear-gradient(to bottom right, var(--cor-azul-claro), var(--cor-vermelho-rosa-escuro));
+}
+
+.header .logo {
+    max-width: 70%;
+    /* Faz com que a imagem seja no máximo tão larga quanto seu container */
+    height: auto;
+    /* Mantém a proporção da imagem */
+    /* Se você quiser que a imagem tenha um tamanho máximo, pode adicionar uma propriedade max-height também */
+}
+
+.nav-item .icon {
+    font-size: 10vh;
+    margin-right: 4vh;
+}
+
+.icons-logo {
+    font-size: 10vh;
+    margin-right: 4vh;
+}
+
+.icon-nav {
+    width: 10vh;
+    height: auto;
+    margin-left: 3vh;
+}
+
+.main-nav a {
+    color: inherit; /* Isso faz com que o link use a cor de texto definida para o elemento pai */
+    text-decoration: none; /* Isso remove o sublinhado do link */
+}
+
+/* Para mudar a cor e remover o sublinhado também no hover: */
+.main-nav a:hover {
+    color: rgb(67, 67, 67); /* Mantém a cor do texto ao passar o mouse */
+    text-decoration: none; /* Garante que o sublinhado não apareça no hover */
+}
+
+/* Estilos para telas pequenas e dispositivos móveis */
+@media (max-width: 767px) {
+    .container {
+        flex-direction: column;
+        min-height: 0;
+        height: 100%;
+        /* Layout vertical também para telas pequenas */
+    }
+
+    .header {
+        width: 70%;
+        align-self: center;
+        margin: 5vh;
+    }
+
+    .main-nav {
+        width: 100%;
+        /* A navegação ocupa a largura total */
+        grid-template-columns: 1fr 1fr;
+        /* Uma única coluna para os itens do menu */
+        grid-template-rows: auto auto;
+        /* Duas linhas, altura automática */
+        padding: 0;
+        /* Remove qualquer padding */
+        margin: 0;
+        /* Remove qualquer margem externa */
+        box-shadow: none;
+        /* Opcional: remove a sombra */
+        min-height: 0;
+        height: fit-content;
+    }
+
+    .nav-item {
+        width: 100%;
+        /* Cada item do menu ocupa 100% da largura */
+        margin: 0;
+        /* Remove qualquer margem externa */
+        border: none;
+        /* Remove bordas */
+        font-size: 1.25em;
+        /* Ajusta o tamanho da fonte */
+        align-items: center;
+    }
+
+    .nav-item:hover {
+        
+    }
+
+    .nav-item .icon {
+        font-size: 5vh;
+        /* Ajuste o tamanho do ícone */
+    }
+
+    .icons-logo {
+        font-size: 5vh;
+        margin-right: 2vh;
+    }
+
+    .icon-nav {
+        margin-left: 0vh;
+    }
+}
