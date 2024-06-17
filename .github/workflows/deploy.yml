@@ -1,0 +1,19 @@
+name: 🚀 Deploy website on push
+on:
+  push:
+    branches:
+      - main
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v2
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.3.2
+        with:
+          server: ftp.bprates.com.br
+          username: esquadrao@esquadraodaalegria.org.br
+          password: ${{ secrets.FTP_PASSWORD_MASTER }}
