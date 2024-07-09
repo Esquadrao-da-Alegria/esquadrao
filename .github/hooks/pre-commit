@@ -1,9 +1,9 @@
 #!/bin/bash
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-REGEX="^(dev)\/[a-z0-9._-]+$"
+REGEX="^(dev)"
 
 if ! [[ $BRANCH =~ $REGEX ]]; then
   echo "Seu commit foi rejeitado pois não segue aos padrões definidos pelo time"
-  echo "Por favor, altere o nome da sua branch de acordo com o padrão '(dev)/algumacoisa' "
+  echo "Por favor, altere o nome da sua branch de acordo com o padrão '(dev)' "
   exit 1
 fi
