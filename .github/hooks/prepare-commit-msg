@@ -1,0 +1,12 @@
+#!/bin/bash
+MESSAGE=$(cat $1) 
+COMMITFORMAT="^(feat|fix|docs|style|refactor|test|chore|perf|other)(\((.)\))?: (.)[a-zA-Z\s]*+$"
+
+if ! [[ "$MESSAGE" =~ $COMMITFORMAT ]]; then
+  echo "Seu commit foi rejeitado porque a mensagem está fora do padrão" 
+  echo ""
+  echo "Por favor, utilize o seguinte formato"
+  echo "feat: comentário de exemplo de uma feature"
+  echo ""
+  exit 1
+fi
