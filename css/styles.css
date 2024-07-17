@@ -8,13 +8,20 @@
     /* Cor 2: Vermelho/ Rosa */
     --cor-amarelo-vivo-logo: #eef10b;
     /* Cor 3: Amarelo Vivo */
+
     --cor-azul-claro-escuro: #99c2d1;
     --cor-amarelo-vivo-escuro: #ccba0a;
     --cor-amarelo-claro-escuro: #cccc66;
     --cor-vermelho-rosa-escuro: #cc2633;
+    --cor-cinza-claro-escuro: #a9a9a9;
+    --cor-azul-escuro: #00008b;
+    --cor-verde-escuro: #006400;
     --cor-branca: #ffffff;
+
+
     --cor-amarelo-claro: #ffff80;
     --cor-azul-claro: #b3e5fc;
+    --cor-verde-claro: #90ee90;
     --fonte-principal: 'Century Gothic', 'Roboto', sans-serif;
     /* Incluímos uma fonte de fallback aqui */
 }
@@ -53,12 +60,12 @@ html {
 
 .main-nav {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 2fr);
     /* duas colunas */
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: repeat(2, 2fr);
     /* duas linhas */
-    width: 50%;
-    min-height: 100vh;
+    width: 70%;
+    min-height: 100%;
     /* altura mínima do viewport */
     background-color: rgba(0, 0, 0, 0.7);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
@@ -71,7 +78,7 @@ html {
     justify-content: flex-end;
     flex-direction: column;
     /* Se necessário, ajuste o padding para dar um pouco mais de espaço */
-    padding: 20px;
+    padding: 15px;
     font-size: 3.25em;
     /* Aumentar o tamanho da fonte; ajuste conforme necessário */
     color: var(--cor-preta-logo);
@@ -114,11 +121,19 @@ html {
 }
 
 #parceiros {
-    background: linear-gradient(to bottom right, var(--cor-amarelo-claro), var(--cor-azul-claro-escuro));
+    background: linear-gradient(to bottom right, var(--cor-azul-claro), var(--cor-azul-escuro));
 }
 
 #contato {
     background: linear-gradient(to bottom right, var(--cor-azul-claro), var(--cor-vermelho-rosa-escuro));
+}
+
+#conheca {
+    background: linear-gradient(to bottom right, var(--cor-verde-claro), var(--cor-verde-escuro));
+}
+
+#transparencia {
+    background: linear-gradient(to bottom right, var(--cor-branca), var(--cor-cinza-claro-escuro));
 }
 
 .header .logo {

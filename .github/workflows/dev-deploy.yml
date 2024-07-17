@@ -15,5 +15,5 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with:
           server: ftp.bprates.com.br
-          username: esquadrao-dev@bprates.com.br
+          username: esq@dev.esquadraodaalegria.org.br
           password: ${{ secrets.FTP_PASSWORD_DEV }}
