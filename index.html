@@ -1,54 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esquadrão da Alegria</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <title>Esquadrão da alegria</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
+
+    <!-- Navigation bar-->
     <div class="container">
-        <header class="header">
-            <img src="assets/img/logo-colorida.png" alt="Logotipo" class="logo">
-            <p>
-                <i class="icons-logo fab fa-facebook"></i> 
-                <i class="icons-logo fab fa-instagram"></i> 
-                <i class="icons-logo fab fa-linkedin"></i> 
-            </p>
-        </header>
-        <nav class="main-nav">
-            <a href="pages/conheca.html" id="sobre" class="nav-item">
-                <img src="assets/img/nariz-vermelho.png" alt="Nariz de Palhaço" class="icon-nav">
-                <!-- <i class="icon fas fa-address-card"></i> -->
-                <div class="text">Conheça!</div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+            <a class="navbar-brand" href="#">
+                <img src="" alt="Logo" class="logo" style="width: 50px;">
             </a>
-            <a href="pages/conheca.html" id="hospitais" class="nav-item">
-                <img src="assets/img/hospitais.png" alt="hopitais" class="icon-nav">
-                <!-- <i class="icon fas fa-stethoscope"></i> -->
-                <div class="text">Hospitais</div>
-            </a>
-            <a href="pages/conheca.html" id="parceiros" class="nav-item">
-                <img src="assets/img/parceiros.png" alt="parceiros" class="icon-nav">
-                <div class="text">Parceiros</div>
-            </a>
-            <a href="pages/conheca.html" id="contato" class="nav-item">
-                <img src="assets/img/contato.png" alt="parceiros" class="icon-nav">
-                <div class="text">Fale conosco!</div>
-            </a>
-            <a href="pages/conheca.html" id="conheca" class="nav-item">
-                <img src="assets/img/contato.png" alt="parceiros" class="icon-nav">
-                <div class="text">Conheça</div>
-            </a>
-            <a href="pages/conheca.html" id="transparencia" class="nav-item">
-                <img src="assets/img/contato.png" alt="parceiros" class="icon-nav">
-                <div class="text">Transparência</div>
-            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Conheça</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Hospitais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Parceiros</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Fale conosco</a>
+                    </li>
+                </ul>
+            </div>
         </nav>
     </div>
-    <script src="script.js"></script>
-</body>
 
+<!-- Quem somos -->
+<div class="container">
+    <div class="row introducao">
+        <div class="col-md-6">
+            <img src="https://via.placeholder.com/500x300" alt="Quem somos" class="img-fluid">
+            
+        </div>
+        <div class="col-md-2">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque, neque?</p>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque, neque?</p>
+            <img src="https://via.placeholder.com/500x300" alt="Quem somos" class="img-fluid">
+        </div>
+    </div>
+</div>
+           
+        </div>
+    </div>
+
+    <!-- Informações-->
+    <div class="informacoes">
+        <img src="" alt="+100 integrantes">
+        <img src="" alt="+300 mil pessoas atendidas">
+        <img src="" alt="+2 mil pessoas/mês">
+    </div>
+
+    <!-- Conheça -->
+    <div class="conheca">
+        <header>Conheça</header>
+        <p>Doutores</p>
+        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quo, possimus?</p>
+        <img src="" alt="">
+    </div>
+
+    <!-- Hospitais -->
+    <div class="hospitais">
+        <header>Hospitais</header>
+        <div class="images-container">
+            <img src="" alt="Hospitais">
+            <img src="" alt="Hospitais">
+            <img src="" alt="Hospitais">
+        </div>
+    </div>
+    
+    <!-- Parceiros -->
+    <div class="parceiros">
+        <header>Parceiros</header>
+        <div class="images-container">
+            <img src="" alt="parceiros">
+            <img src="" alt="parceiros">
+            <img src="" alt="parceiros">
+        </div>
+    </div>
+    
+    <!-- Formulário --> 
+    <footer>
+        <div class="formulario">
+            formulario
+        </div>
+
+        <div class="redes">
+            Redes
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
