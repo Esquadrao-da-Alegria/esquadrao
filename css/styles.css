@@ -95,6 +95,45 @@ header{
     height: auto; 
 }
 
+/*Formulario*/
+.contact-form {
+    margin-top: 100px;
+    background-color: #F14950;
+    color: #FFF;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.contact-form h2 {
+    color: #FFF;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+.contact-form .form-control {
+    background-color: #FFF;
+    color: #000;
+    border: none;
+}
+.contact-form .btn-submit {
+    background-color: #191A23;
+    color: #FFF;
+    border: none;
+    width: 100%;
+}
+.contact-form .btn-submit:hover {
+    background-color: #333;
+}
+.form-container {
+    display: flex;
+    align-items: center;
+}
+
+.form-container img {
+    max-width: 100%;
+    height: auto;
+    margin-left: auto;
+    padding-right: 0;
+}
+
 /* Footer */
 footer{
     margin-top: 100px;
