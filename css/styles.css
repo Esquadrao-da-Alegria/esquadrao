@@ -34,12 +34,47 @@ header{
     margin-top: 1rem; 
 }
 
+.introducao {
+    position: relative;
+}
+
 .col-md-2 .img-fluid{
     margin-left: 200px;
+    
+}
+
+.col-md-1 .img-fluid{
+    margin-top: 250px;
+}
+
+.rotate-left {
+    left: 460px; 
+    width: 330px;
+    height: 120px;
+    border: solid;
+    background-color: whitesmoke;
+    position: absolute;
+    font-size: 65px;
+    transform: rotate(-3deg);  
+    padding-bottom: 20px;
+    letter-spacing: -2px; /* Reduz o espaçamento entre os caracteres */
+    line-height: 50px;
+ }
+
+.col-md-2 .rotate-right{
+    top: 130px;  
+    left: 490px; 
+    width: 330px;
+    height: 100px;
+    border: solid;
+    background-color: whitesmoke;
+    position: absolute;
+    transform: rotate(1deg);
+    padding-bottom: 20px;
+    letter-spacing: -1px; /* Reduz o espaçamento entre os caracteres */
 }
 
 /* Informações */
-
 .informacoes {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -48,8 +83,6 @@ header{
 }
 
 /* Conheça*/
-
-
 .conheca{
     display: grid;
     grid-template-columns: repeat(1, 1fr);
@@ -137,4 +170,45 @@ header{
 /* Footer */
 footer{
     margin-top: 100px;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+
+    .introducao {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navbar-brand img {
+        display: none;
+    }
+
+    .col-md-1 img{
+        width: 100px;
+        height: 100px;
+        top: -80px;
+        margin-left: 160px;
+    }
+
+    .col-md-2 .rotate-left {
+        position: relative;
+        left: 0;
+        top: 0;
+        transform: none; 
+        width: auto;
+        margin-bottom: 10px;
+        text-align: center; 
+    }
+
+    .col-md-2 .rotate-right {
+        position: relative;
+        left: 0;
+        top: 0;
+        transform: none; 
+        width: auto;
+        margin-bottom: 10px;
+        text-align: center; 
+    }
 }
