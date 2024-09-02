@@ -29,49 +29,53 @@ header{
 .introducao {
     margin-bottom: 15px; 
 }
-
+ 
 .mt-3 {
     margin-top: 1rem; 
 }
 
 .introducao {
     position: relative;
+    background-color: #E0E0E0;
+    padding-top: 80px;
+    height: 500px;
 }
 
-.col-md-2 .img-fluid{
-    margin-left: 200px;
+.col-md-6 .image{
+    margin-top: 210px;
+    width: 110px;
+    height: 110px;
+    margin-right: 300px;
+    margin-left: 140px;
+    position: absolute;
     
 }
 
-.col-md-1 .img-fluid{
-    margin-top: 250px;
-}
-
-.rotate-left {
+.col-md-6 .rotate-left {
     left: 460px; 
-    width: 330px;
+    width: 280px;
     height: 120px;
-    border: solid;
-    background-color: whitesmoke;
+    font-size: 52px;
     position: absolute;
-    font-size: 65px;
-    transform: rotate(-3deg);  
+    line-height: 40px;
+    font-weight: 900;
+    font-family: 'Poppins', 'Black';
+    letter-spacing: -2px; 
     padding-bottom: 20px;
-    letter-spacing: -2px; /* Reduz o espaçamento entre os caracteres */
-    line-height: 50px;
+    transform: rotate(-3deg);  
+    background-color: whitesmoke;
  }
 
-.col-md-2 .rotate-right{
-    top: 130px;  
+.col-md-6 .rotate-right{
+    top: 220px;  
     left: 490px; 
     width: 330px;
     height: 100px;
-    border: solid;
     background-color: whitesmoke;
     position: absolute;
     transform: rotate(1deg);
     padding-bottom: 20px;
-    letter-spacing: -1px; /* Reduz o espaçamento entre os caracteres */
+    letter-spacing: -1px;
 }
 
 /* Informações */
@@ -185,14 +189,15 @@ footer{
         display: none;
     }
 
-    .col-md-1 img{
+    .col-md-6 .image{
+        position: relative;
         width: 100px;
         height: 100px;
-        top: -80px;
-        margin-left: 160px;
+        margin-top: 10px;
+       
     }
 
-    .col-md-2 .rotate-left {
+    .col-md-6 .rotate-left {
         position: relative;
         left: 0;
         top: 0;
@@ -202,7 +207,7 @@ footer{
         text-align: center; 
     }
 
-    .col-md-2 .rotate-right {
+    .col-md-6 .rotate-right {
         position: relative;
         left: 0;
         top: 0;
