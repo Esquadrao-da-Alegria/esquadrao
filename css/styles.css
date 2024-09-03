@@ -166,7 +166,7 @@ header{
 
 .form-container img {
     max-width: 100%;
-    height: auto;
+    max-height: 28rem;
     margin-left: auto;
     padding-right: 0;
 }
@@ -215,5 +215,21 @@ footer{
         width: auto;
         margin-bottom: 10px;
         text-align: center; 
+    }
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 768px) {
+    .form-container {
+        flex-direction: column;
+    }
+    
+    .form-container .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .form-container img {
+        display: none;
     }
 }
