@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+
 body {
     padding-top: 70px; 
 }
@@ -58,8 +60,8 @@ header{
     font-size: 52px;
     position: absolute;
     line-height: 40px;
+    font-family: 'Poppins', sans-serif;
     font-weight: 900;
-    font-family: 'Poppins', 'Black';
     letter-spacing: -2px; 
     padding-bottom: 20px;
     transform: rotate(-3deg);  
