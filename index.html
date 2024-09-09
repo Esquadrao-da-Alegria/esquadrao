@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<div class="container">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,9 +10,9 @@
     <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 </head>
 <body>
-
+    <div class="container-global">
     <!-- Navigation bar-->
-    <div class="container">
+    <div class="container-nav">
         <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
             <a class="navbar-brand" href="#">
                 <img src="./assets/img/logo-colorida.png" alt="Logo" class="logo" style="width: 50px;">
@@ -40,7 +40,7 @@
     </div>
 
 <!-- Quem somos -->
-<div class="container">
+<div class="container-nos">
     <div class="row introducao">
         <div class="col-md-6">
             <img src="https://via.placeholder.com/500x300" alt="Quem somos" class="img-fluid">
@@ -53,43 +53,63 @@
     </div>
 </div>
            
-        </div>
-    </div>
-
+    
     <!-- Informações-->
-    <div class="informacoes">
-        <img src="" alt="+100 integrantes">
-        <img src="" alt="+300 mil pessoas atendidas">
-        <img src="" alt="+2 mil pessoas/mês">
-    </div>
-
-    <!-- Conheça -->
-    <div class="conheca">
-        <header>Conheça</header>
-        <p>Doutores</p>
-        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quo, possimus?</p>
-        <img src="" alt="">
-    </div>
-
-    <!-- Hospitais -->
-    <div class="hospitais">
-        <header>Hospitais</header>
-        <div class="images-container">
-            <img src="" alt="Hospitais">
-            <img src="" alt="Hospitais">
-            <img src="" alt="Hospitais">
+    <div class="container-informacoes">
+        <div class="informacoes">
+            <img src="" alt="+100 integrantes">
+            <img src="" alt="+300 mil pessoas atendidas">
+            <img src="" alt="+2 mil pessoas/mês">
         </div>
     </div>
     
-    <!-- Parceiros -->
-    <div class="parceiros">
-        <header>Parceiros</header>
-        <div class="images-container">
-            <img src="" alt="parceiros">
-            <img src="" alt="parceiros">
-            <img src="" alt="parceiros">
+    <!-- Conheça -->
+<div class="container-conheca">
+    <div class="row conheca align-items-center">
+        <div class="conheca">
+            <header>Conheça</header>
+            <img class="img-fluid" src="https://via.placeholder.com/500x300" alt="Quem somos">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae aliquam maiores ea nulla magni quod, 
+               alias laboriosam optio suscipit voluptatibus tenetur sapiente deleniti aliquid possimus.</p>
+            <button class="btn btn-dark rounded-pill">Saiba Mais</button>
         </div>
     </div>
+</div>
+
+    <!-- Hospitais -->
+<div class="container-hospitais">
+    <div class="hospitais">
+        <header class="text-center">Onde atuamos</header>
+        <div class="row images-container">
+            <div class="col-md-3">
+                <img src="https://via.placeholder.com/500x300" alt="Hospitais" style="height: 290px; width: 200px ; border-radius: 10px;" >
+                <figcaption>Santa Catarina</figcaption>
+            </div>
+            <div class="col-md-3">
+                <img src="https://via.placeholder.com/500x300" alt="Hospitais"  style="height: 290px; width: 200px; border-radius: 10px;">
+                <figcaption>Santa Catarina</figcaption>
+            </div>
+            <div class="col-md-3">
+                <img src="https://via.placeholder.com/500x300" alt="Hospitais"  style="height: 290px; width: 200px; border-radius: 10px;">
+                <figcaption>Santa Catarina</figcaption>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <!-- Parceiros -->
+    <div class="container-parceiros">
+        <div class="parceiros">
+            <header>Parceiros</header>
+            <div class="images-container">
+                <img src="" alt="parceiros">
+                <img src="" alt="parceiros">
+                <img src="" alt="parceiros">
+            </div>
+        </div>
+    </div>
+
+</div>
     
     <footer>
         <!-- Formulário --> 
@@ -124,7 +144,7 @@
             </div>
         </div>
     </div>
-
+</div>
 
         <div class="redes">
             Redes
@@ -132,5 +152,5 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</div>
+
 </html>

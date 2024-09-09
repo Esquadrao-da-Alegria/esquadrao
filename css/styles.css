@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
 
+
 body {
     padding-top: 70px; 
 }
@@ -55,9 +56,9 @@ header{
 
 .col-md-6 .rotate-left {
     left: 460px; 
-    width: 280px;
+    width: 310px;
     height: 120px;
-    font-size: 52px;
+    font-size: 57px;
     position: absolute;
     line-height: 40px;
     font-family: 'Poppins', sans-serif;
