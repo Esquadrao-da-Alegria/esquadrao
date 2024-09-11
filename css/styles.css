@@ -82,12 +82,18 @@ header{
 }
 
 /* Informações */
-.informacoes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    justify-items: center;
-    
+.container-informacoes {
+    margin-top: 50px;
+    margin-bottom: 50px;  
+    background-color: #E0E0E0;  
 }
+
+
+.informacoes img {
+    width: 80px;     
+    height: auto;    
+}
+
 
 /* Conheça*/
 .container-conheca {
