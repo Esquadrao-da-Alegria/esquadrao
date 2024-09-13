@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
 
+
 body {
     padding-top: 70px; 
 }
@@ -55,9 +56,9 @@ header{
 
 .col-md-6 .rotate-left {
     left: 460px; 
-    width: 280px;
+    width: 310px;
     height: 120px;
-    font-size: 52px;
+    font-size: 57px;
     position: absolute;
     line-height: 40px;
     font-family: 'Poppins', sans-serif;
@@ -81,18 +82,63 @@ header{
 }
 
 /* Informações */
-.informacoes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    justify-items: center;
-    
+.container-informacoes {
+    margin-top: 50px;
+    margin-bottom: 50px;  
+    background-color: #E0E0E0;  
 }
 
-/* Conheça*/
-.conheca{
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
+
+.informacoes img {
+    width: 80px;     
+    height: auto;    
 }
+
+
+/* Conheça*/
+.container-conheca {
+    margin-top: 20px;
+}
+
+.conheca header {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.container-conheca .conheca {
+    margin-left: 100px;
+}
+
+.container-conheca .conheca header {
+    margin-right: 750px;
+}
+
+.container-conheca .conheca img {
+    float: left;
+    margin-right: 50px;
+}
+
+.container-conheca .conheca p {
+    margin-right: 150px;
+    margin-bottom: 10px;
+}
+
+
+.btn-custom {
+    color: #000;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+
 
 /* Hospitais */
 
@@ -105,14 +151,11 @@ header{
 
 .hospitais .images-container {
     display: flex;
-    justify-content: center;
-    gap: 1rem; 
+    justify-content: space-between;
+    gap: 2rem; 
 }
 
-.hospitais img {
-    width: 150px; 
-    height: auto; 
-}
+
 /* Parceiros */
 
 .parceiros {
