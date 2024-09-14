@@ -30,16 +30,9 @@ header{
 
 /* Quem somos */
 .introducao {
-    margin-bottom: 15px; 
-}
- 
-.mt-3 {
-    margin-top: 1rem; 
-}
-
-.introducao {
     position: relative;
     background-color: #E0E0E0;
+    margin-bottom: 15px; 
     padding-top: 80px;
     height: 500px;
 }
@@ -56,7 +49,7 @@ header{
 
 .col-md-6 .rotate-left {
     left: 460px; 
-    width: 310px;
+    width: 400px;
     height: 120px;
     font-size: 57px;
     position: absolute;
@@ -67,7 +60,7 @@ header{
     padding-bottom: 20px;
     transform: rotate(-3deg);  
     background-color: whitesmoke;
- }
+}
 
 .col-md-6 .rotate-right{
     top: 220px;  
@@ -79,6 +72,55 @@ header{
     transform: rotate(1deg);
     padding-bottom: 20px;
     letter-spacing: -1px;
+}
+
+/* Estrelas */
+.banner {
+    position: relative; /* Garante que as estrelas estejam posicionadas dentro do banner */
+}
+
+.star {
+    font-size: 30px;
+    color: #b0b0b0;
+    position: absolute;
+    transform: rotate(0deg);
+}
+
+/* Estrelas específicas */
+.star.top {
+    top: 5%;
+    left: 50%;
+    font-size: 40px;
+    color: #d3a6ff;
+    transform: rotate(45deg);
+}
+.star.left-top {
+    top: 20%;
+    left: 10%;
+    font-size: 50px;
+    color: #ffcc99;
+    transform: rotate(-30deg);
+}
+.star.left-bottom {
+    bottom: 10%;
+    left: 15%;
+    font-size: 35px;
+    color: #f2a2e8;
+    transform: rotate(20deg);
+}
+.star.right {
+    top: 50%;
+    right: 10%;
+    font-size: 45px;
+    color: #6dd2a0;
+    transform: rotate(-10deg);
+}
+.star.bottom {
+    bottom: 5%;
+    left: 50%;
+    font-size: 60px;
+    color: #ffd480;
+    transform: rotate(15deg);
 }
 
 /* Informações */
