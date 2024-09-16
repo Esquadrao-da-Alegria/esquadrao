@@ -267,7 +267,7 @@ footer{
 
 /* Responsividade */
 /*Estrela fora de alinhamento em tela muito grande*/
-@media (min-width: 1500px) {
+@media (min-width: 1800px) {
     .star.top {
         top: 5%;
     }
