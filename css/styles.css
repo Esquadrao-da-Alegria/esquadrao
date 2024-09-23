@@ -138,6 +138,32 @@ header{
     height: auto;    
 }
 
+/* Apoio*/
+
+/* Ajustar a largura da imagem */
+.img-ajustada {
+    max-width: 80%; /* Diminui a largura da imagem */
+    width: auto;
+}
+
+/* Adicionar espaçamento entre os textos */
+.espaco-textos div {
+    margin-right: 50px; /* Adiciona espaço entre as colunas com as imagens e textos */
+}
+
+.titulo {
+    margin-bottom: 20px; /* Espaçamento maior abaixo do título */
+}
+
+.descricao {
+    margin-top: 20px; /* Espaçamento maior acima do parágrafo */
+}
+
+.d-flex.mb-3 {
+    gap: 20px; /* Aproxima os textos com espaçamento maior entre eles */
+}
+
+
 
 /* Conheça*/
 .container-conheca {
@@ -168,24 +194,7 @@ header{
 }
 
 
-.btn-custom {
-    color: #000;
-    border: none;
-    border-radius: 50px;
-    padding: 10px 20px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.btn-custom:hover {
-    background-color: #333;
-    color: #fff;
-}
-
-
-
 /* Hospitais */
-
 .hospitais {
     margin-top: 80px;
     display: flex;
