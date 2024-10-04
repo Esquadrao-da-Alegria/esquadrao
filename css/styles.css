@@ -36,12 +36,11 @@ header, .navbar {
 .banner {
     position: relative; /* Garante que as estrelas estejam posicionadas dentro do banner */
     padding: 20px; 
-    background-color: #f5f5f5; /* Cor de fundo apenas para visualização */
+    background: linear-gradient(to top, #E0C340, #F9DF56);
     overflow: hidden;
 }
 
 .introducao {
-    background-color: #E0E0E0;
     margin-bottom: 15px; 
     padding-top: 80px;
     padding-bottom: 60px;
