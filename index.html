@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
@@ -7,38 +7,40 @@
     <title>Esquadrão da alegria</title>
     <link rel="stylesheet" href="./css/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!--Favicon-->
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/img/favicon-32x32.png">
     <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 </head>
+
 <body>
     <!-- Container Global-->
     <div class="container-global">
+
     <!-- Navigation bar-->
-    <div class="container-nav">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-            <a class="navbar-brand" href="#">
-                <img src="./assets/img/logo-colorida.png" alt="Logo" class="logo" style="width: 50px;">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <header>
+        <nav class="navbar navbar-expand-lg fixed-top">
+            <div class="container">
+                <a href="#" class="navbar-brand d-flex align-items-center">
+                    <img src="./assets/img/logo-colorida.png" alt="Logo Esquadrão">
+                </a>
+                <button  class="navbar-toggler navbar-light"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbar-links"
+                aria-controls="navbar-links"
+                aria-expanded="false"
+                aria-label="toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Conheça</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Hospitais</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Parceiros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Fale conosco</a>
-                    </li>
-                </ul>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="navbar-links">
+                    <div class="navbar-nav">
+                        <a href="#" class="nav-item nav-link" id="about-menu">Conheça</a>
+                        <a href="#" class="nav-item nav-link" id="hospitals-menu">Hospitais</a>
+                        <a href="#" class="nav-item nav-link" id="partners-menu">Parceiros</a>
+                        <a href="#" class="nav-item nav-link" id="contact-menu">Fale Conosco</a>
             </div>
         </nav>
-
+    </header>
 
 <!-- Banner Principal - Quem somos -->
 <div class="container-fluid banner">
@@ -113,10 +115,6 @@
         </div>
     </div>
     
-    
-    
-
-    
     <!-- Conheça -->
 <div class="container-conheca">
     <div class="row conheca align-items-center">
@@ -124,7 +122,7 @@
             <header>Conheça</header>
             <img class="img-fluid" src="https://via.placeholder.com/500x300" alt="Quem somos">
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae aliquam maiores ea nulla magni quod, 
-               alias laboriosam optio suscipit voluptatibus tenetur sapiente deleniti aliquid possimus.</p>
+            alias laboriosam optio suscipit voluptatibus tenetur sapiente deleniti aliquid possimus.</p>
             <button class="btn btn-dark rounded-pill">Saiba Mais</button>
         </div>
     </div>

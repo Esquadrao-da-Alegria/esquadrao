@@ -1,31 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
 
+/* Gerais */
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.row {
+    margin: 0;
+}
 
 body {
     padding-top: 70px; 
 }
 
-/* Navigation bar */
-
-.navbar {
-    justify-content: space-between;
-}
-.navbar-brand {
-    position: absolute;
-    left: 15%;
-    transform: translateX(-50%);
-}
-.navbar-nav {
-    margin-right: 150px;
-    gap: 20px;
+/* Navbar */
+header, .navbar {
+    background-color: #F3F8FF;
 }
 
-/* Headers*/
-header{
-    display: grid;
-    justify-items: center;
-    margin-top: 80px;
-    font-size: 50px;
+.navbar-brand img {
+    width: 75px;
+}
+
+#navbar-links a {
+    text-decoration: none;
+    color: #02033B;
+    transition: 0.2s;
+}
+
+#navbar-links a:hover {
+    color: #ED1B24;
 }
 
 /* Quem somos */
@@ -303,10 +307,6 @@ footer{
 }
 
 @media (max-width: 992px) {
-
-    .navbar-brand img {
-        display: none;
-    }
 
     .introducao {
         display: flex;
