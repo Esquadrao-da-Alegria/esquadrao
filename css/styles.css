@@ -137,20 +137,20 @@ header, .navbar {
     transform: rotate(15deg);
 }
 
-/* Informações */
+/* Apoiadores */
 .container-informacoes {
     margin-top: 50px;
-    margin-bottom: 50px;  
-    background-color: #E0E0E0;  
+    margin-bottom: 50px;
+    background-color: #FFC8CA;  
 }
 
-
-.informacoes img {
-    width: 80px;     
-    height: auto;    
+.container-informacoes h3 {
+    font-size: 20px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
 }
 
-/* Apoio*/
+/* Como apoiar*/
 
 /* Ajustar a largura da imagem */
 .img-ajustada {
@@ -164,7 +164,7 @@ header, .navbar {
 }
 
 .titulo {
-    margin-bottom: 20px; /* Espaçamento maior abaixo do título */
+    margin-bottom: 10px; /* Espaçamento maior abaixo do título */
 }
 
 .descricao {
