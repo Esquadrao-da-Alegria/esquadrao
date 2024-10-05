@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&display=swap');
 
 /* Gerais */
 body {
@@ -50,12 +51,12 @@ header, .navbar {
 .image-palhacos {
     max-width: 80%;
     height: auto;
-    position: relative; /* Posiciona a imagem para facilitar a sobreposição */
+    position: relative; 
 }
 
 .text-section {
     position: relative;
-    z-index: 1; /* Garante que os textos fiquem acima da imagem */
+    z-index: 1; 
 }
 
 /* Textos e logo sobrepostos */
@@ -69,7 +70,7 @@ header, .navbar {
     background-color: whitesmoke;
     padding: 10px;
     transform: rotate(-3deg);
-    z-index: 1; /* Mantenha esse valor */
+    z-index: 1; 
 }
 
 .rotate-right {
@@ -80,7 +81,7 @@ header, .navbar {
     background-color: whitesmoke;
     padding: 15px;
     transform: rotate(1deg);
-    z-index: 1; /* Garante que o texto fique acima da imagem */
+    z-index: 1; 
 }
 
 .image-logo {
@@ -89,7 +90,7 @@ header, .navbar {
     right: 5%; /* Alinha para a direita */
     max-width: 80px;
     height: auto;
-    z-index: 2; /* Garante que a logo fique acima do texto */
+    z-index: 2; 
 }
 
 /* Estrelas */
@@ -150,32 +151,66 @@ header, .navbar {
     font-weight: 900;
 }
 
-/* Como apoiar*/
+/* Como apoiar */
 
-/* Ajustar a largura da imagem */
-.img-ajustada {
-    max-width: 80%; /* Diminui a largura da imagem */
-    width: auto;
+.como-apoiar-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 50px 0;
 }
 
-/* Adicionar espaçamento entre os textos */
-.espaco-textos div {
-    margin-right: 50px; /* Adiciona espaço entre as colunas com as imagens e textos */
+.como-apoiar-container h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 40px;
+    color: #2E2F35;
 }
 
-.titulo {
-    margin-bottom: 10px; /* Espaçamento maior abaixo do título */
+.como-apoiar-container h1 .apoiar {
+    font-family: 'Covered By Your Grace', cursive;
+    color: #009387;
 }
 
-.descricao {
-    margin-top: 20px; /* Espaçamento maior acima do parágrafo */
+.info-card {
+    font-family: 'Poppins', sans-serif;
+    font-weight: regular;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    text-align: center;
 }
 
-.d-flex.mb-3 {
-    gap: 20px; /* Aproxima os textos com espaçamento maior entre eles */
+.info-card .number {
+    font-size: 36px;
+    font-weight: regular;
+    margin-bottom: 5px; /* Para garantir que o número fique acima do parágrafo */
 }
 
+.como-apoiar-img {
+    width: 250px;
+    height: auto;
+}
 
+.btn-custom {
+    background: linear-gradient(to right, #D95DB0, #3344DC);
+    color: #FFF;
+    font-size: 24px;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 50px;
+    padding: 10px 20px;
+    width: 50%; /* Aumenta a largura do botão */
+}
+
+.btn-custom:hover {
+    background: linear-gradient(to right, #3344DC, #D95DB0);
+}
+
+.mt-4.text-center {
+    text-align: center;
+}
 
 /* Conheça*/
 .container-conheca {
