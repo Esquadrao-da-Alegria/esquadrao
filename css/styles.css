@@ -49,7 +49,7 @@ header, .navbar {
 }
 
 .image-palhacos {
-    max-width: 80%;
+    max-width: 90%;
     height: auto;
     position: relative; 
 }
@@ -159,14 +159,14 @@ header, .navbar {
     padding: 50px 0;
 }
 
-.como-apoiar-container h1 {
+.como-apoiar-container h2 {
     font-family: 'Poppins', sans-serif;
     font-weight: bold;
     font-size: 40px;
     color: #2E2F35;
 }
 
-.como-apoiar-container h1 .apoiar {
+.como-apoiar-container h2 .apoiar {
     font-family: 'Covered By Your Grace', cursive;
     color: #009387;
 }
@@ -202,6 +202,7 @@ header, .navbar {
     border-radius: 50px;
     padding: 10px 20px;
     width: 50%; /* Aumenta a largura do botão */
+    transition: background 0.3s ease;
 }
 
 .btn-custom:hover {
@@ -213,31 +214,42 @@ header, .navbar {
 }
 
 /* Conheça*/
-.container-conheca {
-    margin-top: 20px;
+#conheca {
+    font-family: 'Poppins', sans-serif;
 }
 
-.conheca header {
-    font-size: 2em;
-    margin-bottom: 20px;
+.title-overlay {
+    position: absolute;
+    top: -30px;
+    left: 30%;
+    z-index: 2;
+    font-weight: bold;
+    font-size: 32px;
+    line-height: 1.2;
+    padding: 5px 10px;
 }
 
-.container-conheca .conheca {
-    margin-left: 100px;
+.conheca-img {
+    margin-top: 55px;
+    max-width: 600px;
 }
 
-.container-conheca .conheca header {
-    margin-right: 750px;
+.description {
+    font-weight: 400;
+    font-size: 20px;
 }
 
-.container-conheca .conheca img {
-    float: left;
-    margin-right: 50px;
+.btn-conheca {
+    background: linear-gradient(to right, #D95DB0, #3344DC);
+    color: #FFF;
+    border-radius: 50px;
+    padding: 10px 20px;
+    border: none;
+    transition: background 0.3s ease;
 }
 
-.container-conheca .conheca p {
-    margin-right: 150px;
-    margin-bottom: 10px;
+.btn-conheca:hover {
+    background: linear-gradient(to right, #3344DC, #D95DB0);
 }
 
 
