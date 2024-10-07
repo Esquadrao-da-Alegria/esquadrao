@@ -295,27 +295,6 @@ header, .navbar {
 }
 
 
-/* Parceiros */
-
-.parceiros {
-    margin-top: 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-
-.parceiros .images-container {
-    display: flex;
-    justify-content: center;
-    gap: 1rem; 
-}
-
-.parceiros img {
-    width: 150px; 
-    height: auto; 
-}
-
 /*Formulario*/
 .contact-form {
     margin-top: 100px;
