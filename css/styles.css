@@ -254,17 +254,44 @@ header, .navbar {
 
 
 /* Hospitais */
-.hospitais {
-    margin-top: 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.hospitais-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    text-align: left;
+    margin-bottom: 30px;
 }
 
-.hospitais .images-container {
+.city-card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.city-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    margin: 0;
+    margin-right: 10px; 
+}
+
+.arrow {
+    cursor: pointer;
+    color: #000;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.card-content {
+    margin-top: 10px;
     display: flex;
-    justify-content: space-between;
-    gap: 2rem; 
+    align-items: center; 
+    text-decoration: none;
+    color: inherit; 
+}
+
+.card-content:hover .city-text,
+.card-content:hover .arrow {
+    text-decoration: underline; 
 }
 
 
