@@ -377,6 +377,8 @@ header, .navbar {
 /* Footer */
 
 .footer-image{
+    width: 250px;
+    height: 250px;
     margin-top: 80px;
     margin-left: 150px;
 }
@@ -533,6 +535,8 @@ ul.list-unstyled li {
     }
 
     .footer-image{
+        width: 100px;
+        height: 100px;
         margin-left: 10px;
     }
 
