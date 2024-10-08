@@ -344,21 +344,17 @@ header, .navbar {
 }
 
 .img-esquerda {
-    transform: rotate(5deg);
+    transform: rotate(2deg);
     position: relative;
     top: -30px;
     width: 100%;  
-    max-height: 400px;  
-    margin-left: -20px; 
 }
 
 .img-direita {
-    transform: rotate(5deg);  
+    transform: rotate(2deg);  
     position: relative;
     top: 120px;
     width: 100%;  
-    max-height: 400px; 
-    margin-right: -20px; 
 }
 
 .texto-central {
@@ -369,8 +365,49 @@ header, .navbar {
 }
 
 /* Footer */
-footer{
-    margin-top: 100px;
+
+.footer-image{
+    margin-left: 150px;
+}
+
+ul.list-unstyled li {
+    margin-bottom: 10px;
+}
+
+.social-icons {
+    margin-top: 300px;
+    margin-right: 120px;
+}
+
+
+.social-icons a {
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: #fff;
+}
+
+.text-white {
+    text-decoration: none;
+}
+
+
+@media (max-width: 768px) {
+    .social-icons {
+        margin-top: 20px;
+        margin-left: 90px;
+    }
+
+    .footer-image{
+        margin-left: 10px;
+    }
+
+    .social-icons {
+        margin-right: -20px;
+    }
+
 }
 
 /* Responsividade */
