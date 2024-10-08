@@ -364,9 +364,20 @@ header, .navbar {
     flex: 0 0 auto;
 }
 
+/* inscreva-se*/
+.formulario-palhaco{
+    position: absolute;
+    height: 400px;
+    width: 400px;
+    margin-top: 500px;
+    margin-left: -170px;
+
+}
+
 /* Footer */
 
 .footer-image{
+    margin-top: 80px;
     margin-left: 150px;
 }
 
@@ -394,18 +405,6 @@ ul.list-unstyled li {
 
 
 @media (max-width: 768px) {
-    .social-icons {
-        margin-top: 20px;
-        margin-left: 90px;
-    }
-
-    .footer-image{
-        margin-left: 10px;
-    }
-
-    .social-icons {
-        margin-right: -20px;
-    }
 
 }
 
@@ -526,5 +525,21 @@ ul.list-unstyled li {
 
     .form-container img {
         display: none;
+    }
+
+    .social-icons {
+        margin-top: 20px;
+        margin-left: 90px;
+    }
+
+    .footer-image{
+        margin-left: 10px;
+    }
+
+    .social-icons {
+        margin-right: -20px;
+    }
+    .opcoes{
+        margin-top: 30px;
     }
 }
