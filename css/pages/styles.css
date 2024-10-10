@@ -51,11 +51,84 @@ header, .navbar {
     content: none;
 }
 
+/* Por que somos palhaços*/
+
+.porque-somos-palhacos {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #000; /* Cor preta */
+    text-transform: uppercase;
+    margin-left: 250px;
+    text-align: left;
+}
+
+.texto-menor {
+    font-size: 24px; 
+    line-height: -5;
+}
+
+.texto-maior {
+    font-size: 48px; 
+    line-height: -50;
+    color: #000000; 
+}
+
+
+.descricao {
+    font-size: 1.1rem;
+    color: #333; /* Cor cinza escuro */
+    margin-left: 250px;
+    text-align: left;
+}
+
+.icon {
+    width: 50px; /* Ajuste o tamanho do ícone */
+    height: auto;
+    margin-left: 50px;
+}
+
+.text {
+    font-size: 1rem;
+    color: #555; /* Cor cinza escuro */
+    text-align: left;
+    margin-left: 25px;
+
+}
+
+.bold-text {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #E53935; /* Cor vermelha */
+    text-align: left;
+    margin-left: 25px;
+}
+
+/* Melhorias gerais de espaçamento e responsividade */
+.porque-somos-palhacos-section {
+    padding: 20px;
+}
 
 
 @media (max-width: 768px) {
     #carouselExampleControls img {
         max-height: 300px; 
         object-position: top;
+    }
+    .porque-somos-palhacos {
+        font-size: 2rem;
+    }
+
+    .descricao {
+        font-size: 1rem;
+    }
+
+    .text, .bold-text {
+        font-size: 1rem;
+    }
+
+    .icon {
+        width: 40px;
     }
 }
