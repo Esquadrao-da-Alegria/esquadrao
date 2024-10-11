@@ -64,13 +64,14 @@ header, .navbar {
     position: absolute;
     top: 10%; /* Mantém a posição */
     left: 20%; /* Move o texto para a esquerda */
-    font-size: 40px;
+    font-size: 65px;
     font-family: 'Poppins', sans-serif;
     font-weight: 900;
     background-color: whitesmoke;
-    padding: 10px;
+    padding: 5px;
     transform: rotate(-3deg);
     z-index: 1; 
+    line-height: 50px;
 }
 
 .rotate-right {
@@ -207,6 +208,10 @@ header, .navbar {
 
 .btn-custom:hover {
     background: linear-gradient(to right, #3344DC, #D95DB0);
+}
+
+.btn-conheca{
+    border-radius: 50%;
 }
 
 .mt-4.text-center {
@@ -347,14 +352,14 @@ header, .navbar {
     transform: rotate(2deg);
     position: relative;
     top: -30px;
-    width: 100%;  
+    width: 80%; 
 }
 
 .img-direita {
     transform: rotate(2deg);  
     position: relative;
     top: 120px;
-    width: 100%;  
+    width: 80%;  
 }
 
 .texto-central {
