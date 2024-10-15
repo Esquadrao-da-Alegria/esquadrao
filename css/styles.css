@@ -79,7 +79,6 @@ header, .navbar {
     position: absolute;
     top: 49%; /* Mantém a posição */
     left: -10%; /* Move o texto para a esquerda */
-    height: 110px;
     width: 410px;
     font-size: 18px;
     background-color: whitesmoke;
@@ -571,5 +570,19 @@ ul.list-unstyled li {
     }
     .opcoes{
         margin-top: 30px;
+    }
+}
+
+@media (min-width: 386px) {
+    /* Remove a rotação em telas menores */
+    .col-md-6 .rotate-left {
+        position: relative;
+        left: 0;
+        top: 0;
+        transform: none; 
+        width: auto;
+        margin-bottom: 10px;
+        text-align: center; 
+        font-size: 35px;
     }
 }
