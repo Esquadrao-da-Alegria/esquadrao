@@ -41,7 +41,6 @@ header, .navbar {
 }
 
 .introducao {
-    margin-bottom: 15px;
     padding: 80px 20px; /* Ajuste o padding lateral */
     max-width: 1200px; /* Tamanho máximo da introdução */
     margin-left: auto; /* Centraliza horizontalmente */
@@ -56,42 +55,45 @@ header, .navbar {
 
 .text-section {
     position: relative;
-    z-index: 1; 
+   
 }
 
 /* Textos e logo sobrepostos */
 .rotate-left {
     position: absolute;
-    top: 10%; /* Mantém a posição */
-    left: 20%; /* Move o texto para a esquerda */
+    top: 12%; /* Mantém a posição */
+    left: -19%; /* Move o texto para a esquerda */
+    height: 115px;
+    width: 420px;
     font-size: 65px;
     font-family: 'Poppins', sans-serif;
     font-weight: 900;
     background-color: whitesmoke;
     padding: 5px;
     transform: rotate(-3deg);
-    z-index: 1; 
     line-height: 50px;
+   
 }
 
 .rotate-right {
     position: absolute;
-    top: 50%; /* Mantém a posição */
-    left: 25%; /* Move o texto para a esquerda */
+    top: 49%; /* Mantém a posição */
+    left: -10%; /* Move o texto para a esquerda */
+    height: 110px;
+    width: 410px;
     font-size: 18px;
     background-color: whitesmoke;
     padding: 15px;
     transform: rotate(1deg);
-    z-index: 1; 
+   
 }
 
 .image-logo {
     position: absolute;
-    bottom: 5%; /* Mantém a posição */
-    right: 5%; /* Alinha para a direita */
-    max-width: 80px;
+    margin-top: 250px; /* Mantém a posição */
+    left: 43%; /* Alinha para a direita */
+    max-width: 120px;
     height: auto;
-    z-index: 2; 
 }
 
 /* Estrelas */
@@ -466,17 +468,36 @@ ul.list-unstyled li {
         width: auto;
         margin-bottom: 10px;
         text-align: center; 
+        font-size: 50px;
     }
 
     .col-md-6 .rotate-right {
         position: relative;
         left: 0;
-        top: 0;
         transform: none; 
         width: auto;
-        margin-bottom: 10px;
+        height: auto;
         text-align: center; 
     }
+
+    .image-logo {
+        position: absolute;
+        margin-top: -5px; 
+        left: 32%; 
+    }
+
+    /* Nossa história */
+
+    .img-esquerda{
+        width: 500px;
+        height: 500px;
+    }
+
+    .img-direita{
+        width: 500px;
+        height: 500px;
+    }
+    
 }
 
 /* Ajustes para telas menores */

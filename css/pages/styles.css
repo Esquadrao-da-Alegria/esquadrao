@@ -110,14 +110,545 @@ header, .navbar {
     padding: 20px;
 }
 
+/* Nossa motivação*/
+
+.nossa-motivacao {
+    background-color: #ff4c4c;
+    padding: 40px 0;
+    text-align: center;
+    height: 600px;
+}
+
+.nossa-motivacao h2 {
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    margin-top: 60px;
+}
+
+.testimonial-box-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 100px;
+}
+.testimonial-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    height: 200px;
+    max-width: 100%;
+}
+.box-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.profile {
+    display: flex;
+    align-items: center;
+}
+.profile-img img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+.name-user {
+    margin-left: 10px;
+}
+.name-user strong {
+    display: block;
+    font-size: 16px;
+}
+.name-user span {
+    font-size: 14px;
+    color: #555;
+}
+
+.box-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.reviews {
+    text-align: right; 
+    width: 100%; 
+}
+
+.reviews i {
+    color: #ffcc00;
+}
+
+.client-comment p {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Por que somos palhaços*/
+
+.como-nos-preparamos {
+    position: relative;
+    padding: 20px;
+    text-align: center;
+    max-width: 800px;
+    margin: 40px auto;
+}
+.como-nos-preparamos h1 {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 0;
+}
+.como-nos-preparamos .texto-menor {
+    margin-left: 30px;
+    font-size: 22px;
+    text-transform: uppercase;
+}
+.como-nos-preparamos .texto-maior {
+    margin-left: 30px;
+    font-size: 40px;
+    font-weight: bold;
+}
+.como-nos-preparamos .descricao {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    margin: 20px 0; 
+    max-width: 600px; 
+    margin-left: auto;
+    margin-right: auto;
+}
+ 
+
+/* Estilização das estrelas */
+.star {
+    position: absolute;
+}
+.star-left {
+    top: -30px;
+    left: -30px;
+}
+.star-right {
+    bottom: -30px;
+    right: -30px;
+}
+
+/* Outros serviços */
+
+.outros-servicos-section {
+    background-color: #91C9E6;
+    padding: 40px;
+    margin-top: 40px;
+    height: 730px;
+}
+
+.servico-card {
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 50px;
+    height: 500px;
+    border-radius: 40px;
+}
+
+.titulo-servicos {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #002C77;
+    margin-bottom: 90px; 
+}
+
+.servico-detalhe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
+}
+
+.servico-icon {
+    width: 50px;
+    height: auto;
+}
+
+.servico-titulo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #002C77;
+}
+
+.servico-descricao {
+    font-size: 1rem;
+    color: #555555;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Botão customizado */
+.custom-btn {
+    border-color: #02033B;
+    color: #02033B;
+
+}
+
+.custom-btn:hover {
+    background-color: #02033B;
+    color: #FFFFFF;
+}
+
+/* inscreva-se*/
+.formulario-palhaco{
+    position: absolute;
+    margin-left: -10px;
+}
+
+
+/* Footer */
+
+footer {
+    background: #ED1B24;
+    color: #fff;
+    margin-top: 450px;
+    position: relative;
+    padding: 50px 0;
+    height: auto; 
+}
+
+.footer-image {
+    width: 100%;
+    max-width: 150px; 
+    margin-left: 90px;
+}
+
+
+.options-section h5 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.options-section ul {
+    list-style: none;
+    padding: 0;
+    line-height: 1.5; 
+}
+
+.options-section ul li {
+    margin-bottom: 10px;
+}
+
+.options-section ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.options-section ul li a:hover {
+    text-decoration: underline;
+}
+
+footer p {
+    margin-bottom: 0;
+}
+
+.social-icons {
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+}
+
+.social-icons a {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+.social-icons a:hover {
+    color: #ddd;
+}
+
+/* Responsividade */
+
+/* Ajuste para telas muito grandes */
+@media (min-width: 1800px) {
+     /* Navbar */
+     .navbar {
+        padding: 20px 0; /* Aumenta o espaçamento vertical da navbar */
+    }
+
+    .navbar-brand img {
+        width: 180px; /* Aumenta o tamanho da logo para telas maiores */
+        height: auto;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 1.5rem; /* Aumenta o tamanho do texto dos links de navegação */
+        margin-left: 20px; /* Adiciona mais espaçamento entre os links */
+    }
+
+    .navbar-toggler {
+        font-size: 1.5rem; /* Aumenta o tamanho do ícone do menu no modo mobile */
+    }
+
+    /* Carousel */
+    .carousel {
+        max-width: 100%; /* Certifica-se que o carrossel ocupa toda a largura */
+        overflow: hidden;
+    }
+
+    .carousel-inner .carousel-item img {
+        height: 900px; /* Aumenta a altura das imagens no carrossel */
+        object-fit: cover;
+        object-position: 0 20%; /* Mantém o corte superior */
+    }
+
+    /* Indicadores do carrossel */
+    .carousel-indicators li {
+        width: 15px; /* Aumenta o tamanho dos indicadores */
+        height: 15px;
+        border-radius: 50%;
+    }
+
+    /* Controles do carrossel */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 50px;
+        height: 50px; /* Aumenta o tamanho dos ícones de controle */
+    }
+
+
+    /* Por que somos palhaços*/
+    .porque-somos-palhacos-section {
+        padding: 60px 20px; 
+    }
+
+    .porque-somos-palhacos {
+        font-size: 3.5rem; 
+        line-height: 1.2;
+    }
+
+    .porque-somos-palhacos .texto-menor {
+        font-size: 2.5rem;
+    }
+
+    .porque-somos-palhacos .texto-maior {
+        font-size: 5rem; 
+    }
+
+    .descricao {
+        font-size: 1.8rem; 
+        line-height: 1.6; 
+        margin-bottom: 50px; 
+    }
+
+    .icon {
+        width: 80px; 
+        height: auto; 
+    }
+
+    .text, .bold-text {
+        font-size: 1.7rem; 
+        line-height: 1.5;
+    }
+
+    .bold-text {
+        font-weight: bold; 
+    }
+
+    .row {
+        margin-top: 80px; 
+    }
+}
+
+@media (max-width: 992px) {
+    /* Ajustes no header (nav bar) */
+    header .navbar-brand img {
+        width: 150px; /* Reduz o tamanho do logo */
+    }
+    
+    .navbar-collapse {
+        justify-content: center; /* Centralizar links do menu */
+    }
+    
+    .navbar-nav .nav-link {
+        font-size: 1rem; /* Ajustar o tamanho da fonte dos links do menu */
+    }
+
+    /* Ajustes no carrossel */
+    .carousel-inner img {
+        height: 500px; /* Diminuir a altura das imagens */
+        object-position: 0 30%; /* Ajustar o foco da imagem */
+    }
+
+    /* Seção "Por que Somos Palhaços?" */
+    .porque-somos-palhacos-section h1.porque-somos-palhacos {
+        font-size: 2rem; /* Reduzir o tamanho da fonte do título */
+    }
+
+    .porque-somos-palhacos-section p.descricao {
+        font-size: 0.9rem; /* Reduzir a descrição */
+    }
+
+    .icon {
+        width: 50px; /* Ajustar o tamanho dos ícones */
+    }
+
+    /* Testemunhos */
+    .testimonial-box {
+        margin-bottom: 20px; /* Ajustar o espaçamento entre os boxes */
+    }
+
+    /* Nossa motivação */
+    .nossa-motivacao h2 {
+        font-size: 2rem; /* Reduzir o tamanho do título */
+    }
+
+    /* Seção de serviços */
+    .servico-detalhe {
+        text-align: center;
+    }
+
+    .servico-detalhe .servico-icon {
+        width: 40px; /* Ajustar o tamanho dos ícones de serviço */
+    }
+
+    .servico-card {
+        padding: 20px; /* Reduzir padding da seção de serviços */
+    }
+
+    /* Imagem de palhaço no final da seção */
+    .formulario-palhaco img {
+        width: 350px;
+        height: 350px; /* Reduzir tamanho da imagem de palhaço */
+    }
+
+    /* Footer */
+    footer .footer-image {
+        width: 120px; /* Reduzir logo no rodapé */
+    }
+
+    footer .options-section h5 {
+        font-size: 1.2rem;
+    }
+
+    footer .social-icons {
+        right: 20px; /* Ajustar a posição das redes sociais no rodapé */
+    }
+}
+
+@media (min-width: 810px) {
+    /* Ajustes no Navbar */
+    .navbar {
+        padding: 10px 0; /* Menos espaçamento na navbar */
+    }
+
+    .navbar-brand img {
+        max-width: 80%; /* Reduzir o tamanho do logo */
+    }
+
+    .navbar-nav {
+        flex-direction: column; /* Muda a direção da nav para coluna */
+        align-items: center; /* Centraliza os itens */
+    }
+
+    .nav-item {
+        margin: 10px 0; /* Espaçamento entre os itens do menu */
+    }
+
+    /* Ajustes no Carrossel */
+    #carouselExampleControls .carousel-item img {
+        height: 400px; /* Reduz a altura das imagens do carrossel */
+    }
+
+    /* Ajustes nos textos */
+    .texto-menor{
+        margin-right: 200px;
+    }
+
+    .texto-maior{
+        margin-right: 200px;
+    }
+
+    .col-md-1{
+        margin-right: 50px;
+    }
+
+    .porque-somos-palhacos p,
+    .descricao {
+        font-size: 14px; /* Ajustar tamanho do texto */
+        margin-left: 130px;
+    }
+
+    /* Nossa motivação*/
+
+    .nossa-motivacao{
+        height: 800px;
+    }
+
+    .testimonial-box-container{
+        height: 500px;
+    }
+
+
+    /* Ajustes para a seção "Nossos serviços" */
+    
+    .outros-servicos-section{
+        height: 950px;
+    }
+
+    .servico-card {
+        height: 730px;
+    }
+
+    .servico-detalhe {
+        text-align: center; /* Centraliza os textos dos serviços */
+        margin-left: 50px;
+    }
+
+    .servico-titulo {
+        font-size: 18px; /* Menor tamanho da fonte */
+    }
+
+    /* Ajustes na seção de depoimentos */
+    .testimonial-box {
+        margin-bottom: 20px; /* Menos espaçamento entre os depoimentos */
+    }
+
+    /* Ajustes no rodapé */
+    footer .options-section {
+        text-align: center; /* Centraliza opções no rodapé */
+    }
+
+    .social-icons {
+        bottom: 10px; /* Ajusta a posição dos ícones de redes sociais */
+        right: 10px; /* Ajusta a posição dos ícones de redes sociais */
+    }
+    
+    /* Ajustes para a imagem da palhaça */
+    .formulario-palhaco img {
+        width: 100%; /* Torna a imagem responsiva */
+        height: auto; /* Mantém a proporção */
+    }
+}
+
 
 @media (max-width: 768px) {
+
+    /* Carrousel*/
     #carouselExampleControls img {
         max-height: 300px; 
         object-position: top;
     }
+
+    /* Por que somos palhacos*/
+
+    .porque-somos-palhacos-section .row {
+        margin-top: 30px; 
+    }
     .porque-somos-palhacos {
         font-size: 2rem;
+        margin-right: 100px;
     }
 
     .descricao {
@@ -125,10 +656,232 @@ header, .navbar {
     }
 
     .text, .bold-text {
-        font-size: 1rem;
+        font-size: 1rem; 
+        text-align: center; 
     }
 
     .icon {
+        width: 40px; 
+        margin: 0 auto; 
+    }
+
+    .porque-somos-palhacos {
+        text-align: center; /* Alinha o título à esquerda */
+        margin-right: 0; /* Remove a margem direita */
+        margin-left: 10px; /* Adiciona margem esquerda (opcional) */
+    }
+
+    .porque-somos-palhacos .texto-menor {
+        font-size: 1.2rem;
+        margin-right: 0; /* Remove a margem direita */
+    }
+
+    .porque-somos-palhacos .texto-maior {
+        font-size: 2.5rem; 
+        margin-right: 0; /* Remove a margem direita */
+    }
+
+    .descricao {
+        font-size: 1rem; 
+        margin-right: 0; /* Remove a margem direita */
+        margin-left: 10px; /* Adiciona margem esquerda (opcional) */
+    }
+
+    
+    .col-md-1 {
+        margin-bottom: 15px; 
+    }
+
+    .col-md-7 {
+        text-align: center; 
+    }
+
+    /* Footer */
+    footer {
+        text-align: center; 
+    }
+    
+    .footer-image {
+        margin-bottom: 20px;
+        margin-right: 80px;
+    }
+
+    
+    .options-section ul {
+        line-height: 1.8; 
+    }
+
+    
+    .position-absolute {
+        position: relative;
+        transform: none;
+        margin-left: 0;
+    }
+
+    /* Nossa motivaçao*/
+    .social-icons {
+        left: 0;
+        text-align: right;
+        bottom: 15px;
+        margin-left: 200px;
+    }
+
+    .social-icons a {
+        margin-right: 2px;
+    }
+
+    .nossa-motivacao{
+        height: 1200px;
+    }
+
+    .testimonial-box {
+        width: calc(50% - 20px); /* 2 caixas por linha */
+        min-height: 290px; /* Aumenta o tamanho vertical */
+    }
+
+    .nossa-motivacao h2 {
+        font-size: 1.75rem;
+    }
+
+    .client-comment p {
+        font-size: 0.9rem;
+    }
+
+    /* Outros serviços*/
+
+    .outros-servicos-section{
+        min-height: 1500px;
+    }
+
+    .servico-card {
+        padding: 20px;
+        min-height: 1200px;
+    }
+
+    .titulo-servicos {
+        font-size: 1.75rem;
+    }
+
+    
+    .col-md-6 {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    
+    .servico-icon {
         width: 40px;
+        height: 40px;
+        margin-left: 80px;
+    }
+
+    .servico-titulo {
+        font-size: 1.1rem;
+        margin-left: 80px;
+    }
+
+    .servico-descricao {
+        font-size: 0.9rem;
+        margin-left: 80px;
+    }
+
+    /* Ajusta o botão */
+    .btn {
+        width: 200px;
+        height: 45px;
+        font-size: 0.95rem;
+    }
+
+    .formulario-palhaco {
+        display: none;
+    }
+
+}
+
+@media (max-width: 384px) {
+    .navbar-brand img {
+        width: 10px; /* Ajustar a largura da logo */
+        height: 50px; /* Manter a proporção da imagem */
+    }
+    
+    .navbar-nav {
+        flex-direction: column; /* Colocar os links em coluna */
+        align-items: center; /* Centralizar os links */
+    }
+
+    .nav-link {
+        padding: 10px; /* Aumentar o espaço em torno dos links */
+        font-size: 14px; /* Reduzir o tamanho da fonte */
+    }
+
+    .navbar-toggler {
+        margin-right: 30px; /* Aumente este valor conforme necessário */
+    }
+
+    /* Ajustes para o carrossel */
+    .carousel-inner img {
+        height: 300px; /* Reduzindo a altura das imagens no carrossel */
+        object-position: center; /* Centralizando as imagens no carrossel */
+    }
+
+    .bold-text {
+        font-size: 1rem; /* Ajustando o tamanho do texto em negrito */
+    }
+
+    /* Ajustes para a seção "Nossa Motivação" */
+    .testimonial-box {
+        padding: 10px; /* Reduzindo o espaçamento dos depoimentos */
+    }
+
+    .client-comment p {
+        font-size: 0.9rem; /* Diminuindo o tamanho da fonte nos depoimentos */
+    }
+
+    /* Ajustes para a seção "Outros Serviços" */
+    .servico-card {
+        padding: 20px; /* Reduzindo o padding do card */
+    }
+
+    .servico-titulo {
+        font-size: 1rem; /* Ajustando o tamanho da fonte do título */
+    }
+
+    .servico-descricao {
+        font-size: 0.9rem; /* Ajustando o tamanho da fonte da descrição */
+    }
+
+    /* Ajustes para a seção "Footer" */
+    .footer-image {
+        width: 80px; /* Reduzindo o tamanho da logo no rodapé */
+    }
+
+    .options-section ul {
+        padding-left: 0; /* Removendo o espaçamento lateral da lista */
+    }
+
+    .options-section ul li {
+        font-size: 0.8rem; /* Ajustando o tamanho dos links do rodapé */
+    }
+
+    /* Ajustes gerais */
+    .container {
+        padding-left: 10px;
+        padding-right: 10px; /* Reduzindo o espaçamento lateral */
+    }
+
+    h1, h2, h3, h4, h5 {
+        font-size: smaller; /* Ajustando o tamanho das fontes principais */
+    }
+
+    p {
+        font-size: 0.9rem; /* Reduzindo o tamanho geral dos textos */
+    }
+
+    .btn {
+        width: 150px;
+        height: 40px; /* Reduzindo o tamanho dos botões */
+        font-size: 0.9rem; /* Ajustando o tamanho da fonte do botão */
     }
 }
+
