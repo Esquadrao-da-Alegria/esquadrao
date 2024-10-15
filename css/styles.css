@@ -485,6 +485,18 @@ ul.list-unstyled li {
         margin-top: -5px; 
         left: 32%; 
     }
+
+    /* Nossa história */
+
+    .img-esquerda{
+        width: 500px;
+        height: 500px;
+    }
+
+    .img-direita{
+        width: 500px;
+        height: 500px;
+    }
     
 }
 
