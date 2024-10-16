@@ -41,10 +41,10 @@ header, .navbar {
 }
 
 .introducao {
-    padding: 80px 20px; /* Ajuste o padding lateral */
-    max-width: 1200px; /* Tamanho máximo da introdução */
-    margin-left: auto; /* Centraliza horizontalmente */
-    margin-right: auto; /* Centraliza horizontalmente */
+    padding: 80px 20px; 
+    max-width: 1200px; 
+    margin-left: auto;
+    margin-right: auto; 
 }
 
 .image-palhacos {
@@ -61,8 +61,8 @@ header, .navbar {
 /* Textos e logo sobrepostos */
 .rotate-left {
     position: absolute;
-    top: 12%; /* Mantém a posição */
-    left: -19%; /* Move o texto para a esquerda */
+    top: 12%; 
+    left: -19%;
     height: 115px;
     width: 420px;
     font-size: 65px;
@@ -188,7 +188,7 @@ header, .navbar {
 .info-card .number {
     font-size: 36px;
     font-weight: regular;
-    margin-bottom: 5px; /* Para garantir que o número fique acima do parágrafo */
+    margin-bottom: 5px;
 }
 
 .como-apoiar-img {
@@ -203,7 +203,7 @@ header, .navbar {
     font-family: 'Poppins', sans-serif;
     border-radius: 50px;
     padding: 10px 20px;
-    width: 50%; /* Aumenta a largura do botão */
+    width: 50%; 
     transition: background 0.3s ease;
 }
 
@@ -412,10 +412,6 @@ ul.list-unstyled li {
 }
 
 
-@media (max-width: 768px) {
-
-}
-
 /* Responsividade */
 /*Estrela fora de alinhamento em tela muito grande*/
 @media (min-width: 1800px) {
@@ -441,6 +437,33 @@ ul.list-unstyled li {
     .star.bottom {
         bottom: 30%;
         left: 50%;
+    }
+}
+
+@media (min-width: 1440px) {
+    .col-md-6 .rotate-left {
+        font-size: 50px;
+    }
+}
+
+@media (max-width: 1390px) {
+    .col-md-6 .rotate-left {
+        font-size: 45px;
+    }
+
+    #conheca .conheca-img {
+        width: 100%; 
+        height: auto; 
+        margin-bottom: 20px; 
+    }
+
+    #conheca .description {
+        font-size: 1rem; 
+        margin-top: 50px; 
+    }
+
+    #conheca .btn-conheca {
+        font-size: 1rem; 
     }
 }
 
@@ -496,8 +519,45 @@ ul.list-unstyled li {
         width: 500px;
         height: 500px;
     }
-    
 }
+
+/* Ajustes para telas com largura máxima de 800px */
+@media (max-width: 800px) {
+    #conheca .conheca-img {
+        width: 100%; 
+        height: auto; 
+        margin-bottom: 20px; 
+    }
+
+    #conheca .description {
+        font-size: 1rem; 
+        margin-top: 50px; 
+    }
+
+    #conheca .btn-conheca {
+        font-size: 1rem; 
+    }
+
+    /* Footer*/
+
+    /* Ajusta o padding e margens no footer */
+    footer {
+        height: auto; 
+        padding: 20px 0; 
+    }
+
+     .footer-image {
+        width: 120px;
+        height: auto; 
+        margin-left: 50px;
+    }
+
+    .formulario-palhaco{
+        display: none;
+    }
+}
+
+
 
 /* Ajustes para telas menores */
 @media (max-width: 768px) {
@@ -518,14 +578,14 @@ ul.list-unstyled li {
         text-align: center; 
     }
 
-    /* Ajusta a imagem da logo em telas menores */
+    
     .image {
         width: 80px;
         height: 80px;
         margin-top: 20px;
     }
 
-    /* Remove a rotação em telas menores */
+    
     .rotate-left, .rotate-right {
         transform: none;
         margin-bottom: 10px;
@@ -573,16 +633,14 @@ ul.list-unstyled li {
     }
 }
 
-@media (min-width: 386px) {
-    /* Remove a rotação em telas menores */
+@media (min-width: 400px) {
     .col-md-6 .rotate-left {
-        position: relative;
-        left: 0;
-        top: 0;
-        transform: none; 
-        width: auto;
-        margin-bottom: 10px;
-        text-align: center; 
-        font-size: 35px;
+        font-size: 45px;
+    }
+}
+
+@media (max-width: 390px) {
+    .col-md-6 .rotate-left {
+        font-size: 42px;
     }
 }
