@@ -60,42 +60,43 @@ header, .navbar {
     font-weight: bold;
     color: #000; /* Cor preta */
     text-transform: uppercase;
-    margin-left: 280px;
     text-align: left;
 }
 
 .texto-menor {
     font-size: 24px; 
     line-height: -5;
-    margin-left: 70px;
+    margin-left: auto;
+    margin-left: 130px;
+   
 }
 
 .texto-maior {
     font-size: 48px; 
     line-height: -50;
     color: #000000; 
-    margin-left: 70px;
+    margin-left: auto;
+    margin-left: 130px;
 }
-
 
 .descricao {
     font-size: 1.1rem;
-    color: #333; /* Cor cinza escuro */
-    margin-left: 350px;
+    color: #333; 
+    margin-left: 280px;
     text-align: left;
 }
 
 .icon {
     width: 50px; /* Ajuste o tamanho do ícone */
     height: auto;
-    margin-left: 140px;
+    margin-left: 50px;
 }
 
 .text {
     font-size: 1rem;
     color: #555; /* Cor cinza escuro */
     text-align: left;
-    margin-left: 90px;
+    margin-left: 10px;
 
 }
 
@@ -104,7 +105,7 @@ header, .navbar {
     font-weight: bold;
     color: #E53935; /* Cor vermelha */
     text-align: left;
-    margin-left: 90px;
+    margin-left: 10px;
 }
 
 /* Melhorias gerais de espaçamento e responsividade */
@@ -533,7 +534,7 @@ footer p {
     }
 }
 
-@media (max-width: 820px) {
+@media (max-width: 834px) {
     /* Ajustes no Navbar */
     .navbar {
         padding: 10px 0; 
@@ -558,12 +559,12 @@ footer p {
     }
 
     /* Ajustes nos textos */
-    .texto-menor{
-        margin-right: 200px;
+    .porque-somos-palhacos .texto-menor{
+        margin-right: 400px;
     }
 
-    .texto-maior{
-        margin-right: 200px;
+    .porque-somos-palhacos .texto-maior{
+        margin-right: 400px;
     }
 
     .col-md-1{
@@ -663,13 +664,13 @@ footer p {
     .porque-somos-palhacos .texto-menor {
         font-size: 1.1rem;
         margin-right: 0; 
-        margin-left: 5;
+        margin-left: 70px;
     }
 
     .porque-somos-palhacos .texto-maior {
         font-size: 2.5rem; 
-        margin-right: 0;
-        margin-left: 5;
+        margin-right: 0; 
+        margin-left: 70px;
     }
 
     .descricao {
