@@ -60,40 +60,42 @@ header, .navbar {
     font-weight: bold;
     color: #000; /* Cor preta */
     text-transform: uppercase;
-    margin-left: 250px;
+    margin-left: 280px;
     text-align: left;
 }
 
 .texto-menor {
     font-size: 24px; 
     line-height: -5;
+    margin-left: 70px;
 }
 
 .texto-maior {
     font-size: 48px; 
     line-height: -50;
     color: #000000; 
+    margin-left: 70px;
 }
 
 
 .descricao {
     font-size: 1.1rem;
     color: #333; /* Cor cinza escuro */
-    margin-left: 250px;
+    margin-left: 350px;
     text-align: left;
 }
 
 .icon {
     width: 50px; /* Ajuste o tamanho do ícone */
     height: auto;
-    margin-left: 50px;
+    margin-left: 140px;
 }
 
 .text {
     font-size: 1rem;
     color: #555; /* Cor cinza escuro */
     text-align: left;
-    margin-left: 25px;
+    margin-left: 90px;
 
 }
 
@@ -102,7 +104,7 @@ header, .navbar {
     font-weight: bold;
     color: #E53935; /* Cor vermelha */
     text-align: left;
-    margin-left: 25px;
+    margin-left: 90px;
 }
 
 /* Melhorias gerais de espaçamento e responsividade */
@@ -191,7 +193,6 @@ header, .navbar {
 /* Por que somos palhaços*/
 
 .como-nos-preparamos {
-    position: relative;
     padding: 20px;
     text-align: center;
     max-width: 800px;
@@ -203,12 +204,12 @@ header, .navbar {
     margin: 0;
 }
 .como-nos-preparamos .texto-menor {
-    margin-left: 30px;
+    margin-left: 100px;
     font-size: 22px;
     text-transform: uppercase;
 }
 .como-nos-preparamos .texto-maior {
-    margin-left: 30px;
+    margin-left: 100px;
     font-size: 40px;
     font-weight: bold;
 }
@@ -216,10 +217,9 @@ header, .navbar {
     font-size: 16px;
     line-height: 1.5;
     color: #333;
-    margin: 20px 0; 
-    max-width: 600px; 
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 100px; 
+    max-width: 900px; 
+    text-align: left;
 }
  
 
@@ -255,13 +255,6 @@ header, .navbar {
     border-radius: 40px;
 }
 
-.titulo-servicos {
-    font-size: 1.75rem;
-    font-weight: bold;
-    color: #002C77;
-    margin-bottom: 90px; 
-}
-
 .servico-detalhe {
     display: flex;
     flex-direction: column;
@@ -272,19 +265,22 @@ header, .navbar {
 .servico-icon {
     width: 50px;
     height: auto;
+    margin-right: 60px;
 }
 
 .servico-titulo {
     font-size: 1.25rem;
     font-weight: 600;
     color: #002C77;
+    margin-right: 40px;
 }
 
 .servico-descricao {
     font-size: 1rem;
     color: #555555;
     margin-top: 10px;
-    text-align: center;
+    width: 200px;
+    margin-right: 40px;
 }
 
 /* Botão customizado */
@@ -311,7 +307,7 @@ header, .navbar {
 footer {
     background: #ED1B24;
     color: #fff;
-    margin-top: 450px;
+    margin-top: 370px;
     position: relative;
     padding: 50px 0;
     height: auto; 
@@ -537,10 +533,10 @@ footer p {
     }
 }
 
-@media (min-width: 810px) {
+@media (max-width: 820px) {
     /* Ajustes no Navbar */
     .navbar {
-        padding: 10px 0; /* Menos espaçamento na navbar */
+        padding: 10px 0; 
     }
 
     .navbar-brand img {
@@ -548,17 +544,17 @@ footer p {
     }
 
     .navbar-nav {
-        flex-direction: column; /* Muda a direção da nav para coluna */
-        align-items: center; /* Centraliza os itens */
+        flex-direction: column; 
+        align-items: center; 
     }
 
     .nav-item {
-        margin: 10px 0; /* Espaçamento entre os itens do menu */
+        margin: 10px 0; 
     }
 
     /* Ajustes no Carrossel */
     #carouselExampleControls .carousel-item img {
-        height: 400px; /* Reduz a altura das imagens do carrossel */
+        height: 400px; 
     }
 
     /* Ajustes nos textos */
@@ -602,38 +598,48 @@ footer p {
     }
 
     .servico-detalhe {
-        text-align: center; /* Centraliza os textos dos serviços */
+        text-align: center; 
         margin-left: 50px;
     }
 
     .servico-titulo {
-        font-size: 18px; /* Menor tamanho da fonte */
+        font-size: 18px; 
     }
 
     /* Ajustes na seção de depoimentos */
     .testimonial-box {
-        margin-bottom: 20px; /* Menos espaçamento entre os depoimentos */
+        margin-bottom: 20px; 
     }
 
     /* Ajustes no rodapé */
     footer .options-section {
-        text-align: center; /* Centraliza opções no rodapé */
+        text-align: center;
     }
 
     .social-icons {
-        bottom: 10px; /* Ajusta a posição dos ícones de redes sociais */
-        right: 10px; /* Ajusta a posição dos ícones de redes sociais */
+        bottom: 10px; 
+        right: 10px; 
     }
     
     /* Ajustes para a imagem da palhaça */
     .formulario-palhaco img {
-        width: 100%; /* Torna a imagem responsiva */
-        height: auto; /* Mantém a proporção */
+        width: 100%; 
+        height: auto; 
     }
 }
 
 
 @media (max-width: 768px) {
+
+    .navbar-brand img {
+        width: 20px;
+        height: 70px;
+    }
+
+    .navbar-toggler {
+        margin-right: 50px;
+    }
+
 
     /* Carrousel*/
     #carouselExampleControls img {
@@ -649,42 +655,80 @@ footer p {
     .porque-somos-palhacos {
         font-size: 2rem;
         margin-right: 100px;
+        text-align: center; 
+        margin-right: 10; 
+        margin-left: 0; 
+    }
+    
+    .porque-somos-palhacos .texto-menor {
+        font-size: 1.1rem;
+        margin-right: 0; 
+        margin-left: 5;
+    }
+
+    .porque-somos-palhacos .texto-maior {
+        font-size: 2.5rem; 
+        margin-right: 0;
+        margin-left: 5;
     }
 
     .descricao {
         font-size: 1rem;
     }
 
-    .text, .bold-text {
+    .descricao {
+        text-align: center;
         font-size: 1rem; 
-        text-align: center; 
+        margin-right: 0; 
+        margin-left: 10px; 
     }
 
     .icon {
-        width: 40px; 
-        margin: 0 auto; 
+        width: 50px; 
+        height: auto;
+        margin-left: 60px;
+    }
+    
+    .text {
+        color: #555; 
+        text-align: left;
+        margin-left: 40px;
+    
+    }
+    
+    .bold-text {
+        font-size: 1.0rem;
+        font-weight: bold;
+        color: #E53935; 
+        text-align: left;
+        margin-left: 40px;
     }
 
-    .porque-somos-palhacos {
-        text-align: center; /* Alinha o título à esquerda */
-        margin-right: 0; /* Remove a margem direita */
-        margin-left: 10px; /* Adiciona margem esquerda (opcional) */
+
+    br{
+        display: none;
     }
 
-    .porque-somos-palhacos .texto-menor {
-        font-size: 1.2rem;
-        margin-right: 0; /* Remove a margem direita */
-    }
 
-    .porque-somos-palhacos .texto-maior {
-        font-size: 2.5rem; 
-        margin-right: 0; /* Remove a margem direita */
-    }
+    /* Como nos preparamos */
 
-    .descricao {
-        font-size: 1rem; 
-        margin-right: 0; /* Remove a margem direita */
-        margin-left: 10px; /* Adiciona margem esquerda (opcional) */
+    .como-nos-preparamos .texto-menor {
+        margin-left: 10px;
+        font-size: 22px;
+        text-transform: uppercase;
+    }
+    .como-nos-preparamos .texto-maior {
+        margin-left: 10px;
+        font-size: 40px;
+        font-weight: bold;
+    }
+    .como-nos-preparamos .descricao {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+        margin-left: 10px; 
+        max-width: 900px; 
+        text-align: left;
     }
 
     
@@ -696,29 +740,8 @@ footer p {
         text-align: center; 
     }
 
-    /* Footer */
-    footer {
-        text-align: center; 
-    }
-    
-    .footer-image {
-        margin-bottom: 20px;
-        margin-right: 80px;
-    }
+    /* Nossa motivação*/
 
-    
-    .options-section ul {
-        line-height: 1.8; 
-    }
-
-    
-    .position-absolute {
-        position: relative;
-        transform: none;
-        margin-left: 0;
-    }
-
-    /* Nossa motivaçao*/
     .social-icons {
         left: 0;
         text-align: right;
@@ -735,8 +758,8 @@ footer p {
     }
 
     .testimonial-box {
-        width: calc(50% - 20px); /* 2 caixas por linha */
-        min-height: 290px; /* Aumenta o tamanho vertical */
+        width: calc(50% - 20px);
+        min-height: 290px; 
     }
 
     .nossa-motivacao h2 {
@@ -744,19 +767,72 @@ footer p {
     }
 
     .client-comment p {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 
-    /* Outros serviços*/
-
-    .outros-servicos-section{
-        min-height: 1500px;
+    .name-user {
+        margin-left: 10px;
+        margin-bottom: 15px;
+        
+    }
+    .name-user strong {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    .name-user span {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 15px;
     }
 
+
+    /* Outros serviços */
+    .servico-detalhe {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .servico-icon {
+        width: 50px;
+        height: auto;
+        margin-right: 180px;
+    }
+    
+    .servico-titulo {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #002C77;
+        margin-right: 180px;
+    }
+    
+    .servico-descricao {
+        font-size: 1rem;
+        color: #555555;
+        margin-top: 10px;
+        width: 200px;
+        margin-right: 180px;
+    }
+
+    .outros-servicos-section {
+        background-color: #91C9E6;
+        padding: 40px;
+        margin-top: 40px;
+        height: 1100px;
+    }
+    
     .servico-card {
-        padding: 20px;
-        min-height: 1200px;
+        background-color: #FFFFFF;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 50px;
+        height: 940px;
+        border-radius: 40px;
     }
+
 
     .titulo-servicos {
         font-size: 1.75rem;
@@ -797,91 +873,30 @@ footer p {
         display: none;
     }
 
-}
 
-@media (max-width: 384px) {
-    .navbar-brand img {
-        width: 10px; /* Ajustar a largura da logo */
-        height: 50px; /* Manter a proporção da imagem */
+    /* Footer */
+    footer {
+        text-align: center; 
     }
     
-    .navbar-nav {
-        flex-direction: column; /* Colocar os links em coluna */
-        align-items: center; /* Centralizar os links */
-    }
-
-    .nav-link {
-        padding: 10px; /* Aumentar o espaço em torno dos links */
-        font-size: 14px; /* Reduzir o tamanho da fonte */
-    }
-
-    .navbar-toggler {
-        margin-right: 30px; /* Aumente este valor conforme necessário */
-    }
-
-    /* Ajustes para o carrossel */
-    .carousel-inner img {
-        height: 300px; /* Reduzindo a altura das imagens no carrossel */
-        object-position: center; /* Centralizando as imagens no carrossel */
-    }
-
-    .bold-text {
-        font-size: 1rem; /* Ajustando o tamanho do texto em negrito */
-    }
-
-    /* Ajustes para a seção "Nossa Motivação" */
-    .testimonial-box {
-        padding: 10px; /* Reduzindo o espaçamento dos depoimentos */
-    }
-
-    .client-comment p {
-        font-size: 0.9rem; /* Diminuindo o tamanho da fonte nos depoimentos */
-    }
-
-    /* Ajustes para a seção "Outros Serviços" */
-    .servico-card {
-        padding: 20px; /* Reduzindo o padding do card */
-    }
-
-    .servico-titulo {
-        font-size: 1rem; /* Ajustando o tamanho da fonte do título */
-    }
-
-    .servico-descricao {
-        font-size: 0.9rem; /* Ajustando o tamanho da fonte da descrição */
-    }
-
-    /* Ajustes para a seção "Footer" */
     .footer-image {
-        width: 80px; /* Reduzindo o tamanho da logo no rodapé */
+        margin-bottom: 20px;
+        margin-right: 80px;
     }
 
+    
     .options-section ul {
-        padding-left: 0; /* Removendo o espaçamento lateral da lista */
+        line-height: 1.8; 
     }
 
-    .options-section ul li {
-        font-size: 0.8rem; /* Ajustando o tamanho dos links do rodapé */
+    
+    .position-absolute {
+        position: relative;
+        transform: none;
     }
 
-    /* Ajustes gerais */
-    .container {
-        padding-left: 10px;
-        padding-right: 10px; /* Reduzindo o espaçamento lateral */
-    }
-
-    h1, h2, h3, h4, h5 {
-        font-size: smaller; /* Ajustando o tamanho das fontes principais */
-    }
-
-    p {
-        font-size: 0.9rem; /* Reduzindo o tamanho geral dos textos */
-    }
-
-    .btn {
+    .social-icons{
         width: 150px;
-        height: 40px; /* Reduzindo o tamanho dos botões */
-        font-size: 0.9rem; /* Ajustando o tamanho da fonte do botão */
+        left: 0;
     }
 }
-
