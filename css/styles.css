@@ -205,6 +205,7 @@ header, .navbar {
     padding: 10px 20px;
     width: 50%; 
     transition: background 0.3s ease;
+    margin-left: 150px;
 }
 
 .btn-custom:hover {
@@ -235,6 +236,19 @@ header, .navbar {
     padding: 5px 10px;
 }
 
+.title-overlay::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background-color: #F5DD6D; 
+    z-index: -1; 
+    transform: skewX(-20deg);
+}
+
+
 .conheca-img {
     margin-top: 55px;
     max-width: 600px;
@@ -252,6 +266,7 @@ header, .navbar {
     padding: 10px 20px;
     border: none;
     transition: background 0.3s ease;
+    width: 30%;
 }
 
 .btn-conheca:hover {
@@ -261,11 +276,25 @@ header, .navbar {
 
 /* Hospitais */
 .hospitais-title {
+    position: relative;
     font-family: 'Poppins', sans-serif;
     font-weight: 900;
     font-size: 32px;
     text-align: left;
     margin-bottom: 30px;
+}
+
+.hospitais-title::after{
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 10%;
+    height: 30px;
+    background-color: #F5DD6D; 
+    z-index: -1; 
+    transform: skewX(-20deg);
 }
 
 .city-card {
@@ -368,6 +397,19 @@ header, .navbar {
     width: 400px; 
     max-width: 100%; 
     flex: 0 0 auto;
+}
+
+.btn-historia{
+    background: linear-gradient(to right, #D95DB0, #3344DC);
+    color: #FFF;
+    border-radius: 50px;
+    padding: 10px 20px;
+    border: none;
+    transition: background 0.3s ease;
+}
+
+.btn-historia:hover{
+    background: linear-gradient(to right, #3344DC, #D95DB0);
 }
 
 /* inscreva-se*/
@@ -526,12 +568,13 @@ ul.list-unstyled li {
     #conheca .conheca-img {
         width: 100%; 
         height: auto; 
-        margin-bottom: 20px; 
+        margin-bottom: 10px; 
     }
 
     #conheca .description {
         font-size: 1rem; 
-        margin-top: 50px; 
+        margin-top: 0;
+        padding-top: 60px;
     }
 
     #conheca .btn-conheca {
@@ -614,11 +657,17 @@ ul.list-unstyled li {
         display: none;
     }
 
-    .social-icons {
-        margin-top: 20px;
-        margin-left: 90px;
+    .btn-custom{
+        margin-left: 100px;
     }
 
+    #conheca .description {
+        font-size: 1rem; 
+        margin-top: 0;
+        padding-top: 5px;
+    }
+    
+    /* Footer */
     .footer-image{
         width: 100px;
         height: 100px;
@@ -627,6 +676,8 @@ ul.list-unstyled li {
 
     .social-icons {
         margin-right: -20px;
+        margin-top: 20px;
+        margin-left: 90px;
     }
     .opcoes{
         margin-top: 30px;
