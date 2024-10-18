@@ -458,6 +458,16 @@ footer p {
     }
 }
 
+@media (max-width: 1440px){
+    .porque-somos-palhacos-section .texto-menor {
+        margin-left: 280px;
+    }
+    
+    .porque-somos-palhacos-section .texto-maior {
+         margin-left: 280px;
+    }
+}
+
 @media (max-width: 992px) {
     /* Ajustes no header (nav bar) */
     header .navbar-brand img {
