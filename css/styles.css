@@ -59,7 +59,7 @@ header, .navbar {
 }
 
 /* Textos e logo sobrepostos */
-.rotate-left {
+.col-md-6 .rotate-left {
     position: absolute;
     top: 12%; 
     left: -19%;
@@ -482,16 +482,8 @@ ul.list-unstyled li {
     }
 }
 
-@media (min-width: 1440px) {
-    .col-md-6 .rotate-left {
-        font-size: 50px;
-    }
-}
 
 @media (max-width: 1390px) {
-    .col-md-6 .rotate-left {
-        font-size: 45px;
-    }
 
     #conheca .conheca-img {
         width: 100%; 
@@ -564,7 +556,7 @@ ul.list-unstyled li {
 }
 
 /* Ajustes para telas com largura máxima de 800px */
-@media (max-width: 800px) {
+@media (max-width: 834px) {
     #conheca .conheca-img {
         width: 100%; 
         height: auto; 
@@ -578,6 +570,8 @@ ul.list-unstyled li {
     }
 
     #conheca .btn-conheca {
+        margin-left: 100px;
+        width: 50%;
         font-size: 1rem; 
     }
 
@@ -616,6 +610,15 @@ ul.list-unstyled li {
         height: auto; 
     }
 
+    .navbar-brand img {
+        width: 75px;
+        margin-left: 25px;
+      }
+
+    .navbar-toggler {
+        margin-right: 25px;
+    }
+
     .text-section {
         padding-top: 20px; 
         text-align: center; 
@@ -629,7 +632,11 @@ ul.list-unstyled li {
     }
 
     
-    .rotate-left, .rotate-right {
+    .rotate-left{
+        font-size: 45px;
+    } 
+    
+    .rotate-right {
         transform: none;
         margin-bottom: 10px;
     }
@@ -684,11 +691,6 @@ ul.list-unstyled li {
     }
 }
 
-@media (min-width: 400px) {
-    .col-md-6 .rotate-left {
-        font-size: 45px;
-    }
-}
 
 @media (max-width: 390px) {
     .col-md-6 .rotate-left {
