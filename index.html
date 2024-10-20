@@ -221,41 +221,45 @@
     
     <footer>
         <!-- Formulário --> 
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="contact-form p-4 rounded">
-                    <div class="form-container">
-                        <div class="col-md-6">
-                            <h2 class="mb-4">Fale Conosco</h2>
-                            <form>
-                                <div class="mb-3">
-                                    <label for="nome" class="form-label">Nome</label>
-                                    <input type="text" class="form-control" id="nome" placeholder="Digite seu nome">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" placeholder="Digite seu email">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="mensagem" class="form-label">Mensagem</label>
-                                    <textarea class="form-control" id="mensagem" rows="5" placeholder="Digite sua mensagem"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-submit">Enviar</button>
-                            </form>
-                        </div>
-                        <div class="col-md-6 p-0 d-none d-md-flex align-items-stretch">
-                            <img src="assets/img/form-illustration.png" alt="Imagem">
-                        </div>
-                        <div class="formulario-palhaco">
-                            <img src="./assets/img/image-palhaco-formulario.png" alt="Inscreva-se">
-                        </div>
+    <!-- Formulário --> 
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="contact-form p-4 rounded">
+                <div class="form-container">
+                    <div class="col-md-6">
+                        <h2 class="mb-4">Fale Conosco</h2>
+                        <form action="https://api.staticforms.xyz/submit" method="post">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label" >Nome</label>
+                                <input type="text" name="name" class="form-control" id="nome" required placeholder="Digite seu nome">
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label" required>Email</label>
+                                <input type="email" name="email" class="form-control" id="email" required placeholder="Digite seu email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="mensagem" class="form-label">Mensagem</label>
+                                <textarea class="form-control" name="message" id="mensagem" rows="5" required placeholder="Digite sua mensagem"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-submit ">Enviar</button> <!-- width 100% para o botão -->
+
+                            <input type="hidden" name="accessKey" value="3e403997-7b26-498a-b820-38e28e9ca309">
+                            <input type="hidden" name="redirectTo" value="http://127.0.0.1:5501/index.html">
+                        </form>
+                    </div>
+                    <div class="col-md-6 p-0 d-none d-md-flex align-items-stretch">
+                        <img src="assets/img/form-illustration.png" alt="Imagem">
+                    </div>
+                    <div class="formulario-palhaco">
+                        <img src="./assets/img/image-palhaco-formulario.png" alt="Inscreva-se">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
 
     
