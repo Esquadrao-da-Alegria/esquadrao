@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&display=swap');
+
+/* Gerais */
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding-top: 70px;
+}
+
+.row {
+    margin: 0;
+}
+
+/* Navbar */
+header, .navbar {
+    background-color: #F3F8FF;
+}
+
+.navbar-brand img {
+    width: 75px;
+}
+
+#navbar-links a {
+    text-decoration: none;
+    color: #02033B;
+    transition: 0.2s;
+}
+
+#navbar-links a:hover {
+    color: #ED1B24;
+}
+
+
+/* Banner principal */
+
+body {
+    background-color: #EEF0D3; /* cor de fundo do banner */
+  }
+  
+  .banner {
+    padding-top: 90px;
+    background-color: #EEF0D3; /* cor de fundo do banner */
+    position: relative;
+  }
+  
+  .banner-text {
+    position: relative;
+  }
+  
+  .text-wrapper {
+    position: absolute;
+    top: 125px; 
+    left: 100px;
+  }
+  
+  .hospitais-text {
+    font-size: 65px;
+    width: 350px;
+    height: auto;
+    font-weight: bold;
+    background-color: #ffeb3b;
+    padding: 10px;
+    margin-left: 10px;
+    transform: rotate(-10deg);
+    display: inline-block;
+  }
+  
+  .sub-text {
+    background-color: #F4D94E66;
+    width: 290px;
+    height: 60px;
+    padding: 15px 10px;
+    font-size: 20px;
+    margin-left: 150px;
+  }
+  
+  .banner img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+.banner .bandeirinhas {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 40%; 
+    height: auto;
+    z-index: 1; 
+}
+  
+.banner .baloes {
+    position: absolute;
+    margin-left: 410px;
+    margin-top: 20px;
+    width: 50%; 
+    height: 50%;
+    z-index: 2; 
+}
+  
+.col-md-6 {
+    position: relative;
+}
+
+/* hospitais navigation */
+
+.nav-hospitais {
+  background-color: #4BA3E7;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: white;
+}
+
+.nav-hospitais-item {
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  padding: 10px;
+}
+
+.nav-hospitais-item:hover {
+  color: yellow;
+}
+
+.arrow {
+  margin-left: 5px;
+}
+
+.content {
+  display: none;
+  padding: 20px;
+}
+  
+/* Footer*/
+
+.footer-image{
+    width: 250px;
+    height: 250px;
+    margin-top: 80px;
+    margin-left: 150px;
+}
+
+ul.list-unstyled li {
+    margin-bottom: 10px;
+}
+
+.social-icons {
+    margin-top: 300px;
+    margin-right: 120px;
+}
+
+.social-icons a {
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: #fff;
+}
+
+.text-white {
+    text-decoration: none;
+}
+
+/* Responsividade */
+
+/* Ajuste para tablets */
+@media (max-width: 768px) {
+    .hospitais-text {
+      font-size: 50px; /* Diminui o tamanho do texto em telas menores */
+      width: 300px;
+    }
+  
+    .sub-text {
+      font-size: 16px;
+      width: 250px;
+      margin-left: 10px;
+    }
+  
+    .text-wrapper {
+      top: 100px; /* Ajusta a posição do texto em tablets */
+      left: 50px;
+    }
+  
+    .banner .bandeirinhas,
+    .banner .baloes {
+      display: none; /* Esconde as bandeirinhas e balões em tablets */
+    }
+  
+    .banner .img-fluid {
+      width: 100%;
+      height: auto;
+    }
+  }
+  
+  /* Ajuste para smartphones */
+  @media (max-width: 576px) {
+    .row {
+      display: flex;
+      flex-direction: column-reverse; /* Muda a ordem dos elementos para colocar os textos abaixo da imagem */
+      align-items: center; /* Centraliza os textos */
+    }
+  
+    .hospitais-text {
+      font-size: 40px; /* Diminui ainda mais o texto em smartphones */
+      width: 250px;
+    }
+  
+    .sub-text {
+      font-size: 14px;
+      width: 200px;
+      margin-left: 0;
+    }
+  
+    .text-wrapper {
+      
+      position: static; /* Remove o posicionamento absoluto */
+      margin-top: 20px; /* Ajusta a margem */
+      text-align: center; /* Centraliza o texto */
+    }
+  
+    .banner .bandeirinhas,
+    .banner .baloes {
+      display: none; /* Esconde as bandeirinhas e balões em smartphones */
+    }
+  
+    .banner .img-fluid {
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px; /* Adiciona espaço abaixo da imagem */
+    }
+    
+    .hospitais-text, .sub-text {
+      transform: none;
+      display: block;
+      text-align: center; /* Centraliza os textos em telas pequenas */
+      margin: 0 auto; /* Garante que os textos fiquem centralizados */
+    }
+  }

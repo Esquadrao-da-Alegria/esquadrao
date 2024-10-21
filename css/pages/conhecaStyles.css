@@ -551,7 +551,7 @@ footer p {
     }
 
     .navbar-brand img {
-        max-width: 80%; /* Reduzir o tamanho do logo */
+        max-width: 80%; 
     }
 
     .navbar-nav {
@@ -561,6 +561,16 @@ footer p {
 
     .nav-item {
         margin: 10px 0; 
+    }
+
+    .navbar-brand img {
+        width: 20px;
+        height: 90px;
+    }
+
+    .navbar-toggler {
+        margin-right: 100px;
+      
     }
 
     /* Ajustes no Carrossel */
@@ -590,7 +600,7 @@ footer p {
     /* Nossa motivação*/
 
     .nossa-motivacao{
-        height: 800px;
+        height: 780px;
     }
 
     .testimonial-box-container{
@@ -639,8 +649,30 @@ footer p {
     }
 }
 
+@media (max-width: 768px){
+    
+    .navbar-brand img {
+        width: 20px;
+        height: 90px;
+    }
 
-@media (max-width: 768px) {
+    .navbar-toggler {
+        margin-right: 100px;
+      
+    }
+    
+    /* Nossa motivação*/
+    .nossa-motivacao{
+        height: 950px;
+    }
+
+    .testimonial-box-container{
+        height: 300px;
+    }
+}
+
+
+@media (max-width: 760px) {
 
     .navbar-brand img {
         width: 20px;
