@@ -131,7 +131,29 @@ body {
   display: none;
   padding: 20px;
 }
-  
+
+/* Porto alegre */
+
+.hospital-info h3 {
+  font-size: 55px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.hospital-info p {
+  margin-top: 100px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.col-md-7 h3{
+  margin-left: 150px;
+}
+
+.col-md-7 p{
+  margin-left: 160px;
+}
+
 /* Footer*/
 
 .footer-image{
@@ -192,18 +214,58 @@ ul.list-unstyled li {
       width: 100%;
       height: auto;
     }
-  }
+
+    /* porto alegre*/
+
+    .hospital-info h3 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+  
+    .hospital-info p {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+  
+    .hospital-img img {
+      width: 100%;
+      height: auto;
+    }
+  
+    /* Centralizando o conteúdo em dispositivos menores */
+    .col-md-7 h3, .col-md-7 p {
+      margin-left: 0;
+      text-align: center;
+    }
+  
+    .hospital-info {
+      text-align: center;
+      margin-left: 0;
+    }
+  
+    .hospital-img {
+      text-align: center;
+    }
+  
+    .hospital-img img {
+      margin: 0 auto;
+    }
+  
+    .d-flex {
+      justify-content: center;
+    }
+}
   
   /* Ajuste para smartphones */
   @media (max-width: 576px) {
     .row {
       display: flex;
-      flex-direction: column-reverse; /* Muda a ordem dos elementos para colocar os textos abaixo da imagem */
-      align-items: center; /* Centraliza os textos */
+      flex-direction: column-reverse; 
+      align-items: center; 
     }
   
     .hospitais-text {
-      font-size: 40px; /* Diminui ainda mais o texto em smartphones */
+      font-size: 40px; 
       width: 250px;
     }
   
@@ -214,27 +276,46 @@ ul.list-unstyled li {
     }
   
     .text-wrapper {
-      
-      position: static; /* Remove o posicionamento absoluto */
-      margin-top: 20px; /* Ajusta a margem */
-      text-align: center; /* Centraliza o texto */
+      position: static; 
+      margin-top: 20px; 
+      text-align: center; 
     }
   
     .banner .bandeirinhas,
     .banner .baloes {
-      display: none; /* Esconde as bandeirinhas e balões em smartphones */
+      display: none; 
     }
   
     .banner .img-fluid {
       width: 100%;
       height: auto;
-      margin-bottom: 20px; /* Adiciona espaço abaixo da imagem */
-    }
+      margin-bottom: 20px; 
     
     .hospitais-text, .sub-text {
       transform: none;
       display: block;
-      text-align: center; /* Centraliza os textos em telas pequenas */
-      margin: 0 auto; /* Garante que os textos fiquem centralizados */
+      text-align: center; 
+      margin: 0 auto; 
     }
+
+    /* Porto Alegre */
+
+    .hospital-info h3 {
+      text-align: center;
+      font-size: 24px;
   }
+
+  .hospital-info p {
+      text-align: center;
+      font-size: 12px;
+  }
+
+  .hospital-img {
+      margin-top: 20px;
+  }
+  
+  .row {
+    margin-bottom: 20px;
+  }
+  }
+}
