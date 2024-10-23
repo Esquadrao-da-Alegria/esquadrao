@@ -110,13 +110,16 @@ body {
   justify-content: space-around;
   align-items: center;
   color: white;
+  gap: 20px;
+  cursor: pointer;
 }
 
 .nav-hospitais-item {
+  position: relative;
+  font-size: 18px;
   font-weight: bold;
-  cursor: pointer;
-  text-transform: uppercase;
-  padding: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .nav-hospitais-item:hover {
@@ -125,17 +128,11 @@ body {
 
 .arrow {
   margin-left: 5px;
+  transition: transform 0.3s ease;
 }
 
-.nav-hospitais-item .arrow:hover{
-  display: block;
-  transform: rotate(90dg);
-  transition: 300ms;
-}
-
-.content {
-  display: none;
-  padding: 20px;
+.nav-hospitais-item:hover .arrow {
+  transform: rotate(180deg);
 }
 
 /* Porto alegre */
