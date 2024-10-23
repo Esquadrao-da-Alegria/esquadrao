@@ -34,12 +34,12 @@ header, .navbar {
 /* Banner principal */
 
 body {
-    background-color: #EEF0D3; /* cor de fundo do banner */
+    background-color: #EEF0D3;
   }
   
   .banner {
     padding-top: 90px;
-    background-color: #EEF0D3; /* cor de fundo do banner */
+    background-color: #EEF0D3;
     position: relative;
   }
   
@@ -121,10 +121,15 @@ body {
 
 .nav-hospitais-item:hover {
   color: yellow;
+  
 }
 
 .arrow {
   margin-left: 5px;
+}
+
+.arrow:active{
+  transform: rotate(180dg);
 }
 
 .content {
@@ -157,10 +162,10 @@ body {
 /* Footer*/
 
 .footer-image{
-    width: 250px;
-    height: 250px;
+    width: 150px;
+    height: 150px;
     margin-top: 80px;
-    margin-left: 150px;
+    margin-left: 50px;
 }
 
 ul.list-unstyled li {
@@ -188,9 +193,9 @@ ul.list-unstyled li {
 /* Responsividade */
 
 /* Ajuste para tablets */
-@media (max-width: 768px) {
+@media (max-width: 860px) {
     .hospitais-text {
-      font-size: 50px; /* Diminui o tamanho do texto em telas menores */
+      font-size: 50px; 
       width: 300px;
     }
   
@@ -201,13 +206,13 @@ ul.list-unstyled li {
     }
   
     .text-wrapper {
-      top: 100px; /* Ajusta a posição do texto em tablets */
+      top: 100px; 
       left: 50px;
     }
   
     .banner .bandeirinhas,
     .banner .baloes {
-      display: none; /* Esconde as bandeirinhas e balões em tablets */
+      display: none; 
     }
   
     .banner .img-fluid {
@@ -232,7 +237,6 @@ ul.list-unstyled li {
       height: auto;
     }
   
-    /* Centralizando o conteúdo em dispositivos menores */
     .col-md-7 h3, .col-md-7 p {
       margin-left: 0;
       text-align: center;
@@ -254,25 +258,46 @@ ul.list-unstyled li {
     .d-flex {
       justify-content: center;
     }
+
+    /* Footer*/
+    .footer-image{
+      width: 100px;
+      height: 100px;
+      margin-top: 80px;
+      margin-right: 100px;
+  }
 }
   
   /* Ajuste para smartphones */
   @media (max-width: 576px) {
+    /* Banner*/
+    .navbar-brand img {
+      margin-left: 30px;
+  }
+
+  .navbar-toggler {
+    margin-right: 40px;
+}
+
+    /*Banner*/
     .row {
       display: flex;
       flex-direction: column-reverse; 
-      align-items: center; 
+      align-items: center;
+       
     }
   
     .hospitais-text {
       font-size: 40px; 
       width: 250px;
+      transform: none;
     }
   
     .sub-text {
-      font-size: 14px;
+      font-size: 18px;
       width: 200px;
-      margin-left: 0;
+      margin-left: 85px;
+      transform: none;
     }
   
     .text-wrapper {
