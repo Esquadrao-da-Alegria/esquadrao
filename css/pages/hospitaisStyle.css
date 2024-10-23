@@ -121,15 +121,16 @@ body {
 
 .nav-hospitais-item:hover {
   color: yellow;
-  
 }
 
 .arrow {
   margin-left: 5px;
 }
 
-.arrow:active{
-  transform: rotate(180dg);
+.nav-hospitais-item .arrow:hover{
+  display: block;
+  transform: rotate(90dg);
+  transition: 300ms;
 }
 
 .content {
@@ -189,6 +190,13 @@ ul.list-unstyled li {
 .text-white {
     text-decoration: none;
 }
+
+.formulario-palhaco{
+  
+  width: 100px;  
+  height: 710px; 
+}
+
 
 /* Responsividade */
 
@@ -266,6 +274,10 @@ ul.list-unstyled li {
       margin-top: 80px;
       margin-right: 100px;
   }
+
+  .formulario-palhaco{
+    display: none;
+  }
 }
   
   /* Ajuste para smartphones */
@@ -342,5 +354,8 @@ ul.list-unstyled li {
   .row {
     margin-bottom: 20px;
   }
+  }
+  .formulario-palhaco{
+    display: none;
   }
 }
