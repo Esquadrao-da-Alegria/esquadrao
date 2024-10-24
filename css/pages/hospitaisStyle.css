@@ -326,24 +326,28 @@ footer p {
     width: 100%;
   }
 
-    .row {
-      display: flex;
-      align-items: center;
-       
-    }
+  .row {
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease; 
+  }
+   
+  .nav-hospitais-item:hover .arrow {
+    transform: rotate(180deg);
+  }
   
-    .hospitais-text {
-      font-size: 40px; 
-      width: 250px;
-      transform: none;
-    }
+  .hospitais-text {
+    font-size: 40px; 
+    width: 250px;
+    transform: none;
+  }
   
-    .sub-text {
-      font-size: 18px;
-      width: 200px;
-      margin-left: 85px;
-      transform: none;
-    }
+  .sub-text {
+    font-size: 18px;
+    width: 200px;
+    margin-left: 85px;
+    transform: none;
+  }
 
     .arrow {
       transition: transform 0.3s ease;
@@ -405,7 +409,6 @@ footer p {
     display: none;
   }
 
-  /* Footer */
  /* Footer */
  footer {
   text-align: center; 
@@ -435,6 +438,23 @@ footer p {
 }
 
 @media(max-width: 430px){
+
+  .banner{
+    width: 100%;
+  }
+
+  .hospitais-text {
+    font-size: 40px; 
+    width: 250px;
+    transform: none;
+  }
+  
+  .sub-text {
+    font-size: 18px;
+    width: 200px;
+    margin-left: 110px;
+    transform: none;
+  }
   .social-icons{
     
     margin-left: 250px;
@@ -442,6 +462,23 @@ footer p {
 }
 
 @media(max-width: 390px){
+
+  .banner{
+    width: 100%;
+  }
+
+  .hospitais-text {
+    font-size: 40px; 
+    width: 250px;
+    transform: none;
+  }
+  
+  .sub-text {
+    font-size: 18px;
+    width: 200px;
+    margin-left: 90px;
+    transform: none;
+  }
 
   .nav-hospitais-item{
     font-size: 14px;
@@ -454,6 +491,23 @@ footer p {
 }
 
  @media(max-width: 320px){
+
+  .banner{
+    width: 100%;
+  }
+
+  .hospitais-text {
+    font-size: 40px; 
+    width: 250px;
+    transform: none;
+  }
+  
+  .sub-text {
+    font-size: 18px;
+    width: 200px;
+    margin-left: 55px;
+    transform: none;
+  }
 
   .nav-hospitais-item{
     font-size: 12px;
