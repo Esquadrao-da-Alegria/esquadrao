@@ -229,6 +229,29 @@ footer p {
 
 /* Responsividade */
 
+@media (max-width: 896px){
+  .text-wrapper {
+    top: 100px; 
+    left: 2px;
+  }
+
+  .hospitais-text {
+    font-size: 50px; 
+    width: 300px;
+  }
+
+  .sub-text {
+    font-size: 20px;
+    width: 300px;
+    margin-left: 50px;
+  }
+
+  .formulario-palhaco{
+    display: none;
+  }
+  
+}
+
 /* Ajuste para tablets */
 @media (max-width: 860px) {
     .hospitais-text {
