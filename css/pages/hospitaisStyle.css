@@ -1,0 +1,358 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&display=swap');
+
+/* Gerais */
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding-top: 70px;
+}
+
+.row {
+    margin: 0;
+}
+
+/* Navbar */
+header, .navbar {
+    background-color: #F3F8FF;
+}
+
+.navbar-brand img {
+    width: 75px;
+}
+
+#navbar-links a {
+    text-decoration: none;
+    color: #02033B;
+    transition: 0.2s;
+}
+
+#navbar-links a:hover {
+    color: #ED1B24;
+}
+
+
+/* Banner principal */
+
+body {
+    background-color: #EEF0D3;
+  }
+  
+  .banner {
+    padding-top: 90px;
+    background-color: #EEF0D3;
+    position: relative;
+  }
+  
+  .banner-text {
+    position: relative;
+  }
+  
+  .text-wrapper {
+    position: absolute;
+    top: 125px; 
+    left: 100px;
+  }
+  
+  .hospitais-text {
+    font-size: 65px;
+    width: 350px;
+    height: auto;
+    font-weight: bold;
+    background-color: #ffeb3b;
+    padding: 10px;
+    margin-left: 10px;
+    transform: rotate(-10deg);
+    display: inline-block;
+  }
+  
+  .sub-text {
+    background-color: #F4D94E66;
+    width: 290px;
+    height: 60px;
+    padding: 15px 10px;
+    font-size: 20px;
+    margin-left: 150px;
+  }
+  
+  .banner img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+.banner .bandeirinhas {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 40%; 
+    height: auto;
+    z-index: 1; 
+}
+  
+.banner .baloes {
+    position: absolute;
+    margin-left: 410px;
+    margin-top: 20px;
+    width: 50%; 
+    height: 50%;
+    z-index: 2; 
+}
+  
+.col-md-6 {
+    position: relative;
+}
+
+/* hospitais navigation */
+
+.nav-hospitais {
+  background-color: #4BA3E7;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: white;
+  gap: 20px;
+  cursor: pointer;
+}
+
+.nav-hospitais-item {
+  position: relative;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.nav-hospitais-item:hover {
+  color: yellow;
+}
+
+.arrow {
+  margin-left: 5px;
+  transition: transform 0.3s ease;
+}
+
+.nav-hospitais-item:hover .arrow {
+  transform: rotate(180deg);
+}
+
+/* Porto alegre */
+
+.hospital-info h3 {
+  font-size: 55px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.hospital-info p {
+  margin-top: 100px;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.col-md-7 h3{
+  margin-left: 150px;
+}
+
+.col-md-7 p{
+  margin-left: 160px;
+}
+
+/* Footer*/
+
+.footer-image{
+    width: 150px;
+    height: 150px;
+    margin-top: 80px;
+    margin-left: 50px;
+}
+
+ul.list-unstyled li {
+    margin-bottom: 10px;
+}
+
+.social-icons {
+    margin-top: 300px;
+    margin-right: 120px;
+}
+
+.social-icons a {
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: #fff;
+}
+
+.text-white {
+    text-decoration: none;
+}
+
+.formulario-palhaco{
+  
+  width: 100px;  
+  height: 710px; 
+}
+
+
+/* Responsividade */
+
+/* Ajuste para tablets */
+@media (max-width: 860px) {
+    .hospitais-text {
+      font-size: 50px; 
+      width: 300px;
+    }
+  
+    .sub-text {
+      font-size: 16px;
+      width: 250px;
+      margin-left: 10px;
+    }
+  
+    .text-wrapper {
+      top: 100px; 
+      left: 50px;
+    }
+  
+    .banner .bandeirinhas,
+    .banner .baloes {
+      display: none; 
+    }
+  
+    .banner .img-fluid {
+      width: 100%;
+      height: auto;
+    }
+
+    /* porto alegre*/
+
+    .hospital-info h3 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+  
+    .hospital-info p {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+  
+    .hospital-img img {
+      width: 100%;
+      height: auto;
+    }
+  
+    .col-md-7 h3, .col-md-7 p {
+      margin-left: 0;
+      text-align: center;
+    }
+  
+    .hospital-info {
+      text-align: center;
+      margin-left: 0;
+    }
+  
+    .hospital-img {
+      text-align: center;
+    }
+  
+    .hospital-img img {
+      margin: 0 auto;
+    }
+  
+    .d-flex {
+      justify-content: center;
+    }
+
+    /* Footer*/
+    .footer-image{
+      width: 100px;
+      height: 100px;
+      margin-top: 80px;
+      margin-right: 100px;
+  }
+
+  .formulario-palhaco{
+    display: none;
+  }
+}
+  
+  /* Ajuste para smartphones */
+  @media (max-width: 576px) {
+    /* Banner*/
+    .navbar-brand img {
+      margin-left: 30px;
+  }
+
+  .navbar-toggler {
+    margin-right: 40px;
+}
+
+    /*Banner*/
+    .row {
+      display: flex;
+      flex-direction: column-reverse; 
+      align-items: center;
+       
+    }
+  
+    .hospitais-text {
+      font-size: 40px; 
+      width: 250px;
+      transform: none;
+    }
+  
+    .sub-text {
+      font-size: 18px;
+      width: 200px;
+      margin-left: 85px;
+      transform: none;
+    }
+  
+    .text-wrapper {
+      position: static; 
+      margin-top: 20px; 
+      text-align: center; 
+    }
+  
+    .banner .bandeirinhas,
+    .banner .baloes {
+      display: none; 
+    }
+  
+    .banner .img-fluid {
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px; 
+    
+    .hospitais-text, .sub-text {
+      transform: none;
+      display: block;
+      text-align: center; 
+      margin: 0 auto; 
+    }
+
+    /* Porto Alegre */
+
+    .hospital-info h3 {
+      text-align: center;
+      font-size: 24px;
+  }
+
+  .hospital-info p {
+      text-align: center;
+      font-size: 12px;
+  }
+
+  .hospital-img {
+      margin-top: 20px;
+  }
+  
+  .row {
+    margin-bottom: 20px;
+  }
+  }
+  .formulario-palhaco{
+    display: none;
+  }
+}

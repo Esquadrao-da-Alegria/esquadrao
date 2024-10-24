@@ -4,14 +4,11 @@
 /* Gerais */
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding-top: 70px;
 }
 
 .row {
     margin: 0;
-}
-
-body {
-    padding-top: 70px; 
 }
 
 /* Navbar */

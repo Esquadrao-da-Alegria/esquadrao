@@ -1,8 +1,10 @@
-// Pegue o elemento do hamburger menu
-var hamburger = document.querySelector('.hamburger-menu');
-var nav = document.querySelector('.main-nav');
+function showContent(city) {
+    // Oculta todos os conteúdos
+    let contents = document.querySelectorAll('.content');
+    contents.forEach(function(content) {
+        content.style.display = 'none';
+    });
 
-// Adicione um evento de clique ao hamburger para alternar a visibilidade do menu
-hamburger.addEventListener('click', function() {
-    nav.style.display = nav.style.display === 'block' ? 'none' : 'block';
-});
+    // Exibe o conteúdo da cidade selecionada
+    document.getElementById(city).style.display = 'block';
+}
