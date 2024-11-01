@@ -14,25 +14,6 @@ body {
   padding-top: 70px; 
 }
 
-/* Navbar */
-header, .navbar {
-  background-color: #F3F8FF;
-}
-
-.navbar-brand img {
-  width: 75px;
-}
-
-#navbar-links a {
-  text-decoration: none;
-  color: #02033B;
-  transition: 0.2s;
-}
-
-#navbar-links a:hover {
-  color: #ED1B24;
-}
-
 
 /* Banner principal */
 
@@ -206,27 +187,6 @@ footer {
   text-decoration: underline;
 }
 
-footer p {
-  margin-bottom: 0;
-}
-
-.social-icons {
-  position: absolute;
-  bottom: 10px;
-  right: 20px;
-}
-
-.social-icons a {
-  color: #fff;
-  font-size: 1.5rem;
-  margin-right: 15px;
-}
-
-.social-icons a:hover {
-  color: #ddd;
-}
-
-
 /* Responsividade */
 
 @media (max-width: 896px){
@@ -334,17 +294,8 @@ footer p {
   
   /* Ajuste para smartphones */
   @media (max-width: 760px) {
-    /* Banner*/
-    .navbar-brand img {
-      margin-left: 30px;
-  }
-
-  .navbar-toggler {
-    margin-right: 40px;
-}
-
+  
     /*Banner*/
-
   .banner{
     width: 100%;
   }
@@ -453,11 +404,6 @@ footer p {
   transform: none;
 }
 
-.social-icons{
-  width: 150px;
-  left: 0;
-}
-
 }
 
 @media(max-width: 430px){
@@ -478,10 +424,6 @@ footer p {
     margin-left: 110px;
     transform: none;
   }
-  .social-icons{
-    
-    margin-left: 250px;
- }
 }
 
 @media(max-width: 390px){
@@ -507,10 +449,6 @@ footer p {
     font-size: 14px;
   }
 
-  .social-icons{
-    
-    margin-left: 220px;
- }
 }
 
  @media(max-width: 320px){

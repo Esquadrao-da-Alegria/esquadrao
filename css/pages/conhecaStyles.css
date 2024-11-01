@@ -311,22 +311,7 @@ header, .navbar {
 }
 
 
-/* Footer */
 
-footer {
-    background: #ED1B24;
-    color: #fff;
-    margin-top: 370px;
-    position: relative;
-    padding: 50px 0;
-    height: auto; 
-}
-
-.footer-image {
-    width: 100%;
-    max-width: 150px; 
-    margin-left: 90px;
-}
 
 
 .options-section h5 {
@@ -353,25 +338,7 @@ footer {
     text-decoration: underline;
 }
 
-footer p {
-    margin-bottom: 0;
-}
 
-.social-icons {
-    position: absolute;
-    bottom: 10px;
-    right: 20px;
-}
-
-.social-icons a {
-    color: #fff;
-    font-size: 1.5rem;
-    margin-right: 15px;
-}
-
-.social-icons a:hover {
-    color: #ddd;
-}
 
 /* Responsividade */
 
@@ -525,18 +492,6 @@ footer p {
         height: 350px; 
     }
 
-    /* Footer */
-    footer .footer-image {
-        width: 120px;
-    }
-
-    footer .options-section h5 {
-        font-size: 1.2rem;
-    }
-
-    footer .social-icons {
-        right: 20px; 
-    }
 }
 
 @media (max-width: 834px) {
@@ -622,22 +577,10 @@ footer p {
         font-size: 18px; 
     }
 
-    /* Ajustes na seção de depoimentos */
     .testimonial-box {
         margin-bottom: 20px; 
     }
-
-    /* Ajustes no rodapé */
-    footer .options-section {
-        text-align: center;
-    }
-
-    .social-icons {
-        bottom: 10px; 
-        right: 10px; 
-    }
-    
-    /* Ajustes para a imagem da palhaça */
+  
     .formulario-palhaco img {
         width: 100%; 
         height: auto; 
@@ -780,17 +723,6 @@ footer p {
 
     /* Nossa motivação*/
 
-    .social-icons {
-        left: 0;
-        text-align: right;
-        bottom: 15px;
-        margin-left: 200px;
-    }
-
-    .social-icons a {
-        margin-right: 2px;
-    }
-
     .nossa-motivacao{
         height: 1200px;
     }
@@ -911,18 +843,7 @@ footer p {
         display: none;
     }
 
-
-    /* Footer */
-    footer {
-        text-align: center; 
-    }
-    
-    .footer-image {
-        margin-bottom: 20px;
-        margin-right: 80px;
-    }
-
-    
+ 
     .options-section ul {
         line-height: 1.8; 
     }
@@ -931,10 +852,5 @@ footer p {
     .position-absolute {
         position: relative;
         transform: none;
-    }
-
-    .social-icons{
-        width: 150px;
-        left: 0;
     }
 }

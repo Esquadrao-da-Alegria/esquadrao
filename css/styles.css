@@ -11,25 +11,6 @@ body {
     margin: 0;
 }
 
-/* Navbar */
-header, .navbar {
-    background-color: #F3F8FF;
-}
-
-.navbar-brand img {
-    width: 75px;
-}
-
-#navbar-links a {
-    text-decoration: none;
-    color: #02033B;
-    transition: 0.2s;
-}
-
-#navbar-links a:hover {
-    color: #ED1B24;
-}
-
 /* Quem somos */
 .banner {
     position: relative;
@@ -419,37 +400,6 @@ header, .navbar {
 
 }
 
-/* Footer */
-
-.footer-image{
-    width: 250px;
-    height: 250px;
-    margin-top: 80px;
-    margin-left: 150px;
-}
-
-ul.list-unstyled li {
-    margin-bottom: 10px;
-}
-
-.social-icons {
-    margin-top: 300px;
-    margin-right: 120px;
-}
-
-.social-icons a {
-    font-size: 20px;
-    transition: color 0.3s;
-}
-
-.social-icons a:hover {
-    color: #fff;
-}
-
-.text-white {
-    text-decoration: none;
-}
-
 
 /* Responsividade */
 /*Estrela fora de alinhamento em tela muito grande*/
@@ -477,10 +427,12 @@ ul.list-unstyled li {
         bottom: 30%;
         left: 50%;
     }
+
+    
 }
 
 
-@media (max-width: 1390px) {
+@media (max-width: 1440px) {
 
     #conheca .conheca-img {
         width: 100%; 
@@ -571,30 +523,12 @@ ul.list-unstyled li {
         width: 50%;
         font-size: 1rem; 
     }
-
-    /* Footer*/
-
-    /* Ajusta o padding e margens no footer */
-    footer {
-        height: auto; 
-        padding: 20px 0; 
-    }
-
-     .footer-image {
-        width: 120px;
-        height: auto; 
-        margin-left: 50px;
-    }
-
-    .formulario-palhaco{
-        display: none;
-    }
 }
 
 
 
 /* Ajustes para telas menores */
-@media (max-width: 768px) {
+@media (max-width: 520px) {
     .introducao {
         display: flex;
         flex-direction: column; 
@@ -605,15 +539,6 @@ ul.list-unstyled li {
     .col-md-6 img {
         width: 100%;
         height: auto; 
-    }
-
-    .navbar-brand img {
-        width: 75px;
-        margin-left: 25px;
-      }
-
-    .navbar-toggler {
-        margin-right: 25px;
     }
 
     .text-section {
@@ -669,22 +594,6 @@ ul.list-unstyled li {
         font-size: 1rem; 
         margin-top: 0;
         padding-top: 5px;
-    }
-    
-    /* Footer */
-    .footer-image{
-        width: 100px;
-        height: 100px;
-        margin-left: 10px;
-    }
-
-    .social-icons {
-        margin-right: -20px;
-        margin-top: 20px;
-        margin-left: 90px;
-    }
-    .opcoes{
-        margin-top: 30px;
     }
 }
 
