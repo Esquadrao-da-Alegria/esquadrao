@@ -55,8 +55,8 @@ body {
 
 .rotate-right {
     position: absolute;
-    top: 49%; /* Mantém a posição */
-    left: -10%; /* Move o texto para a esquerda */
+    top: 49%; 
+    left: -10%;
     width: 410px;
     font-size: 18px;
     background-color: whitesmoke;
@@ -67,8 +67,8 @@ body {
 
 .image-logo {
     position: absolute;
-    margin-top: 250px; /* Mantém a posição */
-    left: 43%; /* Alinha para a direita */
+    margin-top: 240px; 
+    left: 45%; 
     max-width: 120px;
     height: auto;
 }
@@ -404,6 +404,25 @@ body {
 /* Responsividade */
 /*Estrela fora de alinhamento em tela muito grande*/
 @media (min-width: 1800px) {
+
+    .image-logo{
+        position: absolute;
+        margin-top: 250px; 
+        left: 43%; 
+        max-width: 120px;
+        height: auto;
+    }
+
+    .col-md-6 .rotate-right{
+        position: absolute;
+        top: 49%;
+        left: -10%;
+        width: 410px;
+        font-size: 17px;
+        background-color: whitesmoke;
+        transform: rotate(1deg);
+    }
+    
     .star.top {
         top: 10%;
     }
@@ -426,9 +445,7 @@ body {
     .star.bottom {
         bottom: 30%;
         left: 50%;
-    }
-
-    
+    }  
 }
 
 

@@ -1,5 +1,4 @@
 /* Footer */
-
 .footer-image {
     width: 150px;
     height: auto;
@@ -52,7 +51,7 @@ ul.list-unstyled li {
      .footer-image {
         width: 120px;
         height: auto; 
-        margin-left: 50px;
+        margin-right: 10px;
     }
 
     .formulario-palhaco{
@@ -60,7 +59,7 @@ ul.list-unstyled li {
     }
 
     footer .col-md-4{
-        margin-left: 50px;
+        margin-right: 100px;
     }
 }
 
