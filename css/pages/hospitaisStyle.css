@@ -25,11 +25,35 @@ body {
     width: 100%;
     padding-top: 50px;
     background-color: #EEF0D3;
+    overflow: hidden;
   }
 
-  .img-palhaco{
+  .banner .container{
+    width: 100%;
+  }
+  
+  .img-palhaco {
     max-width: 130%;
     height: auto;
+    position: relative; 
+    z-index: 3; 
+  }
+  
+  .banner .baloes {
+    position: absolute;
+    margin-left: 640px;
+    width: 18%;
+    height: 45%;
+    z-index: 1; 
+  }
+  
+  .bandeirinhas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: auto;
+    z-index: 1;
   }
   
   .banner-text {
@@ -39,8 +63,7 @@ body {
   .text-wrapper {
     position: absolute;
     top: 200px;
-    left: -10px; 
-    
+    left: -10px;
   }
   
   .hospitais-text {
@@ -64,28 +87,6 @@ body {
     margin-left: 200px;
   }
   
-  
-.banner .bandeirinhas {
-    position: absolute;
-    top: 0; 
-    left: 0;
-    width: 40%; 
-    height: auto;
-    z-index: 1; 
-}
-  
-.banner .baloes {
-    position: absolute;
-    margin-left: 650px;
-    margin-top: 100px;
-    width: 50%; 
-    height: 50%;
-    z-index: 2; 
-}
-  
-.col-md-6 {
-    position: relative;
-}
 
 /* hospitais navigation */
 
@@ -306,11 +307,10 @@ footer {
 
   .banner .baloes {
     position: absolute;
-    margin-left: 360px;
-    margin-top: 50px;
-    width: 50%; 
-    height: 50%;
-    z-index: 2; 
+    margin-left: 370px;
+    width: 18%; 
+    height: 45%;
+    z-index: 1; 
 }
 }
 
@@ -472,9 +472,7 @@ footer {
     transition: transform 0.3s ease; 
   }
    
-  .nav-hospitais-item:hover .arrow {
-    transform: rotate(180deg);
-  }
+  
   
   .hospitais-text {
     font-size: 40px; 
@@ -489,17 +487,13 @@ footer {
     transform: none;
   }
 
-    .arrow {
-      transition: transform 0.3s ease;
-    }
+    
 
     .nav-hospitais-item{
       font-size: 15px;
     }
     
-    .nav-hospitais-item:hover .arrow {
-      transform: rotate(180deg);
-    }
+    
   
     .text-wrapper {
       position: static; 
