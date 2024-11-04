@@ -22,9 +22,14 @@ body {
   }
   
   .banner {
-    padding-top: 90px;
+    width: 100%;
+    padding-top: 50px;
     background-color: #EEF0D3;
-    position: relative;
+  }
+
+  .img-palhaco{
+    max-width: 130%;
+    height: auto;
   }
   
   .banner-text {
@@ -33,13 +38,14 @@ body {
   
   .text-wrapper {
     position: absolute;
-    top: 125px; 
-    left: 100px;
+    top: 200px;
+    left: -10px; 
+    
   }
   
   .hospitais-text {
-    font-size: 65px;
-    width: 350px;
+    font-size: 95px;
+    width: 500px;
     height: auto;
     font-weight: bold;
     background-color: #ffeb3b;
@@ -51,17 +57,13 @@ body {
   
   .sub-text {
     background-color: #F4D94E66;
-    width: 290px;
-    height: 60px;
-    padding: 15px 10px;
-    font-size: 20px;
-    margin-left: 150px;
+    font-size: 30px;
+    width: 430px;
+    height: 90px;
+    padding: 25px 10px;
+    margin-left: 200px;
   }
   
-  .banner img {
-    max-width: 100%;
-    height: auto;
-  }
   
 .banner .bandeirinhas {
     position: absolute;
@@ -74,8 +76,8 @@ body {
   
 .banner .baloes {
     position: absolute;
-    margin-left: 410px;
-    margin-top: 20px;
+    margin-left: 650px;
+    margin-top: 100px;
     width: 50%; 
     height: 50%;
     z-index: 2; 
@@ -189,6 +191,161 @@ footer {
 
 /* Responsividade */
 
+@media(max-width: 1800){
+  banner {
+    width: 100%;
+    padding-top: 50px;
+    background-color: #EEF0D3;
+  }
+
+  .img-palhaco{
+    max-width: 130%;
+    height: auto;
+  }
+  
+  .banner-text {
+    position: relative;
+  }
+  
+  .text-wrapper {
+    position: absolute;
+    top: 200px;
+    left: -10px; 
+    
+  }
+  
+  .hospitais-text {
+    font-size: 95px;
+    width: 500px;
+    height: auto;
+    font-weight: bold;
+    background-color: #ffeb3b;
+    padding: 10px;
+    margin-left: 10px;
+    transform: rotate(-10deg);
+    display: inline-block;
+  }
+  
+  .sub-text {
+    background-color: #F4D94E66;
+    font-size: 30px;
+    width: 430px;
+    height: 90px;
+    padding: 25px 10px;
+    margin-left: 200px;
+  }
+  
+  
+.banner .bandeirinhas {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 40%; 
+    height: auto;
+    z-index: 1; 
+}
+  
+.banner .baloes {
+    position: absolute;
+    margin-left: 650px;
+    margin-top: 100px;
+    width: 50%; 
+    height: 50%;
+    z-index: 2; 
+}
+  
+.col-md-6 {
+    position: relative;
+}
+}
+
+@media(max-width: 1440px){
+  .text-wrapper {
+    position: absolute;
+    top: 100px;
+  }
+  
+  .hospitais-text {
+    font-size: 70px;
+    width: 370px;
+    height: auto;
+    font-weight: bold;
+    background-color: #ffeb3b;
+    padding: 10px;
+    margin-left: 110px;
+    transform: rotate(-10deg);
+    display: inline-block;
+  }
+  
+  .sub-text {
+    background-color: #F4D94E66;
+    font-size: 20px;
+    width: 300px;
+    height: 60px;
+    padding: 15px 10px;
+    margin-left: 240px;
+  }
+  
+  
+  .banner .bandeirinhas {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 40%; 
+    height: auto;
+    z-index: 1; 
+}
+
+  .img-palhaco{
+    width: 90%;
+  }
+  
+  .banner .bandeirinhas{
+    width: 40%;
+  }
+
+  .banner .baloes {
+    position: absolute;
+    margin-left: 360px;
+    margin-top: 50px;
+    width: 50%; 
+    height: 50%;
+    z-index: 2; 
+}
+}
+
+@media(max-width: 1024){
+  /* Banner */
+  .text-wrapper {
+    top: 100px; 
+    left: -80px;
+  }
+
+  .hospitais-text {
+    margin-right: 150px;
+    font-size: 40px; 
+    width: 230px;
+  }
+
+  .sub-text {
+    font-size: 14px;
+    width: 210px;
+    margin-left: 200px;
+  }
+
+  
+  .hospitais-text {
+    margin-left: 150px;
+    font-size: 40px; 
+    width: 230px;
+  }
+
+  .banner .bandeirinhas,
+  .banner .baloes {
+    display: none; 
+  }
+}
+
 @media (max-width: 896px){
   .text-wrapper {
     top: 100px; 
@@ -214,20 +371,29 @@ footer {
 
 /* Ajuste para tablets */
 @media (max-width: 860px) {
-    .hospitais-text {
-      font-size: 50px; 
-      width: 300px;
-    }
-  
-    .sub-text {
-      font-size: 16px;
-      width: 250px;
-      margin-left: 10px;
-    }
-  
+    /* Banner */
     .text-wrapper {
       top: 100px; 
-      left: 50px;
+      left: -80px;
+    }
+
+    .hospitais-text {
+      margin-right: 150px;
+      font-size: 40px; 
+      width: 230px;
+    }
+
+    .sub-text {
+      font-size: 14px;
+      width: 210px;
+      margin-left: 200px;
+    }
+
+    
+    .hospitais-text {
+      margin-left: 150px;
+      font-size: 40px; 
+      width: 230px;
     }
   
     .banner .bandeirinhas,
@@ -235,8 +401,8 @@ footer {
       display: none; 
     }
   
-    .banner .img-fluid {
-      width: 100%;
+    .banner .img-palhaco{
+      max-width: 100%;
       height: auto;
     }
 
@@ -293,7 +459,7 @@ footer {
 }
   
   /* Ajuste para smartphones */
-  @media (max-width: 760px) {
+  @media (max-width: 520px) {
   
     /*Banner*/
   .banner{
@@ -346,10 +512,10 @@ footer {
       display: none; 
     }
   
-    .banner .img-fluid {
-      width: 100%;
+    .banner .img-palhaco{
+      max-width: 100%;
       height: auto;
-      margin-bottom: 20px; 
+    }
     
     .hospitais-text, .sub-text {
       transform: none;
@@ -404,8 +570,6 @@ footer {
   transform: none;
 }
 
-}
-
 @media(max-width: 430px){
 
   .banner{
@@ -434,15 +598,13 @@ footer {
 
   .hospitais-text {
     font-size: 40px; 
-    width: 250px;
-    transform: none;
+    
   }
   
   .sub-text {
     font-size: 18px;
     width: 200px;
-    margin-left: 90px;
-    transform: none;
+    margin-left: 70px;
   }
 
   .nav-hospitais-item{
