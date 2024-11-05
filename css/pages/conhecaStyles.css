@@ -33,30 +33,30 @@ header, .navbar {
     color: #ED1B24;
 }
 
-/* Carrousel */
-
-.carousel-inner .carousel-item .d-block{
-    height: 950px; 
-    object-fit: cover;
-    object-position: 0 10%;
+.carousel-inner .carousel-item .d-block {
+    height: 700px; 
+    object-fit: cover; 
+    object-position: 100% 20%; 
 }
 
 .carousel-indicators li {
     width: 12px;
-    height: 70px;
-    border-radius: 100%; 
+    height: 50px; 
+    border-radius: 50%; 
     background-color: rgba(255, 255, 255, 0.5); 
 }
+
 
 .carousel-indicators .active {
     background-color: white; 
     width: 12px;
-    height: 70px;
+    height: 12px;
 }
 
-.carousel-indicators li::before {
-    content: none;
+.carousel-indicators li [data-bs-slide-to] {
+    display: none; 
 }
+
 
 /* Por que somos palhaços*/
 
@@ -144,6 +144,7 @@ header, .navbar {
     gap: 20px;
     margin-top: 100px;
 }
+
 .testimonial-box {
     background-color: white;
     padding: 20px;
@@ -153,48 +154,9 @@ header, .navbar {
     height: 200px;
     max-width: 100%;
 }
-.box-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-.profile {
-    display: flex;
-    align-items: center;
-}
-.profile-img img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-}
-.name-user {
-    margin-left: 10px;
-}
-.name-user strong {
-    display: block;
-    font-size: 16px;
-}
-.name-user span {
-    font-size: 14px;
-    color: #555;
-}
-
-.box-top {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-.reviews {
-    text-align: right; 
-    width: 100%; 
-}
-
-.reviews i {
-    color: #ffcc00;
-}
 
 .client-comment img {
+    margin-right: 10px;
     width: 100%;
     height: 100%;
 }
@@ -341,6 +303,15 @@ header, .navbar {
 /* Ajuste para telas muito grandes */
 @media (min-width: 1800px) {
      /* Navbar */
+
+     .image-logo{
+        position: absolute;
+        margin-top: 250px; 
+        left: 43%; 
+        max-width: 120px;
+        height: auto;
+    }
+
      .navbar-brand img {
         width: 50px; 
         height: 50px;
@@ -355,23 +326,23 @@ header, .navbar {
         font-size: 1.5rem; 
     }
 
+     /* Ajusta os controles do carrossel para telas grandes */
     .carousel-inner .carousel-item .d-block {
-        height: 1300px; 
+        height: 850px; 
+        object-fit: cover; 
+        object-position: 120% 20%; 
     }
 
-    /* Ajusta os controles do carrossel para telas grandes */
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
         width: 60px; 
         height: 60px;
     }
 
-    /* Indicadores do carrossel para telas grandes */
     .carousel-indicators li {
         width: 20px; 
         height: 20px;
     }
-
 
     /* Por que somos palhaços*/
     .porque-somos-palhacos {
@@ -426,69 +397,6 @@ header, .navbar {
     }
 }
 
-@media (max-width: 992px) {
-    /* Ajustes no header (nav bar) */
-    header .navbar-brand img {
-        width: 150px; /
-    }
-    
-    .navbar-collapse {
-        justify-content: center; 
-    }
-    
-    .navbar-nav .nav-link {
-        font-size: 1rem; 
-    }
-
-    /* Ajustes no carrossel */
-    .carousel-inner img {
-        height: 500px; 
-        object-position: 0 30%; 
-    }
-
-    /* Seção "Por que Somos Palhaços?" */
-    .porque-somos-palhacos-section h1.porque-somos-palhacos {
-        font-size: 2rem; 
-    }
-
-    .porque-somos-palhacos-section p.descricao {
-        font-size: 0.9rem;
-    }
-
-    .icon {
-        width: 50px; 
-    }
-
-    /* Testemunhos */
-    .testimonial-box {
-        margin-bottom: 20px; 
-    }
-
-    /* Nossa motivação */
-    .nossa-motivacao h2 {
-        font-size: 2rem; 
-    }
-
-    /* Seção de serviços */
-    .servico-detalhe {
-        text-align: center;
-    }
-
-    .servico-detalhe .servico-icon {
-        width: 40px; 
-    }
-
-    .servico-card {
-        padding: 20px; 
-    }
-
-    /* Imagem de palhaço no final da seção */
-    .formulario-palhaco img {
-        width: 350px;
-        height: 350px; 
-    }
-
-}
 
 @media (max-width: 834px) {
     /* Ajustes no Navbar */
@@ -525,12 +433,12 @@ header, .navbar {
     }
 
     /* Ajustes nos textos */
-    .porque-somos-palhacos .texto-menor{
-        margin-right: 400px;
+    .porque-somos-palhacos-section .texto-menor{
+        margin-right: 600px;
     }
 
-    .porque-somos-palhacos .texto-maior{
-        margin-right: 400px;
+    .porque-somos-palhacos-section .texto-maior{
+        margin-right: 600px;
     }
 
     .col-md-1{
@@ -587,14 +495,23 @@ header, .navbar {
     
     .navbar-brand img {
         width: 20px;
-        height: 90px;
+        height: 50px;
     }
 
     .navbar-toggler {
-        margin-right: 100px;
+        margin-right: 200px;
       
     }
-    
+
+    /* Por que somos palhaços */
+    .porque-somos-palhacos {
+        font-size: 2rem;
+        margin-right: 150px;
+        text-align: center; 
+        margin-right: 10; 
+        margin-left: 0; 
+    }
+
     /* Nossa motivação*/
     .nossa-motivacao{
         height: 950px;
@@ -629,6 +546,7 @@ header, .navbar {
     .porque-somos-palhacos-section .row {
         margin-top: 30px; 
     }
+
     .porque-somos-palhacos {
         font-size: 2rem;
         margin-right: 100px;

@@ -198,7 +198,17 @@ footer {
 /* Responsividade */
 
 @media(max-width: 1800px){
-  banner {
+  
+  .image-logo{
+    position: absolute;
+    margin-top: 250px; 
+    left: 43%; 
+    max-width: 120px;
+    height: auto;
+}
+
+
+  .banner {
     width: 100%;
     padding-top: 50px;
     background-color: #EEF0D3;
