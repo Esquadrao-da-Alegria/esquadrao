@@ -15,7 +15,14 @@ function showContent(city, element) {
 
     // Define o novo item ativo, altera a seta para ▼ e mantém a seta assim
     element.querySelector('.arrow').innerHTML = '▼';
-
+        
     // Atualiza o item ativo
     activeItem = element;
+
+     // Remover a classe 'active' de todos os itens
+     const items = document.querySelectorAll('.nav-hospitais-item');
+     items.forEach(item => item.classList.remove('active'));
+
+     // Adicionar a classe 'active' ao item clicado
+     element.classList.add('active');
 }

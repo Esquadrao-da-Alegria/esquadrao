@@ -114,6 +114,10 @@ body {
   color: yellow;
 }
 
+.nav-hospitais-item.active {
+  color: yellow; 
+}
+
 .arrow {
   margin-left: 5px;
   transition: transform 0.3s ease;
