@@ -33,12 +33,6 @@ header, .navbar {
     color: #ED1B24;
 }
 
-.carousel-inner .carousel-item .d-block {
-    height: 700px; 
-    object-fit: cover; 
-    object-position: 100% 20%; 
-}
-
 .carousel-indicators li {
     width: 12px;
     height: 50px; 
@@ -350,29 +344,32 @@ header, .navbar {
     }
 
     .porque-somos-palhacos-section .texto-menor {
-        margin-left: 280px;
+        margin-left: 550px;
         font-size: 2.5rem;
     }
 
     .porque-somos-palhacos-section .texto-maior {
-        margin-left: 280px;
+        margin-left: 550px;
         font-size: 5rem; 
     }
 
     .descricao {
         font-size: 1.8rem; 
         line-height: 1.6; 
-        margin-bottom: 50px; 
+        margin-bottom: 50px;
+        margin-left: 550px; 
     }
 
     .icon {
         width: 80px; 
         height: auto; 
+        margin-left: 300px;
     }
 
     .text, .bold-text {
-        font-size: 1.7rem; 
+        font-size: 1.5rem; 
         line-height: 1.5;
+        margin-left: 250px;
     }
 
     .bold-text {
@@ -382,17 +379,68 @@ header, .navbar {
     .row {
         margin-top: 80px; 
     }
+
+    .nossa-motivacao h2 {
+        font-size: 50px;
+    }
+
+    .testimonial-box {
+        width: 300px;
+        height: 200px;
+    }
+
+    .como-nos-preparamos .texto-menor {
+        font-size: 40px;        
+      }
+    
+      .como-nos-preparamos .texto-maior {
+         font-size: 70px;        
+    }
+    
+    .como-nos-preparamos .descricao {
+    width: 100%;
+    font-size: 20px;
+    line-height: 1.0;
+    }
 }
 
 @media(max-width: 1440px){
+
+     /* Ajusta os controles do carrossel para notebooks */
+     .carousel-inner .carousel-item .d-block {
+        height: 600px;
+        object-fit: cover;
+        object-position: 120% 15%;
+      }
+
+
     .porque-somos-palhacos-section .texto-menor {
-        margin-left: 280px;
+        margin-left: 350px;
         font-size: 2rem;
     }
 
     .porque-somos-palhacos-section .texto-maior {
-        margin-left: 280px;
+        margin-left: 350px;
         font-size: 4rem; 
+    }
+
+    .descricao {
+
+        margin-left: 350px; 
+    }
+
+    .icon {
+        margin-left: 150px;
+    }
+
+    .text, .bold-text {
+        font-size: 1.0rem; 
+        line-height: 1.2;
+        margin-left: 120px;
+    }
+
+    .bold-text {
+        font-weight: bold; 
     }
 }
 
