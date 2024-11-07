@@ -542,6 +542,13 @@ body {
     }
 }
 
+@media(max-width: 768px){
+
+    .btn-custom{
+        margin-right: 25px;
+    }
+}
+
 
 
 /* Ajustes para telas menores */
