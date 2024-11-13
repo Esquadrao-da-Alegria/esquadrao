@@ -89,6 +89,7 @@ body {
     display: none;
 }
 
+/* Timeline */
 .image-container img {
     height: auto;
     display: block;
@@ -131,6 +132,35 @@ body {
     width: 20%;
     text-align: center;
     align-self: flex-end; 
+}
+
+/* Linha amarela apontando para a direita no círculo */
+.year-circle::after {
+    content: "";
+    position: absolute;
+    right: -40px;
+    top: 70px;
+    width: 40px;
+    height: 2px;
+    background-color: yellow;
+    transform: translateY(-50%);
+}
+
+/* Linha amarela apontando para baixo na localização */
+.location::before {
+    content: "";
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    width: 2px;
+    height: 30px;
+    background-color: yellow;
+    transform: translateX(-50%);
+}
+
+/* Remove a linha da direita do último item */
+.timeline .year:last-child .year-circle::after {
+    display: none;
 }
 
 
@@ -426,6 +456,22 @@ body {
     .directors-info {
         margin-bottom: 150px;
     }
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+        right: -40px;
+        top: 100px;
+        width: 40px;
+        height: 2px;
+    }
+
+    /* Linha amarela apontando para baixo na localização */
+    .location::before {
+        top: 200px;
+        left: 50%;
+        width: 2px;
+        height: 30px;
+    }
     
     /* Por que somos palhaços*/
     .porque-somos-palhacos {
@@ -720,11 +766,27 @@ body {
         width: 50%;
         margin-bottom: 150px;
     }
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+        margin-right: 10px;
+        top: 100px;
+        width: 30px;
+        height: 2px;
+    }
+
+    /* Linha amarela apontando para baixo na localização */
+    .location::before {
+        top: 200px;
+        left: 50%;
+        width: 2px;
+        height: 30px;
+    }
 }
 
 
 @media(max-width: 834px){
-     /* Ajusta os controles do carrossel para notebooks */
+     /* Ajusta os controles do carrossel para tablets */
      .carousel-inner .carousel-item .d-block {
         height: 600px;
         object-fit: cover;
@@ -799,6 +861,22 @@ body {
         width: 50%;
         margin-bottom: 150px;
     }
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+        margin-right: 10px;
+        top: 80px;
+        width: 30px;
+        height: 2px;
+    }
+
+    /* Linha amarela apontando para baixo na localização */
+    .location::before {
+        top: 150px;
+        left: 50%;
+        width: 2px;
+        height: 30px;
+    }
 }
 
 
@@ -843,7 +921,6 @@ body {
 
 @media (max-width: 760px) {
 
-    
     /* Carrousel*/
     #carouselExampleControls img {
         max-height: 300px; 
@@ -853,27 +930,27 @@ body {
    /* Muda o layout para coluna */
    .timeline {
     flex-direction: column;
-}
+    }
 
-/* Ajuste para a imagem */
-.image-container {
-    margin-bottom: 220px;
-}
+    /* Ajuste para a imagem */
+    .image-container {
+        margin-bottom: 220px;
+    }
 
-.image-container img {
-    width: 100px;
-}
+    .image-container img {
+        width: 100px;
+    }
 
     /* Reduz o tamanho do círculo de ano */
     .year-circle {
-        width: 100px;
-        height: 100px;
+        width: 150px;
+        height: 150px;
         font-size: 20px;
     }
 
     /* Espaçamento para a seta */
     .arrow {
-        margin-top: 170px;
+        margin-bottom: 220px;
     }
 
     /* Ajusta a largura da seção de informações */
@@ -881,6 +958,19 @@ body {
         width: 80%;
         margin-bottom: 150px;
         font-size: 15px;
+    }
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+       display: none;
+    }
+
+    /* Linha amarela apontando para baixo na localização */
+    .location::before {
+        top: 150px;
+        left: 50%;
+        width: 2px;
+        height: 30px;
     }
 
 
