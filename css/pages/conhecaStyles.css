@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&display=swap');
+@import url('../../font/PoorRichardOpti.otf');
 
 /* Gerais */
 body {
@@ -31,6 +32,107 @@ body {
 .carousel-indicators li [data-bs-slide-to] {
     display: none; 
 }
+
+/* Linha do tempo */
+
+.header {
+    background-color: #f44336;
+    color: white;
+    padding: 20px 0;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+.timeline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin: 30px 0;
+}
+.year {
+    position: relative;
+    text-align: center;
+}
+.year-circle {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #001f3f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #001f3f;
+    margin-bottom: 8px;
+    font-family: poor richard;
+}
+
+.location {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 10px;
+    border-radius: 5px;
+    margin-top: 30px;
+    font-size: 20px;
+}
+.line {
+    position: absolute;
+    top: 40px;
+    left: 100%;
+    width: 30px;
+    height: 2px;
+    background-color: #001f3f;
+}
+.line:last-of-type {
+    display: none;
+}
+
+.image-container img {
+    height: auto;
+    display: block;
+}
+
+.directors-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-and-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.director-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    text-align: center;
+    
+}
+
+.arrow {
+    width: 10%;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.directors-info {
+    border: 1px solid #007bff;
+    border-radius: 8px;
+    padding: 15px;
+    font-size: 18px;
+    width: 20%;
+    text-align: center;
+    align-self: flex-end; 
+}
+
 
 
 /* Por que somos palhaços*/
@@ -300,6 +402,31 @@ body {
         height: 20px;
     }
 
+    /* Time line*/
+
+    .image-container{
+        margin-bottom: 220px;
+    }
+
+    .image-container img {
+        width: 250px;
+    }
+
+    .year-circle{
+        width: 200px;
+        height: 200px;
+        font-size: 50px;
+        
+    }
+
+    .arrow  {
+        margin-top: 170px;
+    }
+    
+    .directors-info {
+        margin-bottom: 150px;
+    }
+    
     /* Por que somos palhaços*/
     .porque-somos-palhacos {
         font-size: 3.5rem; 
@@ -373,6 +500,8 @@ body {
     .icon{
         margin-left: 250px;
     }
+
+    
 }
 
 @media(max-width: 1440px){
@@ -415,6 +544,34 @@ body {
     .bold-text{
         margin-right: 200px;
     }
+
+    /* Timeline */
+
+     /* Time line*/
+
+     .image-container{
+        margin-bottom: 220px;
+    }
+
+    .image-container img {
+        width: 250px;
+    }
+
+    .year-circle{
+        width: 150px;
+        height: 150px;
+        font-size: 50px;
+        
+    }
+
+    .arrow  {
+        margin-top: 170px;
+    }
+    
+    .directors-info {
+        margin-bottom: 150px;
+    }
+
    /* Nossa motivação*/
 
    .nossa-motivacao{
@@ -538,6 +695,31 @@ body {
     .como-nos-preparamos .texto-maior {
         margin-right: 430px;
   }
+
+  /* Timeline */
+   .image-container{
+    margin-bottom: 220px;
+    }
+
+    .image-container img {
+        width: 250px;
+    }
+
+    .year-circle{
+        width: 200px;
+        height: 200px;
+        font-size: 50px;
+        
+    }
+
+    .arrow  {
+        margin-top: 170px;
+    }
+
+    .directors-info {
+        width: 50%;
+        margin-bottom: 150px;
+    }
 }
 
 
@@ -592,6 +774,31 @@ body {
       .como-nos-preparamos .descricao{
         margin-left: 70px;
       }
+
+      /* Timeline */
+   .image-container{
+    margin-bottom: 220px;
+    }
+
+    .image-container img {
+        width: 250px;
+    }
+
+    .year-circle{
+        width: 150px;
+        height: 150px;
+        font-size: 50px;
+        
+    }
+
+    .arrow  {
+        margin-top: 170px;
+    }
+
+    .directors-info {
+        width: 50%;
+        margin-bottom: 150px;
+    }
 }
 
 
@@ -642,6 +849,40 @@ body {
         max-height: 300px; 
         object-position: top;
     }
+
+   /* Muda o layout para coluna */
+   .timeline {
+    flex-direction: column;
+}
+
+/* Ajuste para a imagem */
+.image-container {
+    margin-bottom: 220px;
+}
+
+.image-container img {
+    width: 100px;
+}
+
+    /* Reduz o tamanho do círculo de ano */
+    .year-circle {
+        width: 100px;
+        height: 100px;
+        font-size: 20px;
+    }
+
+    /* Espaçamento para a seta */
+    .arrow {
+        margin-top: 170px;
+    }
+
+    /* Ajusta a largura da seção de informações */
+    .directors-info {
+        width: 80%;
+        margin-bottom: 150px;
+        font-size: 15px;
+    }
+
 
     /* Por que somos palhacos*/
 
@@ -869,6 +1110,12 @@ body {
         position: relative;
         transform: none;
     }
+}
+
+@media(max-width: 390px){
+    .directors-info {
+        font-size: 11px;
+      }
 }
 
 @media(max-width: 320px){
