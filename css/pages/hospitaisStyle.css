@@ -3,31 +3,15 @@
 
 /* Gerais */
 body {
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    padding-top: 70px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 .row {
-    margin: 0;
+  margin: 0;
 }
 
-/* Navbar */
-header, .navbar {
-    background-color: #F3F8FF;
-}
-
-.navbar-brand img {
-    width: 75px;
-}
-
-#navbar-links a {
-    text-decoration: none;
-    color: #02033B;
-    transition: 0.2s;
-}
-
-#navbar-links a:hover {
-    color: #ED1B24;
+body {
+  padding-top: 70px; 
 }
 
 
@@ -38,9 +22,24 @@ body {
   }
   
   .banner {
-    padding-top: 90px;
+    width: 100%;
+    padding-top: 50px;
     background-color: #EEF0D3;
-    position: relative;
+    overflow: hidden;
+  }
+  
+  .img-palhaco {
+    max-width: 130%;
+    height: auto;
+    position: relative; 
+  }
+  
+  .bandeirinhas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: auto;
   }
   
   .banner-text {
@@ -49,13 +48,13 @@ body {
   
   .text-wrapper {
     position: absolute;
-    top: 125px; 
-    left: 100px;
+    top: 200px;
+    left: -10px;
   }
   
   .hospitais-text {
-    font-size: 65px;
-    width: 350px;
+    font-size: 95px;
+    width: 500px;
     height: auto;
     font-weight: bold;
     background-color: #ffeb3b;
@@ -67,39 +66,13 @@ body {
   
   .sub-text {
     background-color: #F4D94E66;
-    width: 290px;
-    height: 60px;
-    padding: 15px 10px;
-    font-size: 20px;
-    margin-left: 150px;
+    font-size: 30px;
+    width: 430px;
+    height: 90px;
+    padding: 25px 10px;
+    margin-left: 200px;
   }
   
-  .banner img {
-    max-width: 100%;
-    height: auto;
-  }
-  
-.banner .bandeirinhas {
-    position: absolute;
-    top: 0; 
-    left: 0;
-    width: 40%; 
-    height: auto;
-    z-index: 1; 
-}
-  
-.banner .baloes {
-    position: absolute;
-    margin-left: 410px;
-    margin-top: 20px;
-    width: 50%; 
-    height: 50%;
-    z-index: 2; 
-}
-  
-.col-md-6 {
-    position: relative;
-}
 
 /* hospitais navigation */
 
@@ -124,6 +97,10 @@ body {
 
 .nav-hospitais-item:hover {
   color: yellow;
+}
+
+.nav-hospitais-item.active {
+  color: yellow; 
 }
 
 .arrow {
@@ -157,62 +134,266 @@ body {
   margin-left: 160px;
 }
 
-/* Footer*/
-
-.footer-image{
-    width: 150px;
-    height: 150px;
-    margin-top: 80px;
-    margin-left: 50px;
-}
-
-ul.list-unstyled li {
-    margin-bottom: 10px;
-}
-
-.social-icons {
-    margin-top: 300px;
-    margin-right: 120px;
-}
-
-.social-icons a {
-    font-size: 20px;
-    transition: color 0.3s;
-}
-
-.social-icons a:hover {
-    color: #fff;
-}
-
-.text-white {
-    text-decoration: none;
-}
-
 .formulario-palhaco{
-  
   width: 100px;  
-  height: 710px; 
+  height: 500px; 
 }
 
+/* Footer*/
+footer {
+  background: #ED1B24;
+  color: #fff;
+  margin-top: 370px;
+  position: relative;
+  padding: 50px 0;
+  height: auto; 
+}
+
+.footer-image {
+  width: 100%;
+  max-width: 150px; 
+  margin-left: 90px;
+}
+
+
+.options-section h5 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.options-section ul {
+  list-style: none;
+  padding: 0;
+  line-height: 1.5; 
+}
+
+.options-section ul li {
+  margin-bottom: 10px;
+}
+
+.options-section ul li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.options-section ul li a:hover {
+  text-decoration: underline;
+}
 
 /* Responsividade */
 
+@media(max-width: 1800px){
+  
+  .image-logo{
+    position: absolute;
+    margin-top: 250px; 
+    left: 43%; 
+    max-width: 120px;
+    height: auto;
+}
+
+
+  .banner {
+    width: 100%;
+    padding-top: 50px;
+    background-color: #EEF0D3;
+  }
+
+  .img-palhaco{
+    max-width: 130%;
+    height: auto;
+  }
+  
+  .banner-text {
+    position: relative;
+  }
+  
+  .text-wrapper {
+    position: absolute;
+    top: 200px;
+    left: -10px; 
+    
+  }
+  
+  .hospitais-text {
+    font-size: 95px;
+    width: 500px;
+    height: auto;
+    font-weight: bold;
+    background-color: #ffeb3b;
+    padding: 10px;
+    margin-left: 10px;
+    transform: rotate(-10deg);
+    display: inline-block;
+    
+  }
+  
+  .sub-text {
+    background-color: #F4D94E66;
+    font-size: 30px;
+    width: 430px;
+    height: 90px;
+    padding: 25px 10px;
+    margin-left: 200px;
+  }
+  
+  
+.banner .bandeirinhas {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 40%; 
+    height: auto;
+    z-index: 1; 
+}
+  
+
+.col-md-6 {
+    position: relative;
+}
+}
+
+@media(max-width: 1440px){
+  .text-wrapper {
+    position: absolute;
+    top: 120px;
+    left: 50;
+  }
+  
+  .hospitais-text {
+    font-size: 70px;
+    width: 370px;
+    height: auto;
+    font-weight: bold;
+    background-color: #ffeb3b;
+    padding: 10px;
+    margin-left: 110px;
+    transform: rotate(-10deg);
+    display: inline-block;
+  }
+  
+  .sub-text {
+    background-color: #F4D94E66;
+    font-size: 20px;
+    width: 300px;
+    height: 60px;
+    padding: 15px 10px;
+    margin-left: 240px;
+  }
+  
+  
+  .banner .bandeirinhas {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 40%; 
+    height: auto;
+    z-index: 1; 
+}
+
+  .img-palhaco{
+    width: 90%;
+  }
+  
+  .banner .bandeirinhas{
+    width: 40%;
+  }
+
+  .banner .baloes {
+    position: absolute;
+    margin-left: 420px;
+    width: 20%; 
+    height: 25%;
+    z-index: 1; 
+}
+}
+
+/* Notebooks com touchscreen*/
+@media(max-width: 1280){
+  .banner .baloes {
+    position: absolute;
+    margin-left: 200px;
+    width: 18%; 
+    height: 45%;
+    z-index: 1; 
+}
+}
+
+/* Ipad pro */
+@media(max-width: 1024px){
+  .text-wrapper {
+    position: absolute;
+    top: 110px;
+    left: 20;
+  }
+  
+  .hospitais-text {
+    font-size: 50px;
+    width: 300px;
+    height: auto;
+    font-weight: bold;
+    background-color: #ffeb3b;
+    padding: 10px;
+    margin-left: 110px;
+    transform: rotate(-10deg);
+    display: inline-block;
+  }
+  
+  .sub-text {
+    background-color: #F4D94E66;
+    font-size: 18px;
+    width: 250px;
+    height: 60px;
+    padding: 15px 10px;
+    margin-left: 220px;
+  }
+  
+  
+  .banner .bandeirinhas {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 40%; 
+    height: auto;
+    z-index: 1; 
+}
+
+  .img-palhaco{
+    width: 90%;
+  }
+  
+  .banner .bandeirinhas{
+    width: 50%;
+  }
+  }
+
+
+
 /* Ajuste para tablets */
 @media (max-width: 860px) {
+    /* Banner */
+    .text-wrapper { 
+      top: 50px;
+      left: -80px;
+    }
+
     .hospitais-text {
-      font-size: 50px; 
-      width: 300px;
+      margin-right: 150px;
+      font-size: 40px; 
+      width: 230px;
     }
-  
+
     .sub-text {
-      font-size: 16px;
-      width: 250px;
-      margin-left: 10px;
+      font-size: 14px;
+      width: 210px;
+      margin-left: 200px;
     }
-  
-    .text-wrapper {
-      top: 100px; 
-      left: 50px;
+
+    
+    .hospitais-text {
+      margin-left: 150px;
+      font-size: 40px; 
+      width: 230px;
     }
   
     .banner .bandeirinhas,
@@ -220,8 +401,8 @@ ul.list-unstyled li {
       display: none; 
     }
   
-    .banner .img-fluid {
-      width: 100%;
+    .banner .img-palhaco{
+      max-width: 100%;
       height: auto;
     }
 
@@ -278,52 +459,48 @@ ul.list-unstyled li {
 }
   
   /* Ajuste para smartphones */
-  @media (max-width: 576px) {
-    /* Banner*/
-    .navbar-brand img {
-      margin-left: 30px;
+  @media (max-width: 520px) {
+  
+    /*Banner*/
+  .row {
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease; 
   }
 
-  .navbar-toggler {
-    margin-right: 40px;
-}
+  .text-wrapper {
+    position: static; 
+    margin-top: 20px; 
+  }
 
-    /*Banner*/
-    .row {
-      display: flex;
-      flex-direction: column-reverse; 
-      align-items: center;
-       
-    }
   
-    .hospitais-text {
-      font-size: 40px; 
-      width: 250px;
-      transform: none;
-    }
+  .hospitais-text {
+    font-size: 40px; 
+    width: 250px;
+    transform: none;
+    right: 0;
+    left: 0;
+  }
   
-    .sub-text {
-      font-size: 18px;
-      width: 200px;
-      margin-left: 85px;
-      transform: none;
+  .sub-text {
+    font-size: 18px;
+    width: 200px;
+    transform: none;
+  }
+
+    .nav-hospitais-item{
+      font-size: 15px;
     }
-  
-    .text-wrapper {
-      position: static; 
-      margin-top: 20px; 
-      text-align: center; 
-    }
-  
-    .banner .bandeirinhas,
-    .banner .baloes {
+    
+    .banner .bandeirinhas{
       display: none; 
     }
   
-    .banner .img-fluid {
-      width: 100%;
+    .banner .img-palhaco{
+      max-width: 100%;
       height: auto;
-      margin-bottom: 20px; 
+      margin-left: 50px;
+    }
     
     .hospitais-text, .sub-text {
       transform: none;
@@ -349,10 +526,100 @@ ul.list-unstyled li {
   }
   
   .row {
-    margin-bottom: 20px;
+    margin-bottom: 20px; 
   }
+
   }
   .formulario-palhaco{
     display: none;
+  }
+
+ /* Footer */
+ footer {
+  text-align: center; 
+}
+
+.footer-image {
+  margin-bottom: 20px;
+  margin-right: 80px;
+}
+
+
+.options-section ul {
+  line-height: 1.8; 
+}
+
+
+.position-absolute {
+  position: relative;
+  transform: none;
+}
+
+@media(max-width: 430px){
+
+  .banner{
+    width: 100%;
+  }
+
+  .hospitais-text {
+    font-size: 40px; 
+    width: 250px;
+    transform: none;
+  }
+  
+  .sub-text {
+    font-size: 18px;
+    width: 200px;
+    transform: none;
+  }
+}
+
+@media(max-width: 390px){
+
+  .banner{
+    width: 100%;
+  }
+
+  .hospitais-text {
+    font-size: 40px; 
+    
+  }
+  
+  .sub-text {
+    font-size: 18px;
+    width: 200px;
+  }
+
+  .nav-hospitais-item{
+    font-size: 14px;
+  }
+
+}
+
+ @media(max-width: 320px){
+
+  .banner{
+    width: 100%;
+  }
+
+  .hospitais-text {
+    font-size: 40px; 
+    width: 250px;
+    transform: none;
+  }
+  
+  .sub-text {
+    font-size: 18px;
+    width: 200px;
+    transform: none;
+  }
+
+  .nav-hospitais-item{
+    font-size: 12px;
+  }
+
+  .mb-0 {
+    padding-right: 15px;
+    font-size: 15px;
   }
 }
