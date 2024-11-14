@@ -53,6 +53,8 @@ body {
 .year {
     position: relative;
     text-align: center;
+    gap: 200px;
+   
 }
 .year-circle {
     width: 80px;
@@ -138,10 +140,6 @@ body {
 .year-circle::after {
     content: "";
     position: absolute;
-    right: -40px;
-    top: 70px;
-    width: 40px;
-    height: 2px;
     background-color: yellow;
     transform: translateY(-50%);
 }
@@ -150,10 +148,6 @@ body {
 .location::before {
     content: "";
     position: absolute;
-    top: 150px;
-    left: 50%;
-    width: 2px;
-    height: 30px;
     background-color: yellow;
     transform: translateX(-50%);
 }
@@ -442,6 +436,14 @@ body {
         width: 250px;
     }
 
+    .year{
+        padding-right: 50px;
+    }
+
+    .location{
+        margin-top: 50px;
+    }
+
     .year-circle{
         width: 200px;
         height: 200px;
@@ -459,18 +461,18 @@ body {
 
     /* Linha amarela apontando para a direita no círculo */
     .year-circle::after {
-        right: -40px;
+       margin-left: 280px;
         top: 100px;
-        width: 40px;
+        width: 80px;
         height: 2px;
     }
 
     /* Linha amarela apontando para baixo na localização */
     .location::before {
-        top: 200px;
-        left: 50%;
+        top: 200px; 
+        margin-left: 50px;
         width: 2px;
-        height: 30px;
+        height: 50px; 
     }
     
     /* Por que somos palhaços*/
@@ -591,8 +593,6 @@ body {
         margin-right: 200px;
     }
 
-    /* Timeline */
-
      /* Time line*/
 
      .image-container{
@@ -617,6 +617,22 @@ body {
     .directors-info {
         margin-bottom: 150px;
     }
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+        margin-left: 180px;
+         top: 80px;
+         width: 40px;
+         height: 2px;
+     }
+ 
+     /* Linha amarela apontando para baixo na localização */
+     .location::before {
+         top: 150px; 
+         margin-left: 50px;
+         width: 2px;
+         height: 30px; 
+     }
 
    /* Nossa motivação*/
 
@@ -703,6 +719,8 @@ body {
    .como-nos-preparamos .texto-maior {
         margin-right: 430px;
   }
+
+   
 }
 
 @media(max-width: 1024px){
@@ -769,18 +787,18 @@ body {
 
     /* Linha amarela apontando para a direita no círculo */
     .year-circle::after {
-        margin-right: 10px;
-        top: 100px;
+        margin-left: 230px;
+        top: 90px;
         width: 30px;
         height: 2px;
     }
-
-    /* Linha amarela apontando para baixo na localização */
+    
+        /* Linha amarela apontando para baixo na localização */
     .location::before {
-        top: 200px;
-        left: 50%;
+        top: 200px; 
+        margin-left: 50px;
         width: 2px;
-        height: 30px;
+        height: 30px; 
     }
 }
 
@@ -862,20 +880,20 @@ body {
         margin-bottom: 150px;
     }
 
-    /* Linha amarela apontando para a direita no círculo */
-    .year-circle::after {
-        margin-right: 10px;
-        top: 80px;
+     /* Linha amarela apontando para a direita no círculo */
+     .year-circle::after {
+        margin-left: 180px;
+        top: 70px;
         width: 30px;
         height: 2px;
     }
-
-    /* Linha amarela apontando para baixo na localização */
+    
+        /* Linha amarela apontando para baixo na localização */
     .location::before {
-        top: 150px;
-        left: 50%;
+        top: 150px; 
+        margin-left: 50px;
         width: 2px;
-        height: 30px;
+        height: 30px; 
     }
 }
 
@@ -938,7 +956,7 @@ body {
     }
 
     .image-container img {
-        width: 100px;
+        width: 150px;
     }
 
     /* Reduz o tamanho do círculo de ano */
@@ -950,7 +968,7 @@ body {
 
     /* Espaçamento para a seta */
     .arrow {
-        margin-bottom: 220px;
+        margin-bottom: 150px;
     }
 
     /* Ajusta a largura da seção de informações */
@@ -967,10 +985,7 @@ body {
 
     /* Linha amarela apontando para baixo na localização */
     .location::before {
-        top: 150px;
-        left: 50%;
-        width: 2px;
-        height: 30px;
+       display: none;
     }
 
 
