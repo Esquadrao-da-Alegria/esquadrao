@@ -91,7 +91,6 @@ body {
     display: none;
 }
 
-/* Timeline */
 .image-container img {
     height: auto;
     display: block;
@@ -607,6 +606,7 @@ body {
         width: 150px;
         height: 150px;
         font-size: 50px;
+        margin: 10px;
         
     }
 
@@ -620,16 +620,16 @@ body {
 
     /* Linha amarela apontando para a direita no círculo */
     .year-circle::after {
-        margin-left: 180px;
-         top: 80px;
-         width: 40px;
-         height: 2px;
+        margin-left: 195px;
+        top: 80px;
+        width: 55px;
+        height: 2px;
      }
  
      /* Linha amarela apontando para baixo na localização */
      .location::before {
-         top: 150px; 
-         margin-left: 50px;
+         top: 160px; 
+         margin-left: 40px;
          width: 2px;
          height: 30px; 
      }
