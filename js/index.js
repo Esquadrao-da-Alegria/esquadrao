@@ -33,3 +33,16 @@ function enviarFormulario() {
         alert('Ocorreu um erro ao enviar a mensagem. Tente novamente mais tarde.');
     });
 }
+
+//Para fazer scroll mais suáve
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    });
+});
