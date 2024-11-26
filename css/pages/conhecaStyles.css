@@ -740,10 +740,7 @@ body {
   }
 
   /* Timeline */
-   .image-container{
-    margin-bottom: 220px;
-    }
-
+   
     .image-container img.diretor {
         width: 250px;
     }
@@ -835,9 +832,6 @@ body {
       }
 
       /* Timeline */
-   .image-container{
-    margin-bottom: 220px;
-    }
 
     .image-container img.diretor {
         width: 250px;
@@ -930,10 +924,7 @@ body {
     }
 
     /* Ajuste para a imagem */
-    .image-container {
-        margin-bottom: 220px;
-    }
-
+    
     .image-container img.diretor {
         width: 150px;
     }
