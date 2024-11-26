@@ -96,10 +96,11 @@ body {
     display: block;
 }
 
-.directors-section {
+.director {
     display: flex;
     align-items: center;
     justify-content: center;
+    
 }
 
 .image-and-button {
@@ -128,34 +129,10 @@ body {
 .directors-info {
     border: 1px solid #007bff;
     border-radius: 8px;
-    padding: 15px;
     font-size: 18px;
     width: 20%;
-    text-align: center;
-    align-self: flex-end; 
+    text-align: left;
 }
-
-/* Linha amarela apontando para a direita no círculo */
-.year-circle::after {
-    content: "";
-    position: absolute;
-    background-color: yellow;
-    transform: translateY(-50%);
-}
-
-/* Linha amarela apontando para baixo na localização */
-.location::before {
-    content: "";
-    position: absolute;
-    background-color: yellow;
-    transform: translateX(-50%);
-}
-
-/* Remove a linha da direita do último item */
-.timeline .year:last-child .year-circle::after {
-    display: none;
-}
-
 
 
 /* Por que somos palhaços*/
@@ -206,6 +183,7 @@ body {
 
 /* Melhorias gerais de espaçamento e responsividade */
 .porque-somos-palhacos-section {
+    margin-bottom: 50px;
     padding: 20px;
 }
 
@@ -427,12 +405,17 @@ body {
 
     /* Time line*/
 
-    .image-container{
-        margin-bottom: 220px;
+    .director{
+        margin-right: 40px;
     }
 
-    .image-container img {
-        width: 250px;
+    .image-container{
+        margin-bottom: 150px;
+    }
+
+    .image-container img.diretor {
+        width: 400px;
+        height: 600px;
     }
 
     .year{
@@ -450,13 +433,18 @@ body {
         
     }
 
-    .arrow  {
-        margin-top: 170px;
+    .arrow {
+        width: 250px;
+        margin-top: 320px;
     }
     
     .directors-info {
-        margin-bottom: 150px;
-    }
+        padding-top: 30px;
+        padding-left: 100px;
+        width: 450px;
+        height: 220px;
+        margin-bottom: 100px;
+      }
 
     /* Linha amarela apontando para a direita no círculo */
     .year-circle::after {
@@ -589,55 +577,46 @@ body {
     }
 
     .bold-text{
-        margin-right: 200px;
+        margin-right: 140px;
     }
 
      /* Time line*/
-
-     .image-container{
-        margin-bottom: 220px;
-    }
-
-    .image-container img {
-        width: 250px;
-    }
+    .image-container img.diretor {
+        width: 200px;
+        height: 400px;
+      }
 
     .year-circle{
-        width: 150px;
-        height: 150px;
+        width: 170px;
+        height: 170px;
         font-size: 50px;
-        margin: 10px;
+        margin: 20px;
         
     }
 
     .arrow  {
-        margin-top: 170px;
+        margin-top: 130px;
     }
-    
-    .directors-info {
-        margin-bottom: 150px;
+
+    .directors-info{
+        padding-top: 15px;
+        padding-left: 80px;
+        width: 400px;
     }
 
     /* Linha amarela apontando para a direita no círculo */
     .year-circle::after {
-        margin-left: 195px;
-        top: 80px;
-        width: 55px;
+        margin-left: 239px;
+        top: 100px;
+        width: 70px;
         height: 2px;
      }
  
-     /* Linha amarela apontando para baixo na localização */
-     .location::before {
-         top: 160px; 
-         margin-left: 40px;
-         width: 2px;
-         height: 30px; 
-     }
-
+     
    /* Nossa motivação*/
 
    .nossa-motivacao{
-       height: 780px;
+        height: 500px;
    }
    .nossa-motivacao h2{
       font-size: 40px;
@@ -651,11 +630,11 @@ body {
    /* Ajustes para a seção "Nossos serviços" */
    
    .outros-servicos-section{
-       height: 950px;
+       height: 700px;
    }
 
    .servico-card {
-       height: 730px;
+       height: 500px;
    }
 
    .servico-detalhe {
@@ -765,7 +744,7 @@ body {
     margin-bottom: 220px;
     }
 
-    .image-container img {
+    .image-container img.diretor {
         width: 250px;
     }
 
@@ -860,7 +839,7 @@ body {
     margin-bottom: 220px;
     }
 
-    .image-container img {
+    .image-container img.diretor {
         width: 250px;
     }
 
@@ -955,7 +934,7 @@ body {
         margin-bottom: 220px;
     }
 
-    .image-container img {
+    .image-container img.diretor {
         width: 150px;
     }
 
