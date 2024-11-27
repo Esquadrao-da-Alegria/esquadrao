@@ -853,7 +853,7 @@ body {
         width: 150px;
         font-size: 16px;
         margin-left: 20px;
-        font-size: 12px;
+        font-size: 14px;
       }
 
     .arrow  {
@@ -872,13 +872,6 @@ body {
         height: 2px;
     }
     
-        /* Linha amarela apontando para baixo na localização */
-    .location::before {
-        top: 150px; 
-        margin-left: 50px;
-        width: 2px;
-        height: 30px; 
-    }
 }
 
 
@@ -945,6 +938,10 @@ body {
         width: 100%; 
     }
 
+    .location{
+        font-size: 14px;
+    }
+
     /* Reduz o tamanho do círculo de ano */
     .year-circle {
         width: 150px;
@@ -973,12 +970,6 @@ body {
     .year-circle::after {
        display: none;
     }
-
-    /* Linha amarela apontando para baixo na localização */
-    .location::before {
-       display: none;
-    }
-
 
     /* Por que somos palhacos*/
 
