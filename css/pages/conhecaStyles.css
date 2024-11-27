@@ -47,13 +47,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px;
     margin: 30px 0;
 }
 .year {
     position: relative;
     text-align: center;
-    gap: 200px;
    
 }
 .year-circle {
@@ -129,8 +127,6 @@ body {
 .directors-info {
     border: 1px solid #007bff;
     border-radius: 8px;
-    font-size: 18px;
-    width: 20%;
     text-align: left;
 }
 
@@ -420,6 +416,7 @@ body {
     }
 
     .location{
+        color: #5C9ECC;
         margin-top: 50px;
     }
 
@@ -432,7 +429,7 @@ body {
 
     .arrow {
         width: 250px;
-        margin-top: 320px;
+        margin-top: 460px;
     }
     
     .directors-info {
@@ -440,7 +437,8 @@ body {
         padding-left: 100px;
         width: 450px;
         height: 220px;
-        margin-bottom: 100px;
+        margin-top: 450px;
+        font-size: 19px;
       }
 
     /* Linha amarela apontando para a direita no círculo */
@@ -451,13 +449,6 @@ body {
         height: 2px;
     }
 
-    /* Linha amarela apontando para baixo na localização */
-    .location::before {
-        top: 200px; 
-        margin-left: 50px;
-        width: 2px;
-        height: 50px; 
-    }
     
     /* Por que somos palhaços*/
     .porque-somos-palhacos {
@@ -579,7 +570,7 @@ body {
 
      /* Time line*/
     .image-container img.diretor {
-        width: 200px;
+        width: 300px;
         height: 400px;
       }
 
@@ -591,15 +582,29 @@ body {
         
     }
 
-    .arrow  {
-        margin-top: 130px;
+    .location {
+        background-color: #5C9ECC; 
+        border-radius: 15px; 
+        width: 200px; 
+       
+        font-size: 19px; 
+        padding-top: 15px;
+        text-align: center; 
+        
     }
+    
 
     .directors-info{
-        padding-top: 15px;
-        padding-left: 80px;
         width: 400px;
+        align-self: flex-end;
+        padding-top: 15px;
+        padding-left: 100px;
+        font-size: 16px;
     }
+
+    .arrow  {
+        margin-top: 300px;
+    }   
 
     /* Linha amarela apontando para a direita no círculo */
     .year-circle::after {
@@ -695,8 +700,6 @@ body {
    .como-nos-preparamos .texto-maior {
         margin-right: 430px;
   }
-
-   
 }
 
 @media(max-width: 1024px){
@@ -749,13 +752,18 @@ body {
         
     }
 
+    .location{
+        font-size: 16px;
+        margin-left: 20px;
+        width: 200px;
+    }
+
     .arrow  {
-        margin-top: 170px;
+        margin-top: 300px;;
     }
 
     .directors-info {
-        width: 50%;
-        margin-bottom: 150px;
+        width: 35%;
     }
 
     /* Linha amarela apontando para a direita no círculo */
@@ -841,13 +849,19 @@ body {
         
     }
 
+    .location {
+        width: 150px;
+        font-size: 16px;
+        margin-left: 20px;
+        font-size: 12px;
+      }
+
     .arrow  {
-        margin-top: 170px;
+        margin-top: 300px;
     }
 
     .directors-info {
         width: 50%;
-        margin-bottom: 150px;
     }
 
      /* Linha amarela apontando para a direita no círculo */
@@ -907,7 +921,7 @@ body {
 }
 
 
-@media (max-width: 760px) {
+@media (max-width: 520px) {
 
     /* Carrousel*/
     #carouselExampleControls img {
@@ -921,9 +935,14 @@ body {
     }
 
     /* Ajuste para a imagem */
+
+    .director {
+        flex-direction: column; 
+        align-items: center; 
+    }
     
     .image-container img.diretor {
-        width: 150px;
+        width: 100%; 
     }
 
     /* Reduz o tamanho do círculo de ano */
@@ -935,15 +954,20 @@ body {
 
     /* Espaçamento para a seta */
     .arrow {
-        margin-bottom: 150px;
+       display: none;
     }
 
     /* Ajusta a largura da seção de informações */
     .directors-info {
-        width: 80%;
-        margin-bottom: 150px;
-        font-size: 15px;
+        text-align: left;
+        justify-content: center;
+        align-items: center;
+        width: 90%;
+        margin-right: 20px;
+        padding-right: 40px;
+        font-size: 12px;
     }
+
 
     /* Linha amarela apontando para a direita no círculo */
     .year-circle::after {
@@ -1186,6 +1210,7 @@ body {
 
 @media(max-width: 390px){
     .directors-info {
+        padding-right: 40px;
         font-size: 11px;
       }
 }
@@ -1218,4 +1243,5 @@ body {
         margin-right: 0;
         margin-left: 5px;
       }
+
 }
