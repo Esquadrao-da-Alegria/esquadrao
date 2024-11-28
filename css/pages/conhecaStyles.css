@@ -362,25 +362,6 @@ body {
 
 /* Ajuste para telas muito grandes */
 @media (min-width: 1800px) {
-     /* Navbar */
-
-     .image-logo{
-        position: absolute;
-        margin-top: 250px; 
-        left: 43%; 
-        max-width: 120px;
-        height: auto;
-    }
-
-    .navbar-nav .nav-link {
-        font-size: 1.5rem; 
-        margin-left: 20px; 
-    }
-
-    .navbar-toggler {
-        font-size: 1.5rem; 
-    }
-
      /* Ajusta os controles do carrossel para telas grandes */
     .carousel-inner .carousel-item .d-block {
         height: 850px; 
@@ -482,13 +463,13 @@ body {
     .text {
         font-size: 1.5rem; 
         line-height: 1.5;
-        margin-left: 250px;
+        margin-left: 200px;
     }
 
     .bold-text {
         font-size: 1.5rem; 
         font-weight: bold; 
-        margin-right: 100px;
+        margin-right: 220px;
     }
 
     .row {
