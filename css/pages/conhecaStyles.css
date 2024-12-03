@@ -142,21 +142,21 @@ body {
     text-transform: uppercase;
 }
 
-.texto-menor {
+.porque-somos-palhacos-section .texto-menor {
     font-size: 24px; 
     line-height: -5;
 }
 
-.texto-maior {
+.porque-somos-palhacos-section .texto-maior {
     font-size: 48px; 
     line-height: -50;
     color: #000000; 
 }
 
-.descricao {
+.porque-somos-palhacos-section .descricao {
     font-size: 1.1rem;
     color: #333; 
-    text-align: left;
+    
 }
 
 .icon {
@@ -475,8 +475,7 @@ body {
     .porque-somos-palhacos-section .descricao {
         font-size: 1.8rem; 
         line-height: 1.6; 
-        margin-bottom: 50px;
-        margin-left: 550px; 
+        margin-left: 240px; 
     }
 
     .icon {
@@ -550,6 +549,10 @@ body {
  
     .porque-somos-palhacos-section .texto-maior{
         margin-right: 300px;
+    }
+
+    .porque-somos-palhacos-section.descricao{
+        margin-left: 500px;
     }
  
     .col-md-1{
@@ -706,7 +709,7 @@ body {
     }
  
     .porque-somos-palhacos-section .descricao {
-     margin-left: 240px; 
+     margin-left: 120px; 
  }
  
     .icon {
@@ -952,7 +955,7 @@ body {
         width: 90%;
         margin-right: 20px;
         padding-right: 40px;
-        font-size: 12px;
+        font-size: 16px;
     }
 
 
@@ -987,8 +990,10 @@ body {
         margin-left: 70px;
     }
 
-    .descricao {
-        font-size: 1rem;
+    
+
+    .porque-somos-palhacos-section .descricao {
+        margin-right: 30px;
     }
 
     .descricao {
@@ -1026,6 +1031,10 @@ body {
 
     /* Como nos preparamos */
 
+    .como-nos-preparamos {
+        flex-direction: column; /* Torna a direção dos elementos vertical em telas menores */
+      }
+
     .como-nos-preparamos .texto-menor {
         margin-left: 10px;
         font-size: 22px;
@@ -1046,7 +1055,9 @@ body {
     }
 
     .como-nos-preparamos .imagem-preparacao {
-        width: 100%; /* Ajusta a largura para telas menores */
+        display: flex;
+        align-items: center;
+        width: 100%; 
         height: auto;
       }
       
@@ -1189,7 +1200,11 @@ body {
 @media(max-width: 390px){
     .directors-info {
         padding-right: 40px;
-        font-size: 11px;
+        font-size: 13px;
+      }
+
+      .porque-somos-palhacos-section .descricao {
+        margin-left: 10px;
       }
 }
 
