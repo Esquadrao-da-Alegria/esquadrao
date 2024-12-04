@@ -70,7 +70,7 @@ body {
 }
 
 .location {
-    background-color: #007bff;
+    background-color: #5C9ECC;
     color: white;
     padding: 10px 10px;
     border-radius: 5px;
@@ -156,6 +156,7 @@ body {
 .porque-somos-palhacos-section .descricao {
     font-size: 1.1rem;
     color: #333; 
+    
     
 }
 
@@ -423,7 +424,6 @@ body {
     }
 
     .location{
-        color: #5C9ECC;
         margin-top: 50px;
     }
 
@@ -476,7 +476,8 @@ body {
     .porque-somos-palhacos-section .descricao {
         font-size: 1.8rem; 
         line-height: 1.6; 
-        margin-left: 240px; 
+        margin-left: 550px; 
+        text-align: left;
     }
 
     .icon {
@@ -552,9 +553,10 @@ body {
         margin-right: 300px;
     }
 
-    .porque-somos-palhacos-section.descricao{
-        margin-left: 500px;
-    }
+    .porque-somos-palhacos-section .descricao {
+        text-align: left;
+        margin-left: 360px;
+      }
  
     .col-md-1{
         margin-right: 50px;
@@ -618,6 +620,9 @@ body {
         width: 70px;
         height: 2px;
      }
+    
+     /* Por que somos palhaços*/
+     
  
      
    /* Nossa motivação*/
@@ -710,7 +715,8 @@ body {
     }
  
     .porque-somos-palhacos-section .descricao {
-     margin-left: 120px; 
+     margin-left: 240px; 
+     text-align: left;
  }
  
     .icon {
@@ -788,11 +794,14 @@ body {
     .porque-somos-palhacos-section .texto-maior {
         margin-left: 150px;
         font-size: 4rem; 
-    }
-
+    }  
+    
     .porque-somos-palhacos-section .descricao {
-        margin-left: 50px; 
-    }
+        margin-left: 120px;
+        text-align: left;
+      }
+
+    
 
     .icon {
         margin-left: 50px;
@@ -810,6 +819,8 @@ body {
         font-size: 1.0rem; 
         margin-right: 100px;
     }
+
+    /* Como nos preparamos*/
 
     .como-nos-preparamos .texto-menor {
         font-size: 25px;
@@ -905,6 +916,10 @@ body {
     .testimonial-box-container{
         height: 100px;
     }
+
+    .porque-somos-palhacos-section .descricao {
+        margin-left: 10px;
+      }
 }
 
 
@@ -991,10 +1006,8 @@ body {
         margin-left: 70px;
     }
 
-    
-
     .porque-somos-palhacos-section .descricao {
-        margin-right: 30px;
+        margin-left: 0px; 
     }
 
     .descricao {
