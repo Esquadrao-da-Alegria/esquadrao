@@ -70,13 +70,15 @@ body {
 }
 
 .location {
-    background-color: #007bff;
+    background-color: #5C9ECC;
     color: white;
     padding: 10px 10px;
     border-radius: 5px;
     margin-top: 30px;
     font-size: 20px;
 }
+
+
 .line {
     position: absolute;
     top: 40px;
@@ -142,21 +144,22 @@ body {
     text-transform: uppercase;
 }
 
-.texto-menor {
+.porque-somos-palhacos-section .texto-menor {
     font-size: 24px; 
     line-height: -5;
 }
 
-.texto-maior {
+.porque-somos-palhacos-section .texto-maior {
     font-size: 48px; 
     line-height: -50;
     color: #000000; 
 }
 
-.descricao {
+.porque-somos-palhacos-section .descricao {
     font-size: 1.1rem;
     color: #333; 
-    text-align: left;
+    
+    
 }
 
 .icon {
@@ -223,35 +226,61 @@ body {
     height: 100%;
 }
 
-/* Por que somos palhaços*/
+/* Como nos preparamos*/
 
 .como-nos-preparamos {
-    padding: 20px;
-    text-align: center;
-    max-width: 800px;
-    margin: 40px auto;
-}
-.como-nos-preparamos h1 {
-    font-size: 36px;
+    padding: 40px 20px;
+  }
+  
+  .como-nos-preparamos .texto {
+    padding-right: 20px;
+  }
+  
+  .como-nos-preparamos h1 {
+    font-size: 2.8rem;
     font-weight: bold;
     margin: 0;
-}
-.como-nos-preparamos .texto-menor {
-    font-size: 22px;
+    color: #000;
+  }
+  
+  .como-nos-preparamos .texto-menor {
+    font-size: 1.2rem;
     text-transform: uppercase;
-}
-.como-nos-preparamos .texto-maior {
-    font-size: 40px;
-    font-weight: bold;
-}
-.como-nos-preparamos .descricao {
-    font-size: 16px;
-    line-height: 1.5;
+    color: #000;
+    font-weight: 400;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+  }
+  
+  .como-nos-preparamos .texto-maior {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #000;
+  }
+  
+  .como-nos-preparamos .descricao {
+    font-size: 1rem;
+    line-height: 1.0;
     color: #333;
-    margin-left: 10px; 
-    max-width: 900px; 
     text-align: left;
-}
+  }
+  
+  .como-nos-preparamos img {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .como-nos-preparamos .imagem-preparacao {
+    max-width: 100%; /* Garante que a imagem não ultrapasse a largura do container */
+    height: auto;    /* Mantém a proporção da imagem */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ao redor da imagem */
+    display: block;
+    margin: 0 auto;
+  }
+
+
+  
  
 
 /* Estilização das estrelas */
@@ -362,25 +391,6 @@ body {
 
 /* Ajuste para telas muito grandes */
 @media (min-width: 1800px) {
-     /* Navbar */
-
-     .image-logo{
-        position: absolute;
-        margin-top: 250px; 
-        left: 43%; 
-        max-width: 120px;
-        height: auto;
-    }
-
-    .navbar-nav .nav-link {
-        font-size: 1.5rem; 
-        margin-left: 20px; 
-    }
-
-    .navbar-toggler {
-        font-size: 1.5rem; 
-    }
-
      /* Ajusta os controles do carrossel para telas grandes */
     .carousel-inner .carousel-item .d-block {
         height: 850px; 
@@ -416,7 +426,6 @@ body {
     }
 
     .location{
-        color: #5C9ECC;
         margin-top: 50px;
     }
 
@@ -466,11 +475,11 @@ body {
         font-size: 5rem; 
     }
 
-    .descricao {
+    .porque-somos-palhacos-section .descricao {
         font-size: 1.8rem; 
         line-height: 1.6; 
-        margin-bottom: 50px;
         margin-left: 550px; 
+        text-align: left;
     }
 
     .icon {
@@ -482,13 +491,13 @@ body {
     .text {
         font-size: 1.5rem; 
         line-height: 1.5;
-        margin-left: 250px;
+        margin-left: 200px;
     }
 
     .bold-text {
         font-size: 1.5rem; 
         font-weight: bold; 
-        margin-right: 100px;
+        margin-right: 220px;
     }
 
     .row {
@@ -505,12 +514,10 @@ body {
     }
 
     .como-nos-preparamos .texto-menor {
-        margin-right: 600px;
         font-size: 40px;        
       }
     
       .como-nos-preparamos .texto-maior {
-        margin-right: 450px;
         font-size: 70px;        
     }
     
@@ -547,15 +554,17 @@ body {
     .porque-somos-palhacos-section .texto-maior{
         margin-right: 300px;
     }
+
+    .porque-somos-palhacos-section .descricao {
+        text-align: left;
+        margin-left: 360px;
+      }
  
     .col-md-1{
         margin-right: 50px;
     }
  
-    .descricao {
-     margin-left: 400px; 
- }
- 
+   
     .icon {
         margin-left: 200px;
     }
@@ -613,12 +622,15 @@ body {
         width: 70px;
         height: 2px;
      }
+    
+     /* Por que somos palhaços*/
+     
  
      
    /* Nossa motivação*/
 
    .nossa-motivacao{
-        height: 500px;
+        height: 700px;
    }
    .nossa-motivacao h2{
       font-size: 40px;
@@ -657,12 +669,7 @@ body {
        height: auto; 
    }
 
-   .como-nos-preparamos .texto-menor {
-        margin-right: 600px;
-  }
-   .como-nos-preparamos .texto-maior {
-        margin-right: 430px;
-  }
+   
 }
 
 @media(max-width: 1280px){
@@ -678,7 +685,7 @@ body {
         margin-right: 50px;
     }
  
-    .descricao {
+     .porque-somos-palhacos-section.descricao {
      margin-left: 320px; 
  }
  
@@ -694,12 +701,6 @@ body {
         margin-right: 150px;
     }
 
-   .como-nos-preparamos .texto-menor {
-        margin-right: 610px;
-  }
-   .como-nos-preparamos .texto-maior {
-        margin-right: 430px;
-  }
 }
 
 @media(max-width: 1024px){
@@ -715,8 +716,9 @@ body {
         margin-right: 50px;
     }
  
-    .descricao {
+    .porque-somos-palhacos-section .descricao {
      margin-left: 240px; 
+     text-align: left;
  }
  
     .icon {
@@ -731,13 +733,6 @@ body {
     .bold-text{
         margin-right: 10px;
     }
-
-    .como-nos-preparamos .texto-menor {
-        margin-right: 610px;
-  }
-    .como-nos-preparamos .texto-maior {
-        margin-right: 430px;
-  }
 
   /* Timeline */
    
@@ -801,11 +796,14 @@ body {
     .porque-somos-palhacos-section .texto-maior {
         margin-left: 150px;
         font-size: 4rem; 
-    }
+    }  
+    
+    .porque-somos-palhacos-section .descricao {
+        margin-left: 120px;
+        text-align: left;
+      }
 
-    .descricao {
-        margin-left: 50px; 
-    }
+    
 
     .icon {
         margin-left: 50px;
@@ -824,18 +822,16 @@ body {
         margin-right: 100px;
     }
 
+    /* Como nos preparamos*/
+
     .como-nos-preparamos .texto-menor {
-        margin-right: 450px;
-        font-size: 30px;
+        font-size: 25px;
       }
     .como-nos-preparamos .texto-maior {
         margin-right: 250px;
-        font-size: 50px;
+        font-size: 40px;
       }
-      .como-nos-preparamos .descricao{
-        margin-left: 70px;
-      }
-
+      
       /* Timeline */
 
     .image-container img.diretor {
@@ -870,6 +866,17 @@ body {
         top: 70px;
         width: 30px;
         height: 2px;
+    }
+
+    .servico-card{
+        height: 800px;
+    }
+
+    .outros-servicos-section {
+        background-color: #91C9E6;
+        padding: 40px;
+        margin-top: 40px;
+        height: 1000px;
     }
     
 }
@@ -911,6 +918,10 @@ body {
     .testimonial-box-container{
         height: 100px;
     }
+
+    .porque-somos-palhacos-section .descricao {
+        margin-left: 10px;
+      }
 }
 
 
@@ -962,7 +973,7 @@ body {
         width: 90%;
         margin-right: 20px;
         padding-right: 40px;
-        font-size: 12px;
+        font-size: 16px;
     }
 
 
@@ -997,8 +1008,8 @@ body {
         margin-left: 70px;
     }
 
-    .descricao {
-        font-size: 1rem;
+    .porque-somos-palhacos-section .descricao {
+        margin-left: 0px; 
     }
 
     .descricao {
@@ -1036,6 +1047,10 @@ body {
 
     /* Como nos preparamos */
 
+    .como-nos-preparamos {
+        flex-direction: column; /* Torna a direção dos elementos vertical em telas menores */
+      }
+
     .como-nos-preparamos .texto-menor {
         margin-left: 10px;
         font-size: 22px;
@@ -1055,14 +1070,13 @@ body {
         text-align: left;
     }
 
-    
-    .col-md-1 {
-        margin-bottom: 15px; 
-    }
-
-    .col-md-7 {
-        text-align: center; 
-    }
+    .como-nos-preparamos .imagem-preparacao {
+        display: flex;
+        align-items: center;
+        width: 100%; 
+        height: auto;
+      }
+      
 
     /* Nossa motivação*/
 
@@ -1202,7 +1216,11 @@ body {
 @media(max-width: 390px){
     .directors-info {
         padding-right: 40px;
-        font-size: 11px;
+        font-size: 13px;
+      }
+
+      .porque-somos-palhacos-section .descricao {
+        margin-left: 10px;
       }
 }
 

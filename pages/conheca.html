@@ -12,41 +12,40 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <!--Favicon-->
-        <link rel="icon" type="image/png" sizes="32x32" href="./assets/img/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32x32.png">
         <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
     </head>
 
     <body>
         <div class="global">
-
         <!-- Navigation bar-->
-    <header>
-        <nav class="navbar navbar-expand-lg fixed-top">
-            <div class="container">
-                <a href="../index.html" class="navbar-brand d-flex align-items-center">
-                    <img src="../assets/img/logo-colorida.png" alt="Logo Esquadrão">
-                </a>
-                <button  class="navbar-toggler navbar-light"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbar-links"
-                aria-controls="navbar-links"
-                aria-expanded="false"
-                aria-label="toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-end" id="navbar-links">
-                    <div class="navbar-nav">
-                        <a href="../index.html" class="nav-item nav-link" id="about-menu">Página inicial</a>
-                        <a href="../pages/conheca.html" class="nav-item nav-link" id="about-menu">Conheça</a>
-                        <a href="../pages/hospitais.html" class="nav-item nav-link" id="hospitals-menu">Hospitais</a>
-                        <a href="../pages/docacao.html" class="nav-item nav-link" id="partners-menu">Doação</a>
-                        <a href="../index.html#fale-conosco" class="nav-item nav-link" id="contact-menu">Fale Conosco</a>
+        <header>
+            <nav class="navbar navbar-expand-lg fixed-top">
+                <div class="container">
+                    <a href="../index.html" class="navbar-brand d-flex align-items-center">
+                        <img src="../assets/img/logo-colorida.png" alt="Logo Esquadrão">
+                    </a>
+                    <button  class="navbar-toggler navbar-light"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbar-links"
+                    aria-controls="navbar-links"
+                    aria-expanded="false"
+                    aria-label="toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-end" id="navbar-links">
+                        <div class="navbar-nav">
+                            <a href="../index.html" class="nav-item nav-link" id="about-menu">Página inicial</a>
+                            <a href="../pages/conheca.html" class="nav-item nav-link" id="about-menu">Conheça</a>
+                            <a href="../pages/hospitais.html" class="nav-item nav-link" id="hospitals-menu">Hospitais</a>
+                            <a href="../pages/docacao.html" class="nav-item nav-link" id="partners-menu">Doação</a>
+                            <a href="../index.html#fale-conosco" class="nav-item nav-link" id="contact-menu">Fale Conosco</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </nav>
-    </header>
+            </nav>
+        </header>
 
     <!-- Caroussel -->
     <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
@@ -99,9 +98,9 @@
         <div class="location">Porto Alegre/Canoas</div>
         <div class="line"></div>
     </div>
-    <div class="year">
+    <div class="year ">
         <div class="year-circle">2013</div>
-        <div class="location">São Borja</div>
+        <div class="location">São Borja(Finalizado)</div>
         <div class="line"></div>
     </div>
     <div class="year">
@@ -124,8 +123,8 @@
         <!-- Informações dos Diretores -->
         <div class="directors-info">
             <p><strong>2008 – 2016</strong> → Luciano Mai</p>
-            <p><strong>2017 – 2018</strong> → Laí Weber</p>
-            <p><strong>2019 – 2022</strong> → Eliane Saibat</p>
+            <p><strong>2017 – 2018</strong> → Laís Weber</p>
+            <p><strong>2019 – 2022</strong> → Eliane Saibt</p>
             <p><strong>2023 – 2024</strong> → Bruna Naidon</p>
         </div>
     </div>
@@ -207,19 +206,23 @@
 </div>
 
 
-<div class="como-nos-preparamos">
-    <h1 class="porque-somos-palhacos">
-        <span class="texto-menor">COMO NOS</span><br>
+<div class="container como-nos-preparamos d-flex align-items-center">
+    <div class="col-md-6 texto">
+      <h1>
+        <span class="texto-menor d-block">COMO NOS</span>
         <span class="texto-maior">PREPARAMOS?</span>
-    </h1>
-    <!-- Texto descritivo -->
-    <p class="mt-3 mb-4 descricao">
-        Aos voluntários, é oferecida 1 oficina por mês e, para a permanência no grupo,<br>
-        o voluntário deve ter participação em no mínimo 50% das oficinas a cada semestre.
-    </p> 
-</div>
-
-
+      </h1>
+      <p class="descricao">
+        Aos voluntários, é oferecida 1 oficina por mês e, para a permanência no grupo, o voluntário deve ter participação em no mínimo 50% das oficinas a cada semestre.
+      </p>
+    </div>
+    <div class="col-md-6">
+      <img src="../assets/img/como_nos_preparamos.png" alt="Imagem ilustrativa" class="imagem-preparacao">
+    </div>
+  </div>
+  
+  
+  
 <div class="container text-center mt-5 outros-servicos-section">
     <!-- Título principal -->
     <h2 class="titulo-servicos">OUTROS SERVIÇOS QUE OFERECEMOS</h2>
@@ -272,6 +275,8 @@
     </div>
 </div>
 
+
+</div>
     
 <!-- Footer -->
 <footer class="bg-danger text-white py-5" style="background-color: #ED1B24; margin-top: 150px;">
@@ -296,10 +301,10 @@
             <!-- Ícones de redes sociais -->
             <div class="col-md-1 col-12 text-center text-md-end mt-4 mt-md-0">
                 <div class="social-icons">
-                    <a href="https://www.facebook.com/ongesquadraodaalegria?mibextid=LQQJ4d&rdid=b31OduKmz2bXRUu6&share_url=https%253A%252F%252Fwww.facebook.com%252Fshare%252F18rsKxc1ev%252F%253Fmibextid%253DLQQJ4d" class="text-white"><i class="fab fa-facebook"></i></a>
-                    <a href="https://www.instagram.com/ongesquadraodaalegria/" class="text-white"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.linkedin.com/company/ong-esquadr%C3%A3o-da-alegria/" class="text-white"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://qrcode.esquadraodaalegria.org.br/" class="text-white" > <img src="../assets/img/icons8-white-clown-30.png" alt="Palhaço"></a>
+                    <a href="https://www.facebook.com/ongesquadraodaalegria?mibextid=LQQJ4d&rdid=b31OduKmz2bXRUu6&share_url=https%253A%252F%252Fwww.facebook.com%252Fshare%252F18rsKxc1ev%252F%253Fmibextid%253DLQQJ4d" target="_blank" class="text-white"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/ongesquadraodaalegria/" class="text-white" target="_blank"><i class="fab fa-instagram" target="_blank"></i></a>
+                    <a href="https://www.linkedin.com/company/ong-esquadr%C3%A3o-da-alegria/" class="text-white" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://qrcode.esquadraodaalegria.org.br/" class="text-white" target="_blank"> <img src="../assets/img/icons8-white-clown-30.png" alt="Palhaço"></a>
                 </div>
             </div>
 
