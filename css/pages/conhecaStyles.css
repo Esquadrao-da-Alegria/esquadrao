@@ -1,0 +1,1256 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&display=swap');
+@import url('../../font/PoorRichardOpti.otf');
+
+/* Gerais */
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.row {
+    margin: 0;
+}
+
+body {
+    padding-top: 70px; 
+}
+
+.carousel-indicators li {
+    width: 12px;
+    height: 50px; 
+    border-radius: 50%; 
+    background-color: rgba(255, 255, 255, 0.5); 
+}
+
+
+.carousel-indicators .active {
+    background-color: white; 
+    width: 12px;
+    height: 12px;
+}
+
+.carousel-indicators li [data-bs-slide-to] {
+    display: none; 
+}
+
+/* Linha do tempo */
+
+.header {
+    background-color: #f44336;
+    color: white;
+    padding: 20px 0;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+.timeline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+}
+.year {
+    position: relative;
+    text-align: center;
+   
+}
+.year-circle {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #001f3f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #001f3f;
+    margin-bottom: 8px;
+    font-family: poor richard;
+}
+
+.location {
+    background-color: #5C9ECC;
+    color: white;
+    padding: 10px 10px;
+    border-radius: 5px;
+    margin-top: 30px;
+    font-size: 20px;
+}
+
+
+.line {
+    position: absolute;
+    top: 40px;
+    left: 100%;
+    width: 30px;
+    height: 2px;
+    background-color: #001f3f;
+}
+.line:last-of-type {
+    display: none;
+}
+
+.image-container img {
+    height: auto;
+    display: block;
+}
+
+.director {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.image-and-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.director-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    text-align: center;
+    
+}
+
+.arrow {
+    width: 10%;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.directors-info {
+    border: 1px solid #007bff;
+    border-radius: 8px;
+    text-align: left;
+}
+
+
+/* Por que somos palhaços*/
+
+.porque-somos-palhacos {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #000; /* Cor preta */
+    text-transform: uppercase;
+}
+
+.porque-somos-palhacos-section .texto-menor {
+    font-size: 24px; 
+    line-height: -5;
+}
+
+.porque-somos-palhacos-section .texto-maior {
+    font-size: 48px; 
+    line-height: -50;
+    color: #000000; 
+}
+
+.porque-somos-palhacos-section .descricao {
+    font-size: 1.1rem;
+    color: #333; 
+    
+    
+}
+
+.icon {
+    width: 50px; /* Ajuste o tamanho do ícone */
+    height: auto;
+}
+
+.text {
+    font-size: 1rem;
+    color: #555; /* Cor cinza escuro */
+    text-align: left;
+
+}
+
+.bold-text {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #E53935; /* Cor vermelha */
+}
+
+/* Melhorias gerais de espaçamento e responsividade */
+.porque-somos-palhacos-section {
+    margin-bottom: 50px;
+    padding: 20px;
+}
+
+
+/* Nossa motivação*/
+
+.nossa-motivacao {
+    background-color: #ff4c4c;
+    padding: 40px 0;
+    text-align: center;
+    height: 600px;
+}
+
+.nossa-motivacao h2 {
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    margin-top: 60px;
+}
+
+.testimonial-box-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 100px;
+}
+
+.testimonial-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    height: 180px;
+}
+
+.client-comment img {
+    margin-right: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+/* Como nos preparamos*/
+
+.como-nos-preparamos {
+    padding: 40px 20px;
+  }
+  
+  .como-nos-preparamos .texto {
+    padding-right: 20px;
+  }
+  
+  .como-nos-preparamos h1 {
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin: 0;
+    color: #000;
+  }
+  
+  .como-nos-preparamos .texto-menor {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    color: #000;
+    font-weight: 400;
+    letter-spacing: 0.05rem;
+    font-weight: 700;
+  }
+  
+  .como-nos-preparamos .texto-maior {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #000;
+  }
+  
+  .como-nos-preparamos .descricao {
+    font-size: 1rem;
+    line-height: 1.0;
+    color: #333;
+    text-align: left;
+  }
+  
+  .como-nos-preparamos img {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .como-nos-preparamos .imagem-preparacao {
+    max-width: 100%; /* Garante que a imagem não ultrapasse a largura do container */
+    height: auto;    /* Mantém a proporção da imagem */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ao redor da imagem */
+    display: block;
+    margin: 0 auto;
+  }
+
+
+  
+ 
+
+/* Estilização das estrelas */
+.star {
+    position: absolute;
+}
+.star-left {
+    top: -30px;
+    left: -30px;
+}
+.star-right {
+    bottom: -30px;
+    right: -30px;
+}
+
+/* Outros serviços */
+
+.outros-servicos-section {
+    background-color: #91C9E6;
+    padding: 40px;
+    margin-top: 40px;
+    height: 730px;
+}
+
+.servico-card {
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 50px;
+    height: 500px;
+    border-radius: 40px;
+}
+
+.servico-detalhe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
+}
+
+.servico-icon {
+    width: 50px;
+    height: auto;
+    margin-right: 60px;
+}
+
+.servico-titulo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #002C77;
+    margin-right: 40px;
+}
+
+.servico-descricao {
+    font-size: 1rem;
+    color: #555555;
+    margin-top: 10px;
+    width: 200px;
+    margin-right: 40px;
+}
+
+/* Botão customizado */
+.custom-btn {
+    border-color: #02033B;
+    color: #02033B;
+
+}
+
+.custom-btn:hover {
+    background-color: #02033B;
+    color: #FFFFFF;
+}
+
+/* inscreva-se*/
+.formulario-palhaco{
+    position: absolute;
+    margin-left: -10px;
+}
+
+.options-section h5 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.options-section ul {
+    list-style: none;
+    padding: 0;
+    line-height: 1.5; 
+}
+
+.options-section ul li {
+    margin-bottom: 10px;
+}
+
+.options-section ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.options-section ul li a:hover {
+    text-decoration: underline;
+}
+
+
+
+/* Responsividade */
+
+/* Ajuste para telas muito grandes */
+@media (min-width: 1800px) {
+     /* Ajusta os controles do carrossel para telas grandes */
+    .carousel-inner .carousel-item .d-block {
+        height: 850px; 
+        object-fit: cover; 
+        object-position: 120% 20%; 
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 60px; 
+        height: 60px;
+    }
+
+    .carousel-indicators li {
+        width: 20px; 
+        height: 20px;
+    }
+
+    /* Time line*/
+
+    .director{
+        margin-right: 40px;
+    }
+
+   
+    .image-container img.diretor {
+        width: 400px;
+        height: 600px;
+    }
+
+    .year{
+        padding-right: 50px;
+    }
+
+    .location{
+        margin-top: 50px;
+    }
+
+    .year-circle{
+        width: 200px;
+        height: 200px;
+        font-size: 50px;
+        
+    }
+
+    .arrow {
+        width: 250px;
+        margin-top: 460px;
+    }
+    
+    .directors-info {
+        padding-top: 30px;
+        padding-left: 100px;
+        width: 450px;
+        height: 220px;
+        margin-top: 450px;
+        font-size: 19px;
+      }
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+       margin-left: 280px;
+        top: 100px;
+        width: 80px;
+        height: 2px;
+    }
+
+    
+    /* Por que somos palhaços*/
+    .porque-somos-palhacos {
+        font-size: 3.5rem; 
+        line-height: 1.2;
+    }
+
+    .porque-somos-palhacos-section .texto-menor {
+        margin-right: 450px;
+        font-size: 2.5rem;
+      }
+
+    .porque-somos-palhacos-section .texto-maior {
+        margin-right: 300px;
+        font-size: 5rem; 
+    }
+
+    .porque-somos-palhacos-section .descricao {
+        font-size: 1.8rem; 
+        line-height: 1.6; 
+        margin-left: 550px; 
+        text-align: left;
+    }
+
+    .icon {
+        width: 80px; 
+        height: auto; 
+        margin-left: 100px;
+    }
+
+    .text {
+        font-size: 1.5rem; 
+        line-height: 1.5;
+        margin-left: 200px;
+    }
+
+    .bold-text {
+        font-size: 1.5rem; 
+        font-weight: bold; 
+        margin-right: 220px;
+    }
+
+    .row {
+        margin-top: 80px; 
+    }
+
+    .nossa-motivacao h2 {
+        font-size: 50px;
+    }
+
+    .testimonial-box {
+        width: 300px;
+        height: 200px;
+    }
+
+    .como-nos-preparamos .texto-menor {
+        font-size: 40px;        
+      }
+    
+      .como-nos-preparamos .texto-maior {
+        font-size: 70px;        
+    }
+    
+    .como-nos-preparamos .descricao {
+        width: 100%;
+        font-size: 20px;
+        line-height: 1.0;
+    }
+
+    .icon{
+        margin-left: 250px;
+    }
+
+    
+}
+
+@media(max-width: 1440px){
+
+    /* Ajustes no Carrossel */
+
+    /* Ajusta os controles do carrossel para notebooks */
+    .carousel-inner .carousel-item .d-block {
+        height: 600px;
+        object-fit: cover;
+        object-position: 120% 15%;
+      }
+
+   
+    /* Ajustes nos textos */
+    .porque-somos-palhacos-section .texto-menor{
+        margin-right: 380px;
+    }
+ 
+    .porque-somos-palhacos-section .texto-maior{
+        margin-right: 300px;
+    }
+
+    .porque-somos-palhacos-section .descricao {
+        text-align: left;
+        margin-left: 360px;
+      }
+ 
+    .col-md-1{
+        margin-right: 50px;
+    }
+ 
+   
+    .icon {
+        margin-left: 200px;
+    }
+
+    .text {
+        margin-left: 100px;
+    }
+
+    .bold-text{
+        margin-right: 140px;
+    }
+
+     /* Time line*/
+    .image-container img.diretor {
+        width: 300px;
+        height: 400px;
+      }
+
+    .year-circle{
+        width: 170px;
+        height: 170px;
+        font-size: 50px;
+        margin: 20px;
+        
+    }
+
+    .location {
+        background-color: #5C9ECC; 
+        border-radius: 15px; 
+        width: 200px; 
+       
+        font-size: 19px; 
+        padding-top: 15px;
+        text-align: center; 
+        
+    }
+    
+
+    .directors-info{
+        width: 400px;
+        align-self: flex-end;
+        padding-top: 15px;
+        padding-left: 100px;
+        font-size: 16px;
+    }
+
+    .arrow  {
+        margin-top: 300px;
+    }   
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+        margin-left: 239px;
+        top: 100px;
+        width: 70px;
+        height: 2px;
+     }
+    
+     /* Por que somos palhaços*/
+     
+ 
+     
+   /* Nossa motivação*/
+
+   .nossa-motivacao{
+        height: 700px;
+   }
+   .nossa-motivacao h2{
+      font-size: 40px;
+   }
+
+   .testimonial-box-container{
+       height: 500px;
+   }
+
+
+   /* Ajustes para a seção "Nossos serviços" */
+   
+   .outros-servicos-section{
+       height: 700px;
+   }
+
+   .servico-card {
+       height: 500px;
+   }
+
+   .servico-detalhe {
+       text-align: center; 
+       margin-left: 50px;
+   }
+
+   .servico-titulo {
+       font-size: 18px; 
+   }
+
+   .testimonial-box {
+       margin-bottom: 20px; 
+   }
+ 
+   .formulario-palhaco img {
+       width: 100%; 
+       height: auto; 
+   }
+
+   
+}
+
+@media(max-width: 1280px){
+    .porque-somos-palhacos-section .texto-menor{
+        margin-right: 380px;
+    }
+ 
+    .porque-somos-palhacos-section .texto-maior{
+        margin-right: 300px;
+    }
+ 
+    .col-md-1{
+        margin-right: 50px;
+    }
+ 
+     .porque-somos-palhacos-section.descricao {
+     margin-left: 320px; 
+ }
+ 
+    .icon {
+        margin-left: 150px;
+    }
+
+    .text {
+        margin-left: 80px;
+    }
+
+    .bold-text{
+        margin-right: 150px;
+    }
+
+}
+
+@media(max-width: 1024px){
+    .porque-somos-palhacos-section .texto-menor{
+        margin-right: 290px;
+    }
+ 
+    .porque-somos-palhacos-section .texto-maior{
+        margin-right: 200px;
+    }
+ 
+    .col-md-1{
+        margin-right: 50px;
+    }
+ 
+    .porque-somos-palhacos-section .descricao {
+     margin-left: 240px; 
+     text-align: left;
+ }
+ 
+    .icon {
+        margin-left: 120px;
+    }
+
+    .text {
+        margin-left: 70px;
+        width: 400px;
+    }
+
+    .bold-text{
+        margin-right: 10px;
+    }
+
+  /* Timeline */
+   
+    .image-container img.diretor {
+        width: 250px;
+    }
+
+    .year-circle{
+        width: 200px;
+        height: 200px;
+        font-size: 50px;
+        
+    }
+
+    .location{
+        font-size: 16px;
+        margin-left: 20px;
+        width: 200px;
+    }
+
+    .arrow  {
+        margin-top: 300px;;
+    }
+
+    .directors-info {
+        width: 35%;
+    }
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+        margin-left: 230px;
+        top: 90px;
+        width: 30px;
+        height: 2px;
+    }
+    
+        /* Linha amarela apontando para baixo na localização */
+    .location::before {
+        top: 200px; 
+        margin-left: 50px;
+        width: 2px;
+        height: 30px; 
+    }
+}
+
+
+@media(max-width: 834px){
+     /* Ajusta os controles do carrossel para tablets */
+     .carousel-inner .carousel-item .d-block {
+        height: 600px;
+        object-fit: cover;
+        object-position: 120% 15%;
+      }
+
+
+    .porque-somos-palhacos-section .texto-menor {
+        margin-left: 150px;
+        font-size: 2rem;
+    }
+
+    .porque-somos-palhacos-section .texto-maior {
+        margin-left: 150px;
+        font-size: 4rem; 
+    }  
+    
+    .porque-somos-palhacos-section .descricao {
+        margin-left: 120px;
+        text-align: left;
+      }
+
+    
+
+    .icon {
+        margin-left: 50px;
+    }
+
+    .text{
+        font-size: 1.0rem; 
+        line-height: 1.2;
+        margin-left: 20px;
+        width: 400px;
+    }
+
+    .bold-text {
+        font-weight: bold; 
+        font-size: 1.0rem; 
+        margin-right: 100px;
+    }
+
+    /* Como nos preparamos*/
+
+    .como-nos-preparamos .texto-menor {
+        font-size: 25px;
+      }
+    .como-nos-preparamos .texto-maior {
+        margin-right: 250px;
+        font-size: 40px;
+      }
+      
+      /* Timeline */
+
+    .image-container img.diretor {
+        width: 250px;
+    }
+
+    .year-circle{
+        width: 150px;
+        height: 150px;
+        font-size: 50px;
+        
+    }
+
+    .location {
+        width: 150px;
+        font-size: 16px;
+        margin-left: 20px;
+        font-size: 14px;
+      }
+
+    .arrow  {
+        margin-top: 300px;
+    }
+
+    .directors-info {
+        width: 50%;
+    }
+
+     /* Linha amarela apontando para a direita no círculo */
+     .year-circle::after {
+        margin-left: 180px;
+        top: 70px;
+        width: 30px;
+        height: 2px;
+    }
+
+    .servico-card{
+        height: 800px;
+    }
+
+    .outros-servicos-section {
+        background-color: #91C9E6;
+        padding: 40px;
+        margin-top: 40px;
+        height: 1000px;
+    }
+    
+}
+
+
+@media (max-width: 768px){
+    /* Por que somos palhaços */
+    .porque-somos-palhacos {
+        font-size: 2rem;
+        margin-right: 150px;
+        text-align: center; 
+        margin-right: 10; 
+        margin-left: 0; 
+    }
+
+    .icon {
+        margin-left: 50px;
+    }
+
+    .text{
+        font-size: 1.0rem; 
+        line-height: 1.2;
+        margin-left: 20px;
+        width: 400px;
+    }
+
+    .bold-text {
+        font-weight: bold; 
+        font-size: 1.0rem; 
+        margin-right: 65px;
+    }
+
+
+    /* Nossa motivação*/
+    .nossa-motivacao{
+        height: 950px;
+    }
+
+    .testimonial-box-container{
+        height: 100px;
+    }
+
+    .porque-somos-palhacos-section .descricao {
+        margin-left: 10px;
+      }
+}
+
+
+@media (max-width: 520px) {
+
+    /* Carrousel*/
+    #carouselExampleControls img {
+        max-height: 300px; 
+        object-position: top;
+    }
+
+   /* Muda o layout para coluna */
+   .timeline {
+    flex-direction: column;
+    }
+
+    /* Ajuste para a imagem */
+
+    .director {
+        flex-direction: column; 
+        align-items: center; 
+    }
+    
+    .image-container img.diretor {
+        width: 100%; 
+    }
+
+    .location{
+        font-size: 14px;
+    }
+
+    /* Reduz o tamanho do círculo de ano */
+    .year-circle {
+        width: 150px;
+        height: 150px;
+        font-size: 20px;
+    }
+
+    /* Espaçamento para a seta */
+    .arrow {
+       display: none;
+    }
+
+    /* Ajusta a largura da seção de informações */
+    .directors-info {
+        text-align: left;
+        justify-content: center;
+        align-items: center;
+        width: 90%;
+        margin-right: 20px;
+        padding-right: 40px;
+        font-size: 16px;
+    }
+
+
+    /* Linha amarela apontando para a direita no círculo */
+    .year-circle::after {
+       display: none;
+    }
+
+    /* Por que somos palhacos*/
+
+    .porque-somos-palhacos-section .row {
+        margin-top: 30px; 
+    }
+
+    .porque-somos-palhacos {
+        font-size: 2rem;
+        margin-right: 100px;
+        text-align: center; 
+        margin-right: 10; 
+        margin-left: 0; 
+    }
+    
+    .porque-somos-palhacos .texto-menor {
+        font-size: 1.1rem;
+        margin-right: 0; 
+        margin-left: 70px;
+    }
+
+    .porque-somos-palhacos .texto-maior {
+        font-size: 2.5rem; 
+        margin-right: 0; 
+        margin-left: 70px;
+    }
+
+    .porque-somos-palhacos-section .descricao {
+        margin-left: 0px; 
+    }
+
+    .descricao {
+        text-align: center;
+        font-size: 1rem; 
+        margin-right: 0; 
+        margin-left: 10px; 
+    }
+
+    .icon {
+        width: 50px; 
+        height: auto;
+        margin-left: 60px;
+    }
+    
+    .text {
+        color: #555; 
+        width: 100%;
+        margin-right: 30px;
+    }
+    
+    .bold-text {
+        font-size: 1.0rem;
+        font-weight: bold;
+        color: #E53935; 
+        text-align: center;
+        margin-left: 70px;
+    }
+
+
+    br{
+        display: none;
+    }
+
+
+    /* Como nos preparamos */
+
+    .como-nos-preparamos {
+        flex-direction: column; /* Torna a direção dos elementos vertical em telas menores */
+      }
+
+    .como-nos-preparamos .texto-menor {
+        margin-left: 10px;
+        font-size: 22px;
+        text-transform: uppercase;
+    }
+    .como-nos-preparamos .texto-maior {
+        margin-left: 10px;
+        font-size: 40px;
+        font-weight: bold;
+    }
+    .como-nos-preparamos .descricao {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333;
+        margin-left: 10px; 
+        max-width: 900px; 
+        text-align: left;
+    }
+
+    .como-nos-preparamos .imagem-preparacao {
+        display: flex;
+        align-items: center;
+        width: 100%; 
+        height: auto;
+      }
+      
+
+    /* Nossa motivação*/
+
+    .nossa-motivacao{
+        height: 1850px;
+    }
+
+    .testimonial-box {
+        width: calc(82% - 20px);
+        min-height: 250px; 
+    }
+
+    .nossa-motivacao h2 {
+        font-size: 1.75rem;
+    }
+
+    .client-comment img {
+        height: 200px;
+        width: 250px;
+    }
+
+    .name-user {
+        margin-left: 10px;
+        margin-bottom: 15px;
+        
+    }
+    .name-user strong {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    .name-user span {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 15px;
+    }
+
+
+    /* Outros serviços */
+    .servico-detalhe {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .servico-icon {
+        width: 50px;
+        height: auto;
+        margin-right: 180px;
+    }
+    
+    .servico-titulo {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #002C77;
+        margin-right: 180px;
+    }
+    
+    .servico-descricao {
+        font-size: 1rem;
+        color: #555555;
+        margin-top: 10px;
+        width: 200px;
+        margin-right: 180px;
+    }
+
+    .outros-servicos-section {
+        background-color: #91C9E6;
+        padding: 40px;
+        margin-top: 40px;
+        height: 1100px;
+    }
+    
+    .servico-card {
+        background-color: #FFFFFF;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 50px;
+        height: 940px;
+        border-radius: 40px;
+    }
+
+
+    .titulo-servicos {
+        font-size: 1.75rem;
+    }
+
+    
+    .col-md-6 {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    
+    .servico-icon {
+        width: 40px;
+        height: 40px;
+        margin-left: 80px;
+    }
+
+    .servico-titulo {
+        font-size: 1.1rem;
+        margin-left: 80px;
+    }
+
+    .servico-descricao {
+        font-size: 0.9rem;
+        margin-left: 80px;
+    }
+
+    /* Ajusta o botão */
+    .btn {
+        width: 200px;
+        height: 45px;
+        font-size: 0.95rem;
+    }
+
+    .formulario-palhaco {
+        display: none;
+    }
+
+ 
+    .options-section ul {
+        line-height: 1.8; 
+    }
+
+    
+    .position-absolute {
+        position: relative;
+        transform: none;
+    }
+}
+
+@media(max-width: 390px){
+    .directors-info {
+        padding-right: 40px;
+        font-size: 13px;
+      }
+
+      .porque-somos-palhacos-section .descricao {
+        margin-left: 10px;
+      }
+}
+
+@media(max-width: 320px){
+    .porque-somos-palhacos .texto-menor {
+        font-size: 1.1rem;
+        margin-right: 0;
+        margin-left: 20px;
+      }
+
+    .porque-somos-palhacos .texto-maior {
+        font-size: 2.5rem;
+        margin-right: 0;
+        margin-left: 25px;
+      }
+
+      .client-comment img {
+        height: 200px;
+        width: 210px;
+      }
+
+      .como-nos-preparamos .texto-menor {
+        font-size: 1.3rem;
+        margin-left: 5px;
+      }
+
+      .como-nos-preparamos .texto-maior {
+        font-size: 2.2rem;
+        margin-right: 0;
+        margin-left: 5px;
+      }
+
+}
