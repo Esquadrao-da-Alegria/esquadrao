@@ -5,11 +5,16 @@
 /* Gerais */
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    padding-top: 70px; 
-}
+    
+}  
+
+html, body {
+    overflow-x: hidden; 
+  }
 
 
-.carousel-indicators li {
+
+  .carousel-indicators li {
     width: 12px;
     height: 50px; 
     border-radius: 50%; 
@@ -921,7 +926,14 @@ body {
 
 @media (max-width: 520px) {
 
+
+
     /* Carrousel*/
+    #carouselExampleControls{
+        margin-top: 65px;
+    }
+
+
     #carouselExampleControls img {
         max-height: 300px; 
         object-position: top;
