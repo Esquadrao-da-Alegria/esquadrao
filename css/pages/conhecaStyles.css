@@ -5,17 +5,16 @@
 /* Gerais */
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
+    
+}  
 
-.row {
-    margin: 0;
-}
+html, body {
+    overflow-x: hidden; 
+  }
 
-body {
-    padding-top: 70px; 
-}
 
-.carousel-indicators li {
+
+  .carousel-indicators li {
     width: 12px;
     height: 50px; 
     border-radius: 50%; 
@@ -271,10 +270,10 @@ body {
   }
   
   .como-nos-preparamos .imagem-preparacao {
-    max-width: 100%; /* Garante que a imagem não ultrapasse a largura do container */
-    height: auto;    /* Mantém a proporção da imagem */
-    border-radius: 10px; /* Bordas arredondadas */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ao redor da imagem */
+    max-width: 100%; 
+    height: auto;    
+    border-radius: 10px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
     display: block;
     margin: 0 auto;
   }
@@ -927,7 +926,14 @@ body {
 
 @media (max-width: 520px) {
 
+
+
     /* Carrousel*/
+    #carouselExampleControls{
+        margin-top: 65px;
+    }
+
+
     #carouselExampleControls img {
         max-height: 300px; 
         object-position: top;
@@ -1214,6 +1220,9 @@ body {
 }
 
 @media(max-width: 390px){
+
+    
+
     .directors-info {
         padding-right: 40px;
         font-size: 13px;
