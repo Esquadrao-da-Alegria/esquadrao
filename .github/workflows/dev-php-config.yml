@@ -39,8 +39,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
-
+    
       - name: Build complete
         run: echo "Build e cache do Composer concluídos"
