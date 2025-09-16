@@ -3,7 +3,7 @@ name: PHP Config
 on:
   push:
     branches:
-      - phpyml
+      - dev
 
 jobs:
   run:
