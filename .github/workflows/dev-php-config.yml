@@ -3,7 +3,7 @@ name: PHP Config
 on:
   push:
     branches:
-      - dev
+      - phpyml
 
 jobs:
   run:
@@ -25,4 +25,4 @@ jobs:
           extensions: mbstring, intl, bcmath, pdo_mysql
           ini-values: post_max_size=256M, max_execution_time=180
           coverage: xdebug
-          tools: php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}, composer
+          tools: php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}
