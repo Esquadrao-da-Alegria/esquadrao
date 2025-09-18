@@ -11,34 +11,18 @@ jobs:
     strategy:
       matrix:
         operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-versions: ['8.2', '8.3', '8.4']
+        php-versions: ['8.4']
         phpunit-versions: ['latest']
-        include:
-          - operating-system: 'ubuntu-latest'
-            php-versions: '8.1'
-            phpunit-versions: 10
 
     steps:
       - name: Get latest code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl
+          extensions: mbstring, intl, bcmath, pdo_mysql
           ini-values: post_max_size=256M, max_execution_time=180
           coverage: xdebug
-          tools: php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-    
-      - name: Build complete
-        run: echo "Build e cache do Composer concluídos"
+          tools: php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}, composer
