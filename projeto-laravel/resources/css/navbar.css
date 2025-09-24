@@ -10,7 +10,7 @@ header, .navbar {
 
 #navbar-links a {
     text-decoration: none;
-    color: #02033B;
+    color: #02033B !important;
     transition: 0.2s;
 }
 

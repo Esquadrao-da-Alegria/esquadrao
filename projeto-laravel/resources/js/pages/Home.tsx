@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 // Importar CSS globais
 import '../../css/footer.css';
@@ -22,8 +22,12 @@ const Home: React.FC = () => {
         <div className="container-global">
             {/* Navbar */}
             <header>
-                <nav className="navbar navbar-expand-lg fixed-top">
+                <nav
+                    className="navbar navbar-expand-lg fixed-top"
+                    style={{ zIndex: 1030 }}
+                >
                     <div className="container">
+                        {/* Logo */}
                         <a
                             href="#"
                             className="navbar-brand d-flex align-items-center"
@@ -33,17 +37,6 @@ const Home: React.FC = () => {
                                 alt="Logo Esquadrão"
                             />
                         </a>
-                        <button
-                            className="navbar-toggler navbar-light"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navbar-links"
-                            aria-controls="navbar-links"
-                            aria-expanded="false"
-                            aria-label="toggle navigation"
-                        >
-                            <span className="navbar-toggler-icon"></span>
-                        </button>
                         <div
                             className="navbar-collapse justify-content-end collapse"
                             id="navbar-links"
@@ -118,7 +111,45 @@ const Home: React.FC = () => {
                 <div className="star bottom">★</div>
             </div>
 
-            {/* ...continue com os outros blocos da mesma forma, convertendo class -> className, src -> /assets/... */}
+            {/* Apoiadores */}
+            <div
+                className="container-informacoes p-3"
+                style={{ width: '100%' }}
+            >
+                <div className="container">
+                    <div className="row align-items-center text-center">
+                        <div className="col-md-3 col-12">
+                            <h3>Apoiadores</h3>
+                        </div>
+                        <div className="col-md-3 col-12">
+                            <a
+                                href="https://nfg.sefaz.rs.gov.br/site/index.aspx"
+                                target="_blank"
+                            >
+                                <img
+                                    src="./assets/images/logo-nfg.jpg"
+                                    alt="Nota Fiscal Gaúcha"
+                                    className="img-fluid d-block mx-auto"
+                                    style={{ maxWidth: '150px' }}
+                                ></img>
+                            </a>
+                        </div>
+                        <div className="col-md-3 col-12">
+                            <a
+                                href="https://www.sicredi.com.br/home/"
+                                target="_blank"
+                            >
+                                <img
+                                    src="./assets/images/logo-sicredi.jpg"
+                                    alt="Sicredi"
+                                    className="img-fluid d-block mx-auto"
+                                    style={{ maxWidth: '150px' }}
+                                ></img>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Footer */}
             <footer
