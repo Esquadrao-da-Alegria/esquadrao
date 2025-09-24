@@ -1,0 +1,93 @@
+/* Seção Doação */
+.doacao-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.col {
+    flex: 1;
+    padding: 15px;
+}
+
+/* Imagem */
+.maos-coracao {
+    width: 100%;
+    height: auto;
+}
+
+/* Texto */
+.juntos {
+    font-size: 1.5rem;
+    text-align: left;
+}
+
+.text-danger {
+    color: red;
+}
+
+/* QR Code Section */
+.qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.qr-code {
+    max-width: 200px; 
+    width: 100%; 
+    height: auto; 
+    border: 2px solid #ddd; 
+    border-radius: 8px; 
+  }
+
+.qr-text {
+    text-align: center;
+    line-height: 1.0;
+}
+
+/* Responsividade */
+
+@media (max-width: 834px){
+    .juntos{
+        margin-top: 65px;
+    }
+
+    .qr-text .fs-6 .fs-sm-5 {
+        font-size: 2px;
+      }
+}
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .col {
+        width: 100%;
+        text-align: center;
+    }
+
+    .qr-text {
+        text-align: center;
+    }
+
+    .juntos {
+        
+        font-size: 1.2rem;
+    }
+
+    .qr-text p {
+        font-size: 0.9rem;
+    }
+}
