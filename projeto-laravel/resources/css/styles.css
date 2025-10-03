@@ -19,27 +19,27 @@ body {
 }
 
 .introducao {
-    padding: 80px 20px; 
-    max-width: 1200px; 
+    padding: 80px 20px;
+    max-width: 1200px;
     margin-left: auto;
-    margin-right: auto; 
+    margin-right: auto;
 }
 
 .image-palhacos {
     max-width: 90%;
     height: auto;
-    position: relative; 
+    position: relative;
 }
 
 .text-section {
     position: relative;
-   
+
 }
 
 /* Textos e logo sobrepostos */
 .col-md-6 .rotate-left {
     position: absolute;
-    top: 12%; 
+    top: 12%;
     left: -19%;
     height: 115px;
     width: 420px;
@@ -50,25 +50,25 @@ body {
     padding: 5px;
     transform: rotate(-3deg);
     line-height: 50px;
-   
+
 }
 
 .rotate-right {
     position: absolute;
-    top: 49%; 
+    top: 49%;
     left: -10%;
     width: 410px;
     font-size: 18px;
     background-color: whitesmoke;
     padding: 15px;
     transform: rotate(1deg);
-   
+
 }
 
 .image-logo {
     position: absolute;
-    margin-top: 240px; 
-    left: 45%; 
+    margin-top: 240px;
+    left: 45%;
     max-width: 120px;
     height: auto;
 }
@@ -122,7 +122,7 @@ body {
 .container-informacoes {
     margin-top: 50px;
     margin-bottom: 50px;
-    background-color: #FFC8CA;  
+    background-color: #FFC8CA;
 }
 
 .container-informacoes h3 {
@@ -181,7 +181,7 @@ body {
     font-family: 'Poppins', sans-serif;
     border-radius: 50px;
     padding: 10px 20px;
-    width: 50%; 
+    width: 50%;
     transition: background 0.3s ease;
     margin-left: 150px;
 }
@@ -221,8 +221,8 @@ body {
     left: 0;
     width: 100%;
     height: 30px;
-    background-color: #F5DD6D; 
-    z-index: -1; 
+    background-color: #F5DD6D;
+    z-index: -1;
     transform: skewX(-20deg);
 }
 
@@ -270,8 +270,8 @@ body {
     right: 0;
     width: 10%;
     height: 30px;
-    background-color: #F5DD6D; 
-    z-index: -1; 
+    background-color: #F5DD6D;
+    z-index: -1;
     transform: skewX(-20deg);
 }
 
@@ -284,7 +284,7 @@ body {
     font-family: 'Poppins', sans-serif;
     font-weight: 500;
     margin: 0;
-    margin-right: 10px; 
+    margin-right: 10px;
 }
 
 .arrow {
@@ -297,15 +297,15 @@ body {
 .card-content {
     margin-top: 10px;
     display: flex;
-    align-items: center; 
+    align-items: center;
     text-decoration: none;
-    color: inherit; 
+    color: inherit;
 }
 
-.card-content:hover .city-text,
+/* .card-content:hover .city-text,
 .card-content:hover .arrow {
-    text-decoration: underline; 
-}
+    text-decoration: underline;
+} */
 
 
 /*Formulario*/
@@ -360,20 +360,20 @@ body {
     transform: rotate(2deg);
     position: relative;
     top: -30px;
-    width: 80%; 
+    width: 80%;
 }
 
 .img-direita {
-    transform: rotate(2deg);  
+    transform: rotate(2deg);
     position: relative;
     top: 120px;
-    width: 80%;  
+    width: 80%;
 }
 
 .texto-central {
     text-align: center;
-    width: 400px; 
-    max-width: 100%; 
+    width: 400px;
+    max-width: 100%;
     flex: 0 0 auto;
 }
 
@@ -407,8 +407,8 @@ body {
 
     .image-logo{
         position: absolute;
-        margin-top: 250px; 
-        left: 43%; 
+        margin-top: 250px;
+        left: 43%;
         max-width: 120px;
         height: auto;
     }
@@ -422,7 +422,7 @@ body {
         background-color: whitesmoke;
         transform: rotate(1deg);
     }
-    
+
     .star.top {
         top: 10%;
     }
@@ -445,25 +445,25 @@ body {
     .star.bottom {
         bottom: 30%;
         left: 50%;
-    }  
+    }
 }
 
 
 @media (max-width: 1440px) {
 
     #conheca .conheca-img {
-        width: 100%; 
-        height: auto; 
-        margin-bottom: 20px; 
+        width: 100%;
+        height: auto;
+        margin-bottom: 20px;
     }
 
     #conheca .description {
-        font-size: 1rem; 
-        margin-top: 50px; 
+        font-size: 1rem;
+        margin-top: 50px;
     }
 
     #conheca .btn-conheca {
-        font-size: 1rem; 
+        font-size: 1rem;
     }
 }
 
@@ -486,26 +486,26 @@ body {
         position: relative;
         left: 0;
         top: 0;
-        transform: none; 
+        transform: none;
         width: auto;
         margin-bottom: 10px;
-        text-align: center; 
+        text-align: center;
         font-size: 50px;
     }
 
     .col-md-6 .rotate-right {
         position: relative;
         left: 0;
-        transform: none; 
+        transform: none;
         width: auto;
         height: auto;
-        text-align: center; 
+        text-align: center;
     }
 
     .image-logo {
         position: absolute;
-        margin-top: -5px; 
-        left: 32%; 
+        margin-top: -5px;
+        left: 32%;
     }
 
     /* Nossa história */
@@ -524,13 +524,13 @@ body {
 /* Ajustes para telas com largura máxima de 800px */
 @media (max-width: 834px) {
     #conheca .conheca-img {
-        width: 100%; 
-        height: auto; 
-        margin-bottom: 10px; 
+        width: 100%;
+        height: auto;
+        margin-bottom: 10px;
     }
 
     #conheca .description {
-        font-size: 1rem; 
+        font-size: 1rem;
         margin-top: 0;
         padding-top: 60px;
     }
@@ -538,7 +538,7 @@ body {
     #conheca .btn-conheca {
         margin-left: 100px;
         width: 50%;
-        font-size: 1rem; 
+        font-size: 1rem;
     }
 }
 
@@ -555,33 +555,33 @@ body {
 @media (max-width: 520px) {
     .introducao {
         display: flex;
-        flex-direction: column; 
+        flex-direction: column;
         align-items: center;
-        text-align: center; 
+        text-align: center;
     }
 
     .col-md-6 img {
         width: 100%;
-        height: auto; 
+        height: auto;
     }
 
     .text-section {
-        padding-top: 20px; 
-        text-align: center; 
+        padding-top: 20px;
+        text-align: center;
     }
 
-    
+
     .image {
         width: 80px;
         height: 80px;
         margin-top: 20px;
     }
 
-    
+
     .rotate-left{
         font-size: 45px;
-    } 
-    
+    }
+
     .rotate-right {
         transform: none;
         margin-bottom: 10px;
@@ -600,7 +600,7 @@ body {
     .form-container {
         flex-direction: column;
     }
-    
+
     .form-container .col-md-6 {
         flex: 0 0 100%;
         max-width: 100%;
@@ -615,7 +615,7 @@ body {
     }
 
     #conheca .description {
-        font-size: 1rem; 
+        font-size: 1rem;
         margin-top: 0;
         padding-top: 5px;
     }

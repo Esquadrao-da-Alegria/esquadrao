@@ -8,16 +8,6 @@ header, .navbar {
     width: 75px;
 }
 
-#navbar-links a {
-    text-decoration: none;
-    color: #02033B !important;
-    transition: 0.2s;
-}
-
-#navbar-links a:hover {
-    color: #ED1B24;
-}
-
 @media (max-width: 520px) {
     .navbar-brand img {
         width: 75px;

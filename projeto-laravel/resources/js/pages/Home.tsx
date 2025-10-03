@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 // Importar CSS globais
+import { Link } from '@inertiajs/react';
 import '../../css/footer.css';
-import '../../css/navbar.css';
 import '../../css/styles.css';
 
 const Home: React.FC = () => {
@@ -26,61 +26,82 @@ const Home: React.FC = () => {
         console.log({ ...formData, accessKey });
         alert('Formulário enviado!');
     };
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <div className="container-global">
             {/* Navbar */}
-            <header>
-                <nav
-                    className="navbar navbar-expand-lg fixed-top"
-                    style={{ zIndex: 1030 }}
-                >
-                    <div className="container">
-                        {/* Logo */}
-                        <a
-                            href="#"
-                            className="navbar-brand d-flex align-items-center"
+            <header className="fixed top-0 z-50 w-full bg-white shadow">
+                <nav className="container mx-auto flex items-center justify-between px-4 py-4 md:px-0">
+                    {/* Logo */}
+                    <a href="#" className="flex items-center">
+                        <img
+                            src="/assets/images/logo-colorida.png"
+                            alt="Logo Esquadrão"
+                            className="h-15 md:h-15"
+                        />
+                    </a>
+
+                    {/* Botão hamburger para mobile */}
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="flex items-center justify-center rounded-md p-2 text-gray-700 hover:text-gray-900 focus:ring-2 focus:ring-gray-500 focus:outline-none md:hidden"
+                    >
+                        <svg
+                            className="h-6 w-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
                         >
-                            <img
-                                src="/assets/images/logo-colorida.png"
-                                alt="Logo Esquadrão"
-                            />
-                        </a>
-                        <div
-                            className="navbar-collapse justify-content-end collapse"
-                            id="navbar-links"
+                            {isOpen ? (
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            ) : (
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                            )}
+                        </svg>
+                    </button>
+
+                    {/* Menu links */}
+                    <div
+                        className={`w-full flex-col transition-all duration-300 md:flex md:w-auto md:flex-row md:items-center ${
+                            isOpen ? 'mt-4 flex md:mt-0' : 'hidden md:flex'
+                        }`}
+                    >
+                        <Link
+                            href="/pages/conheca.html"
+                            className="block px-3 py-2 font-medium text-gray-700 no-underline hover:text-orange-500 md:inline-block"
                         >
-                            <div className="navbar-nav">
-                                <a
-                                    href="/pages/conheca.html"
-                                    className="nav-item nav-link"
-                                    id="about-menu"
-                                >
-                                    Conheça
-                                </a>
-                                <a
-                                    href="/pages/hospitais.html"
-                                    className="nav-item nav-link"
-                                    id="hospitals-menu"
-                                >
-                                    Hospitais
-                                </a>
-                                <a
-                                    href="/pages/docacao.html"
-                                    className="nav-item nav-link"
-                                    id="partners-menu"
-                                >
-                                    Doação
-                                </a>
-                                <a
-                                    href="#fale-conosco"
-                                    className="nav-item nav-link"
-                                    id="contact-menu"
-                                >
-                                    Fale Conosco
-                                </a>
-                            </div>
-                        </div>
+                            Conheça
+                        </Link>
+                        <Link
+                            href="/pages/hospitais.html"
+                            className="block px-3 py-2 font-medium text-gray-700 no-underline hover:text-orange-500 md:inline-block"
+                        >
+                            Hospitais
+                        </Link>
+                        <Link
+                            href="/pages/docacao.html"
+                            className="block px-3 py-2 font-medium text-gray-700 no-underline hover:text-orange-500 md:inline-block"
+                        >
+                            Doação
+                        </Link>
+                        <Link
+                            href="#fale-conosco"
+                            className="text-gray-800 no-underline hover:text-orange-500"
+                        >
+                            Fale Conosco
+                        </Link>
                     </div>
                 </nav>
             </header>
