@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 // Importar CSS globais
 import '../../css/footer.css';
@@ -6,17 +6,26 @@ import '../../css/navbar.css';
 import '../../css/styles.css';
 
 const Home: React.FC = () => {
-    // Scripts que precisavam do <script> inline, como seu index.js
-    useEffect(() => {
-        // Se você tinha funções globais, pode chamá-las aqui
-        // Por exemplo, se no index.js havia uma função enviarFormulario:
-        const enviarFormulario = () => {
-            console.log('Formulário enviado!');
-        };
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        message: '',
+    });
 
-        // Torne global se quiser chamar via button inline
-        (window as any).enviarFormulario = enviarFormulario;
-    }, []);
+    const accessKey = '53b7a3e3-b32f-4b85-9be7-d8f176bed235';
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = () => {
+        // Aqui você pode adicionar a lógica de envio do formulário
+        console.log({ ...formData, accessKey });
+        alert('Formulário enviado!');
+    };
 
     return (
         <div className="container-global">
@@ -146,6 +155,321 @@ const Home: React.FC = () => {
                                     style={{ maxWidth: '150px' }}
                                 ></img>
                             </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Como apoiar */}
+            <div
+                className="container-fluid"
+                style={{ backgroundColor: '#ECFFF0' }}
+            >
+                <div className="como-apoiar-container container">
+                    <div className="row align-items-center">
+                        {/* Imagem do lado esquerdo */}
+                        <div className="col-md-6">
+                            <img
+                                src="./assets/images/como-apoiar.png"
+                                alt="Palhaça"
+                                className="img-fluid como-apoiar-img"
+                            />
+                        </div>
+
+                        {/* Conteúdo do lado direito */}
+                        <div className="col-md-6">
+                            <h2>
+                                Como <span className="apoiar">apoiar</span> o
+                                <br />
+                                Esquadrão da Alegria
+                            </h2>
+
+                            {/* Informações */}
+                            <div className="row mt-4">
+                                <div className="col-md-4">
+                                    <div className="info-card">
+                                        <span className="number">+95</span>
+                                        <p>Voluntários</p>
+                                    </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                    <div className="info-card">
+                                        <span className="number">+45mil</span>
+                                        <p>Pessoas impactadas/ano</p>
+                                    </div>
+                                </div>
+
+                                <div className="col-md-4">
+                                    <div className="info-card">
+                                        <span className="number">+900</span>
+                                        <p>Visitas/ano</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Botão */}
+                            <div className="mt-4">
+                                <a href="./pages/docacao.html">
+                                    <button
+                                        className="btn btn-custom"
+                                        style={{
+                                            borderRadius: '15px',
+                                            fontSize: '1.2rem',
+                                        }}
+                                    >
+                                        Saiba mais
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Conheça */}
+            <section id="conheca" className="container py-5">
+                <div className="row align-items-center">
+                    <div className="col-md-6 position-relative">
+                        <h2 className="title-overlay">
+                            CONHEÇA
+                            <br />
+                            NOSSOS
+                            <br />
+                            DOUTORES
+                        </h2>
+                        <img
+                            className="conheca-img img-fluid"
+                            src="./assets/images/conheca-palhacos.png"
+                            alt="Imagem dos Doutores"
+                        />
+                    </div>
+
+                    <div className="col-md-6">
+                        <p className="description">
+                            Nossos doutores besteirologistas são pessoas comuns,
+                            das mais diferentes áreas de formação, que atuam na
+                            sociedade como estudantes, profissionais e
+                            empresários, entre outros, que dedicam parte do seu
+                            tempo a nossa causa.
+                        </p>
+                        <a href="./pages/conheca.html">
+                            <button
+                                className="btn btn-conheca mt-3"
+                                style={{ borderRadius: '15px' }}
+                            >
+                                Saiba mais
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            {/* Hospitais */}
+            <div className="container my-5">
+                <h2 className="hospitais-title">ONDE ATUAMOS</h2>
+                <div className="row">
+                    <div className="col-md-4 mb-4">
+                        <div className="city-card">
+                            <img
+                                src="./assets/images/porto-alegre.png"
+                                alt="Porto Alegre"
+                                className="img-fluid"
+                            />
+                            <a
+                                href="./pages/hospitais.html"
+                                className="card-content d-flex align-items-center"
+                            >
+                                <p className="city-text">Porto Alegre</p>
+                                <span className="arrow">&gt;</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className="col-md-4 mb-4">
+                        <div className="city-card">
+                            <img
+                                src="./assets/images/santa-maria.png"
+                                alt="Santa Maria"
+                                className="img-fluid"
+                            />
+                            <a
+                                href="./pages/hospitais.html"
+                                className="card-content d-flex align-items-center"
+                            >
+                                <p className="city-text">Santa Maria</p>
+                                <span className="arrow">&gt;</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className="col-md-4 mb-4">
+                        <div className="city-card">
+                            <img
+                                src="./assets/images/pelotas.png"
+                                alt="Pelotas"
+                                className="img-fluid"
+                            />
+                            <a
+                                href="./pages/hospitais.html"
+                                className="card-content d-flex align-items-center"
+                            >
+                                <p className="city-text">Pelotas</p>
+                                <span className="arrow">&gt;</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Nossa História */}
+            <div
+                className="nossa-história"
+                style={{ marginTop: '175px', height: '500px' }}
+            >
+                <div className="row align-items-center justify-content-between">
+                    {/* Imagem da esquerda */}
+                    <div className="col text-start">
+                        <img
+                            src="./assets/images/noosa-historia-esquerda.png"
+                            alt="Nossa história"
+                            className="img-fluid img-esquerda"
+                        />
+                    </div>
+
+                    {/* Texto central */}
+                    <div className="col texto-central">
+                        <h3
+                            className="titulo-historia mb-5"
+                            style={{ textAlign: 'center', marginTop: '100px' }}
+                        >
+                            NOSSA HISTÓRIA
+                        </h3>
+                        <p className="mb-5" style={{ marginTop: '90px' }}>
+                            Um grupo que começa com o desejo de transformar
+                            espaços através da palhaçaria
+                        </p>
+                        <a href="./pages/conheca.html">
+                            <button
+                                type="button"
+                                className="btn btn-historia mt-3"
+                                style={{
+                                    width: '200px',
+                                    borderRadius: '15px',
+                                    fontSize: '1.2rem',
+                                }}
+                            >
+                                Saiba mais
+                            </button>
+                        </a>
+                    </div>
+
+                    {/* Imagem da direita */}
+                    <div className="col text-end">
+                        <img
+                            src="./assets/images/nossa-historia-direita.png"
+                            alt="Nossa história"
+                            className="img-fluid img-direita"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* Formulário */}
+            <div className="container my-5" id="fale-conosco">
+                <div className="row justify-content-center">
+                    <div className="col-lg-8">
+                        <div className="contact-form rounded p-4">
+                            <div className="form-container d-flex flex-wrap">
+                                {/* Formulário */}
+                                <div className="col-md-6">
+                                    <h2 className="mb-4">Fale Conosco</h2>
+                                    <form
+                                        id="meuFormulario"
+                                        onSubmit={(e) => e.preventDefault()}
+                                    >
+                                        <div className="mb-3">
+                                            <label
+                                                htmlFor="nome"
+                                                className="form-label"
+                                            >
+                                                Nome
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                className="form-control"
+                                                id="nome"
+                                                required
+                                                placeholder="Digite seu nome"
+                                                value={formData.name}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label
+                                                htmlFor="email"
+                                                className="form-label"
+                                            >
+                                                Email
+                                            </label>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                className="form-control"
+                                                id="email"
+                                                required
+                                                placeholder="Digite seu email"
+                                                value={formData.email}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label
+                                                htmlFor="mensagem"
+                                                className="form-label"
+                                            >
+                                                Mensagem
+                                            </label>
+                                            <textarea
+                                                className="form-control"
+                                                name="message"
+                                                id="mensagem"
+                                                rows={5}
+                                                required
+                                                placeholder="Digite sua mensagem"
+                                                value={formData.message}
+                                                onChange={handleChange}
+                                            ></textarea>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            className="btn btn-submit"
+                                            onClick={handleSubmit}
+                                        >
+                                            Enviar
+                                        </button>
+
+                                        <input
+                                            type="hidden"
+                                            name="accessKey"
+                                            value={accessKey}
+                                        />
+                                    </form>
+                                </div>
+
+                                {/* Imagem lateral */}
+                                <div className="col-md-6 d-none d-md-flex align-items-stretch p-0">
+                                    <img
+                                        src="assets/images/form-illustration.png"
+                                        alt="Imagem"
+                                        className="img-fluid"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
