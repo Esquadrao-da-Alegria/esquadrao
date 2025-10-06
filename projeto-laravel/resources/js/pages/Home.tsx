@@ -1,7 +1,9 @@
+import AppLayout from '@/layouts/AppLayout';
+import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import '../../css/footer.css';
 import '../../css/styles.css';
-import AppLayout from '../layouts/AppLayout';
+import hospitais from '@/routes/hospitais';
 
 const Home: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -218,13 +220,13 @@ const Home: React.FC = () => {
                                 alt="Porto Alegre"
                                 className="img-fluid"
                             />
-                            <a
-                                href="./pages/hospitais.html"
+                            <Link
+                                href={hospitais.index()}
                                 className="card-content d-flex align-items-center"
                             >
                                 <p className="city-text">Porto Alegre</p>
                                 <span className="arrow">&gt;</span>
-                            </a>
+                            </Link>
                         </div>
                     </div>
 

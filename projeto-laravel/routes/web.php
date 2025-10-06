@@ -8,6 +8,16 @@ Route::get('/', function () {
     return Inertia::render('Home');
 })->name('home');
 
+// Hospitais
+Route::get('/hospitais', function () {
+    return Inertia::render('Hospitais/Index');
+})->name('hospitais.index');
+
+// Conheça
+Route::get('/conheça', function () {
+    return Inertia::render('Conheca/Index');
+})->name('conheca.index');
+
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

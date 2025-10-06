@@ -1,8 +1,9 @@
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
-
 import '../../css/footer.css';
 import '../../css/styles.css';
+import { home } from '@/routes';
+import hospitais from '@/routes/hospitais';
 
 interface Props {
     children: React.ReactNode;
@@ -17,13 +18,13 @@ const AppLayout: React.FC<Props> = ({ children }) => {
             <header className="fixed top-0 z-50 w-full bg-white shadow">
                 <nav className="container mx-auto flex items-center justify-between px-4 py-4 md:px-0">
                     {/* Logo */}
-                    <a href="#" className="flex items-center">
+                    <Link href={home()} className="flex items-center">
                         <img
                             src="/assets/images/logo-colorida.png"
                             alt="Logo Esquadrão"
                             className="h-15 md:h-15"
                         />
-                    </a>
+                    </Link>
 
                     {/* Botão hamburger para mobile */}
                     <button
@@ -68,7 +69,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             Conheça
                         </Link>
                         <Link
-                            href="/pages/hospitais.html"
+                            href={hospitais.index()}
                             className="block px-3 py-2 font-medium text-gray-700 no-underline hover:text-orange-500 md:inline-block"
                         >
                             Hospitais
