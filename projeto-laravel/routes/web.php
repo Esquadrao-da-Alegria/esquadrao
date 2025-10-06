@@ -23,6 +23,11 @@ Route::get('/doacoes', function () {
     return Inertia::render('Doacao/Index');
 })->name('doacoes.index');
 
+// Fale Conosco
+Route::get('/fale-conosco', function () {
+    return Inertia::render('FaleConosco/Index');
+})->name('fale_conosco.index');
+
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

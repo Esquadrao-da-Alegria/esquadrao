@@ -1,11 +1,12 @@
 import { home } from '@/routes';
 import conheca from '@/routes/conheca';
+import doacoes from '@/routes/doacoes';
+import fale_conosco from '@/routes/fale_conosco';
 import hospitais from '@/routes/hospitais';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import '../../css/footer.css';
 import '../../css/styles.css';
-import doacoes from '@/routes/doacoes';
 
 interface Props {
     children: React.ReactNode;
@@ -94,7 +95,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             </span>
                         </Link>
                         <Link
-                            href="#fale-conosco"
+                            href={fale_conosco.index()}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                         >
                             <span className="flex items-center gap-2">
@@ -155,7 +156,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                                 </li>
                                 <li>
                                     <Link
-                                        href={doacoes.index()}
+                                        href={fale_conosco.index()}
                                         className="text-white"
                                     >
                                         Fale Conosco
