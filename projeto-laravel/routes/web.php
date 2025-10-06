@@ -18,6 +18,11 @@ Route::get('/conheça', function () {
     return Inertia::render('Conheca/Index');
 })->name('conheca.index');
 
+// Conheça
+Route::get('/doacoes', function () {
+    return Inertia::render('Doacao/Index');
+})->name('doacoes.index');
+
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

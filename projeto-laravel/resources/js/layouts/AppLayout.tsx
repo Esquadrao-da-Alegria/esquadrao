@@ -5,6 +5,7 @@ import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import '../../css/footer.css';
 import '../../css/styles.css';
+import doacoes from '@/routes/doacoes';
 
 interface Props {
     children: React.ReactNode;
@@ -84,7 +85,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             </span>
                         </Link>
                         <Link
-                            href="/pages/docacao.html"
+                            href={doacoes.index()}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-green-50 hover:text-green-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                         >
                             <span className="flex items-center gap-2">
@@ -129,63 +130,63 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             </h5>
                             <ul className="list-unstyled">
                                 <li>
-                                    <a
-                                        href="/pages/conheca.html"
+                                    <Link
+                                        href={conheca.index()}
                                         className="text-white"
                                     >
                                         Nossos Doutores
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a
-                                        href="/pages/hospitais.html"
+                                    <Link
+                                        href={hospitais.index()}
                                         className="text-white"
                                     >
                                         Onde atuamos
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a
-                                        href="/pages/docacao.html"
+                                    <Link
+                                        href={doacoes.index()}
                                         className="text-white"
                                     >
                                         Como Apoiar
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a
-                                        href="/pages/docacao.html"
+                                    <Link
+                                        href={doacoes.index()}
                                         className="text-white"
                                     >
                                         Fale Conosco
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>
 
                         <div className="col-md-1 text-md-end mt-md-0 col-12 mt-4 text-center">
                             <div className="social-icons">
-                                <a
+                                <Link
                                     href="https://www.facebook.com/ongesquadraodaalegria"
                                     className="text-white"
                                     target="_blank"
                                 >
                                     <i className="fab fa-facebook"></i>
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     href="https://www.instagram.com/ongesquadraodaalegria/"
                                     className="text-white"
                                     target="_blank"
                                 >
                                     <i className="fab fa-instagram"></i>
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     href="https://www.linkedin.com/company/ong-esquadr%C3%A3o-da-alegria/"
                                     className="text-white"
                                     target="_blank"
                                 >
                                     <i className="fab fa-linkedin"></i>
-                                </a>
+                                </Link>
                             </div>
                         </div>
 
