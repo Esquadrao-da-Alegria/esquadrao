@@ -1,9 +1,9 @@
 import AppLayout from '@/layouts/AppLayout';
+import hospitais from '@/routes/hospitais';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import '../../css/footer.css';
 import '../../css/styles.css';
-import hospitais from '@/routes/hospitais';
 
 const Home: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -13,6 +13,21 @@ const Home: React.FC = () => {
     });
 
     const accessKey = '53b7a3e3-b32f-4b85-9be7-d8f176bed235';
+
+    const supporters = [
+        {
+            id: 1,
+            name: 'Nota Fiscal Gaúcha',
+            logo: './assets/images/logo-nfg.jpg',
+            url: 'https://nfg.sefaz.rs.gov.br/site/index.aspx',
+        },
+        {
+            id: 2,
+            name: 'Sicredi',
+            logo: './assets/images/logo-sicredi.jpg',
+            url: 'https://www.sicredi.com.br/home/',
+        },
+    ];
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -30,76 +45,125 @@ const Home: React.FC = () => {
     return (
         <AppLayout>
             {/* Banner Principal */}
-            <div className="container-fluid banner">
-                <div className="container">
-                    <div className="row introducao">
-                        <div className="col-md-6 d-flex justify-content-center align-items-center">
-                            <img
-                                className="image-palhacos img-fluid"
-                                src="/assets/images/banner-principal.jpg"
-                                alt="Banner integrantes Esquadrão da Alegria"
-                            />
+            <div className="relative w-full overflow-hidden bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100 py-12 md:py-20">
+                <div className="mx-auto max-w-6xl px-4">
+                    <div className="flex flex-col items-center gap-12 lg:flex-row">
+                        {/* Imagem */}
+                        <div className="flex flex-1 justify-center">
+                            <div className="relative">
+                                <div className="absolute -inset-6 rounded-3xl bg-gradient-to-r from-blue-200 to-purple-200 opacity-50 blur-xl"></div>
+                                <img
+                                    className="relative w-full max-w-md rounded-2xl shadow-2xl"
+                                    src="/assets/images/banner-principal.jpg"
+                                    alt="Banner integrantes Esquadrão da Alegria"
+                                />
+                            </div>
                         </div>
-                        <div className="col-md-6 text-section">
-                            <h1 className="rotate-left">
-                                ESQUADRÃO DA ALEGRIA
+
+                        {/* Texto */}
+                        <div className="flex-1 text-center lg:text-left">
+                            <h1 className="mb-6 -rotate-2 transform text-4xl font-black md:text-5xl lg:text-6xl">
+                                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                                    ESQUADRÃO DA ALEGRIA
+                                </span>
                             </h1>
-                            <p className="rotate-right">
+
+                            <p className="mb-8 rotate-1 transform text-lg leading-relaxed text-gray-700 md:text-xl">
                                 Doutores e doutoras que atuam em hospitais por
                                 meio dos últimos métodos besteirológicos
                                 existentes para gerar o sorriso e o acolhimento
                             </p>
-                            <img
-                                className="image-logo img-fluid"
-                                src="/assets/images/logo-colorida.png"
-                                alt="Quem somos"
-                            />
+
+                            <div className="flex justify-center lg:justify-start">
+                                <img
+                                    className="w-48 opacity-90 transition-opacity duration-300 hover:opacity-100 md:w-56"
+                                    src="/assets/images/logo-colorida.png"
+                                    alt="Logo Esquadrão da Alegria"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="star top">★</div>
-                <div className="star left-top">★</div>
-                <div className="star left-bottom">★</div>
-                <div className="star right">★</div>
-                <div className="star bottom">★</div>
+
+                {/* Estrelas decorativas */}
+                <div className="absolute top-10 left-10 animate-pulse text-2xl text-yellow-400">
+                    ★
+                </div>
+                <div
+                    className="absolute top-20 right-20 animate-bounce text-xl text-purple-400"
+                    style={{ animationDelay: '0.5s' }}
+                >
+                    ★
+                </div>
+                <div
+                    className="absolute bottom-20 left-20 animate-pulse text-lg text-pink-400"
+                    style={{ animationDelay: '1s' }}
+                >
+                    ★
+                </div>
+                <div
+                    className="absolute right-10 bottom-10 animate-bounce text-2xl text-blue-400"
+                    style={{ animationDelay: '1.5s' }}
+                >
+                    ★
+                </div>
+                <div
+                    className="absolute top-1/2 left-1/4 animate-pulse text-xl text-green-400"
+                    style={{ animationDelay: '2s' }}
+                >
+                    ★
+                </div>
             </div>
 
             {/* Apoiadores */}
-            <div
-                className="container-informacoes p-3"
-                style={{ width: '100%' }}
-            >
-                <div className="container">
-                    <div className="row align-items-center text-center">
-                        <div className="col-md-3 col-12">
-                            <h3>Apoiadores</h3>
+            <div className="w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-100 py-8 md:py-12">
+                <div className="mx-auto max-w-6xl px-4">
+                    <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-16">
+                        {/* Título */}
+                        <div className="text-center md:text-left">
+                            <h3 className="mb-2 text-2xl font-bold text-gray-800 md:text-3xl">
+                                Apoiadores
+                            </h3>
+                            <div className="mx-auto h-1 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 md:mx-0"></div>
                         </div>
-                        <div className="col-md-3 col-12">
-                            <a
-                                href="https://nfg.sefaz.rs.gov.br/site/index.aspx"
-                                target="_blank"
+
+                        {/* Logos dos apoiadores */}
+                        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+                            {supporters.map((supporter) => (
+                                <a
+                                    key={supporter.id}
+                                    href={supporter.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group transform transition-all duration-300 hover:scale-105"
+                                >
+                                    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-lg transition-shadow duration-300 hover:shadow-xl">
+                                        <img
+                                            src={supporter.logo}
+                                            alt={supporter.name}
+                                            className="h-16 w-auto object-contain filter transition-all duration-300 group-hover:grayscale-0"
+                                        />
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Elementos decorativos sutis */}
+                    <div className="mt-10 flex justify-center gap-3">
+                        {[
+                            ['💙', 'blue-400'],
+                            ['💜', 'purple-400'],
+                            ['💛', 'yellow-400'],
+                        ].map(([emoji, color], index) => (
+                            <div
+                                key={index}
+                                className={`h-8 w-8 rounded-full bg-${color} bg-opacity-20 flex animate-bounce items-center justify-center text-sm`}
+                                style={{ animationDelay: `${index * 0.3}s` }}
                             >
-                                <img
-                                    src="./assets/images/logo-nfg.jpg"
-                                    alt="Nota Fiscal Gaúcha"
-                                    className="img-fluid d-block mx-auto"
-                                    style={{ maxWidth: '150px' }}
-                                ></img>
-                            </a>
-                        </div>
-                        <div className="col-md-3 col-12">
-                            <a
-                                href="https://www.sicredi.com.br/home/"
-                                target="_blank"
-                            >
-                                <img
-                                    src="./assets/images/logo-sicredi.jpg"
-                                    alt="Sicredi"
-                                    className="img-fluid d-block mx-auto"
-                                    style={{ maxWidth: '150px' }}
-                                ></img>
-                            </a>
-                        </div>
+                                {emoji}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
