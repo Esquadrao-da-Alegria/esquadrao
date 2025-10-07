@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
 
             $table->string('nome', 255);
-            $table->text('observacoes')->nullable();
             $table->boolean('ativo')->default(1);
-            $table->string('endereco', 255);
+            $table->text('observacoes')->nullable();
 
             $table->timestamps();
         });
