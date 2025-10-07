@@ -13,16 +13,16 @@ const Home: React.FC = () => {
 
     const accessKey = '53b7a3e3-b32f-4b85-9be7-d8f176bed235';
 
-    const supporters = [
+    const apoiadores = [
         {
             id: 1,
-            name: 'Nota Fiscal Gaúcha',
+            nome: 'Nota Fiscal Gaúcha',
             logo: './assets/images/logo-nfg.jpg',
             url: 'https://nfg.sefaz.rs.gov.br/site/index.aspx',
         },
         {
             id: 2,
-            name: 'Sicredi',
+            nome: 'Sicredi',
             logo: './assets/images/logo-sicredi.jpg',
             url: 'https://www.sicredi.com.br/home/',
         },
@@ -162,7 +162,7 @@ const Home: React.FC = () => {
 
                         {/* Logos dos apoiadores */}
                         <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-                            {supporters.map((supporter) => (
+                            {apoiadores.map((supporter) => (
                                 <a
                                     key={supporter.id}
                                     href={supporter.url}
@@ -173,7 +173,7 @@ const Home: React.FC = () => {
                                     <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-lg transition-shadow duration-300 hover:shadow-xl">
                                         <img
                                             src={supporter.logo}
-                                            alt={supporter.name}
+                                            alt={supporter.nome}
                                             className="h-16 w-auto object-contain filter transition-all duration-300 group-hover:grayscale-0"
                                         />
                                     </div>
