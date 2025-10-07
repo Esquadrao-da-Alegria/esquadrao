@@ -2,7 +2,7 @@ import { home } from '@/routes';
 import conheca from '@/routes/conheca';
 import doacoes from '@/routes/doacoes';
 import fale_conosco from '@/routes/fale_conosco';
-import hospitais from '@/routes/hospitais';
+import onde_atuamos from '@/routes/onde_atuamos';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import '../../css/footer.css';
@@ -77,7 +77,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             </span>
                         </Link>
                         <Link
-                            href={hospitais.index()}
+                            href={onde_atuamos.index()}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-purple-50 hover:text-purple-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                         >
                             <span className="flex items-center gap-2">
@@ -140,7 +140,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                                 </li>
                                 <li>
                                     <Link
-                                        href={hospitais.index()}
+                                        href={onde_atuamos.index()}
                                         className="text-white"
                                     >
                                         Onde atuamos

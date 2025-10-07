@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/AppLayout';
-import hospitais from '@/routes/hospitais';
+import onde_atuamos from '@/routes/onde_atuamos';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -318,7 +318,7 @@ const Home: React.FC = () => {
                                 className="img-fluid"
                             />
                             <Link
-                                href={hospitais.index()}
+                                href={onde_atuamos.index()}
                                 className="card-content d-flex align-items-center"
                             >
                                 <p className="city-text">Porto Alegre</p>
