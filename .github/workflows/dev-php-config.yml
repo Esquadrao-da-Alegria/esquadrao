@@ -1,4 +1,4 @@
-name: PHP Config
+name: PHP Config (Laravel)
 
 on:
   push:
@@ -6,23 +6,17 @@ on:
       - dev
 
 jobs:
-  run:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-versions: ['8.4']
-        phpunit-versions: ['latest']
+  setup:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Get latest code
         uses: actions/checkout@v3
 
-      - name: Setup PHP
+      - name: Setup PHP for Laravel
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl, bcmath, pdo_mysql
-          ini-values: post_max_size=256M, max_execution_time=180
-          coverage: xdebug
-          tools: php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}
+          php-version: '8.4'
+          extensions: mbstring, intl, bcmath, pdo_mysql, tokenizer, ctype, xml, fileinfo, openssl, json
+          ini-values: post_max_size=256M, upload_max_filesize=256M, max_execution_time=180, memory_limit=512M
+          coverage: none
