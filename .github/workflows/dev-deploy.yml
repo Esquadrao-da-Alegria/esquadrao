@@ -1,8 +1,10 @@
 name: 🚀 Deploy website on push
+
 on:
-  push:
-    branches:
-      - dev
+  workflow_run:
+    workflows: ["PHP Config (Laravel)"]
+    types:
+      - completed
 jobs:
   web-deploy:
     name: 🎉 Deploy
