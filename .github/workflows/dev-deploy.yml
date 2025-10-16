@@ -1,21 +1,59 @@
-name: 🚀 Deploy website on push
+name: 🚀 Deploy website on dev
 
 on:
-  workflow_run:
-    workflows: ["PHP Config (Laravel)"]
-    types:
-      - completed
+  push:
+    branches:
+      - dev
+
 jobs:
   web-deploy:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
+
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v2
-            
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.2
+        uses: actions/checkout@v4
+
+      - name: 🔑 Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          server: ftp.bprates.com.br
-          username: esq@dev.esquadraodaalegria.org.br
-          password: ${{ secrets.FTP_PASSWORD_DEV }}
+           host: ${{ secrets.HOST }}
+           username: ${{ secrets.USERNAME }}
+           key: ${{ secrets.SSH_KEY }}
+           port: ${{ secrets.PORT }}
+           script: |
+            set -e
+            echo "🚀 Iniciando deploy Laravel + React..."
+
+            cd /var/www/laravel  # ajuste conforme o caminho no servidor
+
+            echo "📥 Atualizando código..."
+            git fetch origin
+            git reset --hard origin/dev
+
+            echo "📦 Instalando dependências PHP..."
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "🟢 Instalando dependências React..."
+            cd frontend  # ou resources/js, conforme sua estrutura
+            npm ci --production
+            npm run build
+
+            echo "⬆️ Copiando build para o Laravel..."
+            cp -r dist/* ../public/
+
+            cd ..
+
+            echo "🧹 Limpando e otimizando caches..."
+            php artisan optimize:clear
+            php artisan optimize
+
+            echo "🗄️ Rodando migrações..."
+            php artisan migrate --force
+
+            # Limpar arquivos antigos
+            echo "🗑️ Limpando arquivos antigos..."
+            php artisan storage:link
+            php artisan queue:restart
+
+            echo "✅ Deploy concluído com sucesso!"
