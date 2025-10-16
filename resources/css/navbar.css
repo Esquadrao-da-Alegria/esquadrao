@@ -1,0 +1,20 @@
+/* Navbar */
+header, .navbar {
+    background-color: #F3F8FF;
+}
+
+
+.navbar-brand img {
+    width: 75px;
+}
+
+@media (max-width: 520px) {
+    .navbar-brand img {
+        width: 75px;
+        margin-left: 25px;
+      }
+
+    .navbar-toggler {
+        margin-right: 25px;
+    }
+}

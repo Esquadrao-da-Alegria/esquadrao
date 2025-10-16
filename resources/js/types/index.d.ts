@@ -41,3 +41,37 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+// RECURSOS
+
+export interface Endereco {
+    id: number;
+
+    // Relacionamento polimórfico
+    recurso_id: number;
+    recurso_tipo: string;
+
+    // Relacionamento com cidade
+    cidade_id: number;
+
+    // Dados do endereço
+    logradouro?: string | null;
+    numero?: string | null;
+    complemento?: string | null;
+    bairro?: string | null;
+    cep?: string | null;
+
+    // Timestamps
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Hospital {
+    id: number;
+    nome: string;
+    ativo: boolean;
+    observacoes: string;
+    imagem_url: string;
+    endereco: Endereco|null;
+    endereco_formatado: string;
+}
