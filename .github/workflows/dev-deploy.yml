@@ -1,13 +1,14 @@
-name: 🚀 Deploy website on dev
+name: 🚀 Deploy website on DEV
 
 on:
   push:
     branches:
       - dev
+  workflow_dispatch:
 
 jobs:
   web-deploy:
-    name: 🎉 Deploy
+    name: 🎉 Deploy DEV
     runs-on: ubuntu-latest
 
     steps:
@@ -17,15 +18,15 @@ jobs:
       - name: 🔑 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-           host: ${{ secrets.HOST }}
-           username: ${{ secrets.USERNAME }}
-           key: ${{ secrets.SSH_KEY }}
-           port: ${{ secrets.PORT }}
-           script: |
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
             set -e
-            echo "🚀 Iniciando deploy Laravel + React..."
+            echo "🚀 Iniciando deploy Laravel + React (DEV)..."
 
-            cd /var/www/laravel  # ajuste conforme o caminho no servidor
+            # Caminho do projeto DEV
+            cd ~/dev.esquadroadalegria.org.br
 
             echo "📥 Atualizando código..."
             git fetch origin
@@ -34,15 +35,11 @@ jobs:
             echo "📦 Instalando dependências PHP..."
             composer install --no-dev --optimize-autoloader --no-interaction
 
-            echo "🟢 Instalando dependências React..."
-            cd frontend  # ou resources/js, conforme sua estrutura
+            echo "🟢 Instalando dependências do React/Vite..."
             npm ci --production
+
+            echo "🏗️ Gerando build do frontend..."
             npm run build
-
-            echo "⬆️ Copiando build para o Laravel..."
-            cp -r dist/* ../public/
-
-            cd ..
 
             echo "🧹 Limpando e otimizando caches..."
             php artisan optimize:clear
@@ -51,9 +48,8 @@ jobs:
             echo "🗄️ Rodando migrações..."
             php artisan migrate --force
 
-            # Limpar arquivos antigos
             echo "🗑️ Limpando arquivos antigos..."
             php artisan storage:link
             php artisan queue:restart
 
-            echo "✅ Deploy concluído com sucesso!"
+            echo "✅ Deploy DEV concluído com sucesso!"
