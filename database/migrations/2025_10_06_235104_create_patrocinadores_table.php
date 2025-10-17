@@ -11,17 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hospitais', function (Blueprint $table) {
+        Schema::create('patrocinadores', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('cidade_id')->constrained('cidades')->onDelete('cascade');
             $table->string('nome', 255);
-            $table->string('cnpj', 14);
-            $table->string('endereco', 255);
-            $table->string('telefone', 14);
-            $table->string('email', 50);
-            $table->boolean('ativo')->default(1);
-            $table->json('alas_unidades');
+            $table->string('site', 100);
+            $table->string('categoria', 100);
+            $table->string('url_logotipo', 100);
+            $table->boolean('ativo', 100);
             $table->text('observacoes')->nullable();
 
             $table->timestamps();
@@ -33,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hospitais');
+        Schema::dropIfExists('patrocinadores');
     }
 };
