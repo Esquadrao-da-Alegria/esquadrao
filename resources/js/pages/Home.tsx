@@ -250,105 +250,104 @@ const Home: React.FC = () => {
                     </div>
                 </div>
             </section>
-{/* Conheça */}
-<section id="conheca" className="py-20 border-b border-gray-100">
-  <div className="max-w-6xl mx-auto px-4">
-    <div className="flex flex-col md:flex-row items-center gap-12">
-      {/* Imagem */}
-      <div className="w-full md:w-1/2">
-        <img
-          className="w-full h-auto rounded-2xl shadow-md"
-          src="./assets/images/conheca-palhacos.png"
-          alt="Imagem dos Doutores"
-        />
-      </div>
 
-      {/* Texto */}
-      <div className="w-full md:w-1/2">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-6">
-          CONHEÇA <br /> NOSSOS <br /> DOUTORES
-        </h2>
+            {/* Conheça */}
+            <section id="conheca" className="py-20 border-b border-gray-100">
+                <div className="max-w-6xl mx-auto px-4">
+                    <div className="flex flex-col md:flex-row items-center gap-12">
+                        {/* Imagem */}
+                        <div className="w-full md:w-1/2">
+                            <img
+                                className="w-full h-auto rounded-2xl shadow-md"
+                                src="./assets/images/conheca-palhacos.png"
+                                alt="Imagem dos Doutores"
+                            />
+                        </div>
 
-        <p className="text-lg text-gray-700 leading-relaxed">
-          Nossos doutores besteirologistas são pessoas comuns,
-          das mais diferentes áreas de formação, que atuam na
-          sociedade como estudantes, profissionais e
-          empresários, entre outros, que dedicam parte do seu
-          tempo a nossa causa.
-        </p>
+                        {/* Texto */}
+                        <div className="w-full md:w-1/2">
+                            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-6">
+                                CONHEÇA <br /> NOSSOS <br /> DOUTORES
+                            </h2>
 
-        <a href="./pages/conheca.html">
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 mt-6 rounded-[15px] transition-colors duration-300"
-          >
-            Saiba mais
-          </button>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
+                            <p className="text-lg text-gray-700 leading-relaxed">
+                                Nossos doutores besteirologistas são pessoas comuns,
+                                das mais diferentes áreas de formação, que atuam na
+                                sociedade como estudantes, profissionais e
+                                empresários, entre outros, que dedicam parte do seu
+                                tempo a nossa causa.
+                            </p>
 
-{/* Hospitais */}
-<section id="hospitais" className="mx-auto mt-32 mb-20 max-w-6xl px-6">
-  <h2 className="mb-12 text-center text-3xl font-extrabold text-gray-900">
-    ONDE ATUAMOS
-  </h2>
+                            <a href="./pages/conheca.html">
+                                <button
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 mt-6 rounded-[15px] transition-colors duration-300"
+                                >
+                                    Saiba mais
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-  <div className="grid gap-8 md:grid-cols-3">
-    {/* Porto Alegre */}
-    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
-      <img
-        src="./assets/images/porto-alegre.png"
-        alt="Porto Alegre"
-        className="w-full object-cover"
-      />
-      <Link
-        href={onde_atuamos.index()}
-        className="flex items-center justify-between bg-white px-6 py-4"
-      >
-        <p className="text-lg font-semibold text-gray-800">Porto Alegre</p>
-        <span className="text-2xl text-pink-500 transition-transform duration-200 group-hover:translate-x-1">
-          &gt;
-        </span>
-      </Link>
-    </div>
+            {/* Hospitais */}
+            <section id="hospitais" className="mx-auto mt-32 mb-20 max-w-6xl px-6">
+                <h2 className="mb-12 text-center text-3xl font-extrabold text-gray-900">
+                    ONDE ATUAMOS
+                </h2>
 
-    {/* Santa Maria */}
-    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
-      <img
-        src="./assets/images/santa-maria.png"
-        alt="Santa Maria"
-        className="w-full object-cover"
-      />
-      <a
-        href="./pages/hospitais.html"
-        className="flex items-center justify-between bg-white px-6 py-4"
-      >
-        <p className="text-lg font-semibold text-gray-800">Santa Maria</p>
-        <span className="text-2xl text-pink-500">&gt;</span>
-      </a>
-    </div>
+                <div className="grid gap-8 md:grid-cols-3">
+                    {/* Porto Alegre */}
+                    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
+                        <img
+                            src="./assets/images/porto-alegre.png"
+                            alt="Porto Alegre"
+                            className="w-full object-cover"
+                        />
+                        <Link
+                            href={onde_atuamos.index()}
+                            className="flex items-center justify-between bg-white px-6 py-4"
+                        >
+                            <p className="text-lg font-semibold text-gray-800">Porto Alegre</p>
+                            <span className="text-2xl text-pink-500 transition-transform duration-200 group-hover:translate-x-1">
+                                &gt;
+                            </span>
+                        </Link>
+                    </div>
 
-    {/* Pelotas */}
-    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
-      <img
-        src="./assets/images/pelotas.png"
-        alt="Pelotas"
-        className="w-full object-cover"
-      />
-      <a
-        href="./pages/hospitais.html"
-        className="flex items-center justify-between bg-white px-6 py-4"
-      >
-        <p className="text-lg font-semibold text-gray-800">Pelotas</p>
-        <span className="text-2xl text-pink-500">&gt;</span>
-      </a>
-    </div>
-  </div>
-</section>
+                    {/* Santa Maria */}
+                    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
+                        <img
+                            src="./assets/images/santa-maria.png"
+                            alt="Santa Maria"
+                            className="w-full object-cover"
+                        />
+                        <a
+                            href="./pages/hospitais.html"
+                            className="flex items-center justify-between bg-white px-6 py-4"
+                        >
+                            <p className="text-lg font-semibold text-gray-800">Santa Maria</p>
+                            <span className="text-2xl text-pink-500">&gt;</span>
+                        </a>
+                    </div>
 
-
+                    {/* Pelotas */}
+                    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
+                        <img
+                            src="./assets/images/pelotas.png"
+                            alt="Pelotas"
+                            className="w-full object-cover"
+                        />
+                        <a
+                            href="./pages/hospitais.html"
+                            className="flex items-center justify-between bg-white px-6 py-4"
+                        >
+                            <p className="text-lg font-semibold text-gray-800">Pelotas</p>
+                            <span className="text-2xl text-pink-500">&gt;</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
 
             {/* Nossa História */}
             <section id="nossa-historia" className="mt-44 flex flex-col items-center justify-center overflow-hidden bg-white px-6 py-20 md:flex-row md:justify-between">
