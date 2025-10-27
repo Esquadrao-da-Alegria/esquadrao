@@ -250,176 +250,159 @@ const Home: React.FC = () => {
                     </div>
                 </div>
             </section>
+{/* Conheça */}
+<section id="conheca" className="py-20 border-b border-gray-100">
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="flex flex-col md:flex-row items-center gap-12">
+      {/* Imagem */}
+      <div className="w-full md:w-1/2">
+        <img
+          className="w-full h-auto rounded-2xl shadow-md"
+          src="./assets/images/conheca-palhacos.png"
+          alt="Imagem dos Doutores"
+        />
+      </div>
+
+      {/* Texto */}
+      <div className="w-full md:w-1/2">
+        <h2 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-6">
+          CONHEÇA <br /> NOSSOS <br /> DOUTORES
+        </h2>
+
+        <p className="text-lg text-gray-700 leading-relaxed">
+          Nossos doutores besteirologistas são pessoas comuns,
+          das mais diferentes áreas de formação, que atuam na
+          sociedade como estudantes, profissionais e
+          empresários, entre outros, que dedicam parte do seu
+          tempo a nossa causa.
+        </p>
+
+        <a href="./pages/conheca.html">
+          <button
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 mt-6 rounded-[15px] transition-colors duration-300"
+          >
+            Saiba mais
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Hospitais */}
+<section id="hospitais" className="mx-auto mt-32 mb-20 max-w-6xl px-6">
+  <h2 className="mb-12 text-center text-3xl font-extrabold text-gray-900">
+    ONDE ATUAMOS
+  </h2>
+
+  <div className="grid gap-8 md:grid-cols-3">
+    {/* Porto Alegre */}
+    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
+      <img
+        src="./assets/images/porto-alegre.png"
+        alt="Porto Alegre"
+        className="w-full object-cover"
+      />
+      <Link
+        href={onde_atuamos.index()}
+        className="flex items-center justify-between bg-white px-6 py-4"
+      >
+        <p className="text-lg font-semibold text-gray-800">Porto Alegre</p>
+        <span className="text-2xl text-pink-500 transition-transform duration-200 group-hover:translate-x-1">
+          &gt;
+        </span>
+      </Link>
+    </div>
+
+    {/* Santa Maria */}
+    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
+      <img
+        src="./assets/images/santa-maria.png"
+        alt="Santa Maria"
+        className="w-full object-cover"
+      />
+      <a
+        href="./pages/hospitais.html"
+        className="flex items-center justify-between bg-white px-6 py-4"
+      >
+        <p className="text-lg font-semibold text-gray-800">Santa Maria</p>
+        <span className="text-2xl text-pink-500">&gt;</span>
+      </a>
+    </div>
+
+    {/* Pelotas */}
+    <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
+      <img
+        src="./assets/images/pelotas.png"
+        alt="Pelotas"
+        className="w-full object-cover"
+      />
+      <a
+        href="./pages/hospitais.html"
+        className="flex items-center justify-between bg-white px-6 py-4"
+      >
+        <p className="text-lg font-semibold text-gray-800">Pelotas</p>
+        <span className="text-2xl text-pink-500">&gt;</span>
+      </a>
+    </div>
+  </div>
+</section>
 
 
-            {/* Conheça */}
-            <section id="conheca" className="py-20">
-                <div className="max-w-6xl mx-auto px-4">
-                    <div className="flex flex-col md:flex-row items-center">
-                        <div className="w-full md:w-1/2 relative mb-8 md:mb-0">
-                            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 relative z-10 leading-tight">
-                                CONHEÇA
-                                <br />
-                                NOSSOS
-                                <br />
-                                DOUTORES
-                            </h2>
-                            <img
-                                className="w-full h-auto mt-4 md:mt-0 md:absolute md:top-0 md:left-0"
-                                src="./assets/images/conheca-palhacos.png"
-                                alt="Imagem dos Doutores"
-                            />
-                        </div>
 
-                        <div className="w-full md:w-1/2 md:pl-12">
-                            <p className="text-lg text-gray-700 leading-relaxed">
-                                Nossos doutores besteirologistas são pessoas comuns,
-                                das mais diferentes áreas de formação, que atuam na
-                                sociedade como estudantes, profissionais e
-                                empresários, entre outros, que dedicam parte do seu
-                                tempo a nossa causa.
-                            </p>
-                            <a href="./pages/conheca.html">
-                                <button
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 mt-6 rounded-[15px] transition-colors duration-300"
-                                >
-                                    Saiba mais
-                                </button>
-                            </a>
-                        </div>
-                    </div>
+            {/* Nossa História */}
+            <section id="nossa-historia" className="mt-44 flex flex-col items-center justify-center overflow-hidden bg-white px-6 py-20 md:flex-row md:justify-between">
+                {/* Imagem esquerda */}
+                <div className="flex-1 flex justify-start mb-12 md:mb-0">
+                    <img
+                        src="./assets/images/noosa-historia-esquerda.png"
+                        alt="Nossa história"
+                        className="w-full max-w-sm md:max-w-md"
+                    />
+                </div>
+
+                {/* Texto central */}
+                <div className="flex-1 flex flex-col items-center text-center px-4">
+                    <h3 className="mb-8 text-3xl font-extrabold text-gray-900 md:text-4xl">
+                        NOSSA HISTÓRIA
+                    </h3>
+                    <p className="mb-10 text-lg text-gray-700">
+                        Um grupo que começa com o desejo de transformar espaços através da palhaçaria
+                    </p>
+                    <a href="./pages/conheca.html">
+                        <button className="rounded-full bg-gradient-to-r from-pink-500 to-purple-600 px-8 py-3 text-lg font-semibold text-white shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2">
+                            Saiba mais
+                        </button>
+                    </a>
+                </div>
+
+                {/* Imagem direita */}
+                <div className="flex-1 flex justify-end mt-12 md:mt-0">
+                    <img
+                        src="./assets/images/nossa-historia-direita.png"
+                        alt="Nossa história"
+                        className="w-full max-w-sm md:max-w-md"
+                    />
                 </div>
             </section>
 
-            {/* Hospitais */}
-            <div className="container my-5">
-                <h2 className="hospitais-title">ONDE ATUAMOS</h2>
-                <div className="row">
-                    <div className="col-md-4 mb-4">
-                        <div className="city-card">
-                            <img
-                                src="./assets/images/porto-alegre.png"
-                                alt="Porto Alegre"
-                                className="img-fluid"
-                            />
-                            <Link
-                                href={onde_atuamos.index()}
-                                className="card-content d-flex align-items-center"
-                            >
-                                <p className="city-text">Porto Alegre</p>
-                                <span className="arrow">&gt;</span>
-                            </Link>
-                        </div>
-                    </div>
 
-                    <div className="col-md-4 mb-4">
-                        <div className="city-card">
-                            <img
-                                src="./assets/images/santa-maria.png"
-                                alt="Santa Maria"
-                                className="img-fluid"
-                            />
-                            <a
-                                href="./pages/hospitais.html"
-                                className="card-content d-flex align-items-center"
-                            >
-                                <p className="city-text">Santa Maria</p>
-                                <span className="arrow">&gt;</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div className="col-md-4 mb-4">
-                        <div className="city-card">
-                            <img
-                                src="./assets/images/pelotas.png"
-                                alt="Pelotas"
-                                className="img-fluid"
-                            />
-                            <a
-                                href="./pages/hospitais.html"
-                                className="card-content d-flex align-items-center"
-                            >
-                                <p className="city-text">Pelotas</p>
-                                <span className="arrow">&gt;</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Nossa História */}
-            <div
-                className="nossa-história"
-                style={{ marginTop: '175px', height: '500px' }}
-            >
-                <div className="row align-items-center justify-content-between">
-                    {/* Imagem da esquerda */}
-                    <div className="col text-start">
-                        <img
-                            src="./assets/images/noosa-historia-esquerda.png"
-                            alt="Nossa história"
-                            className="img-fluid img-esquerda"
-                        />
-                    </div>
-
-                    {/* Texto central */}
-                    <div className="col texto-central">
-                        <h3
-                            className="titulo-historia mb-5"
-                            style={{ textAlign: 'center', marginTop: '100px' }}
-                        >
-                            NOSSA HISTÓRIA
-                        </h3>
-                        <p className="mb-5" style={{ marginTop: '90px' }}>
-                            Um grupo que começa com o desejo de transformar
-                            espaços através da palhaçaria
-                        </p>
-                        <a href="./pages/conheca.html">
-                            <button
-                                type="button"
-                                className="btn btn-historia mt-3"
-                                style={{
-                                    width: '200px',
-                                    borderRadius: '15px',
-                                    fontSize: '1.2rem',
-                                }}
-                            >
-                                Saiba mais
-                            </button>
-                        </a>
-                    </div>
-
-                    {/* Imagem da direita */}
-                    <div className="col text-end">
-                        <img
-                            src="./assets/images/nossa-historia-direita.png"
-                            alt="Nossa história"
-                            className="img-fluid img-direita"
-                        />
-                    </div>
-                </div>
-            </div>
-
-            {/* Fale Conosco  */}
+            {/* Fale Conosco */}
             <section
                 id="fale-conosco"
                 className="mx-auto w-full max-w-6xl px-4 py-16 md:py-24"
             >
                 <div className="flex justify-center">
                     <div className="w-full max-w-4xl">
-                        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50 to-purple-50 shadow-lg">
+                        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl">
                             <div className="flex flex-col lg:flex-row">
                                 {/* Formulário */}
                                 <div className="flex-1 p-8 md:p-12">
-                                    <h2 className="mb-8 text-3xl font-bold text-gray-900 md:text-4xl">
+                                    <h2 className="mb-8 text-3xl font-extrabold text-gray-900 md:text-4xl">
                                         Fale Conosco
                                     </h2>
 
-                                    <form
-                                        onSubmit={(e) => e.preventDefault()}
-                                        className="space-y-6"
-                                    >
+                                    <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
                                         {/* Nome */}
                                         <div>
                                             <label
@@ -430,13 +413,13 @@ const Home: React.FC = () => {
                                             </label>
                                             <input
                                                 type="text"
-                                                name="name"
                                                 id="nome"
+                                                name="nome"
                                                 required
                                                 placeholder="Digite seu nome"
                                                 value={formData.nome}
                                                 onChange={handleChange}
-                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-all duration-300 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                             />
                                         </div>
 
@@ -450,13 +433,13 @@ const Home: React.FC = () => {
                                             </label>
                                             <input
                                                 type="email"
-                                                name="email"
                                                 id="email"
+                                                name="email"
                                                 required
                                                 placeholder="Digite seu email"
                                                 value={formData.email}
                                                 onChange={handleChange}
-                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-all duration-300 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                             />
                                         </div>
 
@@ -469,22 +452,22 @@ const Home: React.FC = () => {
                                                 Mensagem
                                             </label>
                                             <textarea
-                                                name="mensagem"
                                                 id="mensagem"
+                                                name="mensagem"
                                                 rows={5}
                                                 required
                                                 placeholder="Digite sua mensagem"
                                                 value={formData.mensagem}
                                                 onChange={handleChange}
-                                                className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition-all duration-300 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                                                className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                             />
                                         </div>
 
-                                        {/* Botão Enviar */}
+                                        {/* Botão */}
                                         <button
                                             type="button"
                                             onClick={handleSubmit}
-                                            className="w-full transform bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                                            className="w-full transform rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-4 font-semibold text-white shadow-md transition hover:scale-105 hover:shadow-lg"
                                         >
                                             Enviar Mensagem
                                         </button>
@@ -494,17 +477,17 @@ const Home: React.FC = () => {
                                 {/* Imagem lateral */}
                                 <div className="hidden flex-1 items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 p-8 lg:flex">
                                     <div className="relative">
-                                        <div className="absolute -inset-6 rounded-2xl bg-gradient-to-r from-blue-200 to-purple-200 opacity-50 blur-lg"></div>
+                                        <div className="absolute -inset-6 rounded-2xl bg-gradient-to-r from-blue-200 to-purple-200 opacity-40 blur-lg"></div>
                                         <img
                                             src="/assets/images/conheca_2.png"
                                             alt="Ilustração de contato"
-                                            className="relative h-full w-full rounded-2xl shadow-lg"
+                                            className="relative rounded-2xl shadow-xl"
                                         />
 
                                         {/* Elementos decorativos */}
-                                        <div className="absolute -top-4 -right-4 h-8 w-8 animate-pulse rounded-full bg-yellow-300 opacity-60"></div>
+                                        <div className="absolute -top-4 -right-4 h-8 w-8 animate-pulse rounded-full bg-yellow-300 opacity-70"></div>
                                         <div
-                                            className="absolute -bottom-4 -left-4 h-6 w-6 animate-bounce rounded-full bg-pink-300 opacity-60"
+                                            className="absolute -bottom-4 -left-4 h-6 w-6 animate-bounce rounded-full bg-pink-300 opacity-70"
                                             style={{ animationDelay: '1s' }}
                                         ></div>
                                     </div>
@@ -514,6 +497,7 @@ const Home: React.FC = () => {
                     </div>
                 </div>
             </section>
+
         </AppLayout>
     );
 };
