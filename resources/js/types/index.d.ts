@@ -27,6 +27,8 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    mensagem_sucesso?: string | null;
+    mensagem_erro?: string | null;
     [key: string]: unknown;
 }
 
@@ -67,11 +69,15 @@ export interface Endereco {
 }
 
 export interface Hospital {
-    id: number;
-    nome: string;
-    ativo: boolean;
-    observacoes: string;
-    imagem_url: string;
-    endereco: Endereco|null;
-    endereco_formatado: string;
+    id?: number
+    cidade_id: number
+    nome: string
+    cnpj: string
+    endereco: string
+    telefone: string
+    email: string
+    ativo: boolean
+    observacoes?: string
+    created_at?: string
+    updated_at?: string
 }

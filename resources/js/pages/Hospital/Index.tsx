@@ -3,34 +3,27 @@ import { Hospital } from '@/types'
 import { Pencil } from 'lucide-react'
 import { Link } from '@inertiajs/react'
 
-const Index: React.FC = () => {
-  const hospitais: Hospital[] = [
-    {
-      id: 1,
-      nome: 'Hospital Universitário São Francisco de Paula',
-      endereco: null,
-      endereco_formatado: 'R. Mal. Deodoro, 1123 - Centro, Pelotas - RS',
-      imagem_url: '../assets/images/hospital-sao-francisco-de-paula.png',
-      ativo: true,
-      observacoes: '',
-    },
-    {
-      id: 2,
-      nome: 'Hospital Escola da UFPel',
-      endereco: null,
-      endereco_formatado: 'R. Prof. Dr. Araújo, 538 - Centro, Pelotas - RS',
-      imagem_url: '../assets/images/hospital-escola-ufpel.png',
-      ativo: true,
-      observacoes: '',
-    },
-  ]
+interface Props {
+  hospitais: Hospital[];
+}
+
+const Index: React.FC<Props> = ({ hospitais }) => {
 
   return (
     <AppLayout>
       <div className="mx-auto max-w-6xl p-6">
-        <h1 className="mb-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-3xl font-extrabold text-transparent">
-          Hospitais Cadastrados
-        </h1>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-3xl font-extrabold text-transparent">
+            Hospitais Cadastrados
+          </h1>
+
+          <button
+            type="button"
+            className="rounded-pill bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
+          >
+            Novo
+          </button>
+        </div>
 
         {/* Tabela responsiva */}
         <div className="mt-6 overflow-hidden rounded-2xl shadow-md ring-1 ring-gray-200">
@@ -62,7 +55,8 @@ const Index: React.FC = () => {
                 >
                   <td className="px-6 py-4">
                     <img
-                      src={hospital.imagem_url}
+                      // src={hospital.imagem_url}
+                      src='https://imagens.ebc.com.br/ezhL7QDLWeq77RcIBaA78AQ9RMc=/1170x700/smart/https://agenciabrasil.ebc.com.br/sites/default/files/thumbnails/image/2025/01/17/toms1434.jpg?itok=QxAcBaX6'
                       alt={hospital.nome}
                       className="h-14 w-14 rounded-full object-cover shadow-sm ring-2 ring-pink-200"
                     />
@@ -71,15 +65,14 @@ const Index: React.FC = () => {
                     {hospital.nome}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {hospital.endereco_formatado}
+                    {hospital.endereco}
                   </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                        hospital.ativo
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
+                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${hospital.ativo
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                        }`}
                     >
                       {hospital.ativo ? 'Ativo' : 'Inativo'}
                     </span>
@@ -107,7 +100,8 @@ const Index: React.FC = () => {
               >
                 <div className="flex items-center gap-4">
                   <img
-                    src={hospital.imagem_url}
+                    // src={hospital.imagem_url}
+                    src='https://imagens.ebc.com.br/ezhL7QDLWeq77RcIBaA78AQ9RMc=/1170x700/smart/https://agenciabrasil.ebc.com.br/sites/default/files/thumbnails/image/2025/01/17/toms1434.jpg?itok=QxAcBaX6'
                     alt={hospital.nome}
                     className="h-14 w-14 rounded-full object-cover ring-2 ring-pink-200"
                   />
@@ -116,7 +110,7 @@ const Index: React.FC = () => {
                       {hospital.nome}
                     </h2>
                     <p className="text-sm text-gray-600">
-                      {hospital.endereco_formatado}
+                      {hospital.endereco}
                     </p>
                   </div>
                   <Link
@@ -129,11 +123,10 @@ const Index: React.FC = () => {
                 </div>
                 <div className="mt-3">
                   <span
-                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                      hospital.ativo
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${hospital.ativo
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                      }`}
                   >
                     {hospital.ativo ? 'Ativo' : 'Inativo'}
                   </span>

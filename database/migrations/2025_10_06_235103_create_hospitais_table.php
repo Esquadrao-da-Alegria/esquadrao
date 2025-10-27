@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('telefone', 14);
             $table->string('email', 50);
             $table->boolean('ativo')->default(1);
-            $table->json('alas_unidades');
             $table->text('observacoes')->nullable();
 
             $table->timestamps();

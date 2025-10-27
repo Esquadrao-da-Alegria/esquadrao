@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Web;
 
+use Inertia\Inertia;
+use App\Services\Hospital\Service;
 use App\Http\Controllers\Controller;
-use App\Services\Cidade\Service;
+use App\Http\Requests\Web\Hospital\StoreRequest;
+use App\Http\Requests\Web\Hospital\UpdateRequest;
+use App\Models\Hospital;
 use App\Services\Hospital\Form\Service as FormService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class HospitalController extends Controller
 {
@@ -20,9 +23,18 @@ class HospitalController extends Controller
     /**
      * Retornar listagem do recurso
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('Hospitais/Index');
+        $filtrosBusca = [
+            ...$request->all(),
+            'retornar_lista' => true,
+        ];
+
+        $retorno = $this->service->index($filtrosBusca);
+
+        $dadosView = ['hospitais' => $retorno['dados']];
+
+        return Inertia::render('Hospital/Index', $dadosView);
     }
 
     /**
@@ -30,33 +42,37 @@ class HospitalController extends Controller
      */
     public function create()
     {
-        $dadosParaView = $this->formService->buscarDados();
+        $dadosView = $this->formService->buscarDados();
 
-        return Inertia::render('Hospitais/Create', $dadosParaView);
+        return Inertia::render('Hospital/Create', $dadosView);
     }
 
     /**
      * Salvar novo recurso
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        //
+        $this->service->store($request->all());
+
+        return redirect()->route('hospitais.index');
     }
 
     /**
      * Retornar formulário de edição
      */
-    public function edit(string $id)
+    public function edit(Hospital $hospital)
     {
-        return Inertia::render('Hospitais/Edit');
+        return Inertia::render('Hospital/Edit', ['hospital' => $hospital]);
     }
 
     /**
      * Atualizar recurso
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRequest $request, string $id)
     {
-        //
+        $this->service->update($id, $request->all());
+
+        return redirect()->route('hospitais.index');
     }
 
     /**
@@ -64,6 +80,8 @@ class HospitalController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $this->service->destroy($id);
+
+        return redirect()->route('hospitais.index');
     }
 }

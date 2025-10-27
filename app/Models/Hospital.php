@@ -19,9 +19,12 @@ class Hospital extends Model
         'telefone',
         'email',
         'ativo',
-        'alas_unidades',
         'observacoes',
+        'created_at',
+        'updated_at',
     ];
+
+    protected $table = 'hospitais';
 
     // public function endereco()
     // {

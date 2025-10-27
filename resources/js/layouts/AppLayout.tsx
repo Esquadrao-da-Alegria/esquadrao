@@ -1,204 +1,200 @@
-import { home } from '@/routes';
-import conheca from '@/routes/conheca';
-import doacoes from '@/routes/doacoes';
-import fale_conosco from '@/routes/fale_conosco';
-import onde_atuamos from '@/routes/onde_atuamos';
-import { Link } from '@inertiajs/react';
-import { useState } from 'react';
-import '../../css/footer.css';
-import '../../css/styles.css';
+import { home } from '@/routes'
+import conheca from '@/routes/conheca'
+import doacoes from '@/routes/doacoes'
+import fale_conosco from '@/routes/fale_conosco'
+import onde_atuamos from '@/routes/onde_atuamos'
+import { Link, usePage } from '@inertiajs/react'
+import { useEffect, useState } from 'react'
+import { SharedData } from '@/types'
+import { toastErro, toastSucesso } from '@/lib/utils/toast'
 
 interface Props {
-    children: React.ReactNode;
+  children: React.ReactNode
 }
 
 const AppLayout: React.FC<Props> = ({ children }) => {
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+  const { props } = usePage<SharedData>()
 
-    return (
-        <div className="container-global bg-white">
-            {/* Navbar */}
-            <header className="fixed top-0 z-50 w-full bg-white shadow">
-                <nav className="container mx-auto flex items-center justify-between px-4 py-4 md:px-0">
-                    {/* Logo */}
-                    <Link href={home()} className="flex items-center">
-                        <img
-                            src="/assets/images/logo-colorida.png"
-                            alt="Logo Esquadrão"
-                            className="h-15 md:h-20"
-                        />
-                    </Link>
+  useEffect(() => {
+    const mensagemSucesso = props.mensagem_sucesso
+    const mensagemErro = props.mensagem_erro
 
-                    {/* Botão hamburger para mobile */}
-                    <button
-                        onClick={() => setIsOpen(!isOpen)}
-                        className="flex items-center justify-center rounded-xl p-3 text-gray-600 transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 focus:ring-2 focus:ring-blue-200 focus:outline-none md:hidden"
-                    >
-                        <svg
-                            className="h-6 w-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            {isOpen ? (
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            ) : (
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                            )}
-                        </svg>
-                    </button>
+    if (mensagemSucesso) toastSucesso(mensagemSucesso)
+    if (mensagemErro) toastErro(mensagemErro)
+  }, [props.mensagem_sucesso, props.mensagem_erro])
 
-                    {/* Menu links */}
-                    <div
-                        className={`w-full flex-col transition-all duration-500 md:flex md:w-auto md:flex-row md:items-center ${
-                            isOpen
-                                ? 'mt-6 flex rounded-2xl border border-gray-100 bg-white/95 p-6 shadow-2xl backdrop-blur-lg md:mt-0 md:border-none md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none'
-                                : 'hidden md:flex'
-                        }`}
-                    >
-                        <Link
-                            href={conheca.index()}
-                            className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
-                        >
-                            <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-blue-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Conheça
-                            </span>
-                        </Link>
-                        <Link
-                            href={onde_atuamos.index()}
-                            className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-purple-50 hover:text-purple-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
-                        >
-                            <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-purple-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Hospitais
-                            </span>
-                        </Link>
-                        <Link
-                            href={doacoes.index()}
-                            className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-green-50 hover:text-green-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
-                        >
-                            <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-green-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Doação
-                            </span>
-                        </Link>
-                        <Link
-                            href={fale_conosco.index()}
-                            className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
-                        >
-                            <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-orange-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Fale Conosco
-                            </span>
-                        </Link>
-                    </div>
-                </nav>
-            </header>
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Navbar */}
+      <header className="fixed top-0 z-50 w-full bg-white shadow">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          {/* Logo */}
+          <Link href={home()} className="flex items-center">
+            <img
+              src="/assets/images/logo-colorida.png"
+              alt="Logo Esquadrão"
+              className="h-16 md:h-20"
+            />
+          </Link>
 
-            {/* Conteúdo da página */}
-            <main className="pt-24">{children}</main>
-
-            {/* Footer */}
-            <footer
-                className="bg-danger py-5 text-white"
-                style={{ backgroundColor: '#ED1B24', marginTop: '150px' }}
+          {/* Botão Mobile */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center justify-center rounded-xl p-2 text-gray-600 transition hover:bg-red-50 hover:text-red-600 focus:outline-none md:hidden"
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
             >
-                <div className="position-relative container mx-auto">
-                    <div className="row justify-content-center align-items-center">
-                        <div className="col-md-3 text-md-start col-12 text-center">
-                            <img
-                                src="/assets/images/logo_png_branco.png"
-                                alt="Esquadrão da Alegria"
-                                className="footer-image"
-                            />
-                        </div>
+              {isOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </button>
 
-                        <div className="col-md-4 col-12 text-center">
-                            <h5 className="mb-3" style={{ fontSize: '1.2rem' }}>
-                                Esquadrão da Alegria
-                            </h5>
-                            <ul className="list-unstyled">
-                                <li>
-                                    <Link
-                                        href={conheca.index()}
-                                        className="text-white"
-                                    >
-                                        Nossos Doutores
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href={onde_atuamos.index()}
-                                        className="text-white"
-                                    >
-                                        Onde atuamos
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href={doacoes.index()}
-                                        className="text-white"
-                                    >
-                                        Como Apoiar
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href={fale_conosco.index()}
-                                        className="text-white"
-                                    >
-                                        Fale Conosco
-                                    </Link>
-                                </li>
-                            </ul>
-                        </div>
+          {/* Links */}
+          <div
+            className={`${
+              isOpen
+                ? 'absolute left-0 top-20 w-full rounded-2xl border border-gray-100 bg-white/95 p-6 shadow-2xl backdrop-blur-lg flex flex-col items-center gap-3 md:static md:flex md:w-auto md:flex-row md:gap-1 md:border-none md:bg-transparent md:p-0 md:shadow-none'
+                : 'hidden md:flex md:flex-row md:items-center md:gap-1'
+            } transition-all duration-300`}
+          >
+            <Link
+              href={conheca.index()}
+              className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-red-600 hover:bg-red-50 md:hover:bg-transparent"
+            >
+              Conheça
+            </Link>
+            <Link
+              href={onde_atuamos.index()}
+              className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-purple-600 hover:bg-purple-50 md:hover:bg-transparent"
+            >
+              Hospitais
+            </Link>
+            <Link
+              href={doacoes.index()}
+              className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-green-600 hover:bg-green-50 md:hover:bg-transparent"
+            >
+              Doação
+            </Link>
+            <Link
+              href={fale_conosco.index()}
+              className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-orange-600 hover:bg-orange-50 md:hover:bg-transparent"
+            >
+              Fale Conosco
+            </Link>
+          </div>
+        </nav>
+      </header>
 
-                        <div className="col-md-1 text-md-end mt-md-0 col-12 mt-4 text-center">
-                            <div className="social-icons">
-                                <Link
-                                    href="https://www.facebook.com/ongesquadraodaalegria"
-                                    className="text-white"
-                                    target="_blank"
-                                >
-                                    <i className="fab fa-facebook"></i>
-                                </Link>
-                                <Link
-                                    href="https://www.instagram.com/ongesquadraodaalegria/"
-                                    className="text-white"
-                                    target="_blank"
-                                >
-                                    <i className="fab fa-instagram"></i>
-                                </Link>
-                                <Link
-                                    href="https://www.linkedin.com/company/ong-esquadr%C3%A3o-da-alegria/"
-                                    className="text-white"
-                                    target="_blank"
-                                >
-                                    <i className="fab fa-linkedin"></i>
-                                </Link>
-                            </div>
-                        </div>
+      {/* Conteúdo */}
+      <main className="flex-1 pt-24">{children}</main>
 
-                        <div className="mt-5 text-center">
-                            <p className="mb-0">© Esquadrão da Alegria</p>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+      {/* Footer */}
+      <footer className="mt-24 bg-[#ED1B24] py-10 text-white">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex flex-col items-center justify-between gap-10 md:flex-row md:items-start">
+            {/* Logo */}
+            <div className="flex justify-center md:justify-start">
+              <img
+                src="/assets/images/logo_png_branco.png"
+                alt="Esquadrão da Alegria"
+                className="h-20 w-auto"
+              />
+            </div>
+
+            {/* Links */}
+            <div className="text-center md:text-left">
+              <h5 className="mb-3 text-lg font-semibold">
+                Esquadrão da Alegria
+              </h5>
+              <ul className="space-y-1">
+                <li>
+                  <Link
+                    href={conheca.index()}
+                    className="transition hover:text-gray-200"
+                  >
+                    Nossos Doutores
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={onde_atuamos.index()}
+                    className="transition hover:text-gray-200"
+                  >
+                    Onde Atuamos
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={doacoes.index()}
+                    className="transition hover:text-gray-200"
+                  >
+                    Como Apoiar
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={fale_conosco.index()}
+                    className="transition hover:text-gray-200"
+                  >
+                    Fale Conosco
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Redes sociais */}
+            <div className="flex justify-center gap-4 md:justify-end">
+              <Link
+                href="https://www.facebook.com/ongesquadraodaalegria"
+                target="_blank"
+                className="text-white transition hover:text-gray-200"
+              >
+                <i className="fab fa-facebook text-2xl"></i>
+              </Link>
+              <Link
+                href="https://www.instagram.com/ongesquadraodaalegria/"
+                target="_blank"
+                className="text-white transition hover:text-gray-200"
+              >
+                <i className="fab fa-instagram text-2xl"></i>
+              </Link>
+              <Link
+                href="https://www.linkedin.com/company/ong-esquadr%C3%A3o-da-alegria/"
+                target="_blank"
+                className="text-white transition hover:text-gray-200"
+              >
+                <i className="fab fa-linkedin text-2xl"></i>
+              </Link>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="mt-8 border-t border-white/20 pt-4 text-center text-sm">
+            © Esquadrão da Alegria
+          </div>
         </div>
-    );
-};
+      </footer>
+    </div>
+  )
+}
 
-export default AppLayout;
+export default AppLayout

@@ -202,63 +202,46 @@ const Home: React.FC = () => {
             </div>
 
             {/* Como apoiar */}
-            <div
-                className="container-fluid"
-                style={{ backgroundColor: '#ECFFF0' }}
-            >
-                <div className="como-apoiar-container container">
-                    <div className="row align-items-center">
+            <section className="bg-[#ECFFF0] py-16">
+                <div className="mx-auto max-w-6xl px-6">
+                    <div className="flex flex-col items-center gap-12 md:flex-row">
                         {/* Imagem do lado esquerdo */}
-                        <div className="col-md-6">
+                        <div className="flex-1 flex justify-center">
                             <img
                                 src="./assets/images/como-apoiar.png"
                                 alt="Palhaça"
-                                className="img-fluid como-apoiar-img"
+                                className="w-full max-w-md rounded-2xl shadow-md"
                             />
                         </div>
 
                         {/* Conteúdo do lado direito */}
-                        <div className="col-md-6">
-                            <h2>
-                                Como <span className="apoiar">apoiar</span> o
-                                <br />
-                                Esquadrão da Alegria
+                        <div className="flex-1 text-center md:text-left">
+                            <h2 className="text-3xl font-extrabold text-gray-800 md:text-4xl">
+                                Como <span className="text-green-600">apoiar ?</span>
                             </h2>
 
                             {/* Informações */}
-                            <div className="row mt-4">
-                                <div className="col-md-4">
-                                    <div className="info-card">
-                                        <span className="number">+95</span>
-                                        <p>Voluntários</p>
-                                    </div>
+                            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                                <div className="rounded-xl bg-white p-6 shadow-sm">
+                                    <span className="block text-3xl font-bold text-green-600">+95</span>
+                                    <p className="mt-1 text-gray-700">Voluntários</p>
                                 </div>
 
-                                <div className="col-md-4">
-                                    <div className="info-card">
-                                        <span className="number">+45mil</span>
-                                        <p>Pessoas impactadas/ano</p>
-                                    </div>
+                                <div className="rounded-xl bg-white p-6 shadow-sm">
+                                    <span className="block text-3xl font-bold text-green-600">+45mil</span>
+                                    <p className="mt-1 text-gray-700">Pessoas impactadas/ano</p>
                                 </div>
 
-                                <div className="col-md-4">
-                                    <div className="info-card">
-                                        <span className="number">+900</span>
-                                        <p>Visitas/ano</p>
-                                    </div>
+                                <div className="rounded-xl bg-white p-6 shadow-sm">
+                                    <span className="block text-3xl font-bold text-green-600">+900</span>
+                                    <p className="mt-1 text-gray-700">Visitas/ano</p>
                                 </div>
                             </div>
 
                             {/* Botão */}
-                            <div className="mt-4">
+                            <div className="mt-8">
                                 <a href="./pages/docacao.html">
-                                    <button
-                                        className="btn btn-custom"
-                                        style={{
-                                            borderRadius: '15px',
-                                            fontSize: '1.2rem',
-                                        }}
-                                    >
+                                    <button className="rounded-full bg-gradient-to-r from-green-400 to-green-600 px-8 py-3 text-white font-semibold shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
                                         Saiba mais
                                     </button>
                                 </a>
@@ -266,42 +249,44 @@ const Home: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
+
 
             {/* Conheça */}
-            <section id="conheca" className="container py-5">
-                <div className="row align-items-center">
-                    <div className="col-md-6 position-relative">
-                        <h2 className="title-overlay">
-                            CONHEÇA
-                            <br />
-                            NOSSOS
-                            <br />
-                            DOUTORES
-                        </h2>
-                        <img
-                            className="conheca-img img-fluid"
-                            src="./assets/images/conheca-palhacos.png"
-                            alt="Imagem dos Doutores"
-                        />
-                    </div>
+            <section id="conheca" className="py-20">
+                <div className="max-w-6xl mx-auto px-4">
+                    <div className="flex flex-col md:flex-row items-center">
+                        <div className="w-full md:w-1/2 relative mb-8 md:mb-0">
+                            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 relative z-10 leading-tight">
+                                CONHEÇA
+                                <br />
+                                NOSSOS
+                                <br />
+                                DOUTORES
+                            </h2>
+                            <img
+                                className="w-full h-auto mt-4 md:mt-0 md:absolute md:top-0 md:left-0"
+                                src="./assets/images/conheca-palhacos.png"
+                                alt="Imagem dos Doutores"
+                            />
+                        </div>
 
-                    <div className="col-md-6">
-                        <p className="description">
-                            Nossos doutores besteirologistas são pessoas comuns,
-                            das mais diferentes áreas de formação, que atuam na
-                            sociedade como estudantes, profissionais e
-                            empresários, entre outros, que dedicam parte do seu
-                            tempo a nossa causa.
-                        </p>
-                        <a href="./pages/conheca.html">
-                            <button
-                                className="btn btn-conheca mt-3"
-                                style={{ borderRadius: '15px' }}
-                            >
-                                Saiba mais
-                            </button>
-                        </a>
+                        <div className="w-full md:w-1/2 md:pl-12">
+                            <p className="text-lg text-gray-700 leading-relaxed">
+                                Nossos doutores besteirologistas são pessoas comuns,
+                                das mais diferentes áreas de formação, que atuam na
+                                sociedade como estudantes, profissionais e
+                                empresários, entre outros, que dedicam parte do seu
+                                tempo a nossa causa.
+                            </p>
+                            <a href="./pages/conheca.html">
+                                <button
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 mt-6 rounded-[15px] transition-colors duration-300"
+                                >
+                                    Saiba mais
+                                </button>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
