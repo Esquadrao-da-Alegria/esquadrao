@@ -108,7 +108,87 @@ const AppLayout: React.FC<Props> = ({ children }) => {
       {/* Footer */}
       <footer className="mt-24 bg-[#ED1B24] py-10 text-white">
         <div className="mx-auto max-w-7xl px-6">
-          {/* Conteúdo do footer */}
+          <div className="flex flex-col items-center justify-between gap-10 md:flex-row md:items-start">
+            {/* Logo */}
+            <div className="flex justify-center md:justify-start">
+              <img
+                src="/assets/images/logo_png_branco.png"
+                alt="Esquadrão da Alegria"
+                className="h-20 w-auto"
+              />
+            </div>
+
+            {/* Links */}
+            <div className="text-center md:text-left">
+              <h5 className="mb-3 text-lg font-semibold">
+                Esquadrão da Alegria
+              </h5>
+              <ul className="space-y-1">
+                <li>
+                  <Link
+                    href={conheca.index()}
+                    className="transition hover:text-gray-200"
+                  >
+                    Nossos Doutores
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={onde_atuamos.index()}
+                    className="transition hover:text-gray-200"
+                  >
+                    Onde Atuamos
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={doacoes.index()}
+                    className="transition hover:text-gray-200"
+                  >
+                    Como Apoiar
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={fale_conosco.index()}
+                    className="transition hover:text-gray-200"
+                  >
+                    Fale Conosco
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Redes sociais */}
+            <div className="flex justify-center gap-4 md:justify-end">
+              <Link
+                href="https://www.facebook.com/ongesquadraodaalegria"
+                target="_blank"
+                className="text-white transition hover:text-gray-200"
+              >
+                <i className="fab fa-facebook text-2xl"></i>
+              </Link>
+              <Link
+                href="https://www.instagram.com/ongesquadraodaalegria/"
+                target="_blank"
+                className="text-white transition hover:text-gray-200"
+              >
+                <i className="fab fa-instagram text-2xl"></i>
+              </Link>
+              <Link
+                href="https://www.linkedin.com/company/ong-esquadr%C3%A3o-da-alegria/"
+                target="_blank"
+                className="text-white transition hover:text-gray-200"
+              >
+                <i className="fab fa-linkedin text-2xl"></i>
+              </Link>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div className="mt-8 border-t border-white/20 pt-4 text-center text-sm">
+            © Esquadrão da Alegria
+          </div>
         </div>
       </footer>
     </div>
