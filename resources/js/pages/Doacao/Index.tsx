@@ -1,4 +1,5 @@
 import AppLayout from '@/layouts/AppLayout';
+import { toastSucesso } from '@/lib/utils/toast';
 import { toast } from 'react-toastify';
 
 const Index: React.FC = () => {
@@ -6,7 +7,7 @@ const Index: React.FC = () => {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(pixCode);
-        toast.success('Código PIX copiado com sucesso!');
+        toastSucesso("Código PIX copiado para a área de transferência");
     };
 
     return (

@@ -1,4 +1,6 @@
 import AppLayout from '@/layouts/AppLayout';
+import conheca from '@/routes/conheca';
+import doacoes from '@/routes/doacoes';
 import onde_atuamos from '@/routes/onde_atuamos';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
@@ -240,11 +242,11 @@ const Home: React.FC = () => {
 
                             {/* Botão */}
                             <div className="mt-8">
-                                <a href="./pages/docacao.html">
+                                <Link href={doacoes.index()}>
                                     <button className="rounded-full bg-gradient-to-r from-green-400 to-green-600 px-8 py-3 text-white font-semibold shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
                                         Saiba mais
                                     </button>
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -278,13 +280,13 @@ const Home: React.FC = () => {
                                 tempo a nossa causa.
                             </p>
 
-                            <a href="./pages/conheca.html">
+                            <Link href={conheca.index()}>
                                 <button
                                     className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 mt-6 rounded-[15px] transition-colors duration-300"
                                 >
                                     Saiba mais
                                 </button>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -322,13 +324,13 @@ const Home: React.FC = () => {
                             alt="Santa Maria"
                             className="w-full object-cover"
                         />
-                        <a
-                            href="./pages/hospitais.html"
+                        <Link
+                            href={onde_atuamos.index()}
                             className="flex items-center justify-between bg-white px-6 py-4"
                         >
                             <p className="text-lg font-semibold text-gray-800">Santa Maria</p>
                             <span className="text-2xl text-pink-500">&gt;</span>
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Pelotas */}
@@ -338,13 +340,13 @@ const Home: React.FC = () => {
                             alt="Pelotas"
                             className="w-full object-cover"
                         />
-                        <a
-                            href="./pages/hospitais.html"
+                        <Link
+                            href={onde_atuamos.index()}
                             className="flex items-center justify-between bg-white px-6 py-4"
                         >
                             <p className="text-lg font-semibold text-gray-800">Pelotas</p>
                             <span className="text-2xl text-pink-500">&gt;</span>
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -368,11 +370,11 @@ const Home: React.FC = () => {
                     <p className="mb-10 text-lg text-gray-700">
                         Um grupo que começa com o desejo de transformar espaços através da palhaçaria
                     </p>
-                    <a href="./pages/conheca.html">
+                    <Link href={conheca.index()}>
                         <button className="rounded-full bg-gradient-to-r from-pink-500 to-purple-600 px-8 py-3 text-lg font-semibold text-white shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2">
                             Saiba mais
                         </button>
-                    </a>
+                    </Link>
                 </div>
 
                 {/* Imagem direita */}
