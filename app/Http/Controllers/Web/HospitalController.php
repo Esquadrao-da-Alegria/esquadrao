@@ -60,7 +60,7 @@ class HospitalController extends Controller
     /**
      * Retornar formulário de edição
      */
-    public function edit(Hospital $hospital)
+    public function edit(Request $request, Hospital $hospital)
     {
         return Inertia::render('Hospital/Edit', ['hospital' => $hospital]);
     }

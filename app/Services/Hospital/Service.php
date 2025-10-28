@@ -16,7 +16,7 @@ class Service
 
             if (!$retorno['sucesso']) {
 
-                session()->flash('message_error', 'Erro ao listar dados!');
+                session()->flash('mensagem_erro', 'Erro ao listar dados!');
             }
 
             return $retorno;
@@ -32,17 +32,16 @@ class Service
 
     public function store(array $dados): array
     {
-        dd($dados);
         try {
 
             $retorno = $this->queries->store($dados);
 
             if (!$retorno['sucesso']) {
 
-                session()->flash('message_error', 'Erro ao salvar dados!');
+                session()->flash('mensagem_erro', 'Erro ao salvar dados!');
             } else {
 
-                session()->flash('message_error', 'Dados salvos com sucesso!');
+                session()->flash('mensagem_sucesso', 'Dados salvos com sucesso!');
             }
 
             return $retorno;
@@ -64,14 +63,14 @@ class Service
 
             if (!$retorno['sucesso']) {
 
-                session()->flash('message_error', 'Erro ao salvar dados!');
+                session()->flash('mensagem_erro', 'Erro ao salvar dados!');
             } else {
 
-                session()->flash('message_error', 'Dados salvos com sucesso!');
+                session()->flash('mensagem_sucesso', 'Dados salvos com sucesso!');
             }
 
             return $retorno;
-        } catch (\Throwable $th) {
+        } catch (\Throwable $th) {dd($th);
 
             return [
                 'sucesso' => false,
@@ -89,10 +88,10 @@ class Service
 
             if (!$retorno['sucesso']) {
 
-                session()->flash('message_error', 'Erro ao excluir dados!');
+                session()->flash('mensagem_erro', 'Erro ao excluir dados!');
             } else {
 
-                session()->flash('message_error', 'Dados excluídos com sucesso!');
+                session()->flash('mensagem_sucesso', 'Dados excluídos com sucesso!');
             }
 
             return $retorno;

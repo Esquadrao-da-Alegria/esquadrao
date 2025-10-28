@@ -1,13 +1,26 @@
 import AppLayout from '@/layouts/AppLayout'
 import { Hospital } from '@/types'
 import { Pencil } from 'lucide-react'
-import { Link } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
+import { create, edit } from '@/routes/hospitais';
 
 interface Props {
   hospitais: Hospital[];
 }
 
 const Index: React.FC<Props> = ({ hospitais }) => {
+
+  const handleCriarClick = () => {
+    const url = create();
+
+    router.visit(url);
+  }
+
+  const handleEditarClick = (hospital: Hospital) => {
+    const url = edit({ id: hospital.id! });
+
+    router.visit(url);
+  }
 
   return (
     <AppLayout>
@@ -18,8 +31,9 @@ const Index: React.FC<Props> = ({ hospitais }) => {
           </h1>
 
           <button
+            onClick={handleCriarClick}
             type="button"
-            className="rounded-pill bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
+            className="rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
           >
             Novo
           </button>
@@ -78,13 +92,14 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <Link
-                      href={`/hospitais/${hospital.id}/editar`}
+                    <button
+                      onClick={() => handleEditarClick(hospital)}
+                      type='button'
                       className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
                       aria-label="Editar hospital"
                     >
                       <Pencil size={16} strokeWidth={1.5} />
-                    </Link>
+                    </button>
                   </td>
                 </tr>
               ))}

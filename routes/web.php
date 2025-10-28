@@ -30,7 +30,7 @@ Route::get('/fale-conosco', function () {
 })->name('fale_conosco.index');
 
 // Hospitais
-Route::resource('/hospitais', HospitalController::class);
+Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais'=>'hospital']);
 
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
