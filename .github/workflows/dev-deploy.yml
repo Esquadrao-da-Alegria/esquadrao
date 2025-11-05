@@ -35,7 +35,7 @@ jobs:
   build-environment:
     name: 🏗️ Build do ambiente Laravel + React
     runs-on: ubuntu-latest
-    needs: deploy-code  # garante que só roda após o deploy do código
+    needs: deploy-code 
 
     steps:
       - name: 🔑 Executar build e otimizações
@@ -62,7 +62,7 @@ jobs:
             php artisan optimize
 
             echo "🗄️ Rodando migrações..."
-            php artisan migrate --force
+            php artisan migrate
 
             echo "🔗 Atualizando links e reiniciando filas..."
             php artisan storage:link
