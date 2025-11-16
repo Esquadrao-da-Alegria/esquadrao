@@ -8,6 +8,9 @@ use App\Http\Controllers\InvitationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
+
 //publicas
 Route::get('/', function () {
     return Inertia::render('Home');
@@ -48,98 +51,125 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('guest');
 
 //login
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-    ->middleware('guest')
-    ->name('login');
+// Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+//     ->middleware('guest')
+//     ->name('login');
 
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-    ->middleware('guest');
+// Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+//     ->middleware('guest');
 
 //solicitar convite
-Route::get('/request-invitation', [InvitationController::class, 'requestInvitation'])
+Route::get('/send-invitation', [InvitationController::class, 'sendInvitation'])
     ->middleware('guest')
-    ->name('request-invitation');
+    ->name('send-invitation');
 
-Route::post('/request-invitation', [InvitationController::class, 'store'])
+Route::post('/send-invitation', [InvitationController::class, 'store'])
     ->middleware('guest')
     ->name('store-invitation');
 
 //logout
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('logout');
+// Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+//     ->middleware('auth')
+//     ->name('logout');
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/dashboard', function () {
+    
+            $user = auth()->user();
+    
+
+            $allPermissions = $user->getAllPermissions()->pluck('name')->toArray();
+    
+
+            $permissionsFormatted = [];
+    
+            foreach ($allPermissions as $permissionName) {
+
+                $key = str_replace(' ', '_', $permissionName);
+                $permissionsFormatted[$key] = true;
+            }
+    
+            return Inertia::render('dashboard', [
+                'permissions' => $permissionsFormatted,
+                'role' => $user->roles->pluck('name')->first(),
+            ]);
+        })->name('dashboard');
+    
+    });
+    
 
 //autenticadas
-Route::middleware(['auth', 'verified'])->group(function () {
+// Route::middleware(['auth', 'verified'])->group(function () {
 
-    //dashboard
-    Route::get('dashboard', function () {
-        $user = auth()->user();
-        $permissions = [];
+//     //dashboard
+//     Route::get('dashboard', function () {
+//         $user = auth()->user();
+//         $permissions = [];
 
-        if ($user && $user->role) {
-            $userRole = $user->role->nomeRole;
+//         if ($user && $user->role) {
+//             $userRole = $user->role->nomeRole;
 
-            switch ($userRole) {
-                case 'admin':
-                case 'diretor':
-                    $permissions = [
-                        'manage_users' => true,
-                        'manage_voluntarios' => true,
-                        'manage_hospitais' => true,
-                        'manage_visitas' => true,
-                        'delete_voluntarios' => true,
-                        'delete_hospitais' => true,
-                        'create_voluntarios' => true,
-                        'create_hospitais' => true,
-                        'create_visitas' => true,
-                        'view_voluntarios' => true,
-                        'view_hospitais' => true,
-                        'view_visitas' => true
-                    ];
-                    break;
+//             switch ($userRole) {
+//                 case 'admin':
+//                 case 'diretor':
+//                     $permissions = [
+//                         'manage_users' => true,
+//                         'manage_voluntarios' => true,
+//                         'manage_hospitais' => true,
+//                         'manage_visitas' => true,
+//                         'delete_voluntarios' => true,
+//                         'delete_hospitais' => true,
+//                         'create_voluntarios' => true,
+//                         'create_hospitais' => true,
+//                         'create_visitas' => true,
+//                         'view_voluntarios' => true,
+//                         'view_hospitais' => true,
+//                         'view_visitas' => true
+//                     ];
+//                     break;
 
-                case 'coordenador':
-                    $permissions = [
-                        'manage_voluntarios' => true,
-                        'manage_hospitais' => true,
-                        'manage_visitas' => true,
-                        'create_voluntarios' => true,
-                        'create_hospitais' => true,
-                        'create_visitas' => true,
-                        'view_voluntarios' => true,
-                        'view_hospitais' => true,
-                        'view_visitas' => true,
-                        'delete_voluntarios' => false,
-                        'delete_hospitais' => false,
-                        'manage_users' => false
-                    ];
-                    break;
+//                 case 'coordenador':
+//                     $permissions = [
+//                         'manage_voluntarios' => true,
+//                         'manage_hospitais' => true,
+//                         'manage_visitas' => true,
+//                         'create_voluntarios' => true,
+//                         'create_hospitais' => true,
+//                         'create_visitas' => true,
+//                         'view_voluntarios' => true,
+//                         'view_hospitais' => true,
+//                         'view_visitas' => true,
+//                         'delete_voluntarios' => false,
+//                         'delete_hospitais' => false,
+//                         'manage_users' => false
+//                     ];
+//                     break;
 
-                case 'voluntario':
-                    $permissions = [
-                        'create_visitas' => true,
-                        'view_visitas' => true,
-                        'manage_users' => false,
-                        'manage_voluntarios' => false,
-                        'manage_hospitais' => false,
-                        'manage_visitas' => false,
-                        'delete_voluntarios' => false,
-                        'delete_hospitais' => false,
-                        'create_voluntarios' => false,
-                        'create_hospitais' => false,
-                        'view_voluntarios' => false,
-                        'view_hospitais' => false
-                    ];
-                    break;
-            }
-        }
+//                 case 'voluntario':
+//                     $permissions = [
+//                         'create_visitas' => true,
+//                         'view_visitas' => true,
+//                         'manage_users' => false,
+//                         'manage_voluntarios' => false,
+//                         'manage_hospitais' => false,
+//                         'manage_visitas' => false,
+//                         'delete_voluntarios' => false,
+//                         'delete_hospitais' => false,
+//                         'create_voluntarios' => false,
+//                         'create_hospitais' => false,
+//                         'view_voluntarios' => false,
+//                         'view_hospitais' => false
+//                     ];
+//                     break;
+//             }
+//         }
 
-        return Inertia::render('dashboard', [
-            'permissions' => $permissions,
-            'userRole' => $user->role->nomeRole ?? 'sem_role'
-        ]);
-    })->name('dashboard');
+//         return Inertia::render('dashboard', [
+//             'permissions' => $permissions,
+//             'userRole' => $user->role->nomeRole ?? 'sem_role'
+//         ]);
+//     })->name('dashboard');
 
     //hospitais do projeto antigo
     Route::prefix('hospitais')->middleware('auth')->group(function () {
@@ -170,17 +200,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //gerenciamento de usuario
     Route::get('/user-management', [UserManagementController::class, 'index'])
-        ->middleware('role:manage_users')
+
         ->name('user-management.index');
 
     Route::post('/user-management/{user}/update-role', [UserManagementController::class, 'updateRole'])
-        ->middleware('role:manage_users')
+
         ->name('user-management.update-role');
 
     Route::post('/user-management/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
-        ->middleware('role:manage_users')
-        ->name('user-management.toggle-active');
-});
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+        ->name('user-management.toggle-active');
+
+
+

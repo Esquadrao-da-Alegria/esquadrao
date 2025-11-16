@@ -7,23 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { login } from '@/routes';
 
-interface RequestInvitationProps {
+
+interface SendInvitationProps {
     status?: string;
 }
 
-export default function RequestInvitation({ status }: RequestInvitationProps) {
+export default function SendInvitation({ status }: SendInvitationProps) {
     return (
         <AuthLayout
-            title="Solicitar Convite"
-            description="Preencha seu email para solicitar um convite de registro"
+            title="Enviar convite"
+            description="Informe o email de um voluntário para enviar um convite de registro"
         >
-            <Head title="Solicitar Convite" />
+            <Head title="Enviar convite" />
 
             <Form
                 method="post"
-                action="/request-invitation"
+                action="/send-invitation"
                 className="flex flex-col gap-6"
             >
                 {({ processing, errors }) => (
@@ -60,7 +60,7 @@ export default function RequestInvitation({ status }: RequestInvitationProps) {
 
                         <div className="mt-6 text-center text-sm text-gray-500">
                             Já tem uma conta?{' '}
-                            <TextLink href={login()} tabIndex={3}>
+                            <TextLink href="/login" tabIndex={3}>
                                 Entrar
                             </TextLink>
                         </div>

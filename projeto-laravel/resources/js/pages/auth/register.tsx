@@ -101,7 +101,7 @@ export default function Register({ invitation, token }: RegisterProps) {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="Confirme sua"
+                                    placeholder="Confirme sua senha"
                                     className="rounded-xl border border-gray-200 px-4 py-3 shadow-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 transition-all duration-300"
                                 />
                                 <InputError message={errors.password_confirmation} className="mt-1" />

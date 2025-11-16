@@ -5,8 +5,7 @@ import fale_conosco from '@/routes/fale_conosco';
 import onde_atuamos from '@/routes/onde_atuamos';
 import { Link } from '@inertiajs/react';
 import { useState } from 'react';
-import '../../css/footer.css';
-import '../../css/styles.css';
+
 
 interface Props {
     children: React.ReactNode;
@@ -71,36 +70,39 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             href={conheca.index()}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                         >
-                            <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-blue-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Conheça
-                            </span>
+                            Conheça
                         </Link>
+
                         <Link
                             href={onde_atuamos.index()}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-purple-50 hover:text-purple-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                         >
-                            <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-purple-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Hospitais
-                            </span>
+                            Hospitais
                         </Link>
+
                         <Link
                             href={doacoes.index()}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-green-50 hover:text-green-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                         >
-                            <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-green-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Doação
-                            </span>
+                            Doação
                         </Link>
+
                         <Link
                             href={fale_conosco.index()}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                         >
+                            Fale Conosco
+                        </Link>
+
+                        <Link
+                            href={'logout'}
+                            method="post"
+                            as="button"
+                            className="block rounded-xl px-6 py-4 font-medium text-red-600 no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
+                        >
                             <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-orange-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Fale Conosco
+                                <span className="h-2 w-2 rounded-full bg-red-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                                Logout
                             </span>
                         </Link>
                     </div>

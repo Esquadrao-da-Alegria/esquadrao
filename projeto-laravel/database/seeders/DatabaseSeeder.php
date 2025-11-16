@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
                 CidadeSeeder::class,
             ]
         );
+        $this->call(PermissionsSeeder::class);
     }
 }

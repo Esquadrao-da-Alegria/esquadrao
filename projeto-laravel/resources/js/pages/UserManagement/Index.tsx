@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toggle } from '@/components/ui/toggle';
-import { type BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 
 interface User {
     id: number;
@@ -16,7 +13,7 @@ interface User {
     role: {
         id: number;
         nomeRole: string;
-    };
+    } | null;
 }
 
 interface Role {
@@ -33,141 +30,131 @@ export default function UserManagement({ users, roles }: Props) {
     const [selectedRoles, setSelectedRoles] = useState<Record<number, number>>({});
 
     const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Dashboard',
-            href: '/dashboard',
-        },
-        {
-            title: 'Gerenciamento de Usuários',
-            href: '/user-management',
-        },
+        { title: 'Dashboard', href: '/dashboard' },
+        { title: 'Gerenciamento de Usuários', href: '/user-management' },
     ];
 
     const handleRoleChange = (userId: number, roleId: number) => {
         setSelectedRoles(prev => ({ ...prev, [userId]: roleId }));
-        
-        router.post(`/user-management/${userId}/update-role`, {
-            role_id: roleId
-        });
+        router.post(`/user-management/${userId}/update-role`, { role_id: roleId });
     };
 
     const handleToggleActive = (userId: number) => {
         router.post(`/user-management/${userId}/toggle-active`);
     };
 
-    const getRoleBadgeColor = (roleName: string) => {
-        switch (roleName) {
-            case 'admin':
-                return 'bg-red-100 text-red-800';
-            case 'diretor':
-                return 'bg-purple-100 text-purple-800';
-            case 'coordenador':
-                return 'bg-blue-100 text-blue-800';
-            case 'voluntario':
-                return 'bg-green-100 text-green-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Gerenciamento de Usuários" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4 overflow-x-auto">
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">
+            <div className="relative flex flex-col gap-8 p-6">
+
+                {/* Elementos decorativos suaves */}
+                <div className="absolute -top-6 -left-6 h-10 w-10 rounded-full bg-blue-300 opacity-30 animate-pulse"></div>
+                <div className="absolute -bottom-6 -right-6 h-8 w-8 rounded-full bg-purple-300 opacity-30 animate-bounce"></div>
+
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">
                         Gerenciamento de Usuários
                     </h1>
-                    <p className="text-gray-600 mt-2">
-                        Gerencie roles e status dos usuários do sistema
+                    <p className="text-gray-600 mt-1">
+                        Controle roles e status dos usuários do sistema
                     </p>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Lista de Usuários</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                                    <div className="space-y-4">
-                                        {users.map((user) => (
-                                            <div
-                                                key={user.id}
-                                                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                                            >
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-3">
-                                                        <div>
-                                                            <h3 className="font-semibold text-gray-900">
-                                                                {user.name}
-                                                            </h3>
-                                                            <p className="text-sm text-gray-600">
-                                                                {user.email}
-                                                            </p>
-                                                        </div>
-                                                        <Badge className={getRoleBadgeColor(user.role.nomeRole)}>
-                                                            {user.role.nomeRole}
-                                                        </Badge>
-                                                        <Badge 
-                                                            variant={user.active ? "default" : "secondary"}
-                                                            className={user.active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
-                                                        >
-                                                            {user.active ? 'Ativo' : 'Inativo'}
-                                                        </Badge>
-                                                    </div>
-                                                </div>
+                <div className="space-y-6">
 
-                                                <div className="flex items-center gap-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <label className="text-sm font-medium">
-                                                            Role:
-                                                        </label>
-                                                        <Select
-                                                            value={user.role.id.toString()}
-                                                            onValueChange={(value) => 
-                                                                handleRoleChange(user.id, parseInt(value))
-                                                            }
-                                                        >
-                                                            <SelectTrigger className="w-40">
-                                                                <SelectValue />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {roles.map((role) => (
-                                                                    <SelectItem 
-                                                                        key={role.id} 
-                                                                        value={role.id.toString()}
-                                                                    >
-                                                                        {role.nomeRole}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-
-                                                    <div className="flex items-center gap-2">
-                                                        <label className="text-sm font-medium">
-                                                            Ativo:
-                                                        </label>
-                                                        <Toggle
-                                                            pressed={user.active}
-                                                            onPressedChange={() => handleToggleActive(user.id)}
-                                                            className={user.active ? "bg-green-500 text-white" : "bg-gray-300"}
-                                                        >
-                                                            {user.active ? '✓' : '✗'}
-                                                        </Toggle>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
+                    {users.map((user) => (
+                        <div
+                            key={user.id}
+                            className="rounded-2xl border bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300"
+                        >
+                            <div className="flex flex-col gap-5 md:flex-row md:justify-between">
+                                
+                                {/* Left side - User info */}
+                                <div className="flex items-start gap-4">
+                                    <div className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white h-12 w-12 flex items-center justify-center shadow-md text-lg font-bold">
+                                        {user.name.charAt(0).toUpperCase()}
                                     </div>
 
-                                    {users.length === 0 && (
-                                        <div className="text-center py-8 text-gray-500">
-                                            Nenhum usuário encontrado
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900 text-lg">
+                                            {user.name}
+                                        </h3>
+                                        <p className="text-sm text-gray-600">{user.email}</p>
+
+                                        <div className="mt-2 flex gap-2 flex-wrap">
+                                            <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
+                                                {user.role?.nomeRole ?? "Sem Role"}
+                                            </span>
+
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-xs ${
+                                                    user.active
+                                                        ? "bg-green-100 text-green-700"
+                                                        : "bg-gray-200 text-gray-700"
+                                                }`}
+                                            >
+                                                {user.active ? "Ativo" : "Inativo"}
+                                            </span>
                                         </div>
-                                    )}
-                    </CardContent>
-                </Card>
+                                    </div>
+                                </div>
+
+                                {/* Right side - Controls */}
+                                <div className="flex flex-col gap-5 md:items-end">
+
+                                    {/* Select Role */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-medium">Role</label>
+                                        <Select
+                                            value={user.role?.id?.toString() ?? ""}
+                                            onValueChange={(value) =>
+                                                handleRoleChange(user.id, parseInt(value))
+                                            }
+                                        >
+                                            <SelectTrigger className="w-48 rounded-xl border-gray-300 shadow-sm">
+                                                <SelectValue placeholder="Selecionar" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                {roles.map(role => (
+                                                    <SelectItem key={role.id} value={role.id.toString()}>
+                                                        {role.nomeRole}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {/* Toggle Active */}
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-medium">Status</label>
+
+                                        <Toggle
+                                            pressed={user.active}
+                                            onPressedChange={() => handleToggleActive(user.id)}
+                                            className={`rounded-xl px-4 py-2 text-white font-medium shadow-md transition-all ${
+                                                user.active
+                                                    ? "bg-green-500 hover:bg-green-600"
+                                                    : "bg-gray-400 hover:bg-gray-500"
+                                            }`}
+                                        >
+                                            {user.active ? "Ativo" : "Inativo"}
+                                        </Toggle>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                    {users.length === 0 && (
+                        <div className="text-center py-10 text-gray-500">
+                            Nenhum usuário encontrado
+                        </div>
+                    )}
+                </div>
             </div>
         </AppLayout>
     );

@@ -14,9 +14,9 @@ class InvitationController extends Controller
     /**
      * Show the request invitation page.
      */
-    public function requestInvitation()
+    public function sendInvitation()
     {
-        return Inertia::render('auth/request-invitation');
+        return Inertia::render('auth/send-invitation');
     }
 
     /**
@@ -31,7 +31,7 @@ class InvitationController extends Controller
         // Enviar email com o convite
         $this->sendInvitationEmail($invitation);
 
-        return redirect()->route('request-invitation')
+        return redirect()->route('send-invitation')
             ->with('success', 'Convite solicitado com sucesso! Você receberá um email com o link para se registrar.');
     }
 
