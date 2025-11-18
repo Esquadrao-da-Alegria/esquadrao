@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('telefone', 14);
             $table->string('email', 50);
             $table->boolean('ativo')->default(1);
+            $table->string('url_foto', 255)->nullable();
             $table->text('observacoes')->nullable();
 
             $table->timestamps();

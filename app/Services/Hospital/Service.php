@@ -3,6 +3,8 @@
 namespace App\Services\Hospital;
 
 use App\Queries\Hospital\Queries;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 
 class Service
 {
@@ -20,7 +22,8 @@ class Service
             }
 
             return $retorno;
-        } catch (\Throwable $th) {dd($th);
+        } catch (\Throwable $th) {
+            dd($th);
 
             return [
                 'sucesso' => false,
@@ -34,15 +37,17 @@ class Service
     {
         try {
 
-            $retorno = $this->queries->store($dados);
+            $dadosDatabase = Arr::except($dados, ['foto']);
 
-            if (!$retorno['sucesso']) {
+            $retorno = $this->queries->store($dadosDatabase);
 
-                session()->flash('mensagem_erro', 'Erro ao salvar dados!');
-            } else {
+            mensagemFlashSalvar($retorno['sucesso']);
 
-                session()->flash('mensagem_sucesso', 'Dados salvos com sucesso!');
-            }
+            $id = $retorno['dados']['id'];
+
+            $retornoFoto = $this->salvarFoto(['foto' => $dados['foto'], 'hospital_id' => $id]);
+
+            $retorno = $this->queries->update($id, ['url_foto' => $retornoFoto['dados']['url'] ?? null]);
 
             return $retorno;
         } catch (\Throwable $th) {
@@ -59,18 +64,21 @@ class Service
     {
         try {
 
-            $retorno = $this->queries->update($id, $dados);
+            $foto = $dados['foto'] ?? null;
 
-            if (!$retorno['sucesso']) {
+            $dadosDatabase = Arr::except($dados, ['foto']);
 
-                session()->flash('mensagem_erro', 'Erro ao salvar dados!');
-            } else {
+            $retorno = $this->queries->update($id, $dadosDatabase);
 
-                session()->flash('mensagem_sucesso', 'Dados salvos com sucesso!');
-            }
+            mensagemFlashSalvar($retorno['sucesso']);
+
+            $retornoFoto = $this->salvarFoto(['foto' => $foto, 'hospital_id' => $id]);
+
+            $this->update($id, ['url_foto' => $retornoFoto['dados']['url'] ?? null]);
 
             return $retorno;
-        } catch (\Throwable $th) {dd($th);
+        } catch (\Throwable $th) {
+            dd($th);
 
             return [
                 'sucesso' => false,
@@ -103,5 +111,34 @@ class Service
                 'erros'   => [formatarMensagemErro($th)]
             ];
         }
+    }
+
+    public function salvarFoto(array $dados): array
+    {
+        $foto       = $dados['foto'];
+        $hospitalId = $dados['hospital_id'];
+
+        if (!$foto) return [
+            'sucesso' => true,
+            'dados'   => [],
+            'erros'   => []
+        ];
+
+        $extensao = "." . $foto->getClientOriginalExtension();
+        $nomeFoto = "imagem-{$hospitalId}-" . uniqid() . "$extensao";
+        $caminho = "imagens/hospitais/{$nomeFoto}";
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk('public');
+
+        $storage->put($caminho, file_get_contents($foto));
+
+        $url = $storage->url($caminho);
+
+        return [
+            'sucesso' => true,
+            'dados'   => ['url' => $url],
+            'erros'   => []
+        ];
     }
 }

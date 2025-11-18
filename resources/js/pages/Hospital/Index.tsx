@@ -69,8 +69,7 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                 >
                   <td className="px-6 py-4">
                     <img
-                      // src={hospital.imagem_url}
-                      src='https://imagens.ebc.com.br/ezhL7QDLWeq77RcIBaA78AQ9RMc=/1170x700/smart/https://agenciabrasil.ebc.com.br/sites/default/files/thumbnails/image/2025/01/17/toms1434.jpg?itok=QxAcBaX6'
+                      src={hospital.url_foto ?? 'https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM='}
                       alt={hospital.nome}
                       className="h-14 w-14 rounded-full object-cover shadow-sm ring-2 ring-pink-200"
                     />

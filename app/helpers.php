@@ -11,3 +11,17 @@ if (!function_exists('formatarMensagemErro')) {
         }
     }
 }
+
+if (!function_exists('mensagemFlashSalvar')) {
+    function mensagemFlashSalvar(bool $sucesso): void
+    {
+        if (!$sucesso) {
+
+            session()->flash('mensagem_erro', 'Erro ao salvar dados!');
+
+            return;
+        }
+
+        session()->flash('mensagem_sucesso', 'Dados salvos com sucesso!');
+    }
+}

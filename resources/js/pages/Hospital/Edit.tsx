@@ -1,56 +1,85 @@
-import React, { useEffect } from 'react'
 import AppLayout from '@/layouts/AppLayout'
-import { useForm } from '@inertiajs/react'
+import { update } from '@/routes/hospitais'
 import { toast } from 'react-toastify'
+import React from 'react'
+import { router, useForm } from '@inertiajs/react'
 import { Hospital } from '@/types'
-import { store } from '@/routes/hospitais'
+import { Check } from 'lucide-react'
 
 interface Props {
     hospital: Hospital
 }
 
+interface CamposFormulario {
+    cidade_id: number
+    nome: string
+    cnpj: string
+    endereco: string
+    telefone: string
+    email: string
+    ativo: boolean
+    foto: File | null
+    observacoes?: string
+}
+
 const Edit: React.FC<Props> = ({ hospital }) => {
-    const { data, setData, post, processing } = useForm<Hospital>({
-        ...hospital, // preenche o formulário com os dados existentes
+    const { data, setData, processing } = useForm<CamposFormulario>({
+        cidade_id: hospital.cidade_id,
+        nome: hospital.nome,
+        cnpj: hospital.cnpj,
+        endereco: hospital.endereco,
+        telefone: hospital.telefone,
+        email: hospital.email,
+        ativo: hospital.ativo,
+        foto: null,
+        observacoes: hospital.observacoes
     })
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-        const { name, value, type } = e.target
+    const handleDataChange = (campo: keyof CamposFormulario, valor: any) => {
 
-        if (!(name in data)) return
-
-        if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
-            setData(name as keyof Hospital, e.target.checked as any)
-        } else if (type === 'number') {
-            setData(name as keyof Hospital, Number(value) as any)
-        } else {
-            setData(name as keyof Hospital, value as any)
-        }
+        setData((prevData) => ({
+            ...prevData,
+            [campo]: valor
+        }))
     }
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null
 
-    const handleSubmit = () => {
+        handleDataChange('foto', file)
+    }
+
+    const handleSubmit = async () => {
         if (!data.nome || !data.cnpj || !data.email || !data.telefone) {
             toast.error('Preencha todos os campos obrigatórios!')
             return
         }
 
-        post(store().url)
+        const url = update({ hospital: hospital.id! }).url;
+
+        router.post(url, { ...data as {}, _method: 'put' })
+    }
+
+    const buscarUrlFoto = () => {
+
+        if (data.foto) return URL.createObjectURL(data.foto);
+
+        if (hospital.url_foto) return hospital.url_foto;
+
+        return null;
     }
 
     return (
         <AppLayout>
-            <section className="mx-auto w-full max-w-6xl px-4 py-16">
+            <section className="mx-auto w-full max-w-8xl px-4 py-16">
                 <div className="flex justify-center">
-                    <div className="w-full max-w-4xl">
+                    <div className="w-full max-w-7xl">
                         <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-pink-50 to-blue-50 shadow-lg">
                             <div className="flex flex-col lg:flex-row">
                                 {/* Formulário */}
-                                <div className="flex-1 p-8 md:p-12">
+                                <div className="flex-2 p-8 md:p-12">
                                     <h2 className="mb-8 text-3xl font-bold text-gray-900 md:text-4xl">
-                                        Editar Hospital
+                                        Cadastrar Hospital
                                     </h2>
 
                                     <form
@@ -60,33 +89,125 @@ const Edit: React.FC<Props> = ({ hospital }) => {
                                         }}
                                         className="space-y-6"
                                     >
-                                        {/** Campos principais */}
-                                        {[
-                                            { label: 'Nome', name: 'nome', type: 'text', required: true },
-                                            { label: 'CNPJ', name: 'cnpj', type: 'text', required: true, maxLength: 14 },
-                                            { label: 'Email', name: 'email', type: 'email', required: true },
-                                            { label: 'Telefone', name: 'telefone', type: 'text', required: true },
-                                            { label: 'Endereço', name: 'endereco', type: 'text', required: true },
-                                            { label: 'ID da Cidade', name: 'cidade_id', type: 'number', required: true },
-                                        ].map(({ label, name, type, required, maxLength }) => (
-                                            <div key={name}>
-                                                <label htmlFor={name} className="mb-2 block text-sm font-medium text-gray-700">
-                                                    {label} {required ? '*' : ''}
-                                                </label>
-                                                <input
-                                                    type={type}
-                                                    name={name}
-                                                    id={name}
-                                                    required={required}
-                                                    maxLength={maxLength}
-                                                    value={data[name as keyof Hospital] as any}
-                                                    onChange={handleChange}
-                                                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
-                                                />
-                                            </div>
-                                        ))}
+                                        {/* Nome */}
+                                        <div>
+                                            <label htmlFor="nome" className="mb-2 block text-sm font-medium text-gray-700">
+                                                Nome *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="nome"
+                                                id="nome"
+                                                required
+                                                placeholder="Digite o nome do hospital"
+                                                value={data.nome}
+                                                onChange={(e) => handleDataChange('nome', e.target.value)}
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+                                            />
+                                        </div>
 
-                                        {/** Observações */}
+                                        {/* CNPJ */}
+                                        <div>
+                                            <label htmlFor="cnpj" className="mb-2 block text-sm font-medium text-gray-700">
+                                                CNPJ *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="cnpj"
+                                                id="cnpj"
+                                                required
+                                                placeholder="Digite o CNPJ (apenas números)"
+                                                value={data.cnpj}
+                                                onChange={(e) => handleDataChange('cnpj', e.target.value)}
+                                                maxLength={14}
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+                                            />
+                                        </div>
+
+                                        {/* Email */}
+                                        <div>
+                                            <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">
+                                                Email *
+                                            </label>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                id="email"
+                                                required
+                                                placeholder="Digite o email"
+                                                value={data.email}
+                                                onChange={(e) => handleDataChange('email', e.target.value)}
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+                                            />
+                                        </div>
+
+                                        {/* Telefone */}
+                                        <div>
+                                            <label htmlFor="telefone" className="mb-2 block text-sm font-medium text-gray-700">
+                                                Telefone *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="telefone"
+                                                id="telefone"
+                                                required
+                                                placeholder="Digite o telefone"
+                                                value={data.telefone}
+                                                onChange={(e) => handleDataChange('telefone', e.target.value)}
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+                                            />
+                                        </div>
+
+                                        {/* Endereço */}
+                                        <div>
+                                            <label htmlFor="endereco" className="mb-2 block text-sm font-medium text-gray-700">
+                                                Endereço *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="endereco"
+                                                id="endereco"
+                                                required
+                                                placeholder="Ex: R. Prof. Dr. Araújo, 538 - Centro, Pelotas - RS"
+                                                value={data.endereco}
+                                                onChange={(e) => handleDataChange('endereco', e.target.value)}
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+                                            />
+                                        </div>
+
+                                        {/* Cidade ID */}
+                                        {/* <div>
+                                            <label htmlFor="cidade_id" className="mb-2 block text-sm font-medium text-gray-700">
+                                                ID da Cidade *
+                                            </label>
+                                            <input
+                                                type="number"
+                                                name="cidade_id"
+                                                id="cidade_id"
+                                                required
+                                                placeholder="Digite o ID da cidade"
+                                                value={data.cidade_id}
+                                                onChange={(e) => handleDataChange('cnpj', e.target.value)}
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+                                            />
+                                        </div> */}
+
+                                        {/* Foto */}
+                                        <div>
+                                            <label htmlFor="foto" className="mb-2 block text-sm font-medium text-gray-700">
+                                                Foto
+                                            </label>
+                                            <input
+                                                type="file"
+                                                name="foto"
+                                                id="foto"
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500 file:mr-4 file:rounded-lg file:border-0 file:bg-pink-50 file:px-4 file:py-2 file:text-pink-700 hover:file:bg-pink-100"
+                                            />
+                                        </div>
+
+                                        {/* Observações */}
                                         <div>
                                             <label htmlFor="observacoes" className="mb-2 block text-sm font-medium text-gray-700">
                                                 Observações
@@ -95,20 +216,22 @@ const Edit: React.FC<Props> = ({ hospital }) => {
                                                 name="observacoes"
                                                 id="observacoes"
                                                 rows={4}
+                                                placeholder="Digite observações adicionais"
                                                 value={data.observacoes}
-                                                onChange={handleChange}
+                                                onChange={(e) => handleDataChange('observacoes', e.target.value)}
                                                 className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+
                                             />
                                         </div>
 
-                                        {/** Status */}
+                                        {/* Status */}
                                         <div className="flex items-center gap-2">
                                             <input
                                                 type="checkbox"
                                                 name="ativo"
                                                 id="ativo"
                                                 checked={data.ativo}
-                                                onChange={handleChange}
+                                                onChange={(e) => handleDataChange('observacoes', e.target.checked)}
                                                 className="h-4 w-4 rounded border-gray-300 text-pink-500 focus:ring-pink-500"
                                             />
                                             <label htmlFor="ativo" className="text-sm font-medium text-gray-700">
@@ -116,13 +239,13 @@ const Edit: React.FC<Props> = ({ hospital }) => {
                                             </label>
                                         </div>
 
-                                        {/** Botão */}
+                                        {/* Botão Salvar */}
                                         <button
                                             type="submit"
                                             disabled={processing}
                                             className="w-full rounded-full bg-gradient-to-r from-pink-500 to-blue-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-70"
                                         >
-                                            {processing ? 'Salvando...' : 'Salvar Alterações'}
+                                            Salvar
                                         </button>
                                     </form>
                                 </div>
@@ -130,7 +253,15 @@ const Edit: React.FC<Props> = ({ hospital }) => {
                                 {/* Imagem lateral */}
                                 <div className="hidden flex-1 items-center justify-center bg-gradient-to-br from-pink-100 to-blue-100 p-8 lg:flex">
                                     <div className="relative flex h-64 w-64 items-center justify-center rounded-2xl bg-white shadow-lg">
-                                        <span className="text-8xl">🏥</span>
+                                        {buscarUrlFoto() ? (
+                                            <img
+                                                src={buscarUrlFoto()!}
+                                                alt={`Foto do ${hospital.nome}`}
+                                                className="h-full w-full rounded-2xl object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-8xl">🏥</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>

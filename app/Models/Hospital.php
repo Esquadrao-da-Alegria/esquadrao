@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Hospital extends Model
 {
@@ -19,15 +20,11 @@ class Hospital extends Model
         'telefone',
         'email',
         'ativo',
+        'url_foto',
         'observacoes',
         'created_at',
         'updated_at',
     ];
 
     protected $table = 'hospitais';
-
-    // public function endereco()
-    // {
-    //     return $this->morphOne(Endereco::class, 'recurso', 'recurso_tipo', 'recurso_id');
-    // }
 }

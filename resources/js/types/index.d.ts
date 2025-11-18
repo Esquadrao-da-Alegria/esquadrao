@@ -77,6 +77,7 @@ export interface Hospital {
     telefone: string
     email: string
     ativo: boolean
+    url_foto: string | null
     observacoes?: string
     created_at?: string
     updated_at?: string
