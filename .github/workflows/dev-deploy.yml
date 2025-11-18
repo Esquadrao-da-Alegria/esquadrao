@@ -21,12 +21,14 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
           script: |
             set -e
             echo "📦 Atualizando código no servidor DEV..."
-            cd ~/dev.esquadroadalegria.org.br
 
-            # Atualiza branch dev
+            cd /var/www/esquadraodaalegria/dev
+
             git fetch origin dev
             git reset --hard origin/dev
 
@@ -38,15 +40,18 @@ jobs:
     needs: deploy-code 
 
     steps:
-      - name: 🔑 Executar build e otimizações
+      - name: 🔑 Executar build e otimizacoes
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
           script: |
             set -e
-            cd ~/dev.esquadroadalegria.org.br
+
+            cd /var/www/esquadraodaalegria/dev
 
             echo "📦 Instalando dependências PHP..."
             composer install --no-dev --optimize-autoloader --no-interaction
