@@ -3,16 +3,34 @@ import conheca from '@/routes/conheca';
 import doacoes from '@/routes/doacoes';
 import fale_conosco from '@/routes/fale_conosco';
 import onde_atuamos from '@/routes/onde_atuamos';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import login from '@/routes/login';
+import type { User } from '@/types/user';
+import AuthRole from '@/components/AuthRole'
 
+
+
+interface AuthProps {
+    user: User | null;
+}
+
+interface InertiaPageProps {
+    auth?: AuthProps; 
+    [key: string]: any;
+}
 
 interface Props {
     children: React.ReactNode;
 }
 
+
 const AppLayout: React.FC<Props> = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+
+    const { props } = usePage<InertiaPageProps>();
+    const user = props.auth?.user;
 
     return (
         <div className="container-global bg-white">
@@ -93,18 +111,56 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                         >
                             Fale Conosco
                         </Link>
+                        {/*so mostra logou se usuario existe*/}
+                        
+                        <AuthRole role='diretor'>
+                        <Link
+                            href={'user-management'}
+                            className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all 
+                            duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
+                            Gerenciador de Voluntários
+                        </Link>
 
                         <Link
-                            href={'logout'}
-                            method="post"
-                            as="button"
-                            className="block rounded-xl px-6 py-4 font-medium text-red-600 no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
-                        >
-                            <span className="flex items-center gap-2">
-                                <span className="h-2 w-2 rounded-full bg-red-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                Logout
-                            </span>
+                            href={'send-invitation'}
+                            className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all 
+                            duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
+                            Enviar Convite
                         </Link>
+                        
+                        
+                        
+                        
+                        </AuthRole> 
+                        {user&&(
+                            <Link
+                                href={'logout'}
+                                method="post"
+                                as="button"
+                                className="block rounded-xl px-6 py-4 font-medium text-red-600 no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <span className="h-2 w-2 rounded-full bg-red-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                                    Logout
+                                </span>
+                            </Link>
+                            )
+                        }      
+                        
+                            {!user 
+                            &&(
+                                <Link
+                                    href={'login'}
+                                    className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
+                                    >
+                                    <span className="flex items-center gap-2">
+                                        <span className="h-2 w-2 rounded-full bg-red-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                                        Login
+                                    </span>
+                                </Link>
+
+                            )
+                        }
                     </div>
                 </nav>
             </header>

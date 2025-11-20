@@ -11,6 +11,7 @@ import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
+
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
@@ -91,7 +92,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 {processing && (
                                     <LoaderCircle className="h-4 w-4 animate-spin" />
                                 )}
-                                Log in
+                                Entrar
                             </Button>
                         </div>
                     </>

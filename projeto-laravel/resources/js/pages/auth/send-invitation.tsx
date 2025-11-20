@@ -1,6 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-
+import AppLayout from '@/layouts/AppLayout';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,8 @@ interface SendInvitationProps {
 
 export default function SendInvitation({ status }: SendInvitationProps) {
     return (
-        <AuthLayout
+        <AppLayout>
+            <AuthLayout
             title="Enviar convite"
             description="Informe o email de um voluntário para enviar um convite de registro"
         >
@@ -54,15 +55,8 @@ export default function SendInvitation({ status }: SendInvitationProps) {
                                 {processing && (
                                     <LoaderCircle className="h-5 w-5 animate-spin" />
                                 )}
-                                Solicitar Convite
+                                Enviar Convite
                             </Button>
-                        </div>
-
-                        <div className="mt-6 text-center text-sm text-gray-500">
-                            Já tem uma conta?{' '}
-                            <TextLink href="/login" tabIndex={3}>
-                                Entrar
-                            </TextLink>
                         </div>
 
                         {status && (
@@ -74,5 +68,7 @@ export default function SendInvitation({ status }: SendInvitationProps) {
                 )}
             </Form>
         </AuthLayout>
+        </AppLayout>
+        
     );
 }

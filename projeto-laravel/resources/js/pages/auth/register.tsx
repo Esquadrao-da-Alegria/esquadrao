@@ -165,23 +165,7 @@ export default function Register({ invitation, token }: RegisterProps) {
                             </Button>
                         </div>
 
-                        {/* Link para login */}
-                        <div className="mt-6 text-center text-sm text-gray-500">
-                            Já tem uma conta?{' '}
-                            <TextLink href={login()} tabIndex={7}>
-                                Entrar
-                            </TextLink>
-                        </div>
 
-                        {/* Link para solicitar convite se não tiver token */}
-                        {!token && (
-                            <div className="mt-2 text-center text-sm text-gray-500">
-                                Precisa de um convite?{' '}
-                                <TextLink href="/request-invitation" tabIndex={8}>
-                                    Solicitar Convite
-                                </TextLink>
-                            </div>
-                        )}
 
                         {/* Elementos decorativos animados */}
                         <div className="absolute -top-8 -left-8 h-12 w-12 animate-pulse rounded-full bg-yellow-300 opacity-40"></div>

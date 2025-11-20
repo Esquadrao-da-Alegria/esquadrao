@@ -1,25 +1,12 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import AppLayout from '@/layouts/AppLayout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toggle } from '@/components/ui/toggle';
 import type { BreadcrumbItem } from '@/types';
+import type { User } from '@/types/user';
+import type { Role } from '@/types/role';
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    active: boolean;
-    role: {
-        id: number;
-        nomeRole: string;
-    } | null;
-}
-
-interface Role {
-    id: number;
-    nomeRole: string;
-}
 
 interface Props {
     users: User[];
@@ -44,24 +31,25 @@ export default function UserManagement({ users, roles }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout>
             <Head title="Gerenciamento de Usuários" />
 
-            <div className="relative flex flex-col gap-8 p-6">
+            <div className="relative flex flex-col gap-8 p-6 py-10">
 
-                {/* Elementos decorativos suaves */}
+
                 <div className="absolute -top-6 -left-6 h-10 w-10 rounded-full bg-blue-300 opacity-30 animate-pulse"></div>
                 <div className="absolute -bottom-6 -right-6 h-8 w-8 rounded-full bg-purple-300 opacity-30 animate-bounce"></div>
 
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">
-                        Gerenciamento de Usuários
+                        Gerenciamento de Voluntários
                     </h1>
                     <p className="text-gray-600 mt-1">
-                        Controle roles e status dos usuários do sistema
+                        Controle roles e status dos voluntários do Esquadrão da Alegria
                     </p>
                 </div>
 
+                
                 <div className="space-y-6">
 
                     {users.map((user) => (
@@ -71,7 +59,7 @@ export default function UserManagement({ users, roles }: Props) {
                         >
                             <div className="flex flex-col gap-5 md:flex-row md:justify-between">
                                 
-                                {/* Left side - User info */}
+                           
                                 <div className="flex items-start gap-4">
                                     <div className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white h-12 w-12 flex items-center justify-center shadow-md text-lg font-bold">
                                         {user.name.charAt(0).toUpperCase()}
@@ -85,7 +73,7 @@ export default function UserManagement({ users, roles }: Props) {
 
                                         <div className="mt-2 flex gap-2 flex-wrap">
                                             <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
-                                                {user.role?.nomeRole ?? "Sem Role"}
+                                                {user.roles[0]?.name ?? "Sem cargo"}
                                             </span>
 
                                             <span
@@ -106,9 +94,9 @@ export default function UserManagement({ users, roles }: Props) {
 
                                     {/* Select Role */}
                                     <div className="flex flex-col gap-2">
-                                        <label className="text-sm font-medium">Role</label>
+                                        <label className="text-sm font-medium">Cargo</label>
                                         <Select
-                                            value={user.role?.id?.toString() ?? ""}
+                                            value={user.roles[0]?.id?.toString() ?? ""}
                                             onValueChange={(value) =>
                                                 handleRoleChange(user.id, parseInt(value))
                                             }
@@ -120,7 +108,7 @@ export default function UserManagement({ users, roles }: Props) {
                                             <SelectContent>
                                                 {roles.map(role => (
                                                     <SelectItem key={role.id} value={role.id.toString()}>
-                                                        {role.nomeRole}
+                                                        {role.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -154,7 +142,7 @@ export default function UserManagement({ users, roles }: Props) {
                             Nenhum usuário encontrado
                         </div>
                     )}
-                </div>
+                </div>        
             </div>
         </AppLayout>
     );

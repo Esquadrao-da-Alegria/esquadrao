@@ -56,6 +56,7 @@ class RegisteredUserController extends Controller
 
         // Criar ou obter roles
         $diretorRole = Role::findOrCreate('diretor');
+        $coordenadorRole = Role::findOrCreate('coordenador');
         $voluntarioRole = Role::findOrCreate('voluntario');
 
         // Criar o usuário
@@ -88,6 +89,6 @@ class RegisteredUserController extends Controller
         }
 
         return redirect()->intended(route('dashboard'))
-            ->with('success', 'Conta criada com sucesso! Bem-vindo ao Esquadrão do Sorriso!');
+            ->with('success', 'Conta criada com sucesso! Bem-vindo ao Esquadrão da Alegria!');
     }
 }
