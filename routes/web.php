@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\Web\HospitalController;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Web\HospitalController;
+use App\Http\Controllers\Web\OndeAtuamosController;
 
 // HOME PAGE
 Route::get('/', function () {
@@ -10,9 +11,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Hospitais
-Route::get('/onde-atuamos', function () {
-    return Inertia::render('OndeAtuamos/Index');
-})->name('onde_atuamos.index');
+Route::get('/onde-atuamos', [OndeAtuamosController::class, 'index'])->name('onde_atuamos.index');
 
 // Conheça
 Route::get('/conheça', function () {

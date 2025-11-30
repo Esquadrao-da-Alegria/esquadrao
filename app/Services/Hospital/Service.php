@@ -78,7 +78,6 @@ class Service
 
             return $retorno;
         } catch (\Throwable $th) {
-            dd($th);
 
             return [
                 'sucesso' => false,
@@ -140,5 +139,36 @@ class Service
             'dados'   => ['url' => $url],
             'erros'   => []
         ];
+    }
+    
+    public function buscarListaAgrupadaPorCidades(): array
+    {
+        $retornoDatabase = $this->queries->index(['retornar_lista' => true]);
+
+        $lista = $retornoDatabase['dados'];
+
+        // Mapeia ID → slug da cidade como no seu front
+        $mapaCidades = [
+            4314902 => 'porto_alegre', // Porto Alegre
+            4304606 => 'canoas', // Canoas
+            4318705 => 'sao_leopoldo', // São Leopoldo
+            4316907 => 'santa_maria',  // Santa Maria
+            4314407 => 'pelotas',     // Pelotas
+        ];
+
+        // Resultado final
+        $agrupado = [];
+
+        foreach ($lista as $hospital) {
+            $slugCidade = $mapaCidades[$hospital->cidade_id] ?? null;
+
+            if (!$slugCidade) {
+                continue; // ignora cidades não mapeadas
+            }
+
+            $agrupado[$slugCidade][] = $hospital;
+        }
+
+        return $agrupado;
     }
 }
