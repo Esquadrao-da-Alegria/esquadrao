@@ -8,17 +8,31 @@ use Illuminate\Database\Eloquent\Collection;
 
 class Queries
 {
-    public function getByCustom(array $filtros): Collection|Cidade|null
+    public function index(array $filtros): Collection
     {
         try {
-            $collection = $filtros['lista'];
+            $query = Cidade::query();
+
+            $this->aplicarFiltros($query, $filtros);
+
+            return $query->get();
+        } catch (\Throwable $th) {
+
+            return new Collection();
+        }
+    }
+
+    public function show(array $filtros): Cidade|null
+    {
+        try {
 
             $query = Cidade::query();
 
             $this->aplicarFiltros($query, $filtros);
 
-            return $collection ? $query->get() : $query->first();
+            return $query->first();
         } catch (\Throwable $th) {
+
             return null;
         }
     }

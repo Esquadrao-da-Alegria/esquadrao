@@ -42,7 +42,7 @@ class HospitalController extends Controller
      */
     public function create()
     {
-        $dadosView = $this->formService->buscarDados();
+        $dadosView = $this->formService->buscarDados(null);
 
         return Inertia::render('Hospital/Create', $dadosView);
     }
@@ -62,7 +62,9 @@ class HospitalController extends Controller
      */
     public function edit(Request $request, Hospital $hospital)
     {
-        return Inertia::render('Hospital/Edit', ['hospital' => $hospital]);
+        $dadosView = $this->formService->buscarDados($hospital);
+
+        return Inertia::render('Hospital/Edit', $dadosView);
     }
 
     /**

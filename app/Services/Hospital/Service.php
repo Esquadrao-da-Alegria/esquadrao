@@ -23,7 +23,6 @@ class Service
 
             return $retorno;
         } catch (\Throwable $th) {
-            dd($th);
 
             return [
                 'sucesso' => false,
@@ -74,7 +73,7 @@ class Service
 
             $retornoFoto = $this->salvarFoto(['foto' => $foto, 'hospital_id' => $id]);
 
-            $this->update($id, ['url_foto' => $retornoFoto['dados']['url'] ?? null]);
+            $this->queries->update($id, ['url_foto' => $retornoFoto['dados']['url'] ?? null]);
 
             return $retorno;
         } catch (\Throwable $th) {

@@ -2,9 +2,7 @@
 
 namespace App\Services\Estado;
 
-use App\Models\Estado;
 use App\Queries\Estado\Queries;
-use Illuminate\Database\Eloquent\Collection;
 
 class Service
 {
@@ -13,8 +11,24 @@ class Service
         //
     }
 
-    public function index(array $filtros): Collection|Estado|null
+    public function index(array $filtros): array
     {
-        return $this->queries->getByCustom($filtros);
+        try {
+
+            $lista = $this->queries->index($filtros);
+
+            return [
+                'sucesso' => true,
+                'dados'   => $lista,
+                'erros'   => []
+            ];
+        } catch (\Throwable $th) {
+
+            return [
+                'sucesso' => false,
+                'dados'   => [],
+                'erros'   => [formatarMensagemErro($th)],
+            ];
+        }
     }
 }

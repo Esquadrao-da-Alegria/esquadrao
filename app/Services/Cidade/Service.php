@@ -13,8 +13,24 @@ class Service
         //
     }
 
-    public function index(array $filtros): Collection|Cidade|null
+    public function index(array $filtros): array
     {
-        return $this->queries->getByCustom($filtros);
+        try {
+
+            $lista = $this->queries->index($filtros);
+
+            return [
+                'sucesso' => true,
+                'dados'   => $lista,
+                'erros'   => []
+            ];
+        } catch (\Throwable $th) {
+
+            return [
+                'sucesso' => false,
+                'dados'   => [],
+                'erros'   => [formatarMensagemErro($th)],
+            ];
+        }
     }
 }

@@ -46,6 +46,18 @@ export interface User {
 
 // RECURSOS
 
+export interface Estado {
+    id: number;
+    nome: string,
+    sigla: number,
+}
+
+export interface Cidade {
+    id: number;
+    nome: string,
+    estado_id: number,
+}
+
 export interface Endereco {
     id: number;
 

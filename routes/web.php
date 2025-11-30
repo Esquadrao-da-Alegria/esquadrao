@@ -4,6 +4,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\OndeAtuamosController;
+use App\Http\Controllers\Web\Json\CidadeController;
 
 // HOME PAGE
 Route::get('/', function () {
@@ -29,7 +30,13 @@ Route::get('/fale-conosco', function () {
 })->name('fale_conosco.index');
 
 // Hospitais
-Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais'=>'hospital']);
+Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
+
+// Listas JSON
+ROUTE::prefix('json')->name('json.')->group(function () {
+
+    Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
+});
 
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {

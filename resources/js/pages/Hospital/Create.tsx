@@ -3,10 +3,15 @@ import { store } from '@/routes/hospitais'
 import { toast } from 'react-toastify'
 import React from 'react'
 import { useForm } from '@inertiajs/react'
-import { Hospital } from '@/types'
+import { Cidade, Estado } from '@/types'
+import { Queries } from '@/Queries/Cidade/Queries'
+
+interface Props {
+    cidades: Cidade[]
+}
 
 interface CamposFormulario {
-    cidade_id: number
+    cidade_id: number|string
     nome: string
     cnpj: string
     endereco: string
@@ -17,9 +22,9 @@ interface CamposFormulario {
     observacoes?: string
 }
 
-const Create: React.FC = () => {
+const Create: React.FC<Props> = ({ cidades }) => {
     const { data, setData, post, processing } = useForm<CamposFormulario>({
-        cidade_id: 4309407,
+        cidade_id: '',
         nome: 'Teste',
         cnpj: '12312312312333',
         endereco: 'teste endereço',
@@ -159,22 +164,32 @@ const Create: React.FC = () => {
                                             />
                                         </div>
 
-                                        {/* Cidade ID */}
-                                        {/* <div>
-                                            <label htmlFor="cidade_id" className="mb-2 block text-sm font-medium text-gray-700">
-                                                ID da Cidade *
+                                        {/* Cidade */}
+                                        <div>
+                                            <label
+                                                htmlFor="cidade_id"
+                                                className="mb-2 block text-sm font-medium text-gray-700"
+                                            >
+                                                Cidade *
                                             </label>
-                                            <input
-                                                type="number"
+
+                                            <select
                                                 name="cidade_id"
                                                 id="cidade_id"
                                                 required
-                                                placeholder="Digite o ID da cidade"
                                                 value={data.cidade_id}
-                                                onChange={(e) => handleDataChange('cnpj', e.target.value)}
+                                                onChange={(e) => handleDataChange('cidade_id', Number(e.target.value))}
                                                 className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
-                                            />
-                                        </div> */}
+                                            >
+                                                <option value="">Selecione uma cidade...</option>
+
+                                                {cidades.map((cidade: Cidade) => (
+                                                    <option key={cidade.id} value={cidade.id}>
+                                                        {cidade.nome}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
 
                                         {/* Foto */}
                                         <div>
