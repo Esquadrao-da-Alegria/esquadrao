@@ -14,24 +14,28 @@ jobs:
       - name: 🚚 Checkout do código
         uses: actions/checkout@v4
 
-      - name: 📤 Enviar arquivos via SSH (rsync)
+      - name: 🔑 Conectar via SSH e iniciar deploy PROD
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
           script: |
+            echo "🔐 Conexão SSH estabelecida com sucesso!"
             echo "🚀 Iniciando deploy PROD..."
 
       - name: 🔁 Sincronizar arquivos com rsync
         uses: burnett01/rsync-deploy@v1.1
         with:
           switches: -avzr --delete
-          path: prod/
-          remote_path: /var/www/esquadraodaalegria/prod
+          path: prod/                      
+          remote_path: ${{ secrets.APP_PATH_PRD }}   
           remote_host: ${{ secrets.SSH_HOST }}
           remote_user: ${{ secrets.SSH_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_port: ${{ secrets.SSH_PORT }}
 
       - name: ✅ Finalizado
         run: echo "Deploy de produção concluído!"
