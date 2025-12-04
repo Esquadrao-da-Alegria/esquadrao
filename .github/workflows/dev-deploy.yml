@@ -7,70 +7,52 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-code:
-    name: 📥 Atualizar código no servidor
+  deploy:
+    name: 🔥 Deploy completo no servidor DEV
     runs-on: ubuntu-latest
 
     steps:
       - name: 🚚 Checkout do código
         uses: actions/checkout@v4
 
-      - name: 🔑 Atualizar repositório remoto via SSH
+      - name: 🔑 Conectar via SSH e executar deploy completo
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+          port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
             set -e
-            echo "📦 Atualizando código no servidor DEV..."
 
-            cd /var/www/esquadraodaalegria/dev
+            echo "📦 Iniciando deploy no servidor DEV..."
+            cd ${{ secrets.APP_PATH_DEV }}
 
+            echo "📥 Atualizando branch dev..."
             git fetch origin dev
             git reset --hard origin/dev
-
-            echo "✅ Código atualizado com sucesso!"
-
-  build-environment:
-    name: 🏗️ Build do ambiente Laravel + React
-    runs-on: ubuntu-latest
-    needs: deploy-code 
-
-    steps:
-      - name: 🔑 Executar build e otimizacoes
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script_stop: true
-          script: |
-            set -e
-
-            cd /var/www/esquadraodaalegria/dev
 
             echo "📦 Instalando dependências PHP..."
             composer install --no-dev --optimize-autoloader --no-interaction
 
-            echo "🟢 Instalando dependências do React/Vite..."
+            echo "🟢 Instalando dependências JS (React/Vite)..."
             npm ci --production
 
             echo "🏗️ Gerando build do frontend..."
             npm run build
 
-            echo "🧹 Limpando e otimizando caches..."
+            echo "🧹 Otimizando Laravel..."
             php artisan optimize:clear
-            php artisan optimize
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
 
-            echo "🗄️ Rodando migrações..."
-            php artisan migrate
+            echo "🗄️ Executando migrações..."
+            php artisan migrate --force
 
             echo "🔗 Atualizando links e reiniciando filas..."
             php artisan storage:link
             php artisan queue:restart
 
-            echo "✅ Build e deploy DEV finalizado com sucesso!"
+            echo "🚀 Deploy finalizado com sucesso!"
