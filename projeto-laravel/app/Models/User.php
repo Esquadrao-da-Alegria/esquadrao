@@ -55,4 +55,9 @@ class User extends Authenticatable
         ];
     }
 
+    public function doutor()
+    {
+        return $this->hasOne(\App\Models\Doutor::class, 'id_user');
+    }
+
 }

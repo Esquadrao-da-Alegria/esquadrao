@@ -114,6 +114,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                         {/*so mostra logou se usuario existe*/}
                         
                         <AuthRole role='diretor'>
+                        
                         <Link
                             href={'user-management'}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all 
@@ -127,10 +128,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
                             Enviar Convite
                         </Link>
-                        
-                        
-                        
-                        
+                
                         </AuthRole> 
                         {user&&(
                             <Link
@@ -146,6 +144,20 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             </Link>
                             )
                         }      
+                        {user&&(
+                            <Link
+                                href={'perfil'}
+                                method="get"
+                                as="button"
+                                className="block rounded-xl px-6 py-4 font-medium text-red-600 no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <span className="h-2 w-2 rounded-full bg-red-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                                    Perfil
+                                </span>
+                            </Link>
+                            )
+                        }    
                         
                             {!user 
                             &&(
