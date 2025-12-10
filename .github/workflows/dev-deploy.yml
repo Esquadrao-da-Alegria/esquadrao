@@ -1,19 +1,58 @@
-name: 🚀 Deploy website on push
+name: 🚀 Deploy website on DEV
+
 on:
   push:
     branches:
       - dev
-jobs:
-  web-deploy:
-    name: 🎉 Deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🚚 Get latest code
-        uses: actions/checkout@v2
+  workflow_dispatch:
 
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.2
+jobs:
+  deploy:
+    name: 🔥 Deploy completo no servidor DEV
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🔑 Conectar via SSH e executar deploy completo
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          server: ftp.bprates.com.br
-          username: esq@dev.esquadraodaalegria.org.br
-          password: ${{ secrets.FTP_PASSWORD_DEV }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -e
+
+            echo "📦 Iniciando deploy no servidor DEV..."
+            cd ${{ secrets.APP_PATH_DEV }}
+
+            echo "📥 Atualizando branch dev..."
+            git fetch origin dev
+            git reset --hard origin/dev
+
+            echo "📦 Instalando dependências PHP..."
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "🟢 Instalando dependências JS (React/Vite)..."
+            npm ci --production
+
+            echo "🏗️ Gerando build do frontend..."
+            npm run build
+
+            echo "🧹 Otimizando Laravel..."
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            echo "🗄️ Executando migrações..."
+            php artisan migrate --force
+
+            echo "🔗 Atualizando links e reiniciando filas..."
+            php artisan storage:link
+            php artisan queue:restart
+
+            echo "🚀 Deploy finalizado com sucesso!"
