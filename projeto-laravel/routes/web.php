@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\InvitationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\PerfilController;
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
@@ -93,54 +94,76 @@ Route::middleware(['auth'])->group(function () {
                 'role' => $user->roles->pluck('name')->first(),
             ]);
         })->name('dashboard');
+
+    Route::get('/perfil', function() {
+        $user = auth()->user();
+
+        $allPermissions = $user->getAllPermissions()->pluck('name')->toArray();
+
+        $permissionsFormatted = [];
+
+        foreach ($allPermissions as $permissionName) {
+            $key = str_replace(' ', '_', $permissionName);
+            $permissionsFormatted[$key] = true;
+        }
+
+        return Inertia::render('Perfil/Index', [
+            'user' => $user,
+            'permissions' => $permissionsFormatted,
+            'role' => $user->roles->pluck('name')->first(),
+        ]);
+    })->name('perfil');
+
+
     
-    });
+
+});
     
 
 
     //hospitais do projeto antigo
-    Route::prefix('hospitais')->middleware('auth')->group(function () {
-        Route::get('/', [HospitalController::class, 'index'])
-            ->middleware('role:view_hospitais')
-            ->name('hospitais.index');
+// Route::prefix('hospitais')->middleware('auth')->group(function () {
+//     Route::get('/', [HospitalController::class, 'index'])
+//         ->middleware('role:view_hospitais')
+//         ->name('hospitais.index');
 
-        Route::get('/cadastrar', [HospitalController::class, 'create'])
-            ->middleware('role:create_hospitais')
-            ->name('hospitais.create');
+//     Route::get('/cadastrar', [HospitalController::class, 'create'])
+//         ->middleware('role:create_hospitais')
+//         ->name('hospitais.create');
 
-        Route::post('/', [HospitalController::class, 'store'])
-            ->middleware('role:create_hospitais')
-            ->name('hospitais.store');
+//     Route::post('/', [HospitalController::class, 'store'])
+//         ->middleware('role:create_hospitais')
+//         ->name('hospitais.store');
 
-        Route::get('/{hospital}/editar', [HospitalController::class, 'edit'])
-            ->middleware('role:manage_hospitais')
-            ->name('hospitais.edit');
+//     Route::get('/{hospital}/editar', [HospitalController::class, 'edit'])
+//         ->middleware('role:manage_hospitais')
+//         ->name('hospitais.edit');
 
-        Route::put('/{hospital}', [HospitalController::class, 'update'])
-            ->middleware('role:manage_hospitais')
-            ->name('hospitais.update');
+//     Route::put('/{hospital}', [HospitalController::class, 'update'])
+//         ->middleware('role:manage_hospitais')
+//         ->name('hospitais.update');
 
-        Route::delete('/{hospital}', [HospitalController::class, 'destroy'])
-            ->middleware('role:delete_hospitais')
-            ->name('hospitais.destroy');
-    });
+//     Route::delete('/{hospital}', [HospitalController::class, 'destroy'])
+//         ->middleware('role:delete_hospitais')
+//         ->name('hospitais.destroy');
+// });
 
     //gerenciamento de usuario
 
-    Route::middleware(['role:diretor'])->group(function (){
+Route::middleware(['role:diretor'])->group(function (){
 
-        Route::get('/user-management', [UserManagementController::class, 'index'])
+    Route::get('/user-management', [UserManagementController::class, 'index'])
 
-            ->name('user-management.index');
+        ->name('user-management.index');
 
-        Route::post('/user-management/{user}/update-role', [UserManagementController::class, 'updateRole'])
+    Route::post('/user-management/{user}/update-role', [UserManagementController::class, 'updateRole'])
 
-            ->name('user-management.update-role');
+        ->name('user-management.update-role');
 
-        Route::post('/user-management/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
+    Route::post('/user-management/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
 
-            ->name('user-management.toggle-active');
-    });
+        ->name('user-management.toggle-active');
+});
 
     
 

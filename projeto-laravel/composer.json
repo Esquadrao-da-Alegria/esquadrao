@@ -13,8 +13,9 @@
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
+        "laravel/installer": "^5.23",
         "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.9",
+        "laravel/wayfinder": "^0.1.12",
         "spatie/laravel-permission": "^6.23",
         "tightenco/ziggy": "^2.6"
     },

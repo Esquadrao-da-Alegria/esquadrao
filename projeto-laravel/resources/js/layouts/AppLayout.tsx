@@ -111,7 +111,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                         >
                             Fale Conosco
                         </Link>
-                        {/*so mostra logou se usuario existe*/}
+
                         
                         <AuthRole role='diretor'>
                         
@@ -130,6 +130,21 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                         </Link>
                 
                         </AuthRole> 
+
+                        {user&&(
+                            <Link
+                                href={'perfil'}
+                                method="get"
+                                as="button"
+                                className="block rounded-xl px-6 py-4 font-medium no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
+                            >
+                                <span className="flex items-center gap-2">
+                                    <span className="h-2 w-2 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                                    Olá, {user.name}!
+                                </span>
+                            </Link>
+                            )
+                        }  
                         {user&&(
                             <Link
                                 href={'logout'}
@@ -139,25 +154,12 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                             >
                                 <span className="flex items-center gap-2">
                                     <span className="h-2 w-2 rounded-full bg-red-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                    Logout
+                                    Sair
                                 </span>
                             </Link>
                             )
                         }      
-                        {user&&(
-                            <Link
-                                href={'perfil'}
-                                method="get"
-                                as="button"
-                                className="block rounded-xl px-6 py-4 font-medium text-red-600 no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
-                            >
-                                <span className="flex items-center gap-2">
-                                    <span className="h-2 w-2 rounded-full bg-red-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
-                                    Perfil
-                                </span>
-                            </Link>
-                            )
-                        }    
+                          
                         
                             {!user 
                             &&(

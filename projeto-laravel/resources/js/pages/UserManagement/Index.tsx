@@ -18,7 +18,7 @@ export default function UserManagement({ users, roles }: Props) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: '/dashboard' },
-        { title: 'Gerenciamento de Usuários', href: '/user-management' },
+        { title: 'Gerenciamento de Voluntários', href: '/user-management' },
     ];
 
     const handleRoleChange = (userId: number, roleId: number) => {
@@ -32,9 +32,9 @@ export default function UserManagement({ users, roles }: Props) {
 
     return (
         <AppLayout>
-            <Head title="Gerenciamento de Usuários" />
+            <Head title="Gerenciamento de Voluntários" />
 
-            <div className="relative flex flex-col gap-8 p-6 py-10">
+            <div className="relative flex flex-col gap-8 p-6 py-10 max-w-5xl mx-auto w-full">
 
 
                 <div className="absolute -top-6 -left-6 h-10 w-10 rounded-full bg-blue-300 opacity-30 animate-pulse"></div>

@@ -84,11 +84,11 @@ class RegisteredUserController extends Controller
 
         // Mensagem especial para o primeiro usuário
         if ($isFirstUser) {
-            return redirect()->intended(route('dashboard'))
+            return redirect('/')
                 ->with('success', 'Parabéns! Você é o primeiro usuário e foi automaticamente definido como Diretor.');
         }
 
-        return redirect()->intended(route('dashboard'))
+        return redirect('/')
             ->with('success', 'Conta criada com sucesso! Bem-vindo ao Esquadrão da Alegria!');
     }
 }
