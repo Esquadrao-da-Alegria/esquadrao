@@ -52,96 +52,99 @@ export default function UserManagement({ users, roles }: Props) {
                 
                 <div className="space-y-6">
 
-                    {users.map((user) => (
-                        <div
-                            key={user.id}
-                            className="rounded-2xl border bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300"
-                        >
-                            <div className="flex flex-col gap-5 md:flex-row md:justify-between">
-                                
-                           
-                                <div className="flex items-start gap-4">
-                                    <div className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white h-12 w-12 flex items-center justify-center shadow-md text-lg font-bold">
-                                        {user.name.charAt(0).toUpperCase()}
+                    {users
+                        .filter(user=>user.profile_visibility==='public')
+                        .map((user) => (
+                            
+                            <div
+                                key={user.id}
+                                className="rounded-2xl border bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300"
+                            >
+                                <div className="flex flex-col gap-5 md:flex-row md:justify-between">
+                                    
+                            
+                                    <div className="flex items-start gap-4">
+                                        <div className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white h-12 w-12 flex items-center justify-center shadow-md text-lg font-bold">
+                                            {user.name.charAt(0).toUpperCase()}
+                                        </div>
+
+                                        <div>
+                                            <h3 className="font-semibold text-gray-900 text-lg">
+                                                {user.name}
+                                            </h3>
+                                            <p className="text-sm text-gray-600">{user.email}</p>
+
+                                            <div className="mt-2 flex gap-2 flex-wrap">
+                                                <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
+                                                    {user.roles[0]?.name ?? "Sem cargo"}
+                                                </span>
+
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs ${
+                                                        user.active
+                                                            ? "bg-green-100 text-green-700"
+                                                            : "bg-gray-200 text-gray-700"
+                                                    }`}
+                                                >
+                                                    {user.active ? "Ativo" : "Inativo"}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900 text-lg">
-                                            {user.name}
-                                        </h3>
-                                        <p className="text-sm text-gray-600">{user.email}</p>
+                                    {/* Right side - Controls */}
+                                    <div className="flex flex-col gap-5 md:items-end">
 
-                                        <div className="mt-2 flex gap-2 flex-wrap">
-                                            <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
-                                                {user.roles[0]?.name ?? "Sem cargo"}
-                                            </span>
+                                        {/* Select Role */}
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-sm font-medium">Cargo</label>
+                                            <Select
+                                                value={user.roles[0]?.id?.toString() ?? ""}
+                                                onValueChange={(value) =>
+                                                    handleRoleChange(user.id, parseInt(value))
+                                                }
+                                            >
+                                                <SelectTrigger className="w-48 rounded-xl border-gray-300 shadow-sm">
+                                                    <SelectValue placeholder="Selecionar" />
+                                                </SelectTrigger>
 
-                                            <span
-                                                className={`px-3 py-1 rounded-full text-xs ${
+                                                <SelectContent>
+                                                    {roles.map(role => (
+                                                        <SelectItem key={role.id} value={role.id.toString()}>
+                                                            {role.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        {/* Toggle Active */}
+                                        <div className="flex flex-col gap-2">
+                                            <label className="text-sm font-medium">Status</label>
+
+                                            <Toggle
+                                                pressed={user.active}
+                                                onPressedChange={() => handleToggleActive(user.id)}
+                                                className={`rounded-xl px-4 py-2 text-white font-medium shadow-md transition-all ${
                                                     user.active
-                                                        ? "bg-green-100 text-green-700"
-                                                        : "bg-gray-200 text-gray-700"
+                                                        ? "bg-green-500 hover:bg-green-600"
+                                                        : "bg-gray-400 hover:bg-gray-500"
                                                 }`}
                                             >
                                                 {user.active ? "Ativo" : "Inativo"}
-                                            </span>
+                                            </Toggle>
                                         </div>
+
                                     </div>
-                                </div>
-
-                                {/* Right side - Controls */}
-                                <div className="flex flex-col gap-5 md:items-end">
-
-                                    {/* Select Role */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-sm font-medium">Cargo</label>
-                                        <Select
-                                            value={user.roles[0]?.id?.toString() ?? ""}
-                                            onValueChange={(value) =>
-                                                handleRoleChange(user.id, parseInt(value))
-                                            }
-                                        >
-                                            <SelectTrigger className="w-48 rounded-xl border-gray-300 shadow-sm">
-                                                <SelectValue placeholder="Selecionar" />
-                                            </SelectTrigger>
-
-                                            <SelectContent>
-                                                {roles.map(role => (
-                                                    <SelectItem key={role.id} value={role.id.toString()}>
-                                                        {role.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    {/* Toggle Active */}
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-sm font-medium">Status</label>
-
-                                        <Toggle
-                                            pressed={user.active}
-                                            onPressedChange={() => handleToggleActive(user.id)}
-                                            className={`rounded-xl px-4 py-2 text-white font-medium shadow-md transition-all ${
-                                                user.active
-                                                    ? "bg-green-500 hover:bg-green-600"
-                                                    : "bg-gray-400 hover:bg-gray-500"
-                                            }`}
-                                        >
-                                            {user.active ? "Ativo" : "Inativo"}
-                                        </Toggle>
-                                    </div>
-
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
 
-                    {users.length === 0 && (
-                        <div className="text-center py-10 text-gray-500">
-                            Nenhum usuário encontrado
-                        </div>
-                    )}
+                        {users.length === 0 && (
+                            <div className="text-center py-10 text-gray-500">
+                                Nenhum usuário encontrado
+                            </div>
+                        )}
                 </div>        
             </div>
         </AppLayout>

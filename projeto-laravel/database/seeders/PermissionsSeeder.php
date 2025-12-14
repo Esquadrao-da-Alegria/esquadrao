@@ -29,9 +29,9 @@ class PermissionsSeeder extends Seeder
         }
 
         // cria roles
-        $diretor = Role::firstOrCreate(['name' => 'diretor']);
-        $coordenador = Role::firstOrCreate(['name' => 'coordenador']);
-        $voluntario = Role::firstOrCreate(['name' => 'voluntario']);
+        $diretor = Role::firstOrCreate(['name' => 'Diretor']);
+        $coordenador = Role::firstOrCreate(['name' => 'Coordenador']);
+        $voluntario = Role::firstOrCreate(['name' => 'Voluntário']);
 
         $diretor->syncPermissions($permissions);
 

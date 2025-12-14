@@ -3,6 +3,7 @@ export interface User {
     name: string;
     email: string;
     active: boolean;
+    profile_visibility: string;
     roles: {
         id: number;
         name: string;

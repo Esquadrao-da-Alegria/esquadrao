@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Http\Controllers\Controller;
+use App\Models\Doutor; 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+
 
 class DoutorController extends Controller
 {
@@ -12,7 +16,7 @@ class DoutorController extends Controller
     }
 
     public function cadastrar(){
-        return Inertia::render('Doutores/CadastrarDoutor',[]);
+        return Inertia::render('Doutores/Create',[]);
     }
 
     public function store(Request $request){
@@ -30,7 +34,7 @@ class DoutorController extends Controller
     }
 
     public function edit (Doutor $doutores ){
-        return Inertia::render('Doutores/EditarDoutor',compact('doutor'));
+        return Inertia::render('Doutores/Edit',compact('doutor'));
     }
 
     public function update (Request $request, Doutor $doutores){

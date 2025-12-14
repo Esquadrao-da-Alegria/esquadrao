@@ -8,6 +8,7 @@ use App\Http\Controllers\InvitationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\Web\DoutorController;
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
@@ -37,6 +38,9 @@ Route::get('/fale-conosco', function () {
     return Inertia::render('FaleConosco/Index');
 })->name('fale_conosco.index');
 
+Route::get('/doutores', [DoutorController::class, 'index'])->name('doutores.index');
+
+Route::get('/doutores/cadastrar', [DoutorController::class, 'cadastrar'])->name('doutores.cadastrar');
 
 
 //registro com convite
