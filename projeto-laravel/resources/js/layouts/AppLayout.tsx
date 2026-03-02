@@ -33,10 +33,10 @@ const AppLayout: React.FC<Props> = ({ children }) => {
     const user = props.auth?.user;
 
     return (
-        <div className="container-global bg-white">
+        <div className="container-global top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-md ring-1 ring-gray-200">
             {/* Navbar */}
-            <header className="fixed top-0 z-50 w-full bg-white shadow">
-                <nav className="container mx-auto flex items-center justify-between px-4 py-4 md:px-0">
+            <header className="fixed top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-md ring-1 ring-gray-200">
+                <nav className="mx-auto flex max-w-6xl items-center justify-between p-6">
                     {/* Logo */}
                     <Link href={home()} className="flex items-center">
                         <img
@@ -49,7 +49,7 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                     {/* Botão hamburger para mobile */}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="flex items-center justify-center rounded-xl p-3 text-gray-600 transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 focus:ring-2 focus:ring-blue-200 focus:outline-none md:hidden"
+                        className="md:hidden rounded-xl p-3 text-gray-600 transition hover:bg-pink-50 hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-200"
                     >
                         <svg
                             className="h-6 w-6"
@@ -136,10 +136,10 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                                 href={'perfil'}
                                 method="get"
                                 as="button"
-                                className="block rounded-xl px-6 py-4 font-medium no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
+                                className="group block rounded-xl px-6 py-4 font-medium text-gray-800 no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                             >
                                 <span className="flex items-center gap-2">
-                                    <span className="h-2 w-2 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
+                                    <span className="h-2 w-2 rounded-full bg-red-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
                                     Olá, {user.name}!
                                 </span>
                             </Link>

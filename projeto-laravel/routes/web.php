@@ -154,7 +154,7 @@ Route::middleware(['auth'])->group(function () {
 
     //gerenciamento de usuario
 
-Route::middleware(['role:diretor'])->group(function (){
+Route::middleware(['role:Diretor'])->group(function (){
 
     Route::get('/user-management', [UserManagementController::class, 'index'])
 

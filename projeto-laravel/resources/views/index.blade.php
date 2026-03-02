@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Esquadrão da alegria</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/navbar.css" />
+    <link rel="stylesheet" href="./css/footer.css" />
+    <script src="./js/index.js"></script>
+    
+    <!-- Icones da rede social-->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!--Favicon-->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/img/favicon-32x32.png"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Poppins"
+      rel="stylesheet"
+    />
+
+  </head>
+
+  <body>
+    <!-- Container Global-->
+    <div class="container-global">
+      <!-- Navigation bar-->
+      <header>
+        <nav class="navbar navbar-expand-lg fixed-top">
+          <div class="container">
+            <a href="#" class="navbar-brand d-flex align-items-center">
+              <img src="./assets/img/logo-colorida.png" alt="Logo Esquadrão" />
+            </a>
+            <button
+              class="navbar-toggler navbar-light"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbar-links"
+              aria-controls="navbar-links"
+              aria-expanded="false"
+              aria-label="toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div
+              class="collapse navbar-collapse justify-content-end"
+              id="navbar-links"
+            >
+              <div class="navbar-nav">
+                <a
+                  href="./pages/conheca.html"
+                  class="nav-item nav-link"
+                  id="about-menu"
+                  >Conheça</a
+                >
+                <a
+                  href="./pages/hospitais.html"
+                  class="nav-item nav-link"
+                  id="hospitals-menu"
+                  >Hospitais</a
+                >
+                <a
+                  href="./pages/docacao.html"
+                  class="nav-item nav-link"
+                  id="partners-menu"
+                  >Doação</a
+                >
+                <a
+                  href="#fale-conosco"
+                  class="nav-item nav-link"
+                  id="contact-menu"
+                  >Fale Conosco</a
+                >
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      <!-- Banner Principal - Quem somos -->
+      <div class="container-fluid banner">
+        <div class="container">
+          <div class="row introducao">
+            <!-- Imagem -->
+            <div
+              class="col-md-6 d-flex justify-content-center align-items-center"
+            >
+              <img
+                class="image-palhacos"
+                src="./assets/img/banner-principal.jpg"
+                alt="Banner integrantes Esquadrão da Alegria"
+                class="img-fluid"
+              />
+            </div>
+            <!-- Texto e logo -->
+            <div class="col-md-6 text-section">
+              <h1 class="rotate-left">ESQUADRAO DA ALEGRIA</h1>
+              <p class="rotate-right">
+                Doutores e doutoras que atuam em hospitais por meio dos últimos
+                métodos besteirológicos existentes para gerar o sorriso e o
+                acolhimento
+              </p>
+              <img
+                class="image-logo"
+                src="./assets/img/logo-colorida.png"
+                alt="Quem somos"
+                class="img-fluid"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="star top">★</div>
+        <div class="star left-top">★</div>
+        <div class="star left-bottom">★</div>
+        <div class="star right">★</div>
+        <div class="star bottom">★</div>
+      </div>
+
+      <!-- Apoiadores -->
+      <div class="container-informacoes p-3" style="width: 100%">
+        <div class="container">
+          <div class="row align-items-center text-center">
+            <div class="col-12 col-md-3">
+              <h3>Apoiadores</h3>
+            </div>
+            <div class="col-12 col-md-3">
+              <a
+                href="https://nfg.sefaz.rs.gov.br/site/index.aspx"
+                target="_blank"
+              >
+                <img
+                  src="./assets/img/logo-nfg.jpg"
+                  alt="Nota Fiscal Gaúcha"
+                  class="img-fluid mx-auto d-block"
+                  style="max-width: 150px"
+                />
+              </a>
+            </div>
+            <!-- <div class="col-12 col-md-3">
+                    <a href="https://www.santinogelato.com.br/?gad_source=1&gclid=Cj0KCQjwpP63BhDYARIsAOQkATYQTVY-FdpZBBufITgKXsYPZExW5wIoV1dySRHzLVxOfZ1xe8l01i8aAustEALw_wcB" target="_blank">
+                        <img src="./assets/img/logo-santino.png" alt="Santino" class="img-fluid mx-auto d-block" style="max-width: 150px;">
+                    </a>
+                </div> -->
+            <div class="col-12 col-md-3">
+              <a href="https://www.sicredi.com.br/home/" target="_blank">
+                <img
+                  src="./assets/img/logo-sicredi.jpg"
+                  alt="Sicredi"
+                  class="img-fluid mx-auto d-block"
+                  style="max-width: 150px"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--Como apoiar-->
+      <div class="container-fluid" style="background-color: #ecfff0">
+        <div class="como-apoiar-container container">
+          <div class="row align-items-center">
+            <!-- Imagem do lado esquerdo -->
+            <div class="col-md-6">
+              <img
+                src="./assets/img/como-apoiar.png"
+                alt="Palhaça"
+                class="img-fluid como-apoiar-img"
+              />
+            </div>
+            <!-- Conteúdo do lado direito -->
+            <div class="col-md-6">
+              <h2>
+                Como <span class="apoiar">apoiar</span> o<br />Esquadrão da
+                Alegria
+              </h2>
+              <!-- Informações -->
+              <div class="row mt-4">
+                <div class="col-md-4">
+                  <div class="info-card">
+                    <span class="number">+95</span>
+                    <p>Voluntários</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="info-card">
+                    <span class="number">+45mil</span>
+                    <p>Pessoas impactadas/ano</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="info-card">
+                    <span class="number">+900</span>
+                    <p>Visitas/ano</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Botão -->
+              <div class="mt-4">
+                <a href="./pages/docacao.html"
+                  ><button
+                    class="btn btn-custom"
+                    style="border-radius: 15px; font-size: 1.2rem"
+                  >
+                    Saiba mais
+                  </button></a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conheça -->
+      <section id="conheca" class="container py-5">
+        <div class="row align-items-center">
+          <div class="col-md-6 position-relative">
+            <h2 class="title-overlay">CONHEÇA<br />NOSSOS<br />DOUTORES</h2>
+            <img
+              class="conheca-img"
+              src="./assets/img/conheca-palhacos.png"
+              alt="Imagem dos Doutores"
+              class="img-fluid"
+            />
+          </div>
+          <div class="col-md-6">
+            <p class="description">
+              Nossos doutores besteirologistas são pessoas comuns, das mais
+              diferentes áreas de formação, que atuam na sociedade como
+              estudantes, profissionais e empresários, entre outros, que dedicam
+              parte do seu tempo a nossa causa.
+            </p>
+            <a href="./pages/conheca.html"
+              ><button class="btn btn-conheca mt-3" style="border-radius: 15px">
+                Saiba mais
+              </button></a
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Hospitais -->
+      <div class="container my-5">
+        <h2 class="hospitais-title">ONDE ATUAMOS</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4">
+            <div class="city-card">
+              <img
+                src="./assets/img/porto-alegre.png"
+                alt="Porto Alegre"
+                class="img-fluid"
+              />
+              <a
+                href="./pages/hospitais.html"
+                class="card-content d-flex align-items-center"
+              >
+                <p class="city-text">Porto Alegre</p>
+                <span class="arrow">&gt;</span>
+              </a>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="city-card">
+              <img
+                src="./assets/img/santa-maria.png"
+                alt="Santa Maria"
+                class="img-fluid"
+              />
+              <a
+                href="./pages/hospitais.html"
+                href="#"
+                class="card-content d-flex align-items-center"
+              >
+                <p class="city-text">Santa Maria</p>
+                <span class="arrow">&gt;</span>
+              </a>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="city-card">
+              <img
+                src="./assets/img/pelotas.png"
+                alt="Pelotas"
+                class="img-fluid"
+              />
+              <a
+                href="./pages/hospitais.html"
+                class="card-content d-flex align-items-center"
+              >
+                <p class="city-text">Pelotas</p>
+                <span class="arrow">&gt;</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nossa história-->
+      <div class="nossa-história" style="margin-top: 175px; height: 500px">
+        <div class="row align-items-center justify-content-between">
+          <!-- Imagem da esquerda -->
+          <div class="col text-start">
+            <img
+              src="./assets/img/noosa-historia-esquerda.png"
+              alt="Nossa história"
+              class="img-fluid img-esquerda"
+            />
+          </div>
+
+          <!-- Texto central -->
+          <div class="col texto-central">
+            <!-- Removido col-md-2 -->
+            <h3
+              class="titulo-historia mb-5"
+              style="text-align: center; margin-top: 100px"
+            >
+              NOSSA HISTÓRIA
+            </h3>
+            <p class="mb-5" style="margin-top: 90px">
+              Um grupo que começa com o desejo de transformar espaços através da
+              palhaçaria
+            </p>
+            <a href="./pages/conheca.html"
+              ><button
+                type="button"
+                class="btn btn-historia mt-3"
+                style="width: 200px; border-radius: 15px; font-size: 1.2rem"
+              >
+                Saiba mais
+              </button>
+            </a>
+          </div>
+
+          <!-- Imagem da direita -->
+          <div class="col text-end">
+            <img
+              src="./assets/img/nossa-historia-direita.png"
+              alt="Nossa história"
+              class="img-fluid img-direita"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulário -->
+      <div class="container my-5" id="fale-conosco">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="contact-form p-4 rounded">
+              <div class="form-container">
+                <div class="col-md-6">
+                  <h2 class="mb-4">Fale Conosco</h2>
+                  <form id="meuFormulario">
+                    <div class="mb-3">
+                      <label for="nome" class="form-label">Nome</label>
+                      <input
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        id="nome"
+                        required
+                        placeholder="Digite seu nome"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="email" class="form-label">Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        id="email"
+                        required
+                        placeholder="Digite seu email"
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label for="mensagem" class="form-label">Mensagem</label>
+                      <textarea
+                        class="form-control"
+                        name="message"
+                        id="mensagem"
+                        rows="5"
+                        required
+                        placeholder="Digite sua mensagem"
+                      ></textarea>
+                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-submit"
+                      onclick="enviarFormulario()"
+                    >
+                      Enviar
+                    </button>
+                    <input
+                      type="hidden"
+                      name="accessKey"
+                      id="accessKey"
+                      value="53b7a3e3-b32f-4b85-9be7-d8f176bed235"
+                    />
+                  </form>
+                </div>
+                <div class="col-md-6 p-0 d-none d-md-flex align-items-stretch">
+                  <img src="assets/img/form-illustration.png" alt="Imagem" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer
+        class="bg-danger text-white py-5"
+        style="background-color: #ed1b24; margin-top: 150px"
+      >
+        <div class="container position-relative mx-auto">
+          <div class="row justify-content-center align-items-center">
+            <!-- Logo à esquerda -->
+            <div class="col-md-3 col-12 text-center text-md-start">
+              <img
+                src="./assets/img/logo_png_branco.png"
+                alt="Esquadrão da Alegria"
+                class="footer-image"
+              />
+            </div>
+
+            <!-- Links centrais -->
+            <div class="col-md-4 col-12 text-center">
+              <h5 class="mb-3" style="font-size: 1.2rem">
+                Esquadrão da Alegria
+              </h5>
+              <ul class="list-unstyled">
+                <li>
+                  <a href="./pages/conheca.html" class="text-white"
+                    >Nossos Doutores</a
+                  >
+                </li>
+                <li>
+                  <a href="./pages/hospitais.html" class="text-white"
+                    >Onde atuamos</a
+                  >
+                </li>
+                <li>
+                  <a href="./pages/docacao.html" class="text-white"
+                    >Como Apoiar</a
+                  >
+                </li>
+                <li>
+                  <a href="./pages/docacao.html" class="text-white"
+                    >Fale Conosco</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <!-- Ícones de redes sociais -->
+            <div class="col-md-1 col-12 text-center text-md-end mt-4 mt-md-0">
+              <div class="social-icons">
+                <a
+                  href="https://www.facebook.com/ongesquadraodaalegria?mibextid=LQQJ4d&rdid=b31OduKmz2bXRUu6&share_url=https%253A%252F%252Fwww.facebook.com%252Fshare%252F18rsKxc1ev%252F%253Fmibextid%253DLQQJ4d"
+                  class="text-white"
+                  target="_blank"
+                  ><i class="fab fa-facebook"></i
+                ></a>
+                <a
+                  href="https://www.instagram.com/ongesquadraodaalegria/"
+                  class="text-white"
+                  target="_blank"
+                  ><i class="fab fa-instagram" target="_blank"></i
+                ></a>
+                <a
+                  href="https://www.linkedin.com/company/ong-esquadr%C3%A3o-da-alegria/"
+                  class="text-white"
+                  target="_blank"
+                  ><i class="fab fa-linkedin"></i
+                ></a>
+                <a
+                  href="https://qrcode.esquadraodaalegria.org.br/"
+                  class="text-white"
+                  target="_blank"
+                >
+                  <img
+                    src="./assets/img/icons8-white-clown-30.png"
+                    alt="Palhaço"
+                /></a>
+              </div>
+            </div>
+
+            <!-- Texto no rodapé -->
+            <div class="text-center mt-5">
+              <p class="mb-0">© Esquadrão da Alegria</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</html>
