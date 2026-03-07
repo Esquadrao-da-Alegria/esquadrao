@@ -10,6 +10,10 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
+use Inertia\Inertia;
+use Throwable;
+use Spatie\Permission\Exceptions\UnauthorizedException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -32,5 +36,20 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (UnauthorizedException $e, $request) {
+
+        return Inertia::render('errors/error-page', [
+            'status' => 403,
+        ])->toResponse($request)->setStatusCode(403);
+
+        
+    });
+
+        $exceptions->render(function (HttpException $e, $request) {
+
+        return Inertia::render('errors/error-page', [
+            'status' => $e->getStatusCode(),
+        ])->toResponse($request)->setStatusCode($e->getStatusCode());
+
+    });
     })->create();

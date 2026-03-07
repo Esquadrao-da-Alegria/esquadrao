@@ -107,49 +107,49 @@ export default function Register({ invitation, token }: RegisterProps) {
                                 <InputError message={errors.password_confirmation} className="mt-1" />
                             </div>
 
-                            {/* Profile Visibility */}
-                            <div className="grid gap-2">
-                                <Label htmlFor="profile_visibility">Visibilidade do Perfil</Label>
-                                <div className="space-y-3">
-                                    <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors">
-                                        <input
-                                            type="radio"
-                                            id="profile_public"
-                                            name="profile_visibility"
-                                            value="public"
-                                            defaultChecked
-                                            className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                        />
-                                        <div className="flex-1">
-                                            <label htmlFor="profile_public" className="block text-sm font-medium text-gray-900 cursor-pointer">
-                                                Perfil Público
-                                            </label>
-                                            <p className="text-xs text-gray-500 mt-1">
-                                                Seu perfil será visível na listagem de voluntários
-                                            </p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors">
-                                        <input
-                                            type="radio"
-                                            id="profile_private"
-                                            name="profile_visibility"
-                                            value="private"
-                                            className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                        />
-                                        <div className="flex-1">
-                                            <label htmlFor="profile_private" className="block text-sm font-medium text-gray-900 cursor-pointer">
-                                                Perfil Privado
-                                            </label>
-                                            <p className="text-xs text-gray-500 mt-1">
-                                                Seu perfil será privado e não aparecerá na listagem
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <InputError message={errors.profile_visibility} className="mt-1" />
-                            </div>
+                            {/* VISIBILIDADE DO PERFIL - USAR EM CADASTRO DE DOUTORES */}
+                            {/* <div className="grid gap-2"> */}
+                            {/*     <Label htmlFor="profile_visibility">Visibilidade do Perfil</Label> */}
+                            {/*     <div className="space-y-3"> */}
+                            {/*         <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors"> */}
+                            {/*             <input */}
+                            {/*                 type="radio" */}
+                            {/*                 id="profile_public" */}
+                            {/*                 name="profile_visibility" */}
+                            {/*                 value="public" */}
+                            {/*                 defaultChecked */}
+                            {/*                 className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" */}
+                            {/*             /> */}
+                            {/*             <div className="flex-1"> */}
+                            {/*                 <label htmlFor="profile_public" className="block text-sm font-medium text-gray-900 cursor-pointer"> */}
+                            {/*                     Perfil Público */}
+                            {/*                 </label> */}
+                            {/*                 <p className="text-xs text-gray-500 mt-1"> */}
+                            {/*                     Seu perfil será visível na listagem de voluntários */}
+                            {/*                 </p> */}
+                            {/*             </div> */}
+                            {/*         </div> */}
+                            {/**/}
+                            {/*         <div className="flex items-start space-x-3 p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors"> */}
+                            {/*             <input */}
+                            {/*                 type="radio" */}
+                            {/*                 id="profile_private" */}
+                            {/*                 name="profile_visibility" */}
+                            {/*                 value="private" */}
+                            {/*                 className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" */}
+                            {/*             /> */}
+                            {/*             <div className="flex-1"> */}
+                            {/*                 <label htmlFor="profile_private" className="block text-sm font-medium text-gray-900 cursor-pointer"> */}
+                            {/*                     Perfil Privado */}
+                            {/*                 </label> */}
+                            {/*                 <p className="text-xs text-gray-500 mt-1"> */}
+                            {/*                     Seu perfil será privado e não aparecerá na listagem */}
+                            {/*                 </p> */}
+                            {/*             </div> */}
+                            {/*         </div> */}
+                            {/*     </div> */}
+                            {/*     <InputError message={errors.profile_visibility} className="mt-1" /> */}
+                            {/* </div> */}
 
                             {/* Botão */}
                             <Button

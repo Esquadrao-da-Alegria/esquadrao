@@ -10,13 +10,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
-
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasRoles;
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
-    
+    use HasFactory;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -28,7 +29,7 @@ class User extends Authenticatable
         'role',
         'password',
         'active',
-        'profile_visibility'
+        'profile_visibility',
     ];
 
     /**
@@ -54,10 +55,4 @@ class User extends Authenticatable
             'profile_visibility' => ProfileVisibility::class,
         ];
     }
-
-    public function doutor()
-    {
-        return $this->hasOne(\App\Models\Doutor::class, 'id_user');
-    }
-
-}
+ }

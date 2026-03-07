@@ -52,10 +52,7 @@ export default function UserManagement({ users, roles }: Props) {
                 
                 <div className="space-y-6">
 
-                    {users
-                        .filter(user=>user.profile_visibility==='public')
-                        .map((user) => (
-                            
+                    {users.map((user) => (
                             <div
                                 key={user.id}
                                 className="rounded-2xl border bg-white p-6 shadow-md hover:shadow-xl transition-all duration-300"
@@ -76,7 +73,7 @@ export default function UserManagement({ users, roles }: Props) {
 
                                             <div className="mt-2 flex gap-2 flex-wrap">
                                                 <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs">
-                                                    {user.roles[0]?.name ?? "Sem cargo"}
+                                                    {user.roles[0]?.label ?? "Sem cargo"}
                                                 </span>
 
                                                 <span
@@ -111,7 +108,7 @@ export default function UserManagement({ users, roles }: Props) {
                                                 <SelectContent>
                                                     {roles.map(role => (
                                                         <SelectItem key={role.id} value={role.id.toString()}>
-                                                            {role.name}
+                                                            {role.label}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>

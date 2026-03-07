@@ -22,6 +22,16 @@ class PermissionsSeeder extends Seeder
             'update hospitais',
             'delete hospitais',
 
+            'create visitas',
+            'read visitas',
+            'update visitas',
+            'delete visitas',
+
+            'create patrocinadores',
+            'read patrocinadores',
+            'update patrocinadores',
+            'delete patrocinadores',
+
         ];
 
         foreach ($permissions as $permission) {
@@ -29,17 +39,20 @@ class PermissionsSeeder extends Seeder
         }
 
         // cria roles
-        $diretor = Role::firstOrCreate(['name' => 'Diretor']);
-        $coordenador_geral = Role::firstOrCreate(['name' => 'Coordenador Geral']);
-        $coordenador_local = Role::firstOrCreate(['name' => 'Coordenador Local']);
-        $artista = Role::firstOrCreate(['name' => 'Artista']);
-        $psicologia = Role::firstOrCreate(['name' => 'Psicologia']);
-        $apoio = Role::firstOrCreate(['name' => 'Apoio']);
-        $voluntario = Role::firstOrCreate(['name' => 'Voluntário']);
+        $admin = Role::firstOrCreate(['name' => 'admin', 'label' => 'Admin']);
+        $diretor = Role::firstOrCreate(['name' => 'diretor', 'label' => 'Diretor']);
+        $coordenador_geral = Role::firstOrCreate(['name' => 'coordenador geral', 'label' => 'Coordenador Geral']);
+        $coordenador_local = Role::firstOrCreate(['name' => 'coordenador_local', 'label' => 'Coordenador Local']);
+        $artista = Role::firstOrCreate(['name' => 'artista', 'label' => 'Artista']);
+        $psicologia = Role::firstOrCreate(['name' => 'psicologia', 'label' => 'Psicologia']);
+        $apoio = Role::firstOrCreate(['name' => 'apoio', 'label' => 'Apoio']);
+        $voluntario = Role::firstOrCreate(['name' => 'voluntario', 'label' => 'Voluntário']);
 
+        $admin->syncPermissions($permissions);
+        
         $diretor->syncPermissions($permissions);
 
-        $coordenador->syncPermissions([
+        $coordenador_geral->syncPermissions([
             'read voluntarios',
             'update voluntarios',
 
@@ -50,6 +63,7 @@ class PermissionsSeeder extends Seeder
         $voluntario->syncPermissions([
             'read voluntarios',
             'read hospitais',
+            'read visitas',
         ]);
     }
 }

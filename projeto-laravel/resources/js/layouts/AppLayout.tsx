@@ -8,6 +8,7 @@ import { useState } from 'react';
 import login from '@/routes/login';
 import type { User } from '@/types/user';
 import AuthRole from '@/components/AuthRole'
+import Auth from '@/actions/App/Http/Controllers/Auth';
 
 
 
@@ -107,25 +108,25 @@ const AppLayout: React.FC<Props> = ({ children }) => {
 
                         <Link
                             href={fale_conosco.index()}
-                            className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
+                            className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all duration-300 hover:bg-orange-50 hover:text-yellow-300 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
                         >
                             Fale Conosco
                         </Link>
 
                         
-                        <AuthRole role='diretor'>
-                        
+                        <AuthRole role={['admin', 'diretor']}>
+
                         <Link
                             href={'user-management'}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all 
-                            duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
+                            duration-300 hover:bg-orange-50 hover:text-green-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
                             Gerenciador de Voluntários
                         </Link>
 
                         <Link
                             href={'send-invitation'}
                             className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all 
-                            duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
+                            duration-300 hover:bg-orange-50 hover:text-purple-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
                             Enviar Convite
                         </Link>
                 
@@ -136,8 +137,8 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                                 href={'perfil'}
                                 method="get"
                                 as="button"
-                                className="group block rounded-xl px-6 py-4 font-medium text-gray-800 no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
-                            >
+                                className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all 
+                            duration-300 hover:bg-orange-50 hover:text-blue-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
                                 <span className="flex items-center gap-2">
                                     <span className="h-2 w-2 rounded-full bg-red-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
                                     Olá, {user.name}!
@@ -150,8 +151,8 @@ const AppLayout: React.FC<Props> = ({ children }) => {
                                 href={'logout'}
                                 method="post"
                                 as="button"
-                                className="block rounded-xl px-6 py-4 font-medium text-red-600 no-underline transition-all duration-300 hover:bg-red-50 hover:text-red-700 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent"
-                            >
+                                className="block rounded-xl px-6 py-4 font-medium text-gray-700 no-underline transition-all 
+                            duration-300 hover:bg-orange-50 hover:text-orange-600 md:mx-1 md:px-4 md:py-2 md:hover:bg-transparent">
                                 <span className="flex items-center gap-2">
                                     <span className="h-2 w-2 rounded-full bg-red-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></span>
                                     Sair

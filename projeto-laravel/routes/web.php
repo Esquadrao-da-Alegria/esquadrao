@@ -39,9 +39,7 @@ Route::get('/fale-conosco', function () {
 })->name('fale_conosco.index');
 
 Route::get('/doutores', [DoutorController::class, 'index'])->name('doutores.index');
-
 Route::get('/doutores/cadastrar', [DoutorController::class, 'cadastrar'])->name('doutores.cadastrar');
-
 
 //registro com convite
 Route::get('/register/{token}', [InvitationController::class, 'showRegistration'])
@@ -78,34 +76,23 @@ Route::post('/send-invitation', [InvitationController::class, 'store'])
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', function () {
-    
-            $user = auth()->user();
-    
-
-            $allPermissions = $user->getAllPermissions()->pluck('name')->toArray();
-    
-
-            $permissionsFormatted = [];
-    
-            foreach ($allPermissions as $permissionName) {
-
-                $key = str_replace(' ', '_', $permissionName);
-                $permissionsFormatted[$key] = true;
-            }
-    
-            return Inertia::render('dashboard', [
-                'permissions' => $permissionsFormatted,
-                'role' => $user->roles->pluck('name')->first(),
-            ]);
-        })->name('dashboard');
-
-    Route::get('/perfil', function() {
         $user = auth()->user();
-
         $allPermissions = $user->getAllPermissions()->pluck('name')->toArray();
-
         $permissionsFormatted = [];
+        foreach ($allPermissions as $permissionName) {
+            $key = str_replace(' ', '_', $permissionName);
+            $permissionsFormatted[$key] = true;
+        }
+        return Inertia::render('dashboard', [
+            'permissions' => $permissionsFormatted,
+            'role' => $user->roles->pluck('name')->first(),
+        ]);
+    })->name('dashboard');
 
+    Route::get('/perfil', function () {
+        $user = auth()->user();
+        $allPermissions = $user->getAllPermissions()->pluck('name')->toArray();
+        $permissionsFormatted = [];
         foreach ($allPermissions as $permissionName) {
             $key = str_replace(' ', '_', $permissionName);
             $permissionsFormatted[$key] = true;
@@ -117,15 +104,25 @@ Route::middleware(['auth'])->group(function () {
             'role' => $user->roles->pluck('name')->first(),
         ]);
     })->name('perfil');
-
-
-    
-
 });
-    
 
+//gerenciamento de usuario
+Route::middleware(['role:diretor|admin'])->group(function () {
 
-    //hospitais do projeto antigo
+    Route::get('/user-management', [UserManagementController::class, 'index'])
+
+        ->name('user-management.index');
+
+    Route::post('/user-management/{user}/update-role', [UserManagementController::class, 'updateRole'])
+
+        ->name('user-management.update-role');
+
+    Route::post('/user-management/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
+
+        ->name('user-management.toggle-active');
+});
+
+//hospitais do projeto antigo
 // Route::prefix('hospitais')->middleware('auth')->group(function () {
 //     Route::get('/', [HospitalController::class, 'index'])
 //         ->middleware('role:view_hospitais')
@@ -151,25 +148,4 @@ Route::middleware(['auth'])->group(function () {
 //         ->middleware('role:delete_hospitais')
 //         ->name('hospitais.destroy');
 // });
-
-    //gerenciamento de usuario
-
-Route::middleware(['role:Diretor'])->group(function (){
-
-    Route::get('/user-management', [UserManagementController::class, 'index'])
-
-        ->name('user-management.index');
-
-    Route::post('/user-management/{user}/update-role', [UserManagementController::class, 'updateRole'])
-
-        ->name('user-management.update-role');
-
-    Route::post('/user-management/{user}/toggle-active', [UserManagementController::class, 'toggleActive'])
-
-        ->name('user-management.toggle-active');
-});
-
-    
-
-
 

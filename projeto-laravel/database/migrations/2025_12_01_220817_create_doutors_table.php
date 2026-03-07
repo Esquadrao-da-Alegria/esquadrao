@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('id_user')->constrained('users')->unique()->onDelete('cascade');
             $table->string('nome_doutor');
             $table->string('descricao_doutor')->nullable();
-
+            // ABAIXO, COLUNA PARA IMPLEMENTAÇÃO DE VISIBILIDADE DO PERFIL
+            // $table->enum('profile_visibility', ['public', 'private'])->default('public');
         });
     }
 

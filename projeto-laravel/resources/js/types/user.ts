@@ -8,5 +8,6 @@ export interface User {
         id: number;
         name: string;
         guard_name: string;
+        label: string;
     }[];
 }
