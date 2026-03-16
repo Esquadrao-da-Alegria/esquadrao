@@ -3,15 +3,14 @@ import { store } from '@/routes/hospitais'
 import { toast } from 'react-toastify'
 import React from 'react'
 import { useForm } from '@inertiajs/react'
-import { Cidade, Estado } from '@/types'
-import { Queries } from '@/Queries/Cidade/Queries'
+import { AlaHospital, Cidade, Estado } from '@/types'
 
 interface Props {
     cidades: Cidade[]
 }
 
 interface CamposFormulario {
-    cidade_id: number|string
+    cidade_id: number | string
     nome: string
     cnpj: string
     endereco: string
@@ -19,11 +18,14 @@ interface CamposFormulario {
     email: string
     ativo: boolean
     foto: File | null
+    alas: AlaHospital[]
     observacoes?: string
 }
 
 const Create: React.FC<Props> = ({ cidades }) => {
-    const { data, setData, post, processing } = useForm<CamposFormulario>({
+    const [novaAla, setNovaAla] = React.useState('')
+
+    const { data, setData, post, processing, errors } = useForm<CamposFormulario>({
         cidade_id: '',
         nome: 'Teste',
         cnpj: '12312312312333',
@@ -32,8 +34,9 @@ const Create: React.FC<Props> = ({ cidades }) => {
         email: 'teste@gmail.com',
         ativo: true,
         foto: null,
+        alas: [],
         observacoes: 'uauauauua',
-    })
+    });
 
     const handleDataChange = (campo: keyof CamposFormulario, valor: any) => {
 
@@ -49,8 +52,29 @@ const Create: React.FC<Props> = ({ cidades }) => {
         handleDataChange('foto', file)
     }
 
+    const adicionarAla = () => {
+        const ala = novaAla.trim()
+
+        if (!ala) return
+
+        if (data.alas.some((a) => a.nome === ala)) {
+            toast.warning('Essa ala ja foi adicionada.')
+            return
+        }
+
+        handleDataChange('alas', [...data.alas, { nome: ala }])
+
+        setNovaAla('')
+    }
+
+    const removerAla = (nome: string) => {
+
+        handleDataChange('alas', data.alas.filter((ala) => ala.nome !== nome))
+    }
+
     const handleSubmit = async () => {
         if (!data.nome || !data.cnpj || !data.email || !data.telefone) {
+
             toast.error('Preencha todos os campos obrigatórios!')
             return
         }
@@ -71,10 +95,21 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                         Cadastrar Hospital
                                     </h2>
 
+                                    {/* Card elegante mostrando erros */}
+                                    {errors && Object.keys(errors).length > 0 && (
+                                        <div className="mb-4 rounded-lg bg-red-100 p-4 text-red-700">
+                                            <ul>
+                                                {Object.entries(errors).map(([campo, mensagem]) => (
+                                                    <li key={campo}>{mensagem}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
                                     <form
                                         onSubmit={(e) => {
-                                            e.preventDefault()
-                                            handleSubmit()
+                                            e.preventDefault();
+                                            handleSubmit();
                                         }}
                                         className="space-y-6"
                                     >
@@ -191,6 +226,58 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             </select>
                                         </div>
 
+                                        {/* Alas */}
+                                        <div>
+                                            <label htmlFor="nova_ala" className="mb-2 block text-sm font-medium text-gray-700">
+                                                Alas do hospital
+                                            </label>
+
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    name="nova_ala"
+                                                    id="nova_ala"
+                                                    placeholder="Digite o nome da ala"
+                                                    value={novaAla}
+                                                    onChange={(e) => setNovaAla(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault()
+                                                            adicionarAla()
+                                                        }
+                                                    }}
+                                                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+                                                />
+
+                                                <button
+                                                    type="button"
+                                                    onClick={adicionarAla}
+                                                    className="rounded-xl bg-pink-500 px-4 py-3 font-semibold text-white transition-colors hover:bg-pink-600"
+                                                >
+                                                    Adicionar
+                                                </button>
+                                            </div>
+
+                                            <ul className="mt-3 space-y-2">
+                                                {data.alas.map((ala) => (
+                                                    <li
+                                                        key={ala.nome}
+                                                        className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-800"
+                                                    >
+                                                        <span>{ala.nome}</span>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removerAla(ala.nome)}
+                                                            className="text-xs font-semibold text-red-500 hover:text-red-700"
+                                                        >
+                                                            Remover
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
                                         {/* Foto */}
                                         <div>
                                             <label htmlFor="foto" className="mb-2 block text-sm font-medium text-gray-700">
@@ -242,7 +329,10 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                         <button
                                             type="submit"
                                             disabled={processing}
-                                            className="w-full rounded-full bg-gradient-to-r from-pink-500 to-blue-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-70"
+                                            className="
+                                                w-full rounded-full bg-gradient-to-r from-pink-500 to-blue-500 
+                                                px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105
+                                                disabled:opacity-70"
                                         >
                                             {processing ? 'Salvando...' : 'Salvar Hospital'}
                                         </button>

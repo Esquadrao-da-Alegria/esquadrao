@@ -14,8 +14,6 @@ class StoreRequest extends FormRequest
 
     public function rules(): array
     {
-        return [];
-
         return [
             'cidade_id'      => ['nullable', 'integer', 'exists:cidades,id'],
             'nome'           => ['required', 'string', 'max:255'],
@@ -24,8 +22,8 @@ class StoreRequest extends FormRequest
             'telefone'       => ['required', 'string', 'max:14'],
             'email'          => ['required', 'string', 'email', 'max:50'],
             'ativo'          => ['boolean'],
-            'alas_unidades'  => ['required', 'array'],
-            'alas_unidades.*' => ['string', 'max:255'],
+            'alas'           => ['nullable', 'array'],
+            'alas.*.nome'    => ['string', 'max:255'],
             'observacoes'    => ['nullable', 'string'],
         ];
     }
@@ -37,7 +35,7 @@ class StoreRequest extends FormRequest
             'cnpj.required'      => 'O CNPJ é obrigatório.',
             'cnpj.size'          => 'O CNPJ deve conter exatamente 14 dígitos.',
             'email.email'        => 'Informe um e-mail válido.',
-            'alas_unidades.required' => 'Informe ao menos uma ala ou unidade.',
+            'alas.array'         => 'As alas devem ser enviadas em lista.',
         ];
     }
 }

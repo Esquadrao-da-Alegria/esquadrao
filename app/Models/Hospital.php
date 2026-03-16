@@ -26,5 +26,12 @@ class Hospital extends Model
         'updated_at',
     ];
 
+    protected $with = ['alas'];
+
     protected $table = 'hospitais';
+
+    public function alas()
+    {
+        return $this->hasMany(Ala::class, 'hospital_id');
+    }
 }

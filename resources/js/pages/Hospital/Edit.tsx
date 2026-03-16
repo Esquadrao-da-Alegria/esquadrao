@@ -3,7 +3,7 @@ import { update } from '@/routes/hospitais'
 import { toast } from 'react-toastify'
 import React from 'react'
 import { router, useForm } from '@inertiajs/react'
-import { Cidade, Hospital } from '@/types'
+import { AlaHospital, Cidade, Hospital } from '@/types'
 import { Check } from 'lucide-react'
 
 interface Props {
@@ -20,10 +20,13 @@ interface CamposFormulario {
     email: string
     ativo: boolean
     foto: File | null
+    alas: AlaHospital[]
     observacoes?: string
 }
 
 const Edit: React.FC<Props> = ({ hospital, cidades }) => {
+    const [novaAla, setNovaAla] = React.useState('')
+
     const { data, setData, processing } = useForm<CamposFormulario>({
         cidade_id: hospital.cidade_id,
         nome: hospital.nome,
@@ -33,6 +36,7 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
         email: hospital.email,
         ativo: hospital.ativo,
         foto: null,
+        alas: hospital.alas || [],
         observacoes: hospital.observacoes
     })
 
@@ -48,6 +52,26 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
         const file = e.target.files?.[0] || null
 
         handleDataChange('foto', file)
+    }
+
+    const adicionarAla = () => {
+        const ala = novaAla.trim()
+
+        if (!ala) return
+
+        if (data.alas.some((a) => a.nome === ala)) {
+            toast.warning('Essa ala ja foi adicionada.')
+            return
+        }
+
+        handleDataChange('alas', [...data.alas, { nome: ala }])
+
+        setNovaAla('')
+    }
+
+    const removerAla = (nome: string) => {
+
+        handleDataChange('alas', data.alas.filter((ala) => ala.nome !== nome))
     }
 
     const handleSubmit = async () => {
@@ -201,6 +225,58 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                                     </option>
                                                 ))}
                                             </select>
+                                        </div>
+
+                                        {/* Alas */}
+                                        <div>
+                                            <label htmlFor="nova_ala" className="mb-2 block text-sm font-medium text-gray-700">
+                                                Alas do hospital
+                                            </label>
+
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    name="nova_ala"
+                                                    id="nova_ala"
+                                                    placeholder="Digite o nome da ala"
+                                                    value={novaAla}
+                                                    onChange={(e) => setNovaAla(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault()
+                                                            adicionarAla()
+                                                        }
+                                                    }}
+                                                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm text-gray-900 focus:ring-2 focus:ring-pink-500"
+                                                />
+
+                                                <button
+                                                    type="button"
+                                                    onClick={adicionarAla}
+                                                    className="rounded-xl bg-pink-500 px-4 py-3 font-semibold text-white transition-colors hover:bg-pink-600"
+                                                >
+                                                    Adicionar
+                                                </button>
+                                            </div>
+
+                                            <ul className="mt-3 space-y-2">
+                                                {data.alas.map((ala) => (
+                                                    <li
+                                                        key={ala.nome}
+                                                        className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-800"
+                                                    >
+                                                        <span>{ala.nome}</span>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removerAla(ala.nome)}
+                                                            className="text-xs font-semibold text-red-500 hover:text-red-700"
+                                                        >
+                                                            Remover
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         </div>
 
                                         {/* Foto */}
