@@ -2,63 +2,149 @@
 
 namespace App\Services\Patrocinador;
 
-use App\Models\Patrocinador;
 use App\Queries\Patrocinador\Queries;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
 
 class Service
 {
     public function __construct(private Queries $queries) {}
 
-    public function index(array $filtros): Collection|Patrocinador|null
+    public function index(array $filtros): array
     {
-        $retornarLista = $filtros['retornar_lista'];
-
         try {
+            // Pega a Collection pura da Query
+            $resultado = $this->queries->index($filtros);
 
-            return $this->queries->index($filtros);
+            // Devolve empacotado para o Controller
+            return [
+                'sucesso' => true,
+                'dados'   => $resultado,
+                'erros'   => []
+            ];
         } catch (\Throwable $th) {
-
-            return $retornarLista ? new Collection() : null;
+            session()->flash('mensagem_erro', 'Erro ao listar dados!');
+            return [
+                'sucesso' => false,
+                'dados'   => [],
+                'erros'   => [formatarMensagemErro($th)]
+            ];
         }
     }
 
-    public function store(array $dados): int|null
+    public function store(array $dados): array
     {
         try {
+            // Tira a imagem antes de mandar para o banco
+            $dadosDatabase = Arr::except($dados, ['logotipo']);
 
-            $sucesso = $this->queries->store($dados);
+            // A query agora retorna o ID do patrocinador salvo
+            $id = $this->queries->store($dadosDatabase);
 
-            return $sucesso;
+            if (!$id) {
+                throw new \Exception("Falha ao salvar no banco de dados.");
+            }
+
+            mensagemFlashSalvar(true);
+
+            // Se mandou logotipo, salva e atualiza o registro
+            if (isset($dados['logotipo'])) {
+                $retornoLogo = $this->salvarLogotipo(['logotipo' => $dados['logotipo'], 'patrocinador_id' => $id]);
+                $this->queries->update((string) $id, ['logo_path' => $retornoLogo['dados']['url'] ?? null]);
+            }
+
+            return [
+                'sucesso' => true,
+                'dados'   => ['id' => $id],
+                'erros'   => []
+            ];
         } catch (\Throwable $th) {
-
-            return null;
+            dd($th->getMessage());
+            mensagemFlashSalvar(false);
+            return [
+                'sucesso' => false,
+                'dados'   => [],
+                'erros'   => [formatarMensagemErro($th)]
+            ];
         }
     }
 
-    public function update(string $id, array $dados): bool
+    public function update(string $id, array $dados): array
     {
         try {
+            $logotipo = $dados['logotipo'] ?? null;
+            $dadosDatabase = Arr::except($dados, ['logotipo']);
 
-            $sucesso = $this->queries->update($id, $dados);
+            // A query retorna um booleano (true/false)
+            $sucesso = $this->queries->update($id, $dadosDatabase);
 
-            return $sucesso;
+            mensagemFlashSalvar($sucesso);
+
+            if ($logotipo) {
+                $retornoLogo = $this->salvarLogotipo(['logotipo' => $logotipo, 'patrocinador_id' => $id]);
+                $this->queries->update($id, ['logo_path' => $retornoLogo['dados']['url'] ?? null]);
+            }
+
+            return [
+                'sucesso' => $sucesso,
+                'dados'   => [],
+                'erros'   => []
+            ];
         } catch (\Throwable $th) {
-
-            return false;
+            mensagemFlashSalvar(false);
+            return [
+                'sucesso' => false,
+                'dados'   => [],
+                'erros'   => [formatarMensagemErro($th)]
+            ];
         }
     }
 
-    public function destroy(string $id): bool
+    public function destroy(string $id): array
     {
         try {
-
+            // A query retorna um booleano (true/false)
             $sucesso = $this->queries->destroy($id);
 
-            return $sucesso;
-        } catch (\Throwable $th) {
+            if (!$sucesso) {
+                session()->flash('mensagem_erro', 'Erro ao excluir dados!');
+            } else {
+                session()->flash('mensagem_sucesso', 'Dados excluídos com sucesso!');
+            }
 
-            return false;
+            return [
+                'sucesso' => $sucesso,
+                'dados'   => [],
+                'erros'   => []
+            ];
+        } catch (\Throwable $th) {
+            return [
+                'sucesso' => false,
+                'dados'   => [],
+                'erros'   => [formatarMensagemErro($th)]
+            ];
         }
+    }
+
+    public function salvarLogotipo(array $dados): array
+    {
+        $logotipo = $dados['logotipo'];
+        $patrocinadorId = $dados['patrocinador_id'];
+
+        if (!$logotipo) return ['sucesso' => true, 'dados' => [], 'erros' => []];
+
+        $extensao = "." . $logotipo->getClientOriginalExtension();
+        $nomeLogo = "logo-{$patrocinadorId}-" . uniqid() . "$extensao";
+        $caminho = "imagens/patrocinadores/{$nomeLogo}";
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk('public');
+        $storage->put($caminho, file_get_contents($logotipo));
+
+        return [
+            'sucesso' => true,
+            'dados'   => ['url' => $storage->url($caminho)],
+            'erros'   => []
+        ];
     }
 }

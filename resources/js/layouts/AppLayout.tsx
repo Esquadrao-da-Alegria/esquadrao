@@ -7,6 +7,7 @@ import { Link, usePage } from '@inertiajs/react'
 import { useEffect, useState } from 'react'
 import { SharedData } from '@/types'
 import { toastErro, toastSucesso } from '@/lib/utils/toast'
+import patrocinadores from '@/routes/patrocinadores'
 
 interface Props {
   children: React.ReactNode
@@ -56,6 +57,12 @@ const AppLayout: React.FC<Props> = ({ children }) => {
               className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-purple-600 hover:bg-purple-50 md:hover:bg-transparent"
             >
               Hospitais
+            </Link>
+            <Link
+              href={patrocinadores.index()}
+              className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-orange-600 hover:bg-orange-50 md:hover:bg-transparent"
+            >
+              Patrocinadores
             </Link>
             <Link
               href={doacoes.index()}
