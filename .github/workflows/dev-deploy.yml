@@ -29,6 +29,9 @@ jobs:
             echo "📦 Iniciando deploy no servidor DEV..."
             cd ${{ secrets.APP_PATH_DEV }}
 
+            echo "🔐 Configurando safe directory..."
+            git config --global --add safe.directory ${{ secrets.APP_PATH_DEV }}
+
             echo "📥 Atualizando branch dev..."
             git fetch origin dev
             git reset --hard origin/dev
