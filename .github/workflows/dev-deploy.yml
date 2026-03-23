@@ -32,6 +32,10 @@ jobs:
             echo "🔐 Configurando safe directory..."
             git config --global --add safe.directory ${{ secrets.APP_PATH_DEV }}
 
+            echo "🔑 Adicionando GitHub ao known_hosts..."
+            mkdir -p ~/.ssh
+            ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
+
             echo "📥 Atualizando branch dev..."
             git fetch origin dev
             git reset --hard origin/dev
