@@ -82,8 +82,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
         post(store().url)
     }
 
-    // TESTE COMMIT
-    // TESTE COMMIT 2
+    // 2
 
     return (
         <AppLayout>
