@@ -13,10 +13,8 @@ class Service
     public function index(array $filtros): array
     {
         try {
-            // Pega a Collection pura da Query
             $resultado = $this->queries->index($filtros);
 
-            // Devolve empacotado para o Controller
             return [
                 'sucesso' => true,
                 'dados'   => $resultado,
@@ -32,13 +30,12 @@ class Service
         }
     }
 
+    //A função store retorna um erro caso a logo do patrocinador seja maior que 2MB, isso acontece porque o método salvarLogotipo é chamado dentro do store, e ele não tem tratamento para arquivos grandes. Para resolver isso, podemos adicionar uma validação no método store para verificar o tamanho do arquivo antes de chamar salvarLogotipo. Se o arquivo for maior que 2MB, podemos retornar um erro específico para o usuário posteriormente.
     public function store(array $dados): array
     {
         try {
-            // Tira a imagem antes de mandar para o banco
             $dadosDatabase = Arr::except($dados, ['logotipo']);
 
-            // A query agora retorna o ID do patrocinador salvo
             $id = $this->queries->store($dadosDatabase);
 
             if (!$id) {
@@ -47,7 +44,6 @@ class Service
 
             mensagemFlashSalvar(true);
 
-            // Se mandou logotipo, salva e atualiza o registro
             if (isset($dados['logotipo'])) {
                 $retornoLogo = $this->salvarLogotipo(['logotipo' => $dados['logotipo'], 'patrocinador_id' => $id]);
                 $this->queries->update((string) $id, ['logo_path' => $retornoLogo['dados']['url'] ?? null]);
@@ -75,7 +71,6 @@ class Service
             $logotipo = $dados['logotipo'] ?? null;
             $dadosDatabase = Arr::except($dados, ['logotipo']);
 
-            // A query retorna um booleano (true/false)
             $sucesso = $this->queries->update($id, $dadosDatabase);
 
             mensagemFlashSalvar($sucesso);
@@ -103,7 +98,6 @@ class Service
     public function destroy(string $id): array
     {
         try {
-            // A query retorna um booleano (true/false)
             $sucesso = $this->queries->destroy($id);
 
             if (!$sucesso) {

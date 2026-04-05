@@ -59,8 +59,16 @@ const Edit: React.FC<Props> = ({ patrocinador }) => {
       return
     }
 
-    // Envia como POST mas com _method put para o Laravel aceitar upload de ficheiros
     router.post(`/patrocinadores/${patrocinador.id}`, { ...data, _method: 'put' })
+  }
+
+  const handleDelete = () => {
+    if (confirm('Tem certeza que deseja excluir este patrocinador? Esta ação não pode ser desfeita.')) {
+      router.delete(`/patrocinadores/${patrocinador.id}`, {
+        onSuccess: () => toast.success('Patrocinador excluído com sucesso!'),
+        onError: () => toast.error('Erro ao excluir o patrocinador.'),
+      })
+    }
   }
 
   const buscarUrlLogo = () => {
@@ -188,14 +196,25 @@ const Edit: React.FC<Props> = ({ patrocinador }) => {
                       </label>
                     </div>
 
-                    {/* Botão Salvar */}
-                    <button
-                      type="submit"
-                      disabled={processing}
-                      className="w-full rounded-full bg-gradient-to-r from-pink-500 to-blue-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-70"
-                    >
-                      {processing ? 'Salvando...' : 'Atualizar Patrocinador'}
-                    </button>
+                    {/* Botões de Ação (ATUALIZADO) */}
+                    <div className="flex flex-col-reverse gap-4 sm:flex-row pt-2">
+                      <button
+                        type="button"
+                        onClick={handleDelete}
+                        disabled={processing}
+                        className="w-full rounded-full border-2 border-red-500 px-6 py-4 font-semibold text-red-500 transition-all duration-300 hover:bg-red-50 hover:scale-105 disabled:opacity-70 sm:w-1/3"
+                      >
+                        Excluir
+                      </button>
+
+                      <button
+                        type="submit"
+                        disabled={processing}
+                        className="w-full rounded-full bg-gradient-to-r from-pink-500 to-blue-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-70 sm:w-2/3"
+                      >
+                        {processing ? 'Salvando...' : 'Atualizar Patrocinador'}
+                      </button>
+                    </div>
                   </form>
                 </div>
 

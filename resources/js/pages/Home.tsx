@@ -139,7 +139,7 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
                 <div className="absolute top-1/2 left-1/4 animate-pulse text-xl text-green-400" style={{ animationDelay: '2s' }}>★</div>
             </div>
 
-            {/* Apoiadores - CARROSSEL */}
+            {/* Apoiadores - Finalizar Carrossel */}
             <div className="w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-100 py-8 md:py-16">
                 <div className="mx-auto max-w-6xl px-4">
                     <div className="flex flex-col items-center justify-center gap-10">
@@ -153,7 +153,7 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
 
                         {/* Carrossel Tailwind */}
                         <div className="w-full">
-                            <div className="flex w-full snap-x snap-mandatory gap-6 overflow-x-auto px-4 py-8 sm:px-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                            <div className="flex w-full justify-center snap-x snap-mandatory gap-6 overflow-x-auto px-4 py-8 sm:px-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                 {patrocinadores.length > 0 ? (
                                     patrocinadores.map((patrocinador) => (
                                         <a
@@ -161,9 +161,9 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
                                             href={patrocinador.site || '#'}
                                             target={patrocinador.site ? "_blank" : "_self"}
                                             rel="noopener noreferrer"
-                                            className="group flex w-48 shrink-0 snap-center flex-col items-center justify-center transition-all duration-300 hover:-translate-y-2 md:w-56"
+                                            className="group flex w-56 shrink-0 snap-center flex-col items-center justify-center transition-all duration-300 hover:-translate-y-2 md:w-64"
                                         >
-                                            <div className="flex h-32 w-full items-center justify-center rounded-2xl border border-gray-100 bg-white p-6 shadow-md transition-shadow duration-300 group-hover:shadow-xl">
+                                            <div className="flex h-40 w-full items-center justify-center rounded-2xl border border-gray-100 bg-white p-6 shadow-md transition-shadow duration-300 group-hover:shadow-xl">
                                                 {patrocinador.logo_path ? (
                                                     <img
                                                         src={patrocinador.logo_path}
