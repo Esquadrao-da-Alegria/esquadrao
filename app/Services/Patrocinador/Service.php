@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\Patrocinador;
+ ;;5/ewsa   namespace App\Services\Patrocinador;[4]
 
 use App\Queries\Patrocinador\Queries;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
+ ;;5/ewsa   use Illuminate\Support\Facades\Storage;[4]
 
 class Service
 {

@@ -59,12 +59,6 @@ const AppLayout: React.FC<Props> = ({ children }) => {
               Hospitais
             </Link>
             <Link
-              href={patrocinadores.index()}
-              className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-orange-600 hover:bg-orange-50 md:hover:bg-transparent"
-            >
-              Patrocinadores
-            </Link>
-            <Link
               href={doacoes.index()}
               className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-green-600 hover:bg-green-50 md:hover:bg-transparent"
             >
