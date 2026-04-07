@@ -82,8 +82,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
         post(store().url)
     }
 
-    // 2
-    // TESTE
+    // xxxxxx
 
     return (
         <AppLayout>
