@@ -8,20 +8,35 @@ use Illuminate\Database\Eloquent\Collection;
 
 class Queries
 {
-    public function getByCustom(array $filtros): Collection|Estado|null
+    public function index(array $filtros): Collection
     {
         try {
-            $collection = $filtros['lista'];
 
             $query = Estado::query();
 
             $this->aplicarFiltros($query, $filtros);
 
-            return $collection ? $query->get() : $query->first();
+            return $query->get();
         } catch (\Throwable $th) {
+
+            return new Collection();
+        }
+    }
+    public function show(array $filtros): Collection|Estado|null
+    {
+        try {
+
+            $query = Estado::query();
+
+            $this->aplicarFiltros($query, $filtros);
+
+            return $query->first();
+        } catch (\Throwable $th) {
+
             return null;
         }
     }
+
 
     private function aplicarFiltros(Builder $query, array $filtros): void
     {
@@ -32,9 +47,10 @@ class Queries
         }
 
         // ESTADO
-        if (!empty($filtros['sigla'])) {
+        $apenasAtivos = $filtros['apenas_ativos'] ?? false;
+        if ($apenasAtivos) {
 
-            $query->where('sigla', $filtros['sigla']);
+            $query->where('id', 24);
         }
     }
 }

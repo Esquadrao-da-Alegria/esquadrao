@@ -2,7 +2,7 @@
 
 namespace App\Services\Hospital\Form;
 
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Hospital;
 use App\Services\Cidade\Service as CidadeService;
 
 class Service
@@ -13,10 +13,16 @@ class Service
         //
     }
 
-    public function buscarDados(): array
+    public function buscarDados(Hospital|null $hospital): array
     {
-        return [
-            'estados' => $this->cidadeService->index([])
+        $cidades = $this->cidadeService->index(['estado_id' => 43])['dados'];
+
+        $retorno = [
+            'cidades' => $cidades
         ];
+
+        if ($hospital) $retorno['hospital'] = $hospital;
+
+        return $retorno;
     }
 }

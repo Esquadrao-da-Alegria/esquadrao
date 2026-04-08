@@ -46,6 +46,18 @@ export interface User {
 
 // RECURSOS
 
+export interface Estado {
+    id: number;
+    nome: string,
+    sigla: number,
+}
+
+export interface Cidade {
+    id: number;
+    nome: string,
+    estado_id: number,
+}
+
 export interface Endereco {
     id: number;
 
@@ -79,6 +91,16 @@ export interface Hospital {
     ativo: boolean
     url_foto: string | null
     observacoes?: string
+    alas?: AlaHospital[]
     created_at?: string
     updated_at?: string
+}
+
+interface AlaHospital {
+    id?: number;
+    hospital_id: number;
+    nome: string;
+    observacoes?: string;
+    created_at?: string;
+    updated_at?: string;
 }

@@ -25,7 +25,7 @@ const Index: React.FC<Props> = ({ hospitais }) => {
   return (
     <AppLayout>
       <div className="mx-auto max-w-6xl p-6">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mt-2 mb-6 flex items-center justify-between">
           <h1 className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-3xl font-extrabold text-transparent">
             Hospitais Cadastrados
           </h1>
@@ -33,8 +33,11 @@ const Index: React.FC<Props> = ({ hospitais }) => {
           <button
             onClick={handleCriarClick}
             type="button"
-            className="rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
             Novo
           </button>
         </div>

@@ -1,8 +1,10 @@
 <?php
 
-use App\Http\Controllers\Web\HospitalController;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Web\HospitalController;
+use App\Http\Controllers\Web\OndeAtuamosController;
+use App\Http\Controllers\Web\Json\CidadeController;
 
 // HOME PAGE
 Route::get('/', function () {
@@ -10,9 +12,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Hospitais
-Route::get('/onde-atuamos', function () {
-    return Inertia::render('OndeAtuamos/Index');
-})->name('onde_atuamos.index');
+Route::get('/onde-atuamos', [OndeAtuamosController::class, 'index'])->name('onde_atuamos.index');
 
 // Conheça
 Route::get('/conheça', function () {
@@ -30,7 +30,13 @@ Route::get('/fale-conosco', function () {
 })->name('fale_conosco.index');
 
 // Hospitais
-Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais'=>'hospital']);
+Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
+
+// Listas JSON
+ROUTE::prefix('json')->name('json.')->group(function () {
+
+    Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
+});
 
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {

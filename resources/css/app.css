@@ -141,3 +141,9 @@
         @apply bg-background text-foreground;
     }
 }
+
+html,
+body {
+  background: #fff !important;
+  background-image: none !important;
+}

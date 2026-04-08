@@ -83,7 +83,7 @@ class Queries
 
             return [
                 'sucesso' => $sucesso,
-                'dados'   => ['id' => $model->id],
+                'dados'   => ['id' => $model->id, 'model' => $model],
                 'erros'   => []
             ];
         } catch (\Throwable $th) {
@@ -108,7 +108,7 @@ class Queries
 
             return [
                 'sucesso' => $sucesso,
-                'dados'   => [],
+                'dados'   => ['model' => $model],
                 'erros'   => []
             ];
         } catch (\Throwable $th) {

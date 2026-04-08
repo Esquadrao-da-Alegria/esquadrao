@@ -1,180 +1,58 @@
 import AppLayout from '@/layouts/AppLayout';
 import { useState } from 'react';
 import '../../../css/pages/hospitais.css';
+import { Hospital } from '@/types';
 
-const Index: React.FC = () => {
+interface ListaHospitais {
+    porto_alegre: Hospital[];
+    santa_maria: Hospital[];
+    pelotas: Hospital[];
+    sao_leopoldo: Hospital[];
+    canoas: Hospital[];
+}
+
+interface Props {
+    hospitais: ListaHospitais;
+}
+
+const Index: React.FC<Props> = ({ hospitais }) => {
+
+    console.log(hospitais)
+
     const [cidadeSelecionada, setCidadeSelecionada] =
-        useState<string>('portoAlegre');
+        useState<string>('porto_alegre');
 
     const handleExibriConteudo = (city: string) => {
         setCidadeSelecionada(city);
     };
 
     const cidades = [
-        { id: 'portoAlegre', name: 'PORTO ALEGRE' },
-        { id: 'santaMaria', name: 'SANTA MARIA' },
+        { id: 'porto_alegre', name: 'PORTO ALEGRE' },
+        { id: 'canoas', name: 'CANOAS' },
+        { id: 'sao_leopoldo', name: 'SÃO LEOPOLDO' },
+        { id: 'santa_maria', name: 'SANTA MARIA' },
         { id: 'pelotas', name: 'PELOTAS' },
     ];
-
-    const hospitais = {
-        portoAlegre: [
-            {
-                id: 1,
-                name: 'Hospital Santa Clara - Complexo Santa Casa',
-                address:
-                    'Rua Professor Annes Dias, 135 - Centro Histórico, Porto Alegre - RS',
-                image: '../assets/images/hospital-santa-clara.png',
-                layout: 'normal',
-            },
-            {
-                id: 2,
-                name: 'Hospital Ernesto Dornelles',
-                address: 'Av. Ipiranga, 1801 - Azenha, Porto Alegre - RS',
-                image: '../assets/images/hospital-ernesto-dornelli.png',
-                layout: 'reverse',
-            },
-            {
-                id: 3,
-                name: 'Instituto de Cardiologia',
-                address:
-                    'Av. Princesa Isabel, 395 - Santana, Porto Alegre - RS',
-                image: '../assets/images/instituto-de-cardiologia.png',
-                layout: 'normal',
-            },
-            {
-                id: 4,
-                name: 'Ulbra Canoas',
-                address: 'Av. Farroupilha, 8001 - São José, Canoas - RS',
-                image: '../assets/images/ulbra-canoas.png',
-                layout: 'reverse',
-            },
-            {
-                id: 5,
-                name: 'Hospital da Brigada Militar',
-                address:
-                    'R. Dr. Castro de Menezes, 155 - Vila Assunção, Porto Alegre - RS',
-                image: '../assets/images/brigada-militar.png',
-                layout: 'normal',
-            },
-            {
-                id: 6,
-                name: 'Hospital Centenário',
-                address:
-                    'Av. Theodomiro Porto da Fonseca, 799 - Fião, São Leopoldo - RS',
-                image: '../assets/images/hospital_centenario.png',
-                layout: 'reverse',
-            },
-        ],
-        santaMaria: [
-            {
-                id: 1,
-                name: 'Hospital Geral de Santa Maria (HGSM)',
-                address:
-                    "R. Mal. Hermes, 190 - Passo D'areia, Santa Maria - RS",
-                image: '../assets/images/hospital-geral-santa-maria.png',
-                layout: 'normal',
-            },
-            {
-                id: 2,
-                name: 'Unidade de Pronto Atendimento 24HR',
-                address: 'R. Venâncio Aires, 1078 - Centro, Santa Maria - RS',
-                image: '../assets/images/unimed_24h.png',
-                layout: 'reverse',
-            },
-            {
-                id: 3,
-                name: 'Hospital de São Francisco',
-                address:
-                    'R. Joana D Arc, 465 - Nossa Sra. de Lourdes, Santa Maria - RS',
-                image: '../assets/images/hospital-sao-francisco-de-assis.png',
-                layout: 'normal',
-            },
-            {
-                id: 4,
-                name: 'Hospital Universitário de Santa Maria (HUSM)',
-                address:
-                    'Av. Roraima, 1000 Prédio 22 - Camobi, Santa Maria - RS',
-                image: '../assets/images/hospital-universitario.png',
-                layout: 'reverse',
-            },
-            {
-                id: 5,
-                name: 'Hospital Casa de Saúde',
-                address:
-                    'R. Gen. Neto, 477 - Nossa Sra. de Lourdes, Santa Maria - RS',
-                image: '../assets/images/hospital-casa-de-saude.png',
-                layout: 'normal',
-            },
-            {
-                id: 6,
-                name: 'Hospital Regional de Santa Maria',
-                address:
-                    'R. Florianópolis, 1041 - Pinheiro Machado, Santa Maria - RS',
-                image: '../assets/images/hospital_regional.png',
-                layout: 'reverse',
-            },
-            {
-                id: 7,
-                name: 'Hospital da Brigada Militar de Santa Maria',
-                address:
-                    'R. Euclídes da Cunha, 1800 - Pres. Joao Goulart, Santa Maria - RS',
-                image: '../assets/images/hospital-da-brigada-sm.png',
-                layout: 'normal',
-            },
-            {
-                id: 8,
-                name: 'Hospital de Caridade Alcides Brum',
-                address: 'R. Floriano Peixoto, 1745 - Centro, Santa Maria - RS',
-                image: '../assets/images/hospital-de-caridade.png',
-                layout: 'reverse',
-            },
-            {
-                id: 9,
-                name: 'UPA 24',
-                address: 'R. Ari Lagranha Domingues, 188 - Santa Maria - RS',
-                image: '../assets/images/upa-sm.png',
-                layout: 'normal',
-            },
-        ],
-        pelotas: [
-            {
-                id: 1,
-                name: 'Hospital Universitário São Francisco de Paula',
-                address: 'R. Mal. Deodoro, 1123 - Centro, Pelotas - RS',
-                image: '../assets/images/hospital-sao-francisco-de-paula.png',
-                layout: 'reverse',
-            },
-            {
-                id: 2,
-                name: 'Hospital Escola da UFPel',
-                address: 'R. Prof. Dr. Araújo, 538 - Centro, Pelotas - RS',
-                image: '../assets/images/hospital-escola-ufpel.png',
-                layout: 'normal',
-            },
-        ],
-    };
 
     const HospitalCard = ({ hospital }: { hospital: any }) => (
         <div className="mb-16 last:mb-0">
             <div
-                className={`flex flex-col items-center gap-8 lg:flex-row ${
-                    hospital.layout === 'reverse' ? 'lg:flex-row-reverse' : ''
-                }`}
+                className={`flex flex-col items-center gap-8 lg:flex-row ${hospital.layout === 'reverse' ? 'lg:flex-row-reverse' : ''
+                    }`}
             >
                 {/* Informações do Hospital */}
                 <div
-                    className={`flex-1 ${
-                        hospital.layout === 'reverse'
-                            ? 'lg:pl-8 lg:text-right'
-                            : 'lg:pr-8'
-                    }`}
+                    className={`flex-1 ${hospital.layout === 'reverse'
+                        ? 'lg:pl-8 lg:text-right'
+                        : 'lg:pr-8'
+                        }`}
                 >
                     <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-purple-50 p-8 shadow-lg transition-all duration-300 hover:shadow-xl">
                         <h3 className="mb-4 text-2xl leading-tight font-bold text-gray-800 md:text-3xl">
-                            {hospital.name}
+                            {hospital.nome}
                         </h3>
                         <p className="text-lg leading-relaxed text-gray-600 md:text-xl">
-                            {hospital.address}
+                            {hospital.endereco}
                         </p>
                         <div className="mt-6 flex items-center gap-3">
                             <div className="h-3 w-3 animate-pulse rounded-full bg-green-400"></div>
@@ -187,14 +65,11 @@ const Index: React.FC = () => {
 
                 {/* Imagem do Hospital */}
                 <div className="flex-1">
-                    <div className="group relative">
-                        <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-blue-400 to-purple-400 opacity-30 blur-lg transition-opacity duration-300 group-hover:opacity-50"></div>
-                        <img
-                            src={hospital.image}
-                            alt={hospital.name}
-                            className="relative h-64 w-full rounded-xl object-cover shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl md:h-80"
-                        />
-                    </div>
+                    <img
+                        src={hospital.url_foto}
+                        alt={hospital.name}
+                        className="w-full h-64 md:h-90 object-contain"
+                    />
                 </div>
             </div>
         </div>
@@ -258,35 +133,35 @@ const Index: React.FC = () => {
 
             {/* Cidades */}
             <div className="flex flex-col items-center justify-center gap-6 rounded-3xl bg-gradient-to-br from-purple-50 to-cyan-50 p-8 shadow-2xl md:flex-row">
-                {cidades.map((city) => (
+                {cidades.map((cidade) => (
                     <div
-                        key={city.id}
-                        className={`group relative flex min-w-[220px] cursor-pointer items-center justify-between rounded-2xl border-2 border-transparent px-8 py-4 transition-all duration-500 ${
-                            cidadeSelecionada === city.id
-                                ? '-translate-y-2 scale-105 transform border-white/30 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl'
-                                : 'bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm hover:scale-105 hover:border-purple-300 hover:bg-gradient-to-r hover:from-white hover:to-purple-50 hover:shadow-xl'
-                        } `}
-                        onClick={() => handleExibriConteudo(city.id)}
+                        key={cidade.id}
+                        className={`group relative flex min-w-[220px] cursor-pointer items-center justify-between rounded-2xl border-2 border-transparent px-8 py-4 transition-all duration-500 ${cidadeSelecionada === cidade.id
+                            ? '-translate-y-2 scale-105 transform border-white/30 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl'
+                            : 'bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm hover:scale-105 hover:border-purple-300 hover:bg-gradient-to-r hover:from-white hover:to-purple-50 hover:shadow-xl'
+                            } `}
+                        onClick={() => handleExibriConteudo(cidade.id)}
                     >
                         {/* Efeito de brilho para o estado ativo */}
-                        {cidadeSelecionada === city.id && (
+                        {cidadeSelecionada === cidade.id && (
                             <div className="absolute -inset-1 animate-pulse rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 opacity-30 blur"></div>
                         )}
 
                         <span
-                            className={`relative z-10 text-lg font-bold tracking-wider uppercase ${cidadeSelecionada === city.id ? 'text-white drop-shadow-md' : 'text-gray-800 group-hover:text-purple-700'} `}
+                            className={`relative z-10 text-lg font-bold tracking-wider uppercase ${cidadeSelecionada === cidade.id ? 'text-white drop-shadow-md' : 'text-gray-800 group-hover:text-purple-700'} `}
                         >
-                            {city.name}
+                            {cidade.name}
                         </span>
 
                         <div
-                            className={`relative ml-5 text-lg transition-all duration-500 ${
-                                cidadeSelecionada === city.id
-                                    ? 'scale-125 rotate-180 text-yellow-300'
-                                    : 'rotate-0 text-purple-500 group-hover:scale-110 group-hover:text-pink-500'
-                            } `}
+                            className={`
+                            relative ml-5 text-xl transition-all duration-500
+                            ${cidadeSelecionada === cidade.id
+                                    ? 'rotate-180 text-purple-600'
+                                    : 'text-purple-500 group-hover:text-pink-500'}
+                        `}
                         >
-                            ⬆️
+                            ▾
                         </div>
 
                         {/* Efeito de partículas no hover */}
@@ -299,27 +174,28 @@ const Index: React.FC = () => {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Conteúdo das Cidades */}
                     <div className="space-y-12">
-                        {Object.entries(hospitais).map(([city, hospitals]) => (
+                        {Object.entries(hospitais).map(([cidadeLoop, listaAgrupada]) => (
                             <div
-                                key={city}
-                                className={`rounded-3xl p-8 transition-all duration-500 ${
-                                    cidadeSelecionada === city
-                                        ? 'block scale-100 opacity-100'
-                                        : 'hidden scale-95 opacity-0'
-                                }`}
+                                key={cidadeLoop}
+                                className={`rounded-3xl p-8 transition-all duration-500 ${cidadeSelecionada === cidadeLoop
+                                    ? 'block scale-100 opacity-100'
+                                    : 'hidden scale-95 opacity-0'
+                                    }`}
                             >
                                 <div className="mb-12 text-center">
                                     <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-4xl font-black text-transparent md:text-5xl">
-                                        {city === 'portoAlegre' &&
+                                        {cidadeLoop === 'porto_alegre' &&
                                             'PORTO ALEGRE'}
-                                        {city === 'santaMaria' && 'SANTA MARIA'}
-                                        {city === 'pelotas' && 'PELOTAS'}
+                                        {cidadeLoop === 'santa_maria' && 'SANTA MARIA'}
+                                        {cidadeLoop === 'pelotas' && 'PELOTAS'}
+                                        {cidadeLoop === 'canoas' && 'CANOAS'}
+                                        {cidadeLoop === 'sao_leopoldo' && 'SÃO LEOPOLDO'}
                                     </h2>
                                     <div className="mx-auto h-1 w-24 rounded-full bg-gradient-to-r from-purple-400 to-blue-400"></div>
                                 </div>
 
                                 <div className="space-y-8">
-                                    {hospitals.map((hospital) => (
+                                    {listaAgrupada.map((hospital: Hospital) => (
                                         <HospitalCard
                                             key={hospital.id}
                                             hospital={hospital}
