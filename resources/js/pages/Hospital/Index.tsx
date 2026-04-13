@@ -27,7 +27,7 @@ const Index: React.FC<Props> = ({ hospitais }) => {
       <div className="mx-auto max-w-6xl p-6">
         <div className="mt-2 mb-6 flex items-center justify-between">
           <h1 className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-3xl font-extrabold text-transparent">
-            Hospitais Cadastrados (teste)
+            Hospitais Cadastrados
           </h1>
 
           <button
