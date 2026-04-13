@@ -82,9 +82,6 @@ const Create: React.FC<Props> = ({ cidades }) => {
         post(store().url)
     }
 
-    // teste commit
-    // xxxxxx
-
     return (
         <AppLayout>
             <section className="mx-auto w-full max-w-8xl px-4 py-16">
