@@ -52,7 +52,7 @@ jobs:
             composer install --no-dev --optimize-autoloader --no-interaction
 
             echo "🟢 Instalando dependências JS (React/Vite)..."
-            npm ci --production
+            npm ci
 
             echo "🏗️ Gerando build do frontend..."
             npm run build
