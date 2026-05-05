@@ -1,4 +1,4 @@
-import AppLayout from '@/layouts/AppLayout'
+import PainelLayout from '@/layouts/PainelLayout'
 import { Hospital } from '@/types'
 import { Pencil } from 'lucide-react'
 import { Link, router } from '@inertiajs/react'
@@ -23,7 +23,7 @@ const Index: React.FC<Props> = ({ hospitais }) => {
   }
 
   return (
-    <AppLayout>
+    <PainelLayout>
       <div className="mx-auto max-w-6xl p-6">
         <div className="mt-2 mb-6 flex items-center justify-between">
           <h1 className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-3xl font-extrabold text-transparent">
@@ -153,7 +153,7 @@ const Index: React.FC<Props> = ({ hospitais }) => {
           </div>
         </div>
       </div>
-    </AppLayout>
+    </PainelLayout>
   )
 }
 

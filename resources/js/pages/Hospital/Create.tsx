@@ -1,4 +1,4 @@
-import AppLayout from '@/layouts/AppLayout'
+import PainelLayout from '@/layouts/PainelLayout'
 import { store } from '@/routes/hospitais'
 import { toast } from 'react-toastify'
 import React from 'react'
@@ -83,7 +83,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
     }
 
     return (
-        <AppLayout>
+        <PainelLayout>
             <section className="mx-auto w-full max-w-8xl px-4 py-16">
                 <div className="flex justify-center">
                     <div className="w-full max-w-7xl">
@@ -358,7 +358,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
                     </div>
                 </div>
             </section>
-        </AppLayout>
+        </PainelLayout>
     )
 }
 
