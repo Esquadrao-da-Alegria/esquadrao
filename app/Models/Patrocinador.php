@@ -3,21 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Patrocinador extends Model
 {
+    use HasUuids;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
+
+    protected $table = 'patrocinadores';
     protected $fillable = [
         'nome',
         'site',
         'categoria',
-        'url_logotipo',
+        'logo_path',
         'ativo',
-        'observacoes',
+        'ordem_exibicao', 
     ];
 
     // public function endereco()

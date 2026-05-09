@@ -12,15 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('patrocinadores', function (Blueprint $table) {
-            $table->id();
-
+            $table->uuid('id')->primary();
             $table->string('nome', 255);
-            $table->string('site', 100);
-            $table->string('categoria', 100);
-            $table->string('url_logotipo', 100);
-            $table->boolean('ativo', 100);
-            $table->text('observacoes')->nullable();
-
+            $table->string('site', 100)->nullable();
+            $table->string('categoria', 100)->nullable();
+            $table->string('logo_path', 100)->nullable();
+            $table->boolean('ativo')->default(true);
+            $table->integer('ordem_exibicao')->default(1);
             $table->timestamps();
         });
     }
