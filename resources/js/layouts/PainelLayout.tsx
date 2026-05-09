@@ -1,3 +1,7 @@
+// REACT/INERTIA
+import { Link, router, usePage } from '@inertiajs/react'
+
+// UI
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -6,14 +10,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { dashboard, home, login, logout } from '@/routes'
-import { create, index } from '@/routes/hospitais'
-import { edit } from '@/routes/profile'
-import { type SharedData } from '@/types'
 import { toastErro, toastSucesso } from '@/lib/utils/toast'
-import { Link, router, usePage } from '@inertiajs/react'
-import { Building2, ChevronDown, LayoutGrid, LogOut, Plus, User } from 'lucide-react'
+
+// ROTAS
+import { edit } from '@/routes/profile'
+import { index } from '@/routes/hospitais'
 import { useEffect, useState } from 'react'
+import { dashboard, home, login, logout } from '@/routes'
+
+// TIPOS
+import { type SharedData } from '@/types'
+import { Building2, ChevronDown, LayoutGrid, LogOut, User } from 'lucide-react'
 
 interface Props {
     children: React.ReactNode
@@ -50,7 +57,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
         'rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900'
     const navLinkActive = (active: boolean) =>
         active
-            ? 'bg-red-50 text-red-800 ring-1 ring-red-100'
+            ? 'bg-amber-50 text-amber-800 ring-1 ring-amber-100'
             : ''
 
     return (
@@ -113,10 +120,10 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                         {user ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger
-                                    className="flex max-w-[14rem] items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pl-2 pr-2 text-left text-sm shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                                    className="flex max-w-[14rem] items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pl-2 pr-2 text-left text-sm shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                                     aria-label="Menu da conta"
                                 >
-                                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-800">
+                                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-800">
                                         <User className="size-4" aria-hidden />
                                     </span>
                                     <span className="hidden min-w-0 flex-1 truncate sm:block">
@@ -145,7 +152,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
-                                        className="flex cursor-pointer items-center gap-2 text-red-700 focus:text-red-800"
+                                        className="flex cursor-pointer items-center gap-2 text-gray-600 focus:text-gray-900"
                                         onSelect={() => {
                                             handleLogout()
                                         }}
@@ -158,7 +165,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                         ) : (
                             <Link
                                 href={login()}
-                                className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:border-red-200 hover:bg-red-50"
+                                className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:border-amber-200 hover:bg-amber-50"
                             >
                                 Entrar
                             </Link>

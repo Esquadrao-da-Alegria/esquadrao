@@ -29,7 +29,7 @@ class TwoFactorAuthenticationTest extends TestCase
             ->withSession(['auth.password_confirmed_at' => time()])
             ->get(route('two-factor.show'))
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Profile/TwoFactor')
+                ->component('Preferencias/TwoFactor')
                 ->where('twoFactorEnabled', false)
             );
     }
@@ -70,7 +70,7 @@ class TwoFactorAuthenticationTest extends TestCase
             ->get(route('two-factor.show'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Profile/TwoFactor')
+                ->component('Preferencias/TwoFactor')
             );
     }
 

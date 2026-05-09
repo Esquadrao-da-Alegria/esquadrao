@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function () {
         ->name('password.update');
 
     Route::get('configuracoes/aparencia', function () {
-        return Inertia::render('Profile/Appearance');
+        return Inertia::render('Preferencias/Appearance');
     })->name('appearance.edit');
 
     Route::get('configuracoes/dois-fatores', [TwoFactorAuthenticationController::class, 'show'])

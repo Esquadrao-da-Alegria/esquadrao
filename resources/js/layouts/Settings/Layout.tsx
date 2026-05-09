@@ -21,16 +21,6 @@ const sidebarNavItems: NavItem[] = [
         href: editPassword(),
         icon: null,
     },
-    {
-        title: 'Dois fatores',
-        href: show(),
-        icon: null,
-    },
-    {
-        title: 'Aparência',
-        href: editAppearance(),
-        icon: null,
-    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
@@ -42,7 +32,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const currentPath = window.location.pathname;
 
     return (
-        <div className="px-4 py-6">
+        <div className="py-6">
             <Heading
                 title="Configurações"
                 description="Gerencie seu perfil e as configurações da conta"

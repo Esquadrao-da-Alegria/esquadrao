@@ -8,19 +8,19 @@ const placeholderCards = [
         title: 'Visão geral',
         description: 'Resumo das suas informações aparecerá aqui.',
         icon: LayoutDashboard,
-        accent: 'from-red-500/10 to-red-600/5 text-red-700',
+        accent: 'from-amber-500/10 to-amber-600/5 text-amber-700',
     },
     {
         title: 'Atividades recentes',
         description: 'Últimas ações e atualizações do painel.',
         icon: Sparkles,
-        accent: 'from-purple-500/10 to-purple-600/5 text-purple-700',
+        accent: 'from-amber-400/10 to-amber-500/5 text-amber-900',
     },
     {
         title: 'Próximos passos',
         description: 'Sugestões e lembretes para você acompanhar.',
         icon: HeartHandshake,
-        accent: 'from-green-500/10 to-green-600/5 text-green-700',
+        accent: 'from-yellow-400/10 to-amber-500/10 text-amber-800',
     },
 ] as const;
 
@@ -30,12 +30,12 @@ export default function Dashboard() {
             <Head title="Painel" />
 
             <div className="mx-auto max-w-7xl px-6 pb-16">
-                <section className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-red-50 via-white to-purple-50/50 p-8 shadow-sm md:p-12">
+                <section className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-amber-50/90 via-white to-yellow-50/40 p-8 shadow-sm md:p-12">
                     <PlaceholderPattern className="pointer-events-none absolute -right-12 -top-12 h-72 w-72 stroke-neutral-900/[0.06] dark:stroke-neutral-100/[0.06] md:h-96 md:w-96" />
                     <div className="relative max-w-2xl">
-                        <p className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-white/80 px-3 py-1 text-sm font-medium text-red-800 shadow-sm backdrop-blur-sm">
+                        <p className="inline-flex items-center gap-2 rounded-full border border-amber-100 bg-white/80 px-3 py-1 text-sm font-medium text-amber-800 shadow-sm backdrop-blur-sm">
                             <Sparkles
-                                className="size-4 shrink-0 text-red-600"
+                                className="size-4 shrink-0 text-amber-600"
                                 aria-hidden
                             />
                             Área do painel

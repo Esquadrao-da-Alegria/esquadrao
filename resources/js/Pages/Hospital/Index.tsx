@@ -1,160 +1,122 @@
 import PainelLayout from '@/layouts/PainelLayout'
 import { Hospital } from '@/types'
-import { Pencil } from 'lucide-react'
+import { MapPin, Pencil, Plus } from 'lucide-react'
 import { Link, router } from '@inertiajs/react'
-import { create, edit } from '@/routes/hospitais';
+import { create, edit } from '@/routes/hospitais'
+
+const placeholderImg =
+    'https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM='
 
 interface Props {
-  hospitais: Hospital[];
+    hospitais: Hospital[]
 }
 
 const Index: React.FC<Props> = ({ hospitais }) => {
+    const handleCriarClick = () => {
+        router.visit(create.url())
+    }
 
-  const handleCriarClick = () => {
-    const url = create();
-
-    router.visit(url);
-  }
-
-  const handleEditarClick = (hospital: Hospital) => {
-    const url = edit({ id: hospital.id! });
-
-    router.visit(url);
-  }
-
-  return (
-    <PainelLayout>
-      <div className="mx-auto max-w-6xl p-6">
-        <div className="mt-2 mb-6 flex items-center justify-between">
-          <h1 className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-3xl font-extrabold text-transparent">
-            Hospitais Cadastrados
-          </h1>
-
-          <button
-            onClick={handleCriarClick}
-            type="button"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Novo
-          </button>
-        </div>
-
-        {/* Tabela responsiva */}
-        <div className="mt-6 overflow-hidden rounded-2xl shadow-md ring-1 ring-gray-200">
-          <table className="hidden min-w-full divide-y divide-gray-200 bg-white md:table">
-            <thead className="bg-gradient-to-r from-pink-500 to-blue-500 text-white">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-                  Imagem
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-                  Nome
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-                  Endereço
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
-                  Editar
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {hospitais.map((hospital) => (
-                <tr
-                  key={hospital.id}
-                  className="transition hover:bg-gray-50"
-                >
-                  <td className="px-6 py-4">
-                    <img
-                      src={hospital.url_foto ?? 'https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM='}
-                      alt={hospital.nome}
-                      className="h-14 w-14 rounded-full object-cover shadow-sm ring-2 ring-pink-200"
-                    />
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {hospital.nome}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {hospital.endereco}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${hospital.ativo
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                        }`}
-                    >
-                      {hospital.ativo ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
+    return (
+        <PainelLayout>
+            <div className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
+                <header className="mb-10 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold tracking-tight text-amber-950 sm:text-3xl">
+                            Hospitais
+                        </h1>
+                        <p className="mt-1 max-w-md text-sm text-amber-900/55">
+                            {hospitais.length === 0
+                                ? 'Cadastre o primeiro hospital para começar.'
+                                : `${hospitais.length} ${hospitais.length === 1 ? 'cadastro' : 'cadastros'}`}
+                        </p>
+                    </div>
                     <button
-                      onClick={() => handleEditarClick(hospital)}
-                      type='button'
-                      className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
-                      aria-label="Editar hospital"
+                        onClick={handleCriarClick}
+                        type="button"
+                        className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 sm:w-auto"
                     >
-                      <Pencil size={16} strokeWidth={1.5} />
+                        <Plus className="size-5" strokeWidth={2} aria-hidden />
+                        Novo hospital
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </header>
 
-          {/* Versão mobile (cards) */}
-          <div className="space-y-4 bg-white p-4 md:hidden">
-            {hospitais.map((hospital) => (
-              <div
-                key={hospital.id}
-                className="flex flex-col rounded-2xl border border-gray-100 bg-gradient-to-br from-pink-50 via-white to-blue-50 p-4 shadow-sm"
-              >
-                <div className="flex items-center gap-4">
-                  <img
-                    // src={hospital.imagem_url}
-                    src='https://imagens.ebc.com.br/ezhL7QDLWeq77RcIBaA78AQ9RMc=/1170x700/smart/https://agenciabrasil.ebc.com.br/sites/default/files/thumbnails/image/2025/01/17/toms1434.jpg?itok=QxAcBaX6'
-                    alt={hospital.nome}
-                    className="h-14 w-14 rounded-full object-cover ring-2 ring-pink-200"
-                  />
-                  <div className="flex-1">
-                    <h2 className="font-semibold text-gray-800">
-                      {hospital.nome}
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                      {hospital.endereco}
-                    </p>
-                  </div>
-                  <Link
-                    href={`/hospitais/${hospital.id}/editar`}
-                    className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
-                    aria-label="Editar hospital"
-                  >
-                    <Pencil size={16} strokeWidth={1.5} />
-                  </Link>
-                </div>
-                <div className="mt-3">
-                  <span
-                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${hospital.ativo
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                      }`}
-                  >
-                    {hospital.ativo ? 'Ativo' : 'Inativo'}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </PainelLayout>
-  )
+                {hospitais.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-amber-200 bg-white px-6 py-20 text-center">
+                        <p className="text-sm text-amber-900/50">
+                            Nenhum hospital na lista.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={handleCriarClick}
+                            className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-amber-600 bg-white px-5 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
+                        >
+                            <Plus className="size-4" aria-hidden />
+                            Adicionar hospital
+                        </button>
+                    </div>
+                ) : (
+                    <ul className="flex w-full flex-col gap-5">
+                        {hospitais.map((hospital) => (
+                            <li key={hospital.id} className="w-full">
+                                <article className="w-full overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition duration-300 hover:border-amber-200 hover:shadow-md">
+                                    <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+                                        <div className="shrink-0">
+                                            <img
+                                                src={
+                                                    hospital.url_foto ??
+                                                    placeholderImg
+                                                }
+                                                alt={hospital.nome}
+                                                className="size-[4.5rem] rounded-2xl object-cover ring-1 ring-amber-100"
+                                            />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <h2 className="text-base font-semibold leading-snug text-amber-950 sm:text-lg">
+                                                {hospital.nome}
+                                            </h2>
+                                            <p className="mt-1.5 flex gap-1.5 text-sm leading-relaxed text-amber-900/50">
+                                                <MapPin
+                                                    className="mt-0.5 size-3.5 shrink-0 text-amber-700/40"
+                                                    strokeWidth={2}
+                                                    aria-hidden
+                                                />
+                                                <span>{hospital.endereco}</span>
+                                            </p>
+                                        </div>
+                                        <div className="flex shrink-0 items-center justify-between gap-4 border-t border-amber-50 pt-4 sm:w-auto sm:justify-end sm:border-t-0 sm:border-l sm:border-amber-50 sm:pl-6 sm:pt-0">
+                                            <span
+                                                className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide ${hospital.ativo
+                                                    ? 'border-amber-200/80 bg-white text-amber-800'
+                                                    : 'border-transparent bg-amber-50 text-amber-700'
+                                                    }`}
+                                            >
+                                                {hospital.ativo
+                                                    ? 'Ativo'
+                                                    : 'Inativo'}
+                                            </span>
+                                            <Link
+                                                href={edit.url(
+                                                    hospital.id!,
+                                                )}
+                                                prefetch
+                                                className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                                                aria-label={`Editar ${hospital.nome}`}
+                                            >
+                                                <Pencil
+                                                    size={17}
+                                                    strokeWidth={1.75}
+                                                />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </article>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </PainelLayout>
+    )
 }
 
 export default Index
