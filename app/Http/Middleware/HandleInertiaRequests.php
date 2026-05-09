@@ -38,16 +38,25 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+
+        if ($user) {
+            $user->loadMissing('cargos');
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
+            'eh_administrador' => $user
+                ? $user->cargos->contains(fn ($cargo) => $cargo->slug === 'administrador')
+                : false,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'mensagem_sucesso' => session('mensagem_sucesso'),
-            'mensagem_erro'    => session('mensagem_erro'),
+            'mensagem_erro' => session('mensagem_erro'),
         ];
     }
 }

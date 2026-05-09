@@ -7,11 +7,10 @@ import { Form, Head, Link, usePage } from '@inertiajs/react';
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses';
 import PainelLayout from '@/layouts/PainelLayout';
 import SettingsLayout from '@/layouts/Settings/Layout';
+import { Check } from 'lucide-react';
 
 export default function Profile({
     mustVerifyEmail,
@@ -43,12 +42,17 @@ export default function Profile({
                         >
                             {({ processing, recentlySuccessful, errors }) => (
                                 <>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="name">Nome</Label>
+                                    <div>
+                                        <label
+                                            htmlFor="name"
+                                            className={painelLabelClass}
+                                        >
+                                            Nome
+                                        </label>
 
-                                        <Input
+                                        <input
                                             id="name"
-                                            className="mt-1 block w-full"
+                                            className={painelInputClass}
                                             defaultValue={auth.user.name}
                                             name="name"
                                             required
@@ -62,13 +66,18 @@ export default function Profile({
                                         />
                                     </div>
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="email">E-mail</Label>
+                                    <div>
+                                        <label
+                                            htmlFor="email"
+                                            className={painelLabelClass}
+                                        >
+                                            E-mail
+                                        </label>
 
-                                        <Input
+                                        <input
                                             id="email"
                                             type="email"
-                                            className="mt-1 block w-full"
+                                            className={painelInputClass}
                                             defaultValue={auth.user.email}
                                             name="email"
                                             required
@@ -86,7 +95,7 @@ export default function Profile({
                                         auth.user.email_verified_at ===
                                             null && (
                                             <div>
-                                                <p className="-mt-4 text-sm text-muted-foreground">
+                                                <p className="-mt-4 text-sm text-amber-900/60">
                                                     Seu endereço de e-mail não
                                                     foi verificado.{' '}
                                                     <Link
@@ -110,13 +119,19 @@ export default function Profile({
                                             </div>
                                         )}
 
-                                    <div className="flex items-center gap-4">
-                                        <Button
+                                    <div className="flex flex-wrap items-center gap-4">
+                                        <button
+                                            type="submit"
                                             disabled={processing}
                                             data-test="update-profile-button"
+                                            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
                                         >
-                                            Salvar
-                                        </Button>
+                                            <Check
+                                                className="size-4"
+                                                aria-hidden
+                                            />
+                                            {processing ? 'Salvando...' : 'Salvar'}
+                                        </button>
 
                                         <Transition
                                             show={recentlySuccessful}

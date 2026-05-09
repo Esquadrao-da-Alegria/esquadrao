@@ -1,19 +1,20 @@
 <?php
 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
-use App\Models\Patrocinador;
 use App\Http\Controllers\Web\HospitalController;
-use App\Http\Controllers\Web\PatrocinadorController;
-use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\Json\CidadeController;
+use App\Http\Controllers\Web\OndeAtuamosController;
+use App\Http\Controllers\Web\PatrocinadorController;
+use App\Http\Controllers\Web\VoluntarioController;
+use App\Models\Patrocinador;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // HOME PAGE
 Route::get('/', function () {
     return Inertia::render('Home', [
         'patrocinadores' => Patrocinador::where('ativo', true)
-                                        ->orderBy('ordem_exibicao')
-                                        ->get()
+            ->orderBy('ordem_exibicao')
+            ->get(),
     ]);
 })->name('home');
 
@@ -52,7 +53,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    // ADMINISTRADOR
+    Route::middleware(['administrador'])->group(function () {
+
+        // VOLUNTARIOS
+        Route::resource('/voluntarios', VoluntarioController::class)
+            ->parameters(['voluntarios' => 'voluntario'])
+            ->except(['show']);
+    });
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

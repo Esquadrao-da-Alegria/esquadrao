@@ -15,12 +15,13 @@ import { toastErro, toastSucesso } from '@/lib/utils/toast'
 // ROTAS
 import { edit } from '@/routes/profile'
 import { index } from '@/routes/hospitais'
+import { index as voluntariosIndex } from '@/routes/voluntarios'
 import { useEffect, useState } from 'react'
 import { dashboard, home, login, logout } from '@/routes'
 
 // TIPOS
 import { type SharedData } from '@/types'
-import { Building2, ChevronDown, LayoutGrid, LogOut, User } from 'lucide-react'
+import { Building2, ChevronDown, LayoutGrid, LogOut, User, UsersRound } from 'lucide-react'
 
 interface Props {
     children: React.ReactNode
@@ -32,6 +33,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const pathname = (url.split('?')[0] ?? '').replace(/\/$/, '') || '/'
 
     const user = props.auth?.user
+    const ehAdministrador = props.eh_administrador === true
 
     useEffect(() => {
         const mensagemSucesso = props.mensagem_sucesso
@@ -48,6 +50,11 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const isHospitaisNav =
         pathname === '/hospitais' ||
         /^\/hospitais\/[^/]+\/edit$/.test(pathname)
+
+    const isVoluntariosCreate = pathname === '/voluntarios/create'
+    const isVoluntariosNav =
+        pathname === '/voluntarios' ||
+        /^\/voluntarios\/[^/]+\/edit$/.test(pathname)
 
     const handleLogout = () => {
         router.post(logout.url())
@@ -106,6 +113,18 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 <Building2 className="size-4 shrink-0 opacity-70" aria-hidden />
                                 Hospitais
                             </Link>
+                            {ehAdministrador ? (
+                                <Link
+                                    href={voluntariosIndex()}
+                                    className={`${navLinkClass} ${navLinkActive(
+                                        isVoluntariosNav && !isVoluntariosCreate,
+                                    )} flex items-center gap-2`}
+                                    onClick={closeMobile}
+                                >
+                                    <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
+                                    Voluntários
+                                </Link>
+                            ) : null}
                         </div>
                     </div>
 

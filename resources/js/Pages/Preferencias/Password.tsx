@@ -7,9 +7,8 @@ import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses';
+import { Check } from 'lucide-react';
 
 export default function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -51,72 +50,94 @@ export default function Password() {
                         >
                             {({ errors, processing, recentlySuccessful }) => (
                                 <>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="current_password">
+                                    <div>
+                                        <label
+                                            htmlFor="current_password"
+                                            className={painelLabelClass}
+                                        >
                                             Senha atual
-                                        </Label>
+                                        </label>
 
-                                        <Input
+                                        <input
                                             id="current_password"
                                             ref={currentPasswordInput}
                                             name="current_password"
                                             type="password"
-                                            className="mt-1 block w-full"
+                                            className={painelInputClass}
                                             autoComplete="current-password"
                                             placeholder="Senha atual"
                                         />
 
                                         <InputError
+                                            className="mt-2"
                                             message={errors.current_password}
                                         />
                                     </div>
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="password">
+                                    <div>
+                                        <label
+                                            htmlFor="password"
+                                            className={painelLabelClass}
+                                        >
                                             Nova senha
-                                        </Label>
+                                        </label>
 
-                                        <Input
+                                        <input
                                             id="password"
                                             ref={passwordInput}
                                             name="password"
                                             type="password"
-                                            className="mt-1 block w-full"
+                                            className={painelInputClass}
                                             autoComplete="new-password"
                                             placeholder="Nova senha"
                                         />
 
-                                        <InputError message={errors.password} />
+                                        <InputError
+                                            className="mt-2"
+                                            message={errors.password}
+                                        />
                                     </div>
 
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="password_confirmation">
+                                    <div>
+                                        <label
+                                            htmlFor="password_confirmation"
+                                            className={painelLabelClass}
+                                        >
                                             Confirmar senha
-                                        </Label>
+                                        </label>
 
-                                        <Input
+                                        <input
                                             id="password_confirmation"
                                             name="password_confirmation"
                                             type="password"
-                                            className="mt-1 block w-full"
+                                            className={painelInputClass}
                                             autoComplete="new-password"
                                             placeholder="Confirmar senha"
                                         />
 
                                         <InputError
+                                            className="mt-2"
                                             message={
                                                 errors.password_confirmation
                                             }
                                         />
                                     </div>
 
-                                    <div className="flex items-center gap-4">
-                                        <Button
+                                    <div className="flex flex-wrap items-center gap-4">
+                                        <button
+                                            type="submit"
                                             disabled={processing}
                                             data-test="update-password-button"
+                                            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
                                         >
-                                            Salvar senha
-                                        </Button>
+                                            <Check
+                                                className="size-4"
+                                                aria-hidden
+                                            />
+                                            {processing
+                                                ? 'Salvando...'
+                                                : 'Salvar senha'}
+                                        </button>
 
                                         <Transition
                                             show={recentlySuccessful}
