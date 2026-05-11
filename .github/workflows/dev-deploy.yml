@@ -38,7 +38,7 @@ jobs:
 
             echo "🔑 Configurando chave SSH para GitHub..."
             mkdir -p ~/.ssh
-            echo "$GH_DEPLOY_KEY" > ~/.ssh/id_ed25519
+            printf '%s\n' "$GH_DEPLOY_KEY" > ~/.ssh/id_ed25519
             chmod 600 ~/.ssh/id_ed25519
             ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
             eval "$(ssh-agent -s)"
@@ -52,7 +52,7 @@ jobs:
             composer install --no-dev --optimize-autoloader --no-interaction
 
             echo "🟢 Instalando dependências JS (React/Vite)..."
-            npm ci --production
+            npm ci
 
             echo "🏗️ Gerando build do frontend..."
             npm run build
