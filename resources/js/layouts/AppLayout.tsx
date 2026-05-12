@@ -7,6 +7,7 @@ import { Link, usePage } from '@inertiajs/react'
 import { useEffect, useState } from 'react'
 import { SharedData } from '@/types'
 import { toastErro, toastSucesso } from '@/lib/utils/toast'
+import patrocinadores from '@/routes/patrocinadores'
 
 interface Props {
   children: React.ReactNode

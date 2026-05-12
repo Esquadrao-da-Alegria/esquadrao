@@ -2,13 +2,19 @@
 
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Models\Patrocinador;
 use App\Http\Controllers\Web\HospitalController;
+use App\Http\Controllers\Web\PatrocinadorController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\Json\CidadeController;
 
 // HOME PAGE
 Route::get('/', function () {
-    return Inertia::render('Home');
+    return Inertia::render('Home', [
+        'patrocinadores' => Patrocinador::where('ativo', true)
+                                        ->orderBy('ordem_exibicao')
+                                        ->get()
+    ]);
 })->name('home');
 
 // Hospitais
@@ -31,6 +37,9 @@ Route::get('/fale-conosco', function () {
 
 // Hospitais
 Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
+
+// patrocinadores
+Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
 
 // Listas JSON
 ROUTE::prefix('json')->name('json.')->group(function () {

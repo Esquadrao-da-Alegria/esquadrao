@@ -3,10 +3,38 @@ import conheca from '@/routes/conheca';
 import doacoes from '@/routes/doacoes';
 import onde_atuamos from '@/routes/onde_atuamos';
 import { Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { toast } from 'react-toastify';
 
-const Home: React.FC = () => {
+
+interface Patrocinador {
+    id: string;
+    nome: string;
+    site?: string;
+    logo_path?: string;
+    ativo: boolean;
+    ordem_exibicao: number;
+}
+
+interface Props {
+    patrocinadores?: Patrocinador[];
+}
+
+//finalizar o conserto do carrosel, falta os botoes e os elementos decorativos
+const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
+    const carrosselRef = useRef<HTMLDivElement>(null);
+
+    const scrollEsquerda = () => {
+        if (carrosselRef.current) {
+            carrosselRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+        }
+    };
+
+    const scrollDireita = () => {
+        if (carrosselRef.current) {
+            carrosselRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+        }
+    };
     const [formData, setFormData] = useState({
         nome: '',
         email: '',
@@ -14,21 +42,6 @@ const Home: React.FC = () => {
     });
 
     const accessKey = '53b7a3e3-b32f-4b85-9be7-d8f176bed235';
-
-    const apoiadores = [
-        {
-            id: 1,
-            nome: 'Nota Fiscal Gaúcha',
-            logo: './assets/images/logo-nfg.jpg',
-            url: 'https://nfg.sefaz.rs.gov.br/site/index.aspx',
-        },
-        {
-            id: 2,
-            nome: 'Sicredi',
-            logo: './assets/images/logo-sicredi.jpg',
-            url: 'https://www.sicredi.com.br/home/',
-        },
-    ];
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -48,7 +61,6 @@ const Home: React.FC = () => {
     const handleSubmit = async () => {
         try {
             const url = 'https://api.staticforms.xyz/submit';
-
             const dadosPost = { ...formData, accessKey: accessKey };
 
             const options = {
@@ -64,18 +76,17 @@ const Home: React.FC = () => {
             if (!retorno.ok) throw new Error('Erro ao enviar a mensagem.');
 
             toast.success('Mensagem enviada com sucesso!');
-
             resetarFormulario();
-
             setTimeout(() => location.reload(), 500);
         } catch (error) {
             console.error('Erro:', error);
-
             toast.error(
                 'Ocorreu um erro ao enviar a mensagem. Tente novamente mais tarde.',
             );
         }
     };
+
+    
 
     return (
         <AppLayout>
@@ -121,71 +132,63 @@ const Home: React.FC = () => {
                 </div>
 
                 {/* Estrelas decorativas */}
-                <div className="absolute top-10 left-10 animate-pulse text-2xl text-yellow-400">
-                    ★
-                </div>
-                <div
-                    className="absolute top-20 right-20 animate-bounce text-xl text-purple-400"
-                    style={{ animationDelay: '0.5s' }}
-                >
-                    ★
-                </div>
-                <div
-                    className="absolute bottom-20 left-20 animate-pulse text-lg text-pink-400"
-                    style={{ animationDelay: '1s' }}
-                >
-                    ★
-                </div>
-                <div
-                    className="absolute right-10 bottom-10 animate-bounce text-2xl text-blue-400"
-                    style={{ animationDelay: '1.5s' }}
-                >
-                    ★
-                </div>
-                <div
-                    className="absolute top-1/2 left-1/4 animate-pulse text-xl text-green-400"
-                    style={{ animationDelay: '2s' }}
-                >
-                    ★
-                </div>
+                <div className="absolute top-10 left-10 animate-pulse text-2xl text-yellow-400">★</div>
+                <div className="absolute top-20 right-20 animate-bounce text-xl text-purple-400" style={{ animationDelay: '0.5s' }}>★</div>
+                <div className="absolute bottom-20 left-20 animate-pulse text-lg text-pink-400" style={{ animationDelay: '1s' }}>★</div>
+                <div className="absolute right-10 bottom-10 animate-bounce text-2xl text-blue-400" style={{ animationDelay: '1.5s' }}>★</div>
+                <div className="absolute top-1/2 left-1/4 animate-pulse text-xl text-green-400" style={{ animationDelay: '2s' }}>★</div>
             </div>
 
-            {/* Apoiadores */}
-            <div className="w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-100 py-8 md:py-12">
+            {/* Apoiadores - Finalizar Carrossel */}
+            <div className="w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-100 py-8 md:py-16">
                 <div className="mx-auto max-w-6xl px-4">
-                    <div className="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-16">
+                    <div className="flex flex-col items-center justify-center gap-10">
                         {/* Título */}
-                        <div className="text-center md:text-left">
+                        <div className="text-center">
                             <h3 className="mb-2 text-2xl font-bold text-gray-800 md:text-3xl">
                                 Apoiadores
                             </h3>
-                            <div className="mx-auto h-1 w-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 md:mx-0"></div>
+                            <div className="mx-auto h-1 w-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
                         </div>
 
-                        {/* Logos dos apoiadores */}
-                        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-                            {apoiadores.map((supporter) => (
-                                <a
-                                    key={supporter.id}
-                                    href={supporter.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="group transform transition-all duration-300 hover:scale-105"
-                                >
-                                    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-lg transition-shadow duration-300 hover:shadow-xl">
-                                        <img
-                                            src={supporter.logo}
-                                            alt={supporter.nome}
-                                            className="h-16 w-auto object-contain filter transition-all duration-300 group-hover:grayscale-0"
-                                        />
-                                    </div>
-                                </a>
-                            ))}
+                        {/* Carrossel Tailwind */}
+                        <div className="w-full">
+                            <div className="flex w-full justify-center snap-x snap-mandatory gap-6 overflow-x-auto px-4 py-8 sm:px-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                {patrocinadores.length > 0 ? (
+                                    patrocinadores.map((patrocinador) => (
+                                        <a
+                                            key={patrocinador.id}
+                                            href={patrocinador.site || '#'}
+                                            target={patrocinador.site ? "_blank" : "_self"}
+                                            rel="noopener noreferrer"
+                                            className="group flex w-56 shrink-0 snap-center flex-col items-center justify-center transition-all duration-300 hover:-translate-y-2 md:w-64"
+                                        >
+                                            <div className="flex h-40 w-full items-center justify-center rounded-2xl border border-gray-100 bg-white p-6 shadow-md transition-shadow duration-300 group-hover:shadow-xl">
+                                                {patrocinador.logo_path ? (
+                                                    <img
+                                                        src={patrocinador.logo_path}
+                                                        alt={patrocinador.nome}
+                                                        className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                                                    />
+                                                ) : (
+                                                    <span className="text-center font-bold text-gray-400">
+                                                        {patrocinador.nome}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </a>
+                                    ))
+                                ) : (
+                                    <p className="w-full text-center text-gray-500 italic">
+                                        Estamos em busca de parceiros incríveis para fazer parte do nosso time de apoiadores! Se você têm interesse em colaborar, entre em contato conosco!!
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
 
                     {/* Elementos decorativos sutis */}
-                    <div className="mt-10 flex justify-center gap-3">
+                    <div className="mt-6 flex justify-center gap-3">
                         {[
                             ['💙', 'blue-400'],
                             ['💜', 'purple-400'],
@@ -193,7 +196,7 @@ const Home: React.FC = () => {
                         ].map(([emoji, color], index) => (
                             <div
                                 key={index}
-                                className={`h-8 w-8 rounded-full bg-${color} bg-opacity-20 flex animate-bounce items-center justify-center text-sm`}
+                                className={`h-8 w-8 rounded-full bg-${color} flex animate-bounce items-center justify-center bg-opacity-20 text-sm`}
                                 style={{ animationDelay: `${index * 0.3}s` }}
                             >
                                 {emoji}
@@ -207,8 +210,7 @@ const Home: React.FC = () => {
             <section className="bg-[#ECFFF0] py-16">
                 <div className="mx-auto max-w-6xl px-6">
                     <div className="flex flex-col items-center gap-12 md:flex-row">
-                        {/* Imagem do lado esquerdo */}
-                        <div className="flex-1 flex justify-center">
+                        <div className="flex flex-1 justify-center">
                             <img
                                 src="./assets/images/como-apoiar.png"
                                 alt="Palhaça"
@@ -216,13 +218,11 @@ const Home: React.FC = () => {
                             />
                         </div>
 
-                        {/* Conteúdo do lado direito */}
                         <div className="flex-1 text-center md:text-left">
                             <h2 className="text-3xl font-extrabold text-gray-800 md:text-4xl">
                                 Como <span className="text-green-600">apoiar ?</span>
                             </h2>
 
-                            {/* Informações */}
                             <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
                                 <div className="rounded-xl bg-white p-6 shadow-sm">
                                     <span className="block text-3xl font-bold text-green-600">+95</span>
@@ -240,10 +240,9 @@ const Home: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Botão */}
                             <div className="mt-8">
                                 <Link href={doacoes.index()}>
-                                    <button className="rounded-full bg-gradient-to-r from-green-400 to-green-600 px-8 py-3 text-white font-semibold shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
+                                    <button className="rounded-full bg-gradient-to-r from-green-400 to-green-600 px-8 py-3 font-semibold text-white shadow-md transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
                                         Saiba mais
                                     </button>
                                 </Link>
@@ -254,25 +253,23 @@ const Home: React.FC = () => {
             </section>
 
             {/* Conheça */}
-            <section id="conheca" className="py-20 border-b border-gray-100">
-                <div className="max-w-6xl mx-auto px-4">
-                    <div className="flex flex-col md:flex-row items-center gap-12">
-                        {/* Imagem */}
+            <section id="conheca" className="border-b border-gray-100 py-20">
+                <div className="mx-auto max-w-6xl px-4">
+                    <div className="flex flex-col items-center gap-12 md:flex-row">
                         <div className="w-full md:w-1/2">
                             <img
-                                className="w-full h-auto rounded-2xl shadow-md"
+                                className="h-auto w-full rounded-2xl shadow-md"
                                 src="./assets/images/conheca-palhacos.png"
                                 alt="Imagem dos Doutores"
                             />
                         </div>
 
-                        {/* Texto */}
                         <div className="w-full md:w-1/2">
-                            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight mb-6">
+                            <h2 className="mb-6 text-4xl font-bold leading-tight text-gray-800 md:text-5xl">
                                 CONHEÇA <br /> NOSSOS <br /> DOUTORES
                             </h2>
 
-                            <p className="text-lg text-gray-700 leading-relaxed">
+                            <p className="text-lg leading-relaxed text-gray-700">
                                 Nossos doutores besteirologistas são pessoas comuns,
                                 das mais diferentes áreas de formação, que atuam na
                                 sociedade como estudantes, profissionais e
@@ -281,9 +278,7 @@ const Home: React.FC = () => {
                             </p>
 
                             <Link href={conheca.index()}>
-                                <button
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 mt-6 rounded-[15px] transition-colors duration-300"
-                                >
+                                <button className="mt-6 rounded-[15px] bg-blue-600 px-8 py-3 font-medium text-white transition-colors duration-300 hover:bg-blue-700">
                                     Saiba mais
                                 </button>
                             </Link>
@@ -293,13 +288,12 @@ const Home: React.FC = () => {
             </section>
 
             {/* Hospitais */}
-            <section id="hospitais" className="mx-auto mt-32 mb-20 max-w-6xl px-6">
+            <section id="hospitais" className="mx-auto mb-20 mt-32 max-w-6xl px-6">
                 <h2 className="mb-12 text-center text-3xl font-extrabold text-gray-900">
                     ONDE ATUAMOS
                 </h2>
 
                 <div className="grid gap-8 md:grid-cols-3">
-                    {/* Porto Alegre */}
                     <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
                         <img
                             src="./assets/images/porto-alegre.png"
@@ -308,7 +302,7 @@ const Home: React.FC = () => {
                         />
                         <Link
                             href={onde_atuamos.index()}
-                            className="flex items-center justify-between bg-white px-6 py-4"
+                            className="group flex items-center justify-between bg-white px-6 py-4"
                         >
                             <p className="text-lg font-semibold text-gray-800">Porto Alegre</p>
                             <span className="text-2xl text-pink-500 transition-transform duration-200 group-hover:translate-x-1">
@@ -317,7 +311,6 @@ const Home: React.FC = () => {
                         </Link>
                     </div>
 
-                    {/* Santa Maria */}
                     <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
                         <img
                             src="./assets/images/santa-maria.png"
@@ -326,14 +319,13 @@ const Home: React.FC = () => {
                         />
                         <Link
                             href={onde_atuamos.index()}
-                            className="flex items-center justify-between bg-white px-6 py-4"
+                            className="group flex items-center justify-between bg-white px-6 py-4"
                         >
                             <p className="text-lg font-semibold text-gray-800">Santa Maria</p>
-                            <span className="text-2xl text-pink-500">&gt;</span>
+                            <span className="text-2xl text-pink-500 transition-transform duration-200 group-hover:translate-x-1">&gt;</span>
                         </Link>
                     </div>
 
-                    {/* Pelotas */}
                     <div className="overflow-hidden rounded-2xl shadow-md transition-transform duration-300 hover:scale-105">
                         <img
                             src="./assets/images/pelotas.png"
@@ -342,10 +334,10 @@ const Home: React.FC = () => {
                         />
                         <Link
                             href={onde_atuamos.index()}
-                            className="flex items-center justify-between bg-white px-6 py-4"
+                            className="group flex items-center justify-between bg-white px-6 py-4"
                         >
                             <p className="text-lg font-semibold text-gray-800">Pelotas</p>
-                            <span className="text-2xl text-pink-500">&gt;</span>
+                            <span className="text-2xl text-pink-500 transition-transform duration-200 group-hover:translate-x-1">&gt;</span>
                         </Link>
                     </div>
                 </div>
@@ -353,8 +345,7 @@ const Home: React.FC = () => {
 
             {/* Nossa História */}
             <section id="nossa-historia" className="mt-44 flex flex-col items-center justify-center overflow-hidden bg-white px-6 py-20 md:flex-row md:justify-between">
-                {/* Imagem esquerda */}
-                <div className="flex-1 flex justify-start mb-12 md:mb-0">
+                <div className="mb-12 flex flex-1 justify-start md:mb-0">
                     <img
                         src="./assets/images/noosa-historia-esquerda.png"
                         alt="Nossa história"
@@ -362,8 +353,7 @@ const Home: React.FC = () => {
                     />
                 </div>
 
-                {/* Texto central */}
-                <div className="flex-1 flex flex-col items-center text-center px-4">
+                <div className="flex flex-1 flex-col items-center px-4 text-center">
                     <h3 className="mb-8 text-3xl font-extrabold text-gray-900 md:text-4xl">
                         NOSSA HISTÓRIA
                     </h3>
@@ -377,8 +367,7 @@ const Home: React.FC = () => {
                     </Link>
                 </div>
 
-                {/* Imagem direita */}
-                <div className="flex-1 flex justify-end mt-12 md:mt-0">
+                <div className="mt-12 flex flex-1 justify-end md:mt-0">
                     <img
                         src="./assets/images/nossa-historia-direita.png"
                         alt="Nossa história"
@@ -386,7 +375,6 @@ const Home: React.FC = () => {
                     />
                 </div>
             </section>
-
 
             {/* Fale Conosco */}
             <section
@@ -397,100 +385,39 @@ const Home: React.FC = () => {
                     <div className="w-full max-w-4xl">
                         <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl">
                             <div className="flex flex-col lg:flex-row">
-                                {/* Formulário */}
                                 <div className="flex-1 p-8 md:p-12">
                                     <h2 className="mb-8 text-3xl font-extrabold text-gray-900 md:text-4xl">
                                         Fale Conosco
                                     </h2>
 
                                     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-                                        {/* Nome */}
                                         <div>
-                                            <label
-                                                htmlFor="nome"
-                                                className="mb-2 block text-sm font-medium text-gray-700"
-                                            >
-                                                Nome
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="nome"
-                                                name="nome"
-                                                required
-                                                placeholder="Digite seu nome"
-                                                value={formData.nome}
-                                                onChange={handleChange}
-                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            />
+                                            <label htmlFor="nome" className="mb-2 block text-sm font-medium text-gray-700">Nome</label>
+                                            <input type="text" id="nome" name="nome" required placeholder="Digite seu nome" value={formData.nome} onChange={handleChange} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                         </div>
 
-                                        {/* Email */}
                                         <div>
-                                            <label
-                                                htmlFor="email"
-                                                className="mb-2 block text-sm font-medium text-gray-700"
-                                            >
-                                                Email
-                                            </label>
-                                            <input
-                                                type="email"
-                                                id="email"
-                                                name="email"
-                                                required
-                                                placeholder="Digite seu email"
-                                                value={formData.email}
-                                                onChange={handleChange}
-                                                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            />
+                                            <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">Email</label>
+                                            <input type="email" id="email" name="email" required placeholder="Digite seu email" value={formData.email} onChange={handleChange} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                         </div>
 
-                                        {/* Mensagem */}
                                         <div>
-                                            <label
-                                                htmlFor="mensagem"
-                                                className="mb-2 block text-sm font-medium text-gray-700"
-                                            >
-                                                Mensagem
-                                            </label>
-                                            <textarea
-                                                id="mensagem"
-                                                name="mensagem"
-                                                rows={5}
-                                                required
-                                                placeholder="Digite sua mensagem"
-                                                value={formData.mensagem}
-                                                onChange={handleChange}
-                                                className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                            />
+                                            <label htmlFor="mensagem" className="mb-2 block text-sm font-medium text-gray-700">Mensagem</label>
+                                            <textarea id="mensagem" name="mensagem" rows={5} required placeholder="Digite sua mensagem" value={formData.mensagem} onChange={handleChange} className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500" />
                                         </div>
 
-                                        {/* Botão */}
-                                        <button
-                                            type="button"
-                                            onClick={handleSubmit}
-                                            className="w-full transform rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-4 font-semibold text-white shadow-md transition hover:scale-105 hover:shadow-lg"
-                                        >
+                                        <button type="button" onClick={handleSubmit} className="w-full transform rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-4 font-semibold text-white shadow-md transition hover:scale-105 hover:shadow-lg">
                                             Enviar Mensagem
                                         </button>
                                     </form>
                                 </div>
 
-                                {/* Imagem lateral */}
                                 <div className="hidden flex-1 items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100 p-8 lg:flex">
                                     <div className="relative">
                                         <div className="absolute -inset-6 rounded-2xl bg-gradient-to-r from-blue-200 to-purple-200 opacity-40 blur-lg"></div>
-                                        <img
-                                            src="/assets/images/conheca_2.png"
-                                            alt="Ilustração de contato"
-                                            className="relative rounded-2xl shadow-xl"
-                                        />
-
-                                        {/* Elementos decorativos */}
-                                        <div className="absolute -top-4 -right-4 h-8 w-8 animate-pulse rounded-full bg-yellow-300 opacity-70"></div>
-                                        <div
-                                            className="absolute -bottom-4 -left-4 h-6 w-6 animate-bounce rounded-full bg-pink-300 opacity-70"
-                                            style={{ animationDelay: '1s' }}
-                                        ></div>
+                                        <img src="/assets/images/conheca_2.png" alt="Ilustração de contato" className="relative rounded-2xl shadow-xl" />
+                                        <div className="absolute -right-4 -top-4 h-8 w-8 animate-pulse rounded-full bg-yellow-300 opacity-70"></div>
+                                        <div className="absolute -bottom-4 -left-4 h-6 w-6 animate-bounce rounded-full bg-pink-300 opacity-70" style={{ animationDelay: '1s' }}></div>
                                     </div>
                                 </div>
                             </div>
@@ -498,7 +425,6 @@ const Home: React.FC = () => {
                     </div>
                 </div>
             </section>
-
         </AppLayout>
     );
 };
