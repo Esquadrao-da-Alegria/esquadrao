@@ -49,7 +49,7 @@ export interface User {
 export interface Cargo {
     id: number;
     nome: string;
-    slug: string;
+    slug: 'administrador' | 'diretor' | 'coordenador_geral' | 'coordenador_local' | 'artista' | 'psicologia' | 'apoio' | 'voluntario';
     created_at?: string;
     updated_at?: string;
 }
