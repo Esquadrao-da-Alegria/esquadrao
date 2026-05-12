@@ -48,6 +48,8 @@ class User extends Authenticatable
         ];
     }
 
+    protected $with = ['cargos'];
+
     /**
      * Cargos deste voluntário (usuário).
      */
