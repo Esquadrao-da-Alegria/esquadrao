@@ -2,6 +2,7 @@ import MarketingLayout from '@/layouts/MarketingLayout'
 import { toast } from 'react-toastify'
 import React from 'react'
 import { useForm } from '@inertiajs/react'
+import { useImageCompressor } from '@/hooks/use-image-compressor'
 
 interface CamposFormulario {
   nome: string
@@ -22,6 +23,8 @@ const Create: React.FC = () => {
     ordem_exibicao: 1,
   })
 
+  const { processImage, isCompressing } = useImageCompressor()
+
   const handleDataChange = (campo: keyof CamposFormulario, valor: any) => {
     setData((prevData) => ({
       ...prevData,
@@ -29,9 +32,16 @@ const Create: React.FC = () => {
     }))
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null
-    handleDataChange('logotipo', file)
+    
+    if (!file) {
+      handleDataChange('logotipo', null)
+      return
+    }
+
+    const compressedFile = await processImage(file)
+    handleDataChange('logotipo', compressedFile)
   }
 
   const handleSubmit = async () => {
@@ -170,10 +180,10 @@ const Create: React.FC = () => {
                     {/* Botão Salvar */}
                     <button
                       type="submit"
-                      disabled={processing}
+                      disabled={processing || isCompressing}
                       className="w-full rounded-full bg-gradient-to-r from-pink-500 to-blue-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-70"
                     >
-                      {processing ? 'Salvando...' : 'Salvar Patrocinador'}
+                      {isCompressing ? 'Otimizando imagem...' : processing ? 'Salvando...' : 'Salvar Patrocinador'}
                     </button>
                   </form>
                 </div>
