@@ -36,23 +36,17 @@ Route::get('/fale-conosco', function () {
     return Inertia::render('FaleConosco/Index');
 })->name('fale_conosco.index');
 
-// Hospitais
-Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
-
-// patrocinadores
-Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
-
-// Listas JSON
-ROUTE::prefix('json')->name('json.')->group(function () {
-
-    Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
-});
-
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    // Listas JSON
+    ROUTE::prefix('json')->name('json.')->group(function () {
+
+        Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
+    });
 
     // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
@@ -61,8 +55,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('/voluntarios', VoluntarioController::class)
             ->parameters(['voluntarios' => 'voluntario'])
             ->except(['show']);
+
+        // Hospitais
+        Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
+
+        // patrocinadores
+        Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
     });
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
