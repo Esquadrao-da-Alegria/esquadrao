@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -45,5 +46,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected $with = ['cargos'];
+
+    /**
+     * Cargos deste voluntário (usuário).
+     */
+    public function cargos(): BelongsToMany
+    {
+        return $this->belongsToMany(Cargo::class, 'voluntario_cargo', 'voluntario_id', 'cargo_id')
+            ->withTimestamps();
+    }
+
+    public function temCargo(string $slug): bool
+    {
+        return $this->cargos()->where('slug', $slug)->exists();
     }
 }

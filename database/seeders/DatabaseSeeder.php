@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             [
                 EstadoSeeder::class,
                 CidadeSeeder::class,
+                CargoSeeder::class,
+                UserSeeder::class,
                 HospitalSeeder::class,
             ]
         );

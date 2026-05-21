@@ -27,6 +27,7 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    eh_administrador?: boolean;
     mensagem_sucesso?: string | null;
     mensagem_erro?: string | null;
     [key: string]: unknown;
@@ -41,7 +42,16 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
+    cargos?: Cargo[];
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Cargo {
+    id: number;
+    nome: string;
+    slug: 'administrador' | 'diretor' | 'coordenador_geral' | 'coordenador_local' | 'artista' | 'psicologia' | 'apoio' | 'voluntario';
+    created_at?: string;
+    updated_at?: string;
 }
 
 // RECURSOS
