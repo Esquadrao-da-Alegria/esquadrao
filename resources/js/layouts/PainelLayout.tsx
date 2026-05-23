@@ -16,6 +16,7 @@ import { toastErro, toastSucesso } from '@/lib/utils/toast'
 import { edit } from '@/routes/profile'
 import { index } from '@/routes/hospitais'
 import { index as voluntariosIndex } from '@/routes/voluntarios'
+import { index as patrocinadoresIndex } from '@/routes/patrocinadores'
 import { useEffect, useState } from 'react'
 import { dashboard, home, login, logout } from '@/routes'
 
@@ -55,6 +56,11 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const isVoluntariosNav =
         pathname === '/voluntarios' ||
         /^\/voluntarios\/[^/]+\/edit$/.test(pathname)
+
+    const isPatrocinadoresCreate = pathname === '/patrocinadores/create'
+    const isPatrocinadoresNav =
+        pathname === '/patrocinadores' ||
+        /^\/patrocinadores\/[^/]+\/edit$/.test(pathname)
 
     const handleLogout = () => {
         router.post(logout.url())
@@ -123,6 +129,18 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 >
                                     <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
                                     Voluntários
+                                </Link>
+                            ) : null}
+                            {ehAdministrador ? (
+                                <Link
+                                    href={patrocinadoresIndex()}
+                                    className={`${navLinkClass} ${navLinkActive(
+                                        isPatrocinadoresNav && !isPatrocinadoresCreate,
+                                    )} flex items-center gap-2`}
+                                    onClick={closeMobile}
+                                >
+                                    <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
+                                    Patrocinadores
                                 </Link>
                             ) : null}
                         </div>
