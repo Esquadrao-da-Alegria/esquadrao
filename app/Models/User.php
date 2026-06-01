@@ -14,6 +14,10 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
+    public const STATUS_ATIVO = 'ativo';
+    public const STATUS_CONVITE_ENVIADO = 'convite_enviado';
+    public const STATUS_INATIVO = 'inativo';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,6 +27,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'status',
+        'convite_enviado_em',
+        'convite_expira_em',
+        'inativado_em',
     ];
 
     /**
@@ -45,6 +53,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'convite_enviado_em' => 'datetime',
+            'convite_expira_em' => 'datetime',
+            'inativado_em' => 'datetime',
         ];
     }
 
