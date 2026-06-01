@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\Voluntario\StoreConviteRequest;
 use App\Http\Requests\Web\Voluntario\StoreRequest;
 use App\Http\Requests\Web\Voluntario\UpdateRequest;
 use App\Models\User;
@@ -29,7 +30,15 @@ class VoluntarioController extends Controller
 
         $retorno = $this->service->index($filtrosBusca);
 
-        $dadosView = ['voluntarios' => $retorno['dados']];
+        $dadosView = [
+            'voluntarios' => $retorno['dados'],
+            'contadores' => $retorno['contadores'] ?? [],
+            'filtros' => [
+                'aba' => $request->string('aba', 'voluntarios')->toString(),
+                'busca' => $request->string('busca')->toString(),
+                'status' => $request->string('status', 'todos')->toString(),
+            ],
+        ];
 
         return Inertia::render('Voluntario/Index', $dadosView);
     }
@@ -46,6 +55,13 @@ class VoluntarioController extends Controller
         $this->service->store($request->validated());
 
         return redirect()->route('voluntarios.index');
+    }
+
+    public function storeConvite(StoreConviteRequest $request)
+    {
+        $this->service->storeConvite($request->validated());
+
+        return redirect()->route('voluntarios.index', ['aba' => 'convidados']);
     }
 
     public function edit(Request $request, User $voluntario)
@@ -72,6 +88,20 @@ class VoluntarioController extends Controller
 
         $this->service->destroy($voluntario->id);
 
-        return redirect()->route('voluntarios.index');
+        return redirect()->route('voluntarios.index', ['aba' => 'voluntarios']);
+    }
+
+    public function reenviarConvite(User $voluntario)
+    {
+        $this->service->reenviarConvite($voluntario);
+
+        return redirect()->route('voluntarios.index', ['aba' => 'convidados']);
+    }
+
+    public function cancelarConvite(User $voluntario)
+    {
+        $this->service->cancelarConvite($voluntario);
+
+        return redirect()->route('voluntarios.index', ['aba' => 'convidados']);
     }
 }

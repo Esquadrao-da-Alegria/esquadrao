@@ -45,13 +45,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Listas JSON
     ROUTE::prefix('json')->name('json.')->group(function () {
 
-        Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
+        Route::get('cidades', [CidadeController::class, 'index'])->name('cidades.index');
     });
 
     // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
 
         // VOLUNTARIOS
+        Route::post('/voluntarios/convite', [VoluntarioController::class, 'storeConvite'])
+            ->name('voluntarios.convite.store');
+
+        Route::post('/voluntarios/{voluntario}/reenviar-convite', [VoluntarioController::class, 'reenviarConvite'])
+            ->name('voluntarios.convite.reenviar');
+
+        Route::delete('/voluntarios/{voluntario}/convite', [VoluntarioController::class, 'cancelarConvite'])
+            ->name('voluntarios.convite.cancelar');
+
         Route::resource('/voluntarios', VoluntarioController::class)
             ->parameters(['voluntarios' => 'voluntario'])
             ->except(['show']);
