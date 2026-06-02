@@ -1,182 +1,132 @@
-import MarketingLayout from '@/layouts/MarketingLayout'
-import { Pencil } from 'lucide-react'
+import PainelLayout from '@/layouts/PainelLayout'
+import { create, edit } from '@/routes/patrocinadores'
 import { Link, router } from '@inertiajs/react'
+import { Handshake, Pencil, Plus } from 'lucide-react'
 import React from 'react'
 
 interface Patrocinador {
-  id?: string
-  nome: string
-  site?: string
-  categoria?: string
-  logo_path?: string
-  ativo: boolean
-  ordem_exibicao: number
+    id?: string
+    nome: string
+    site?: string
+    categoria?: string
+    logo_path?: string
+    ativo: boolean
+    ordem_exibicao: number
 }
 
 interface Props {
-  patrocinadores: Patrocinador[]
+    patrocinadores: Patrocinador[]
 }
 
 const Index: React.FC<Props> = ({ patrocinadores }) => {
-  const handleCriarClick = () => {
-    router.visit('/patrocinadores/create')
-  }
+    const handleCriarClick = () => {
+        router.visit(create.url())
+    }
 
-  const handleEditarClick = (patrocinador: Patrocinador) => {
-    router.visit(`/patrocinadores/${patrocinador.id}/edit`)
-  }
-
-  return (
-    <MarketingLayout>
-      <div className="mx-auto max-w-6xl p-6">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-3xl font-extrabold text-transparent">
-            Patrocinadores Cadastrados
-          </h1>
-
-          <button
-            onClick={handleCriarClick}
-            type="button"
-            className="rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 px-6 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
-          >
-            Novo
-          </button>
-        </div>
-
-        {/* Tabela responsiva */}
-        <div className="mt-6 overflow-hidden rounded-2xl shadow-md ring-1 ring-gray-200">
-          <table className="hidden min-w-full divide-y divide-gray-200 bg-white md:table">
-            <thead className="bg-gradient-to-r from-pink-500 to-blue-500 text-white">
-              <tr>
-                <th className="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider w-20">
-                  Ordem
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-                  Logotipo
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-                  Nome
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-                  Categoria
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-center text-sm font-semibold uppercase tracking-wider">
-                  Editar
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {patrocinadores.map((patrocinador) => (
-                <tr key={patrocinador.id} className="transition hover:bg-gray-50">
-                  <td className="px-6 py-4 text-center text-sm font-bold text-gray-500">
-                    {patrocinador.ordem_exibicao}
-                  </td>
-                  <td className="px-6 py-4">
-                    {patrocinador.logo_path ? (
-                      <img
-                        src={patrocinador.logo_path}
-                        alt={patrocinador.nome}
-                        className="h-14 w-14 rounded-full object-cover shadow-sm ring-2 ring-pink-200"
-                      />
-                    ) : (
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-pink-100 text-2xl shadow-sm ring-2 ring-pink-200">
-                        🤝
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {patrocinador.nome}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
-                    {patrocinador.categoria || '-'}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                        patrocinador.ativo
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {patrocinador.ativo ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <button
-                      onClick={() => handleEditarClick(patrocinador)}
-                      type="button"
-                      className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
-                      aria-label="Editar patrocinador"
-                    >
-                      <Pencil size={16} strokeWidth={1.5} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              
-              {patrocinadores.length === 0 && (
-                <tr>
-                    <td colSpan={6} className="py-8 text-center text-gray-500">
-                        Nenhum patrocinador cadastrado.
-                    </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-
-          {/* Versão mobile (cards) */}
-          <div className="space-y-4 bg-white p-4 md:hidden">
-            {patrocinadores.map((patrocinador) => (
-              <div
-                key={patrocinador.id}
-                className="relative flex flex-col rounded-2xl border border-gray-100 bg-gradient-to-br from-pink-50 via-white to-blue-50 p-4 shadow-sm"
-              >
-                <div className="absolute top-4 right-4 text-xs font-bold text-gray-400">
-                  Ordem: {patrocinador.ordem_exibicao}
-                </div>
-                <div className="flex items-center gap-4">
-                  {patrocinador.logo_path ? (
-                    <img
-                      src={patrocinador.logo_path}
-                      alt={patrocinador.nome}
-                      className="h-14 w-14 rounded-full object-cover ring-2 ring-pink-200"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-pink-100 text-2xl shadow-sm ring-2 ring-pink-200">
-                      🤝
+    return (
+        <PainelLayout>
+            <div className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
+                <header className="mb-10 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold tracking-tight text-amber-950 sm:text-3xl">
+                            Patrocinadores
+                        </h1>
+                        <p className="mt-1 max-w-md text-sm text-amber-900/55">
+                            {patrocinadores.length === 0
+                                ? 'Cadastre o primeiro patrocinador exibido no site.'
+                                : `${patrocinadores.length} ${patrocinadores.length === 1 ? 'cadastro' : 'cadastros'}`}
+                        </p>
                     </div>
-                  )}
-                  <div className="flex-1 pr-12">
-                    <h2 className="font-semibold text-gray-800">{patrocinador.nome}</h2>
-                    <p className="text-sm text-gray-600">{patrocinador.categoria}</p>
-                  </div>
-                  <Link
-                    href={`/patrocinadores/${patrocinador.id}/edit`}
-                    className="rounded-md p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
-                    aria-label="Editar patrocinador"
-                  >
-                    <Pencil size={16} strokeWidth={1.5} />
-                  </Link>
-                </div>
-                <div className="mt-3">
-                  <span
-                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                      patrocinador.ativo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}
-                  >
-                    {patrocinador.ativo ? 'Ativo' : 'Inativo'}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </MarketingLayout>
-  )
+                    <button
+                        onClick={handleCriarClick}
+                        type="button"
+                        className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 sm:w-auto"
+                    >
+                        <Plus className="size-5" strokeWidth={2} aria-hidden />
+                        Novo patrocinador
+                    </button>
+                </header>
+
+                {patrocinadores.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-amber-200 bg-white px-6 py-20 text-center">
+                        <p className="text-sm text-amber-900/50">
+                            Nenhum patrocinador cadastrado ainda.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={handleCriarClick}
+                            className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-amber-600 bg-white px-5 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
+                        >
+                            <Plus className="size-4" aria-hidden />
+                            Adicionar patrocinador
+                        </button>
+                    </div>
+                ) : (
+                    <ul className="flex w-full flex-col gap-5">
+                        {patrocinadores.map((patrocinador) => (
+                            <li key={patrocinador.id} className="w-full">
+                                <article className="w-full overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition duration-300 hover:border-amber-200 hover:shadow-md">
+                                    <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+                                        <div className="shrink-0">
+                                            {patrocinador.logo_path ? (
+                                                <img
+                                                    src={patrocinador.logo_path}
+                                                    alt={patrocinador.nome}
+                                                    className="size-[4.5rem] rounded-2xl object-cover ring-1 ring-amber-100"
+                                                />
+                                            ) : (
+                                                <div className="flex size-[4.5rem] items-center justify-center rounded-2xl bg-amber-100 ring-1 ring-amber-100">
+                                                    <Handshake
+                                                        className="size-9 text-amber-800/80"
+                                                        strokeWidth={1.5}
+                                                        aria-hidden
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <h2 className="text-base font-semibold leading-snug text-amber-950 sm:text-lg">
+                                                {patrocinador.nome}
+                                            </h2>
+                                            {patrocinador.categoria ? (
+                                                <p className="mt-1 text-sm text-amber-900/55">
+                                                    {patrocinador.categoria}
+                                                </p>
+                                            ) : null}
+                                            <div className="mt-3 flex flex-wrap gap-1.5">
+                                                <span className="inline-flex items-center rounded-full border border-amber-200/80 bg-amber-50/80 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-amber-900">
+                                                    Ordem {patrocinador.ordem_exibicao}
+                                                </span>
+                                                <span
+                                                    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide ${
+                                                        patrocinador.ativo
+                                                            ? 'border-amber-200/80 bg-amber-50/80 text-amber-900'
+                                                            : 'border-amber-100 bg-white text-amber-900/45'
+                                                    }`}
+                                                >
+                                                    {patrocinador.ativo ? 'Ativo' : 'Inativo'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex shrink-0 items-center justify-end border-t border-amber-50 pt-4 sm:w-auto sm:border-t-0 sm:border-l sm:border-amber-50 sm:pl-6 sm:pt-0">
+                                            <Link
+                                                href={edit.url(patrocinador.id!)}
+                                                prefetch
+                                                className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                                                aria-label={`Editar ${patrocinador.nome}`}
+                                            >
+                                                <Pencil size={17} strokeWidth={1.75} />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </article>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </PainelLayout>
+    )
 }
 
 export default Index
