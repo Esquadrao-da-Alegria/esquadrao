@@ -1,14 +1,21 @@
 <?php
 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\HospitalController;
-use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\Json\CidadeController;
+use App\Http\Controllers\Web\OndeAtuamosController;
+use App\Http\Controllers\Web\PatrocinadorController;
+use App\Http\Controllers\Web\VoluntarioController;
+use App\Models\Patrocinador;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // HOME PAGE
 Route::get('/', function () {
-    return Inertia::render('Home');
+    return Inertia::render('Home', [
+        'patrocinadores' => Patrocinador::where('ativo', true)
+            ->orderBy('ordem_exibicao')
+            ->get(),
+    ]);
 })->name('home');
 
 // Hospitais
@@ -29,20 +36,32 @@ Route::get('/fale-conosco', function () {
     return Inertia::render('FaleConosco/Index');
 })->name('fale_conosco.index');
 
-// Hospitais
-Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
-
-// Listas JSON
-ROUTE::prefix('json')->name('json.')->group(function () {
-
-    Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
-});
-
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    // Listas JSON
+    ROUTE::prefix('json')->name('json.')->group(function () {
+
+        Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
+    });
+
+    // ADMINISTRADOR
+    Route::middleware(['administrador'])->group(function () {
+
+        // VOLUNTARIOS
+        Route::resource('/voluntarios', VoluntarioController::class)
+            ->parameters(['voluntarios' => 'voluntario'])
+            ->except(['show']);
+
+        // Hospitais
+        Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
+
+        // patrocinadores
+        Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
+    });
 });
 
 require __DIR__ . '/settings.php';

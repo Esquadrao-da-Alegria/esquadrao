@@ -7,22 +7,22 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::middleware('auth')->group(function () {
-    Route::redirect('settings', '/settings/profile');
+    Route::redirect('configuracoes', '/configuracoes/perfil');
 
-    Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('configuracoes/perfil', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('configuracoes/perfil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('configuracoes/perfil', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
+    Route::get('configuracoes/senha', [PasswordController::class, 'edit'])->name('password.edit');
 
-    Route::put('settings/password', [PasswordController::class, 'update'])
+    Route::put('configuracoes/senha', [PasswordController::class, 'update'])
         ->middleware('throttle:6,1')
         ->name('password.update');
 
-    Route::get('settings/appearance', function () {
-        return Inertia::render('settings/appearance');
+    Route::get('configuracoes/aparencia', function () {
+        return Inertia::render('Preferencias/Appearance');
     })->name('appearance.edit');
 
-    Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
+    Route::get('configuracoes/dois-fatores', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
 });

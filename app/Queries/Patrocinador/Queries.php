@@ -61,7 +61,7 @@ class Queries
         return $query;
     }
 
-    public function store(array $dados): int|null
+    public function store(array $dados): string|null
     {
         try {
 
@@ -69,7 +69,6 @@ class Queries
 
             return $model->id;
         } catch (\Throwable $th) {
-
             return null;
         }
     }
