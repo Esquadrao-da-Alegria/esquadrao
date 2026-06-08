@@ -1,7 +1,9 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import PainelLayout from '@/layouts/PainelLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { HeartHandshake, LayoutDashboard, Sparkles } from 'lucide-react';
+import { index as hospitaisIndex } from '@/routes/hospitais';
+import { index as eventosIndex } from '@/routes/eventos';
 
 const placeholderCards = [
     {
@@ -57,6 +59,33 @@ export default function Dashboard() {
                             </span>
                         </div>
                     </div>
+                </section>
+
+                <section className="mt-8 grid gap-4 md:grid-cols-2">
+                    <Link
+                        href={hospitaisIndex()}
+                        className="rounded-3xl border border-gray-200 bg-white p-6 text-left shadow-sm transition hover:border-gray-300 hover:shadow-md"
+                    >
+                        <div className="mb-3 inline-flex rounded-2xl bg-amber-50 p-3 text-amber-700">
+                            <LayoutDashboard className="size-6" aria-hidden />
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-900">Hospitais</h2>
+                        <p className="mt-2 text-sm text-gray-600">
+                            Gerencie hospitais e suas informações no painel.
+                        </p>
+                    </Link>
+                    <Link
+                        href={eventosIndex()}
+                        className="rounded-3xl border border-gray-200 bg-white p-6 text-left shadow-sm transition hover:border-gray-300 hover:shadow-md"
+                    >
+                        <div className="mb-3 inline-flex rounded-2xl bg-amber-50 p-3 text-amber-700">
+                            <Sparkles className="size-6" aria-hidden />
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-900">Eventos</h2>
+                        <p className="mt-2 text-sm text-gray-600">
+                            Acesse os eventos e cadastre novas ações diretamente.
+                        </p>
+                    </Link>
                 </section>
 
                 <div className="mt-8 grid gap-4 md:grid-cols-3">

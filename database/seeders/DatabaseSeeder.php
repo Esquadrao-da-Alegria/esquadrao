@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
                 UserSeeder::class,
                 HospitalSeeder::class,
                 PatrocinadorSeeder::class,
+                EventoSeeder::class,
             ]
         );
     }

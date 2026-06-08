@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 // ROTAS
 import { edit } from '@/routes/profile'
 import { index } from '@/routes/hospitais'
+import { index as eventosIndex } from '@/routes/eventos'
 import { index as voluntariosIndex } from '@/routes/voluntarios'
 import { index as patrocinadoresIndex } from '@/routes/patrocinadores'
 import { useEffect, useState } from 'react'
@@ -28,7 +29,7 @@ import {
     ChevronDown,
     Handshake,
     LayoutGrid,
-    LogOut,
+    LogOut, Sparkles,
     User,
     UsersRound,
     type LucideIcon,

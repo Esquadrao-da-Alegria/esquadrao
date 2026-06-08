@@ -1,0 +1,15 @@
+{
+  "version": "0.9.1",
+  "integration_state_schema": 1,
+  "installed_integrations": [
+    "windsurf"
+  ],
+  "integration_settings": {
+    "windsurf": {
+      "script": "sh",
+      "invoke_separator": "."
+    }
+  },
+  "integration": "windsurf",
+  "default_integration": "windsurf"
+}
