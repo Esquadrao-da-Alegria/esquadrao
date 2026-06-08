@@ -1,0 +1,8 @@
+{
+  "ai": "windsurf",
+  "branch_numbering": "sequential",
+  "here": false,
+  "integration": "windsurf",
+  "script": "sh",
+  "speckit_version": "0.9.1"
+}

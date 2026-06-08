@@ -15,13 +15,14 @@ import { toastErro, toastSucesso } from '@/lib/utils/toast'
 // ROTAS
 import { edit } from '@/routes/profile'
 import { index } from '@/routes/hospitais'
+import { index as eventosIndex } from '@/routes/eventos'
 import { index as voluntariosIndex } from '@/routes/voluntarios'
 import { useEffect, useState } from 'react'
 import { dashboard, home, login, logout } from '@/routes'
 
 // TIPOS
 import { type SharedData } from '@/types'
-import { Building2, ChevronDown, LayoutGrid, LogOut, User, UsersRound } from 'lucide-react'
+import { Building2, ChevronDown, LayoutGrid, LogOut, Sparkles, User, UsersRound } from 'lucide-react'
 
 interface Props {
     children: React.ReactNode
@@ -112,6 +113,16 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                             >
                                 <Building2 className="size-4 shrink-0 opacity-70" aria-hidden />
                                 Hospitais
+                            </Link>
+                            <Link
+                                href={eventosIndex()}
+                                className={`${navLinkClass} ${navLinkActive(
+                                    pathname === '/eventos' || /^\/eventos\/[0-9]+\/edit$/.test(pathname),
+                                )} flex items-center gap-2`}
+                                onClick={closeMobile}
+                            >
+                                <Sparkles className="size-4 shrink-0 opacity-70" aria-hidden />
+                                Eventos
                             </Link>
                             {ehAdministrador ? (
                                 <Link

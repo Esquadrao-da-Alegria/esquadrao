@@ -5,6 +5,7 @@ use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
 use App\Http\Controllers\Web\VoluntarioController;
+use App\Http\Controllers\Web\EventoController;
 use App\Models\Patrocinador;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -47,6 +48,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
     });
+
+    // Eventos acessíveis para qualquer usuário autenticado
+    Route::resource('/eventos', EventoController::class)->parameters(['eventos' => 'evento']);
 
     // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
