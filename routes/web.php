@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\HospitalController;
+use App\Http\Controllers\Web\ConviteCadastroController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -35,6 +36,12 @@ Route::get('/doacoes', function () {
 Route::get('/fale-conosco', function () {
     return Inertia::render('FaleConosco/Index');
 })->name('fale_conosco.index');
+
+Route::get('/convites/{token}', [ConviteCadastroController::class, 'show'])
+    ->name('convites.show');
+
+Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'concluir'])
+    ->name('convites.concluir');
 
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {

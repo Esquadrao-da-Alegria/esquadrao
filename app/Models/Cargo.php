@@ -15,7 +15,7 @@ class Cargo extends Model
     ];
 
     /**
-     * Voluntários (users) com este cargo.
+     * Usuários do sistema com este cargo.
      */
     public function voluntarios(): BelongsToMany
     {

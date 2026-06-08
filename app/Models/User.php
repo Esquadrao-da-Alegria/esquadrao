@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,6 +25,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'voluntario_id',
         'name',
         'email',
         'password',
@@ -61,8 +63,13 @@ class User extends Authenticatable
 
     protected $with = ['cargos'];
 
+    public function voluntario(): BelongsTo
+    {
+        return $this->belongsTo(Voluntario::class);
+    }
+
     /**
-     * Cargos deste voluntário (usuário).
+     * Cargos deste usuário do sistema.
      */
     public function cargos(): BelongsToMany
     {

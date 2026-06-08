@@ -3,6 +3,8 @@
 namespace App\Queries\Voluntario;
 
 use App\Models\User;
+use App\Models\ConviteCadastro;
+use App\Models\Voluntario;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -18,7 +20,7 @@ class Queries
             $this->aplicarFiltros($query, $filtros);
             $this->aplicarFiltroAba($query, $filtros['aba'] ?? 'voluntarios');
 
-            $query->orderBy('name');
+            $query->orderBy('nome_completo');
 
             $dados = $retornarLista
                 ? $query
@@ -49,9 +51,8 @@ class Queries
 
     private function queryBase(): Builder
     {
-        return User::query()
-            ->with('cargos')
-            ->whereHas('cargos');
+        return Voluntario::query()
+            ->with(['user.cargos', 'conviteCadastroAtual', 'cidadeBase']);
     }
 
     private function aplicarFiltros(Builder $query, array $filtros): Builder
@@ -71,7 +72,7 @@ class Queries
 
                     $query->where(function (Builder $query) use ($valor) {
                         $query
-                            ->where('name', 'like', "%{$valor}%")
+                            ->where('nome_completo', 'like', "%{$valor}%")
                             ->orWhere('email', 'like', "%{$valor}%");
                     });
 
@@ -93,7 +94,7 @@ class Queries
 
                 case 'name':
 
-                    $query->where('name', 'like', "%{$valor}%");
+                    $query->where('nome_completo', 'like', "%{$valor}%");
 
                     break;
 
@@ -171,7 +172,7 @@ class Queries
             ->where(function (Builder $query) {
                 $query
                     ->where('status', User::STATUS_ATIVO)
-                    ->orWhereNotNull('email_verified_at');
+                    ->orWhereHas('user', fn (Builder $query) => $query->whereNotNull('email_verified_at'));
             })
             ->where(function (Builder $query) {
                 $query
@@ -195,8 +196,23 @@ class Queries
                     ->where('status', User::STATUS_CONVITE_ENVIADO)
                     ->where(function (Builder $query) {
                         $query
-                            ->whereNull('convite_expira_em')
-                            ->orWhere('convite_expira_em', '>=', now());
+                            ->whereHas('convitesCadastro', function (Builder $query) {
+                                $query
+                                    ->whereIn('status', [
+                                        ConviteCadastro::STATUS_PENDENTE,
+                                        ConviteCadastro::STATUS_ENVIADO,
+                                    ])
+                                    ->where(function (Builder $query) {
+                                        $query
+                                            ->whereNull('expira_em')
+                                            ->orWhere('expira_em', '>=', now());
+                                    });
+                            })
+                            ->orWhereHas('user', function (Builder $query) {
+                                $query
+                                    ->whereNull('convite_expira_em')
+                                    ->orWhere('convite_expira_em', '>=', now());
+                            });
                     });
 
                 break;
@@ -204,14 +220,30 @@ class Queries
             case 'convite_expirado':
                 $query
                     ->where('status', User::STATUS_CONVITE_ENVIADO)
-                    ->whereNotNull('convite_expira_em')
-                    ->where('convite_expira_em', '<', now());
+                    ->where(function (Builder $query) {
+                        $query
+                            ->whereHas('convitesCadastro', function (Builder $query) {
+                                $query
+                                    ->whereIn('status', [
+                                        ConviteCadastro::STATUS_PENDENTE,
+                                        ConviteCadastro::STATUS_ENVIADO,
+                                        ConviteCadastro::STATUS_EXPIRADO,
+                                    ])
+                                    ->whereNotNull('expira_em')
+                                    ->where('expira_em', '<', now());
+                            })
+                            ->orWhereHas('user', function (Builder $query) {
+                                $query
+                                    ->whereNotNull('convite_expira_em')
+                                    ->where('convite_expira_em', '<', now());
+                            });
+                    });
 
                 break;
 
             case 'cadastro_completo':
                 $query
-                    ->whereNotNull('email_verified_at')
+                    ->whereHas('user', fn (Builder $query) => $query->whereNotNull('email_verified_at'))
                     ->where('status', '!=', User::STATUS_INATIVO);
 
                 break;
@@ -225,7 +257,7 @@ class Queries
             default:
                 $query
                     ->where('status', User::STATUS_ATIVO)
-                    ->whereNull('email_verified_at');
+                    ->whereHas('user', fn (Builder $query) => $query->whereNull('email_verified_at'));
 
                 break;
         }
@@ -237,7 +269,7 @@ class Queries
     {
         try {
 
-            $model = User::create($dados);
+            $model = Voluntario::create($dados);
 
             $sucesso = $model && $model->id !== null;
 
@@ -260,7 +292,7 @@ class Queries
     {
         try {
 
-            $model = User::findOrFail($id);
+            $model = Voluntario::findOrFail($id);
 
             $model->update($dados);
 
@@ -285,11 +317,10 @@ class Queries
     {
         try {
 
-            $model = User::findOrFail($id);
+            $model = Voluntario::findOrFail($id);
 
             $sucesso = $model->update([
                 'status' => User::STATUS_INATIVO,
-                'inativado_em' => now(),
             ]);
 
             return [
@@ -311,7 +342,7 @@ class Queries
     {
         try {
 
-            $model = User::findOrFail($id);
+            $model = Voluntario::findOrFail($id);
 
             $sucesso = $model->delete();
 

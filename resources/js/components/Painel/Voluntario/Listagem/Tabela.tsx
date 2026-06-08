@@ -112,7 +112,7 @@ const Tabela: React.FC<Props> = ({
                                                 </span>
                                             ) : (
                                                 <span className="text-sm text-gray-500">
-                                                    {getCidade()}
+                                                    {getCidade(voluntario)}
                                                 </span>
                                             )}
                                         </td>

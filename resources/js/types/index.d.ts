@@ -30,6 +30,7 @@ export interface SharedData {
     eh_administrador?: boolean;
     mensagem_sucesso?: string | null;
     mensagem_erro?: string | null;
+    link_convite?: string | null;
     [key: string]: unknown;
 }
 
@@ -43,6 +44,8 @@ export interface User {
     convite_enviado_em?: string | null;
     convite_expira_em?: string | null;
     inativado_em?: string | null;
+    cidade_base_id?: number | null;
+    cidade_base?: Cidade | null;
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;

@@ -90,7 +90,14 @@ export const getEquipe = (voluntario: User) => {
     return cargos.length > 0 ? cargos.join(', ') : '-';
 };
 
-export const getCidade = () => '-';
+export const getCidade = (voluntario: User) => {
+    const cidadeBase = voluntario.cidade_base as
+        | { nome?: string | null }
+        | null
+        | undefined;
+
+    return cidadeBase?.nome ?? '-';
+};
 
 export const getStatusVoluntario = (voluntario: User) => {
     if (voluntario.status === 'inativo') {

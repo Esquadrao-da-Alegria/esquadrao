@@ -3,11 +3,15 @@
 namespace App\Services\Voluntario;
 
 use App\Models\Cargo;
+use App\Models\ConviteCadastro;
 use App\Models\User;
+use App\Models\Voluntario;
+use App\Notifications\ConviteCadastroNotification;
 use App\Queries\Voluntario\Queries;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class Service
@@ -44,10 +48,13 @@ class Service
 
             $cargoIds = array_values(array_unique(array_map('intval', $dados['cargo_ids'] ?? [])));
 
-            $dadosUsuario = Arr::only($dados, ['name', 'email', 'password']);
-            $dadosUsuario['status'] = User::STATUS_ATIVO;
+            $dadosVoluntario = [
+                'nome_completo' => $dados['name'],
+                'email' => $dados['email'],
+                'status' => User::STATUS_ATIVO,
+            ];
 
-            $retorno = $this->queries->store($dadosUsuario);
+            $retorno = $this->queries->store($dadosVoluntario);
 
             if (! $retorno['sucesso']) {
 
@@ -58,10 +65,18 @@ class Service
                 return $retorno;
             }
 
-            /** @var \App\Models\User $model */
+            /** @var \App\Models\Voluntario $model */
             $model = $retorno['dados']['model'];
 
-            $model->cargos()->sync($cargoIds);
+            $usuario = User::create([
+                'voluntario_id' => $model->id,
+                'name' => $dados['name'],
+                'email' => $dados['email'],
+                'password' => $dados['password'],
+                'status' => User::STATUS_ATIVO,
+            ]);
+
+            $usuario->cargos()->sync($cargoIds);
 
             session()->flash('mensagem_sucesso', 'Dados salvos com sucesso!');
 
@@ -90,13 +105,12 @@ class Service
 
             $cargoIds = array_values(array_unique(array_map('intval', $dados['cargo_ids'] ?? [])));
 
-            $dadosUsuario = Arr::only($dados, ['name', 'email']);
+            $dadosVoluntario = [
+                'nome_completo' => $dados['name'],
+                'email' => $dados['email'],
+            ];
 
-            if (! empty($dados['password'])) {
-                $dadosUsuario['password'] = $dados['password'];
-            }
-
-            $retorno = $this->queries->update((string) $id, $dadosUsuario);
+            $retorno = $this->queries->update((string) $id, $dadosVoluntario);
 
             if (! $retorno['sucesso']) {
 
@@ -107,10 +121,29 @@ class Service
                 return $retorno;
             }
 
-            /** @var \App\Models\User $model */
+            /** @var \App\Models\Voluntario $model */
             $model = $retorno['dados']['model'];
 
-            $model->cargos()->sync($cargoIds);
+            $dadosUsuario = Arr::only($dados, ['name', 'email']);
+
+            if (! empty($dados['password'])) {
+                $dadosUsuario['password'] = $dados['password'];
+            }
+
+            $usuario = $model->user;
+
+            if ($usuario) {
+                $usuario->update($dadosUsuario);
+            } else {
+                $usuario = User::create([
+                    ...$dadosUsuario,
+                    'voluntario_id' => $model->id,
+                    'password' => $dados['password'] ?? Str::password(32),
+                    'status' => $model->status,
+                ]);
+            }
+
+            $usuario->cargos()->sync($cargoIds);
 
             session()->flash('mensagem_sucesso', 'Dados salvos com sucesso!');
 
@@ -141,6 +174,13 @@ class Service
 
                 session()->flash('mensagem_erro', 'Erro ao excluir dados!');
             } else {
+                /** @var \App\Models\Voluntario|null $model */
+                $model = $retorno['dados']['model'] ?? null;
+
+                $model?->user?->update([
+                    'status' => User::STATUS_INATIVO,
+                    'inativado_em' => now(),
+                ]);
 
                 session()->flash('mensagem_sucesso', 'Voluntário inativado com sucesso!');
             }
@@ -167,12 +207,9 @@ class Service
                 ->firstOrFail();
 
             $retorno = $this->queries->store([
-                'name' => $dados['name'],
+                'nome_completo' => $dados['name'],
                 'email' => $dados['email'],
-                'password' => Str::password(32),
                 'status' => User::STATUS_CONVITE_ENVIADO,
-                'convite_enviado_em' => now(),
-                'convite_expira_em' => now()->addMinutes(config('auth.passwords.users.expire', 60)),
             ]);
 
             if (! $retorno['sucesso']) {
@@ -184,11 +221,21 @@ class Service
                 return $retorno;
             }
 
-            /** @var \App\Models\User $model */
+            /** @var \App\Models\Voluntario $model */
             $model = $retorno['dados']['model'];
 
-            $model->cargos()->sync([$cargoVoluntario->id]);
-            $this->enviarConvite($model);
+            $usuario = User::create([
+                'voluntario_id' => $model->id,
+                'name' => $dados['name'],
+                'email' => $dados['email'],
+                'password' => Str::password(32),
+                'status' => User::STATUS_CONVITE_ENVIADO,
+                'convite_enviado_em' => now(),
+                'convite_expira_em' => $this->calcularExpiracaoConvite(),
+            ]);
+
+            $usuario->cargos()->sync([$cargoVoluntario->id]);
+            $this->criarEnviarConviteCadastro($model, $dados['email']);
 
             session()->flash('mensagem_sucesso', 'Convite enviado com sucesso!');
 
@@ -196,6 +243,11 @@ class Service
 
             return $retorno;
         } catch (\Throwable $th) {
+
+            Log::error('Erro ao criar convite de voluntário.', [
+                'erro' => formatarMensagemErro($th),
+                'email' => $dados['email'] ?? null,
+            ]);
 
             session()->flash('mensagem_erro', 'Erro ao criar convite!');
 
@@ -209,11 +261,13 @@ class Service
         }
     }
 
-    public function reenviarConvite(User $voluntario): array
+    public function reenviarConvite(Voluntario $voluntario): array
     {
         try {
 
-            if (! in_array($voluntario->status, [null, User::STATUS_CONVITE_ENVIADO], true)) {
+            $usuario = $voluntario->user;
+
+            if (! $usuario || ! in_array($voluntario->status, [null, User::STATUS_CONVITE_ENVIADO], true)) {
 
                 session()->flash('mensagem_erro', 'Este voluntário não está pendente de convite.');
 
@@ -224,13 +278,21 @@ class Service
                 ];
             }
 
-            $this->enviarConvite($voluntario);
+            DB::beginTransaction();
+
+            $this->criarEnviarConviteCadastro($voluntario, $voluntario->email);
 
             $voluntario->update([
                 'status' => User::STATUS_CONVITE_ENVIADO,
-                'convite_enviado_em' => now(),
-                'convite_expira_em' => now()->addMinutes(config('auth.passwords.users.expire', 60)),
             ]);
+
+            $usuario->update([
+                'status' => User::STATUS_CONVITE_ENVIADO,
+                'convite_enviado_em' => now(),
+                'convite_expira_em' => $this->calcularExpiracaoConvite(),
+            ]);
+
+            DB::commit();
 
             session()->flash('mensagem_sucesso', 'Convite reenviado com sucesso!');
 
@@ -241,7 +303,14 @@ class Service
             ];
         } catch (\Throwable $th) {
 
+            Log::error('Erro ao reenviar convite de voluntário.', [
+                'erro' => formatarMensagemErro($th),
+                'voluntario_id' => $voluntario->id ?? null,
+            ]);
+
             session()->flash('mensagem_erro', 'Erro ao reenviar convite!');
+
+            DB::rollBack();
 
             return [
                 'sucesso' => false,
@@ -251,12 +320,13 @@ class Service
         }
     }
 
-    public function cancelarConvite(User $voluntario): array
+    public function cancelarConvite(Voluntario $voluntario): array
     {
         try {
 
+            $usuario = $voluntario->user;
             $convitePendente = $voluntario->status === User::STATUS_CONVITE_ENVIADO
-                || ($voluntario->status === null && $voluntario->email_verified_at === null);
+                || ($voluntario->status === null && $usuario?->email_verified_at === null);
 
             if (! $convitePendente) {
 
@@ -269,20 +339,41 @@ class Service
                 ];
             }
 
-            $retorno = $this->queries->delete((string) $voluntario->id);
+            DB::beginTransaction();
+
+            $voluntario->convitesCadastro()
+                ->whereIn('status', [
+                    ConviteCadastro::STATUS_PENDENTE,
+                    ConviteCadastro::STATUS_ENVIADO,
+                    ConviteCadastro::STATUS_EXPIRADO,
+                ])
+                ->update(['status' => ConviteCadastro::STATUS_CANCELADO]);
+
+            $usuario?->update([
+                'status' => User::STATUS_INATIVO,
+                'inativado_em' => now(),
+            ]);
+
+            $retorno = $this->queries->destroy((string) $voluntario->id);
 
             if (! $retorno['sucesso']) {
                 session()->flash('mensagem_erro', 'Erro ao excluir convite!');
+
+                DB::rollBack();
 
                 return $retorno;
             }
 
             session()->flash('mensagem_sucesso', 'Convite excluído com sucesso!');
 
+            DB::commit();
+
             return $retorno;
         } catch (\Throwable $th) {
 
             session()->flash('mensagem_erro', 'Erro ao excluir convite!');
+
+            DB::rollBack();
 
             return [
                 'sucesso' => false,
@@ -292,10 +383,47 @@ class Service
         }
     }
 
-    private function enviarConvite(User $voluntario): void
+    private function criarEnviarConviteCadastro(Voluntario $voluntario, string $email): ConviteCadastro
     {
-        $token = Password::broker()->createToken($voluntario);
+        $voluntario->convitesCadastro()
+            ->whereIn('status', [
+                ConviteCadastro::STATUS_PENDENTE,
+                ConviteCadastro::STATUS_ENVIADO,
+                ConviteCadastro::STATUS_EXPIRADO,
+            ])
+            ->update(['status' => ConviteCadastro::STATUS_CANCELADO]);
 
-        $voluntario->sendPasswordResetNotification($token);
+        $token = Str::random(64);
+        $expiraEm = $this->calcularExpiracaoConvite();
+
+        $convite = $voluntario->convitesCadastro()->create([
+            'token' => hash('sha256', $token),
+            'email' => $email,
+            'status' => ConviteCadastro::STATUS_ENVIADO,
+            'enviado_em' => now(),
+            'expira_em' => $expiraEm,
+            'created_by' => auth()->id(),
+        ]);
+
+        session()->flash('link_convite', route('convites.show', ['token' => $token]));
+
+        try {
+            Notification::route('mail', $email)
+                ->notify(new ConviteCadastroNotification($convite, $token));
+        } catch (\Throwable $th) {
+            Log::warning('Convite criado, mas o e-mail não foi enviado.', [
+                'erro' => formatarMensagemErro($th),
+                'convite_id' => $convite->id,
+                'email' => $email,
+                'link' => route('convites.show', ['token' => $token]),
+            ]);
+        }
+
+        return $convite;
+    }
+
+    private function calcularExpiracaoConvite(): \Illuminate\Support\Carbon
+    {
+        return now()->addMinutes((int) config('auth.passwords.users.expire', 60));
     }
 }

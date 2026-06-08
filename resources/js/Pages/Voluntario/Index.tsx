@@ -152,6 +152,19 @@ const Index: React.FC<Props> = ({ voluntarios, contadores, filtros }) => {
                     ehAdministrador={ehAdministrador}
                     onCadastrar={handleAbrirModal}
                 />
+                {props.link_convite ? (
+                    <div className="mt-5 mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                        <p className="font-medium">
+                            Link do convite gerado para ambiente local
+                        </p>
+                        <a
+                            href={props.link_convite}
+                            className="mt-1 block break-all text-amber-800 underline underline-offset-2"
+                        >
+                            {props.link_convite}
+                        </a>
+                    </div>
+                ) : null}
                 <Abas
                     aba={aba}
                     contadores={contadores}
