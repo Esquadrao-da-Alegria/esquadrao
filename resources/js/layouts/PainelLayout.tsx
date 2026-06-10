@@ -24,9 +24,6 @@ import { dashboard, home, login, logout } from '@/routes'
 
 // TIPOS
 import { type SharedData } from '@/types'
-<<<<<<< HEAD
-import { Building2, ChevronDown, LayoutGrid, LogOut, Sparkles, User, UsersRound } from 'lucide-react'
-=======
 import {
     Building2,
     ChevronDown,
@@ -35,9 +32,9 @@ import {
     LogOut,
     User,
     UsersRound,
+    Sparkles,
     type LucideIcon,
 } from 'lucide-react'
->>>>>>> origin/dev
 
 interface Props {
     children: React.ReactNode
@@ -265,40 +262,13 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 Painel administrativo
                             </span>
 
-                            {/* Menu mobile — sem alterações */}
+                            {/* Menu mobile */}
                             <div
                                 className={`${mobileOpen
                                     ? 'absolute left-0 right-0 top-full z-50 mx-4 mt-2 flex flex-col rounded-xl border border-gray-200 bg-white p-2 shadow-lg'
                                     : 'hidden'
                                     } sm:hidden`}
                             >
-<<<<<<< HEAD
-                                <Building2 className="size-4 shrink-0 opacity-70" aria-hidden />
-                                Hospitais
-                            </Link>
-                            <Link
-                                href={eventosIndex()}
-                                className={`${navLinkClass} ${navLinkActive(
-                                    pathname === '/eventos' || /^\/eventos\/[0-9]+\/edit$/.test(pathname),
-                                )} flex items-center gap-2`}
-                                onClick={closeMobile}
-                            >
-                                <Sparkles className="size-4 shrink-0 opacity-70" aria-hidden />
-                                Eventos
-                            </Link>
-                            {ehAdministrador ? (
-=======
->>>>>>> origin/dev
-                                <Link
-                                    href={dashboard()}
-                                    className={`${navLinkClass} ${navLinkActive(
-                                        isDashboard,
-                                    )} flex items-center gap-2`}
-                                    onClick={closeMobile}
-                                >
-                                    <LayoutGrid className="size-4 shrink-0 opacity-70" aria-hidden />
-                                    Início
-                                </Link>
                                 <Link
                                     href={index()}
                                     className={`${navLinkClass} ${navLinkActive(
@@ -309,29 +279,53 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     <Building2 className="size-4 shrink-0 opacity-70" aria-hidden />
                                     Hospitais
                                 </Link>
+
+                                <Link
+                                    href={eventosIndex()}
+                                    className={`${navLinkClass} ${navLinkActive(
+                                        pathname === '/eventos' || /^\/eventos\/[0-9]+\/edit$/.test(pathname),
+                                    )} flex items-center gap-2`}
+                                    onClick={closeMobile}
+                                >
+                                    <Sparkles className="size-4 shrink-0 opacity-70" aria-hidden />
+                                    Eventos
+                                </Link>
+
                                 {ehAdministrador ? (
-                                    <Link
-                                        href={voluntariosIndex()}
-                                        className={`${navLinkClass} ${navLinkActive(
-                                            isVoluntariosNav && !isVoluntariosCreate,
-                                        )} flex items-center gap-2`}
-                                        onClick={closeMobile}
-                                    >
-                                        <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
-                                        Voluntários
-                                    </Link>
-                                ) : null}
-                                {ehAdministrador ? (
-                                    <Link
-                                        href={patrocinadoresIndex()}
-                                        className={`${navLinkClass} ${navLinkActive(
-                                            isPatrocinadoresNav && !isPatrocinadoresCreate,
-                                        )} flex items-center gap-2`}
-                                        onClick={closeMobile}
-                                    >
-                                        <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
-                                        Patrocinadores
-                                    </Link>
+                                    <>
+                                        <Link
+                                            href={dashboard()}
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                isDashboard,
+                                            )} flex items-center gap-2`}
+                                            onClick={closeMobile}
+                                        >
+                                            <LayoutGrid className="size-4 shrink-0 opacity-70" aria-hidden />
+                                            Início
+                                        </Link>
+
+                                        <Link
+                                            href={voluntariosIndex()}
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                isVoluntariosNav && !isVoluntariosCreate,
+                                            )} flex items-center gap-2`}
+                                            onClick={closeMobile}
+                                        >
+                                            <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
+                                            Voluntários
+                                        </Link>
+
+                                        <Link
+                                            href={patrocinadoresIndex()}
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                isPatrocinadoresNav && !isPatrocinadoresCreate,
+                                            )} flex items-center gap-2`}
+                                            onClick={closeMobile}
+                                        >
+                                            <Handshake className="size-4 shrink-0 opacity-70" aria-hidden />
+                                            Patrocinadores
+                                        </Link>
+                                    </>
                                 ) : null}
                             </div>
                         </div>
