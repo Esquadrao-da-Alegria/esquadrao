@@ -51,17 +51,17 @@ jobs:
             echo "📦 Instalando dependências PHP..."
             composer install --no-dev --optimize-autoloader --no-interaction
 
+            echo "🧹 Limpando cache e otimizações..."
+            php artisan optimize:clear
+
+            echo "🔍 Gerando Rotas Wayfinder..."
+            php artisan wayfinder:generate
+
             echo "🟢 Instalando dependências JS (React/Vite)..."
             npm ci
 
-            echo "🏗️ Gerando build do frontend..."
-            npm run build
-
-            echo "🧹 Otimizando Laravel..."
-            php artisan optimize:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            echo "🔨 Compilando assets..."
+            pnpm run build
 
             echo "🗄️ Executando migrações..."
             php artisan migrate --force
@@ -69,5 +69,8 @@ jobs:
             echo "🔗 Atualizando links e reiniciando filas..."
             php artisan storage:link
             php artisan queue:restart
+            
+            echo "🔍 Gerando cache de otimização..."
+            php artisan optimize
 
             echo "🚀 Deploy finalizado com sucesso!"

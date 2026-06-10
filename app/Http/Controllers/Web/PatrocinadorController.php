@@ -13,18 +13,11 @@ use Illuminate\Http\Request;
 
 class PatrocinadorController extends Controller
 {
-    // gambiarra enquanto nao temos sistema de login, mude para true para acessar as rotas enquanto isso
-    // cuidado com o commit!!
-    private const AUTHORIZED = false;
 
     public function __construct(
         private Service $service,
         private FormService $formService,
-    ) {
-        if (!self::AUTHORIZED) {
-            abort(404); 
-        }
-    }
+    ) {}
 
     /**
      * Retornar listagem do recurso
