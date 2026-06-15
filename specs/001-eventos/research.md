@@ -1,4 +1,41 @@
-# Research for Sistema de Eventos
+# Research for Sistema de Eventos — Aprimoramentos
+
+**Atualizado**: 2026-06-10
+
+---
+
+## Decision: geolocalização via Nominatim (OpenStreetMap) + deep links
+
+- **Decision**: Usar Nominatim para geocodificação (endereço → lat/lon) no frontend. Armazenar `local_latitude`, `local_longitude` e `local_descricao` no banco. Exibir links de "Abrir no Google Maps" e "Abrir no Waze" usando deep links padrão — sem embed de mapa.
+- **Rationale**: Nominatim é 100% gratuito e sem API key. O volume de criação de eventos da ONG (dezenas/mês) está bem dentro do limite de cortesia de 1 req/s. Deep links não exigem API key e funcionam em mobile e desktop. Sem embed = sem componente extra, sem custo.
+- **Como usar no frontend**: `GET https://nominatim.openstreetmap.org/search?format=json&q={endereço}&limit=5` — retorna `lat`, `lon`, `display_name`. O formulário envia os três campos ao backend.
+- **Deep links**:
+  - Google Maps: `https://maps.google.com/?q={lat},{lon}`
+  - Waze: `https://waze.com/ul?ll={lat},{lon}&navigate=yes`
+- **Alternatives considered**: Google Maps Geocoding API (requer billing), Mapbox (requer API key) — ambos descartados por adicionar setup sem necessidade.
+
+## Decision: date/time picker nativo HTML5
+
+- **Decision**: Usar `<input type="datetime-local">` para seleção de data e hora. Sem biblioteca externa.
+- **Rationale**: Projeto já usa inputs nativos estilizados com Tailwind. O atributo `min` do input permite validar `data_fim > data_inicio` no cliente sem JS extra. Consistente com o padrão existente.
+- **Alternatives considered**: `react-datepicker` — descartado para não introduzir dependência sem necessidade.
+
+## Decision: autorização por responsável via Policy Laravel
+
+- **Decision**: Criar `EventoPolicy` com métodos `update`, `finalizar`, `cancelar`. A policy verifica `criado_por_id === Auth::id()` OR existência na tabela `evento_responsaveis`.
+- **Rationale**: O projeto usa middleware de cargo para admin, mas permissões de evento são por dado (não por cargo). Laravel Policy é a forma idiomática e evita repetir lógica em Service e Controller.
+- **Alternatives considered**: Verificação inline no Service — descartado por espalhar lógica.
+
+## Decision: remoção de evento_origem_id e status TRANSFERIDO
+
+- **Decision**: Nova migration remove `evento_origem_id` da tabela `eventos`. Enum `StatusEvento` perde valor `TRANSFERIDO`.
+- **Rationale**: Decisão de produto — funcionalidade de transferência descartada. Manter seria dead code.
+- **Atenção**: Verificar existência de registros com `status = TRANSFERIDO` antes de rodar em produção.
+
+## Decision: rotas dedicadas "meus eventos" sem novo controller
+
+- **Decision**: Adicionar `GET /eventos/meus-responsaveis` e `GET /eventos/meus-inscritos` como rotas nomeadas estáticas no `EventoController`, declaradas antes do `Route::resource`.
+- **Rationale**: Reutiliza controller existente; queries são extensões naturais das queries já implementadas.
 
 ## Decision: backend filtering first
 

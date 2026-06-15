@@ -49,8 +49,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
     });
 
-    // Eventos acessíveis para qualquer usuário autenticado
+    // Eventos — rota estática ANTES do resource para evitar conflito de parâmetros
+    Route::get('/eventos/dashboard', [EventoController::class, 'dashboard'])->name('eventos.dashboard');
+
+    // Eventos — resource padrão
     Route::resource('/eventos', EventoController::class)->parameters(['eventos' => 'evento']);
+
+    // Eventos — ações extras (fora do CRUD padrão)
+    Route::post('/eventos/{evento}/inscrever', [EventoController::class, 'inscrever'])->name('eventos.inscrever');
+    Route::delete('/eventos/{evento}/inscricao', [EventoController::class, 'cancelarInscricao'])->name('eventos.cancelar-inscricao');
+    Route::get('/eventos/{evento}/finalizar', [EventoController::class, 'paginaFinalizar'])->name('eventos.pagina-finalizar');
+    Route::post('/eventos/{evento}/finalizar', [EventoController::class, 'finalizar'])->name('eventos.finalizar');
+    Route::post('/eventos/{evento}/cancelar', [EventoController::class, 'cancelar'])->name('eventos.cancelar');
 
     // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {

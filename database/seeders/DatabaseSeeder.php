@@ -18,11 +18,7 @@ class DatabaseSeeder extends Seeder
                 CargoSeeder::class,
                 UserSeeder::class,
                 HospitalSeeder::class,
-<<<<<<< HEAD
                 EventoSeeder::class,
-=======
-                PatrocinadorSeeder::class,
->>>>>>> origin/dev
             ]
         );
     }

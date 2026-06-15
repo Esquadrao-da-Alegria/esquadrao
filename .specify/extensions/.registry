@@ -14,6 +14,13 @@
           "speckit.git.remote",
           "speckit.git.initialize",
           "speckit.git.commit"
+        ],
+        "claude": [
+          "speckit.git.feature",
+          "speckit.git.validate",
+          "speckit.git.remote",
+          "speckit.git.initialize",
+          "speckit.git.commit"
         ]
       },
       "registered_skills": [],
@@ -27,6 +34,9 @@
       "priority": 10,
       "registered_commands": {
         "windsurf": [
+          "speckit.agent-context.update"
+        ],
+        "claude": [
           "speckit.agent-context.update"
         ]
       },

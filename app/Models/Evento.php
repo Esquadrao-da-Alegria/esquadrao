@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\StatusEvento;
+use App\Enums\TipoEvento;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Enums\TipoEvento;
-use App\Enums\StatusEvento;
 
 class Evento extends Model
 {
@@ -20,22 +20,25 @@ class Evento extends Model
         'descricao',
         'data_inicio',
         'data_fim',
-        'local',
+        'complemento',
+        'local_latitude',
+        'local_longitude',
         'cidade_id',
         'status',
         'limite_vagas',
         'feedback_habilitado',
-        'evento_origem_id',
         'criado_por_id',
     ];
 
     protected $casts = [
-        'data_inicio' => 'datetime',
-        'data_fim' => 'datetime',
+        'data_inicio'      => 'datetime',
+        'data_fim'         => 'datetime',
         'feedback_habilitado' => 'boolean',
-        'limite_vagas' => 'integer',
-        'tipo' => TipoEvento::class,
-        'status' => StatusEvento::class,
+        'limite_vagas'     => 'integer',
+        'local_latitude'   => 'float',
+        'local_longitude'  => 'float',
+        'tipo'             => TipoEvento::class,
+        'status'           => StatusEvento::class,
     ];
 
     public function cidade()
@@ -48,18 +51,14 @@ class Evento extends Model
         return $this->belongsTo(User::class, 'criado_por_id');
     }
 
-    public function eventoOrigem()
-    {
-        return $this->belongsTo(self::class, 'evento_origem_id');
-    }
-
-    public function eventosTransferidos()
-    {
-        return $this->hasMany(self::class, 'evento_origem_id');
-    }
-
     public function participantes()
     {
         return $this->hasMany(EventoParticipante::class, 'evento_id');
     }
+
+    public function responsaveis()
+    {
+        return $this->hasMany(EventoResponsavel::class, 'evento_id');
+    }
+
 }
