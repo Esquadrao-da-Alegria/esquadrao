@@ -130,7 +130,7 @@ export interface Hospital {
     updated_at?: string;
 }
 
-interface AlaHospital {
+export interface AlaHospital {
     id?: number;
     hospital_id: number;
     nome: string;
@@ -172,4 +172,58 @@ export interface Evento {
     participantes_ativos?: EventoParticipante[];
     created_at: string;
     updated_at: string;
+}
+
+// VISITAS
+
+export type VisitaTipo =
+    | 'hospital'
+    | 'residencia'
+    | 'acao_especial'
+    | 'oficina'
+    | 'reuniao'
+    | 'outro';
+
+export type VisitaStatus = 'agendada' | 'cancelada' | 'realizada' | 'pendente';
+
+export type VisitaOrigem = 'sistema' | 'importacao' | 'outro';
+
+export type TipoParticipacao = 'palhaco' | 'paisana';
+
+export type PapelNaVisita = 'participante' | 'relator';
+
+export type StatusParticipacao = 'confirmado' | 'pendente' | 'cancelado' | 'falta';
+
+export interface Visita {
+    id?: number;
+    hospital_id: number;
+    ala_unidade_id?: number | null;
+    criado_por_id: number;
+    lider_id?: number | null;
+    inicio_em: string;
+    fim_em: string;
+    tipo: VisitaTipo;
+    status: VisitaStatus;
+    origem: VisitaOrigem;
+    observacao?: string | null;
+    created_at?: string;
+    updated_at?: string;
+    hospital?: Hospital;
+    alaUnidade?: AlaHospital | null;
+    criadoPor?: User;
+    lider?: User | null;
+    participantes?: VisitaParticipante[];
+}
+
+export interface VisitaParticipante {
+    id?: number;
+    visita_id: number;
+    voluntario_id: number;
+    tipo_participacao: TipoParticipacao;
+    papel_na_visita: PapelNaVisita;
+    status_participacao: StatusParticipacao;
+    created_at?: string;
+    updated_at?: string;
+    visita?: Visita;
+    voluntario?: User;
 }
