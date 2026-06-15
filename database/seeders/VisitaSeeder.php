@@ -120,7 +120,7 @@ class VisitaSeeder extends Seeder
                 fim: $fim,
                 tipo: VisitaTipo::Hospital,
                 status: $this->statusPorData($inicio),
-                observacoes: "Visita semanal — {$hospital->nome}",
+                observacoes: "Teste - Visita semanal — {$hospital->nome}",
                 voluntarios: $voluntarios,
                 indiceParticipantes: count($visitas),
             );
