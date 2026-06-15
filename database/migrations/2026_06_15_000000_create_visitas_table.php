@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('status', 50);
             $table->string('origem', 50);
 
-            $table->text('observacao')->nullable();
+            $table->text('observacoes')->nullable();
 
             $table->timestamps();
 

@@ -23,7 +23,7 @@ class Visita extends Model
         'tipo',
         'status',
         'origem',
-        'observacao',
+        'observacoes',
     ];
 
     protected function casts(): array
