@@ -184,7 +184,13 @@ export type VisitaTipo =
     | 'reuniao'
     | 'outro';
 
-export type VisitaStatus = 'agendada' | 'cancelada' | 'realizada' | 'pendente';
+export type VisitaStatus =
+    | 'agendada'
+    | 'realizada'
+    | 'cancelada'
+    | 'pendente_relatorio'
+    | 'contabilizada'
+    | 'nao_contabilizada';
 
 export type VisitaOrigem = 'sistema' | 'importacao' | 'outro';
 

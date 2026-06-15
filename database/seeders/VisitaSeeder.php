@@ -260,10 +260,20 @@ class VisitaSeeder extends Seeder
             return StatusParticipacao::Cancelado;
         }
 
-        if ($statusVisita === VisitaStatus::Realizada) {
+        if ($this->visitaJaOcorreu($statusVisita)) {
             return $indice === 2 ? StatusParticipacao::Falta : StatusParticipacao::Confirmado;
         }
 
         return $indice === 1 ? StatusParticipacao::Pendente : StatusParticipacao::Confirmado;
+    }
+
+    private function visitaJaOcorreu(VisitaStatus $statusVisita): bool
+    {
+        return in_array($statusVisita, [
+            VisitaStatus::Realizada,
+            VisitaStatus::PendenteRelatorio,
+            VisitaStatus::Contabilizada,
+            VisitaStatus::NaoContabilizada,
+        ], true);
     }
 }

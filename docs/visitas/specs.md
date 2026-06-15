@@ -112,9 +112,11 @@ Valores persistidos como varchar(50) no banco; cast para enum PHP backed string 
 | Case | Valor |
 |------|-------|
 | `Agendada` | `agendada` |
-| `Cancelada` | `cancelada` |
 | `Realizada` | `realizada` |
-| `Pendente` | `pendente` |
+| `Cancelada` | `cancelada` |
+| `PendenteRelatorio` | `pendente_relatorio` |
+| `Contabilizada` | `contabilizada` |
+| `NaoContabilizada` | `nao_contabilizada` |
 
 ### VisitaOrigem
 
@@ -148,8 +150,6 @@ Valores persistidos como varchar(50) no banco; cast para enum PHP backed string 
 | `Pendente` | `pendente` |
 | `Cancelado` | `cancelado` |
 | `Falta` | `falta` |
-
-> `pendente` existe também em `VisitaStatus` — cuidado em logs/UI para não confundir contextos.
 
 ---
 

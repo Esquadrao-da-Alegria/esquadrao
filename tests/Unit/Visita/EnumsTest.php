@@ -26,10 +26,12 @@ class EnumsTest extends TestCase
     public function test_visita_status_tem_valores_esperados(): void
     {
         $this->assertSame('agendada', VisitaStatus::Agendada->value);
-        $this->assertSame('cancelada', VisitaStatus::Cancelada->value);
         $this->assertSame('realizada', VisitaStatus::Realizada->value);
-        $this->assertSame('pendente', VisitaStatus::Pendente->value);
-        $this->assertCount(4, VisitaStatus::cases());
+        $this->assertSame('cancelada', VisitaStatus::Cancelada->value);
+        $this->assertSame('pendente_relatorio', VisitaStatus::PendenteRelatorio->value);
+        $this->assertSame('contabilizada', VisitaStatus::Contabilizada->value);
+        $this->assertSame('nao_contabilizada', VisitaStatus::NaoContabilizada->value);
+        $this->assertCount(6, VisitaStatus::cases());
     }
 
     public function test_visita_origem_tem_valores_esperados(): void
