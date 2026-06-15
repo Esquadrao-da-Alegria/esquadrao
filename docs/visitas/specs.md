@@ -186,6 +186,76 @@ Valores persistidos como varchar(50) no banco; cast para enum PHP backed string 
 
 ---
 
+## Tipagem TypeScript (`resources/js/types/index.d.ts`)
+
+Tipos do frontend para props Inertia e componentes React. Os **union types** espelham os enums PHP (`app/Enums/`): mesmos valores string persistidos no banco. As **interfaces** descrevem o shape dos models quando serializados para JSON.
+
+Importação padrão no projeto:
+
+```tsx
+import type { Visita, VisitaStatus, VisitaParticipante } from '@/types';
+```
+
+### Union types (enums)
+
+| Tipo TS | Valores | Enum PHP |
+|---------|---------|----------|
+| `VisitaTipo` | `'hospital' \| 'residencia' \| 'acao_especial' \| 'oficina' \| 'reuniao' \| 'outro'` | `VisitaTipo` |
+| `VisitaStatus` | `'agendada' \| 'realizada' \| 'cancelada' \| 'pendente_relatorio' \| 'contabilizada' \| 'nao_contabilizada'` | `VisitaStatus` |
+| `VisitaOrigem` | `'sistema' \| 'importacao' \| 'outro'` | `VisitaOrigem` |
+| `TipoParticipacao` | `'palhaco' \| 'paisana'` | `TipoParticipacao` |
+| `PapelNaVisita` | `'participante' \| 'relator'` | `PapelNaVisita` |
+| `StatusParticipacao` | `'confirmado' \| 'pendente' \| 'cancelado' \| 'falta'` | `StatusParticipacao` |
+
+> `pendente` em `StatusParticipacao` é distinto de qualquer valor de `VisitaStatus`.
+
+### Interface `Visita`
+
+| Campo | Tipo TS | Obrigatório | Descrição |
+|-------|---------|-------------|-----------|
+| `id` | `number` | não | Presente após persistência. |
+| `hospital_id` | `number` | sim | FK → hospital. |
+| `ala_unidade_id` | `number \| null` | não | FK → ala (nullable). |
+| `criado_por_id` | `number` | sim | FK → usuário criador. |
+| `lider_id` | `number \| null` | não | FK → líder da visita (nullable). |
+| `inicio_em` | `string` | sim | ISO 8601 (datetime serializado). |
+| `fim_em` | `string` | sim | ISO 8601 (datetime serializado). |
+| `tipo` | `VisitaTipo` | sim | Tipo da visita. |
+| `status` | `VisitaStatus` | sim | Status da visita. |
+| `origem` | `VisitaOrigem` | sim | Origem do registro. |
+| `observacao` | `string \| null` | não | Texto livre. |
+| `created_at` | `string` | não | Auditoria. |
+| `updated_at` | `string` | não | Auditoria. |
+| `hospital` | `Hospital` | não | Relacionamento eager-loaded. |
+| `alaUnidade` | `AlaHospital \| null` | não | Relacionamento eager-loaded (`alaUnidade()`). |
+| `criadoPor` | `User` | não | Relacionamento eager-loaded (`criadoPor()`). |
+| `lider` | `User \| null` | não | Relacionamento eager-loaded (`lider()`). |
+| `participantes` | `VisitaParticipante[]` | não | Relacionamento eager-loaded (`participantes()`). |
+
+### Interface `VisitaParticipante`
+
+| Campo | Tipo TS | Obrigatório | Descrição |
+|-------|---------|-------------|-----------|
+| `id` | `number` | não | Presente após persistência. |
+| `visita_id` | `number` | sim | FK → visita. |
+| `voluntario_id` | `number` | sim | FK → usuário (voluntário). |
+| `tipo_participacao` | `TipoParticipacao` | sim | Palhaço ou paisana. |
+| `papel_na_visita` | `PapelNaVisita` | sim | Participante ou relator. |
+| `status_participacao` | `StatusParticipacao` | sim | Status da inscrição. |
+| `created_at` | `string` | não | Auditoria. |
+| `updated_at` | `string` | não | Auditoria. |
+| `visita` | `Visita` | não | Relacionamento eager-loaded (`visita()`). |
+| `voluntario` | `User` | não | Relacionamento eager-loaded (`voluntario()`). |
+
+### Convenções frontend
+
+- **Colunas** do banco permanecem em `snake_case` (`hospital_id`, `inicio_em`); **relacionamentos** serializados pelo Laravel/Inertia usam `camelCase` (`criadoPor`, `alaUnidade`), espelhando os nomes dos métodos Eloquent.
+- **Datas** chegam como `string` (ISO 8601), não como `Date` — converter no componente quando necessário.
+- Campos de relacionamento são opcionais na interface: só existem quando o controller faz eager load.
+- Ao alterar enums PHP, atualizar o union type correspondente em `index.d.ts` e esta seção.
+
+---
+
 ## Decisões técnicas
 
 ### varchar(50) + enum PHP backed string
@@ -276,3 +346,4 @@ vendor/bin/sail artisan test --compact tests/Unit/Visita tests/Feature/Visita
 | Hospital é obrigatório? | Sim, `hospital_id` NOT NULL. |
 | Como evitar duplicata de inscrito? | Unique `(visita_id, voluntario_id)` no banco. |
 | Onde validar `fim_em > inicio_em`? | No service/form request (não no banco). |
+| Onde estão os tipos TS de visita? | `resources/js/types/index.d.ts` — seção `// VISITAS`. |
