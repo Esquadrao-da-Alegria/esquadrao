@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash .specify/scripts/bash/setup-plan.sh --json)",
+      "Bash(bash .specify/scripts/bash/setup-tasks.sh --json)",
+      "Bash(bash .specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
+      "Bash(git -C /home/maurosergio/Documents/Projects/esquadrao branch --show-current)",
+      "Bash(php artisan *)"
+    ]
+  }
+}

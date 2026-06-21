@@ -33,6 +33,7 @@ import {
     Sparkles,
     User,
     UsersRound,
+    Sparkles,
     type LucideIcon,
 } from 'lucide-react'
 
@@ -270,15 +271,6 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     } sm:hidden`}
                             >
                                 <Link
-                                    href={dashboard()}
-                                    className={`${navLinkClass} ${navLinkActive(isDashboard)} flex items-center gap-2`}
-                                    onClick={closeMobile}
-                                >
-                                    <LayoutGrid className="size-4 shrink-0 opacity-70" aria-hidden />
-                                    Início
-                                </Link>
-
-                                <Link
                                     href={index()}
                                     className={`${navLinkClass} ${navLinkActive(isHospitaisNav && !isHospitaisCreate)} flex items-center gap-2`}
                                     onClick={closeMobile}
@@ -301,8 +293,21 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 {ehAdministrador ? (
                                     <>
                                         <Link
+                                            href={dashboard()}
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                isDashboard,
+                                            )} flex items-center gap-2`}
+                                            onClick={closeMobile}
+                                        >
+                                            <LayoutGrid className="size-4 shrink-0 opacity-70" aria-hidden />
+                                            Início
+                                        </Link>
+
+                                        <Link
                                             href={voluntariosIndex()}
-                                            className={`${navLinkClass} ${navLinkActive(isVoluntariosNav && !isVoluntariosCreate)} flex items-center gap-2`}
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                isVoluntariosNav && !isVoluntariosCreate,
+                                            )} flex items-center gap-2`}
                                             onClick={closeMobile}
                                         >
                                             <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
@@ -311,7 +316,9 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
 
                                         <Link
                                             href={patrocinadoresIndex()}
-                                            className={`${navLinkClass} ${navLinkActive(isPatrocinadoresNav && !isPatrocinadoresCreate)} flex items-center gap-2`}
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                isPatrocinadoresNav && !isPatrocinadoresCreate,
+                                            )} flex items-center gap-2`}
                                             onClick={closeMobile}
                                         >
                                             <Handshake className="size-4 shrink-0 opacity-70" aria-hidden />

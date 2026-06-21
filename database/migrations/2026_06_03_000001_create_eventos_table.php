@@ -12,10 +12,12 @@ return new class extends Migration
             $table->id();
             $table->enum('tipo', ['OFICINA', 'REUNIAO']);
             $table->string('titulo', 255);  
-            $table->string('descricao', 255);
+            $table->text('descricao');
             $table->dateTime('data_inicio');
             $table->dateTime('data_fim');
-            $table->string('local', 255);
+            $table->string('complemento', 500)->nullable();
+            $table->decimal('local_latitude', 10, 7)->nullable();
+            $table->decimal('local_longitude', 10, 7)->nullable();
             $table->unsignedBigInteger('cidade_id');
             $table->string('status')->default('AGENDADO');
             $table->unsignedInteger('limite_vagas')->nullable(); //Nullable caso o evento não tenha limite de vagas

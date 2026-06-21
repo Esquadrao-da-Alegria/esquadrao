@@ -11,9 +11,10 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as eventosIndex, dashboard as eventosDashboard } from '@/routes/eventos';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, CalendarDays, BarChart2, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,6 +22,16 @@ const mainNavItems: NavItem[] = [
         title: 'Painel',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Eventos',
+        href: eventosIndex(),
+        icon: CalendarDays,
+    },
+    {
+        title: 'Participação',
+        href: eventosDashboard(),
+        icon: BarChart2,
     },
 ];
 

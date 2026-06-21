@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
                 CargoSeeder::class,
                 UserSeeder::class,
                 HospitalSeeder::class,
-                PatrocinadorSeeder::class,
                 EventoSeeder::class,
             ]
         );

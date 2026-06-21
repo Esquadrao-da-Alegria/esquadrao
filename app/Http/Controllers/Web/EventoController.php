@@ -2,56 +2,50 @@
 
 namespace App\Http\Controllers\Web;
 
-use Inertia\Inertia;
 use App\Enums\StatusEvento;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Web\Evento\FinalizarRequest;
 use App\Http\Requests\Web\Evento\StoreRequest;
 use App\Http\Requests\Web\Evento\UpdateRequest;
 use App\Models\Evento;
 use App\Services\Evento\Form\Service as FormService;
 use App\Services\Evento\Service;
 use Illuminate\Http\Request;
+use App\Enums\StatusInscricao;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class EventoController extends Controller
 {
     public function __construct(
         private Service $service,
         private FormService $formService,
-    ) {
-        //
-    }
-    
-    /**
-     * Retornar listagem de eventos agendados
-     */
+    ) {}
+
     public function index(Request $request)
     {
         $filtrosBusca = [
-            ...$request->all(),
-            'status' => StatusEvento::AGENDADO->value,
+            ...$request->only(['titulo', 'tipo', 'data', 'minha_relacao', 'cidade_id']),
+            'status'         => StatusEvento::AGENDADO->value,
             'retornar_lista' => true,
         ];
 
         $retorno = $this->service->index($filtrosBusca);
 
-        $dadosView = ['eventos' => $retorno['dados']];
+        $cidades = $this->formService->buscarDados(null)['cidades'];
 
-        return Inertia::render('Evento/Index', $dadosView);
+        return Inertia::render('Evento/Index', [
+            'eventos' => $retorno['dados'],
+            'filtros' => $request->only(['titulo', 'tipo', 'data', 'minha_relacao', 'cidade_id']),
+            'cidades' => $cidades,
+        ]);
     }
 
-    /**
-     * Retornar formulário de criação
-     */
     public function create()
     {
-        $dadosView = $this->formService->buscarDados(null);
-
-        return Inertia::render('Evento/Create', $dadosView);
+        return Inertia::render('Evento/Create', $this->formService->buscarDados(null));
     }
 
-    /**
-     * Salvar novo recurso
-     */
     public function store(StoreRequest $request)
     {
         $this->service->store($request->validated());
@@ -59,33 +53,96 @@ class EventoController extends Controller
         return redirect()->route('eventos.index');
     }
 
-    /**
-     * Retornar formulário de edição
-     */
+    public function show(Evento $evento)
+    {
+        $evento->load(['cidade', 'criadoPor', 'responsaveis.voluntario', 'participantes.usuario']);
+
+        $userId = Auth::id();
+
+        $inscrito     = $evento->participantes->where('user_id', $userId)->where('status', StatusInscricao::INSCRITO)->isNotEmpty();
+        $passouInicio = now()->greaterThanOrEqualTo($evento->data_inicio);
+
+        return Inertia::render('Evento/Show', compact('evento', 'inscrito', 'passouInicio'));
+    }
+
     public function edit(Evento $evento)
     {
-        $dadosView = $this->formService->buscarDados($evento);
+        $this->authorize('update', $evento);
 
-        return Inertia::render('Evento/Edit', $dadosView);
+        return Inertia::render('Evento/Edit', $this->formService->buscarDados($evento));
     }
 
-    /**
-     * Atualizar recurso
-     */
-    public function update(UpdateRequest $request, string $id)
+    public function update(UpdateRequest $request, Evento $evento)
     {
-        $this->service->update($id, $request->validated());
+        $this->authorize('update', $evento);
+
+        $this->service->update((string) $evento->id, $request->validated());
 
         return redirect()->route('eventos.index');
     }
 
-    /**
-     * Excluir recurso
-     */
-    public function destroy(string $id)
+    public function destroy(Evento $evento)
     {
-        $this->service->destroy($id);
+        $this->authorize('delete', $evento);
+
+        $this->service->destroy((string) $evento->id);
 
         return redirect()->route('eventos.index');
+    }
+
+    public function inscrever(Evento $evento)
+    {
+        $this->service->inscrever($evento->id, Auth::id());
+
+        return redirect()->back();
+    }
+
+    public function cancelarInscricao(Evento $evento)
+    {
+        $this->service->cancelarInscricao($evento->id, Auth::id());
+
+        return redirect()->back();
+    }
+
+    public function paginaFinalizar(Evento $evento)
+    {
+        $this->authorize('finalizar', $evento);
+
+        $evento->load(['participantes.usuario']);
+
+        return Inertia::render('Evento/Finalizar', [
+            'evento'        => $evento,
+            'participantes' => $evento->participantes,
+        ]);
+    }
+
+    public function finalizar(FinalizarRequest $request, Evento $evento)
+    {
+        $this->authorize('finalizar', $evento);
+
+        $this->service->finalizar($evento->id, $request->validated()['presencas']);
+
+        return redirect()->route('eventos.index');
+    }
+
+    public function cancelar(Evento $evento)
+    {
+        $this->authorize('cancelar', $evento);
+
+        $this->service->cancelarEvento($evento->id);
+
+        return redirect()->route('eventos.index');
+    }
+
+    public function dashboard(Request $request)
+    {
+        $filtros = $request->only(['semestre', 'nome']);
+        $retorno = $this->service->dashboard($filtros);
+
+        return Inertia::render('Evento/Dashboard', [
+            'participantes' => $retorno['dados']['dados'],
+            'semestres'     => $retorno['dados']['semestres'],
+            'filtros'       => $filtros,
+        ]);
     }
 }
