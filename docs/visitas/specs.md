@@ -48,6 +48,12 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 6. **Validação de datas**  
    Não há constraint `fim_em > inicio_em` no banco. Validar no service/form request quando existir UI de cadastro.
 
+7. **Limite de participantes**  
+   Máximo 5 inscrições ativas por visita (`papel_na_visita = participante`, `status_participacao ∈ {confirmado, pendente}`).
+
+8. **Inscrição self-service**  
+   Voluntário autenticado pode se inscrever em visita `agendada` via modal do calendário.
+
 ---
 
 ## Modelo de dados
@@ -331,6 +337,7 @@ VisitaParticipante::query()->create([
 | `tests/Feature/Visita/VisitaModelTest.php` | Casts e relacionamentos de `Visita` |
 | `tests/Feature/Visita/VisitaParticipanteModelTest.php` | Casts, relacionamentos e unique por comportamento |
 | `tests/Feature/Visita/VisitaIndexTest.php` | Rota index, filtro de mês, auth |
+| `tests/Feature/Visita/ParticipanteStoreTest.php` | Inscrição self-service, limite, duplicata, visita cancelada, auth |
 
 ```bash
 vendor/bin/sail artisan test --compact tests/Unit/Visita tests/Feature/Visita
@@ -340,13 +347,19 @@ vendor/bin/sail artisan test --compact tests/Unit/Visita tests/Feature/Visita
 
 ## Rotas Web
 
+Grupo `visitas.` (middleware `auth` + `verified`):
+
 | Método | URI | Action | Nome |
 |--------|-----|--------|------|
 | GET | `/visitas` | `VisitaController@index` | `visitas.index` |
+| POST | `/visitas/{visita}/participantes` | `VisitaParticipanteController@store` | `visitas.participantes.store` |
+| DELETE | `/visitas/{visita}/participantes/{participante}` | `VisitaParticipanteController@destroy` | `visitas.participantes.destroy` |
 
-Query string: `?mes=YYYY-MM` — filtra visitas pelo mês de `inicio_em`.
+Query string (index): `?mes=YYYY-MM` — filtra visitas pelo mês de `inicio_em`.
 
-Camadas: `VisitaController` → `Visita\Service` → `Visita\Queries`
+Camadas index: `VisitaController` → `Visita\Service` → `Visita\Queries`
+
+Camadas participantes: `VisitaParticipanteController` → `Visita\Participante\Service` → `Visita\Participante\Queries`
 
 ---
 
@@ -361,9 +374,12 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 | `Pages/Visita/Index.tsx` | Page principal — estado de modais, navegação de mês |
 | `components/Painel/Visita/Card/Show.tsx` | Card de visita no calendário |
 | `components/Painel/Visita/Calendario/Show.tsx` | Grade mensal |
-| `components/Painel/Visita/Calendario/Detalhes/Modal/Show.tsx` | Modal de detalhes |
+| `components/Painel/Visita/Calendario/Detalhes/Modal/Show.tsx` | Modal de detalhes + inscrição em 2 passos |
 | `components/Painel/Visita/Calendario/ListaCompleta/Modal/Show.tsx` | Modal lista completa do dia |
-| `lib/visita.ts` | Helpers: `contarParticipantes`, `classeCardPorStatus`, `labelStatus` |
+| `lib/visita.ts` | Helpers: `contarParticipantes`, `contarParticipantesAtivos`, `usuarioJaInscrito`, `visitaAtingiuLimite`, `classeCardPorStatus`, `labelStatus` |
+| `Queries/Visita/Participante/Queries.tsx` | `fetch` POST para `visitas.participantes.store` |
+| `Services/Visita/Participante/Service.tsx` | Orquestra inscrição, toasts e reload Inertia |
+| `utils/form.ts` | Helper `obterCsrfToken` |
 
 ### Regras
 
@@ -371,6 +387,19 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 - Overflow: máximo 2 cards por dia; "+X mais" abre modal de lista completa
 - Navegação de mês via `router.visit` com Inertia (sem reload de página)
 - Estado dos modais centralizado na Page
+
+### Modal de detalhes — fluxo de inscrição
+
+**Passo 1 (detalhes):** exibe dados da visita. Botão **Participar**:
+- Oculto se `status !== agendada`
+- Desabilitado com texto "Você já está inscrito" se o usuário autenticado já é participante ativo
+- Ao clicar: se limite de 5 atingido → `toastInfo`; senão → passo 2
+
+**Passo 2 (inscrição):** escolha palhaço/paisana + **Confirmar** + **Voltar**.
+- **Confirmar** chama `Services/Visita/Participante/Service.participar` → em sucesso: toast, reload Inertia, fecha modal
+- **Voltar** retorna ao passo 1
+- Estado `enviando` evita double-submit
+- Ao fechar modal, passo reseta para detalhes
 
 ---
 

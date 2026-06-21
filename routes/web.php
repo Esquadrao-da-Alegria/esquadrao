@@ -4,6 +4,7 @@ use App\Http\Controllers\Web\EventoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\ConviteCadastroController;
+use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
 use App\Http\Controllers\Web\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
@@ -64,9 +65,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
 
     // VISITAS
-    Route::resource('/visitas', VisitaController::class)
-        ->parameters(['visitas' => 'visita'])
-        ->only(['index']);
+    Route::prefix('visitas')->name('visitas.')->group(function () {
+        Route::get('/', [VisitaController::class, 'index'])->name('index');
+
+        Route::post('{visita}/participantes', [VisitaParticipanteController::class, 'store'])
+            ->name('participantes.store');
+
+        Route::delete('{visita}/participantes/{participante}', [VisitaParticipanteController::class, 'destroy'])
+            ->name('participantes.destroy');
+    });
 
     // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {

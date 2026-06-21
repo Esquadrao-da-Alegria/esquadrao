@@ -1,16 +1,78 @@
-import { type FC } from 'react'
+import { usePage } from '@inertiajs/react'
+import { type FC, useEffect, useState } from 'react'
 
 import Modal from '@/components/Modal/Show'
-import { contarParticipantes, labelStatus } from '@/lib/visita'
-import type { Visita } from '@/types'
+import { Button } from '@/components/ui/button'
+import {
+    contarParticipantes,
+    labelStatus,
+    usuarioJaInscrito,
+    visitaAtingiuLimite,
+} from '@/lib/visita'
+import { toastInfo } from '@/lib/utils/toast'
+import { Service } from '@/Services/Visita/Participante/Service'
+import type { SharedData, TipoParticipacao, Visita } from '@/types'
 
 interface Props {
     visita: Visita | null
     onFechar: () => void
 }
 
+type Passo = 'detalhes' | 'inscricao'
+
 const Show: FC<Props> = ({ visita, onFechar }) => {
+    const { auth } = usePage<SharedData>().props
+    const [passo, setPasso] = useState<Passo>('detalhes')
+    const [tipo, setTipo] = useState<TipoParticipacao | null>(null)
+    const [enviando, setEnviando] = useState(false)
+
     const participantes = visita ? contarParticipantes(visita) : null
+    const jaInscrito = visita ? usuarioJaInscrito(visita, auth.user.id) : false
+    const visitaAgendada = visita?.status === 'agendada'
+
+    useEffect(() => {
+        if (visita === null) {
+            setPasso('detalhes')
+            setTipo(null)
+            setEnviando(false)
+        }
+    }, [visita])
+
+    const fecharModal = () => {
+        setPasso('detalhes')
+        setTipo(null)
+        setEnviando(false)
+        onFechar()
+    }
+
+    const handleParticipar = () => {
+        if (!visita) {
+            return
+        }
+
+        if (visitaAtingiuLimite(visita)) {
+            toastInfo('Visita atingiu limite de participantes')
+            return
+        }
+
+        setPasso('inscricao')
+    }
+
+    const handleConfirmar = async () => {
+        if (!visita || !tipo || enviando) {
+            return
+        }
+
+        setEnviando(true)
+
+        const sucesso = await Service.participar(visita.id!, tipo)
+
+        setEnviando(false)
+
+        if (sucesso) {
+            fecharModal()
+        }
+    }
 
     const formatarData = (d: Date) =>
         d.toLocaleDateString('pt-BR', {
@@ -24,8 +86,8 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
         d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
     return (
-        <Modal isOpen={visita !== null} onClose={onFechar} className="max-w-md">
-            {visita && (
+        <Modal isOpen={visita !== null} onClose={fecharModal} className="max-w-md">
+            {visita && passo === 'detalhes' && (
                 <div className="p-6">
                     <div className="mb-4 flex items-start justify-between gap-4">
                         <h2 className="text-lg font-semibold text-gray-900">
@@ -33,7 +95,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                         </h2>
                         <button
                             type="button"
-                            onClick={onFechar}
+                            onClick={fecharModal}
                             className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
                             aria-label="Fechar"
                         >
@@ -104,6 +166,84 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                             </div>
                         )}
                     </dl>
+
+                    {visitaAgendada && (
+                        <div className="mt-6">
+                            {jaInscrito ? (
+                                <Button className="w-full" disabled>
+                                    Você já está inscrito
+                                </Button>
+                            ) : (
+                                <Button className="w-full" onClick={handleParticipar}>
+                                    Participar
+                                </Button>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {visita && passo === 'inscricao' && (
+                <div className="p-6">
+                    <div className="mb-4 flex items-start justify-between gap-4">
+                        <h2 className="text-lg font-semibold text-gray-900">
+                            Escolha o tipo de participação
+                        </h2>
+                        <button
+                            type="button"
+                            onClick={fecharModal}
+                            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                            aria-label="Fechar"
+                        >
+                            ✕
+                        </button>
+                    </div>
+
+                    <div className="space-y-3">
+                        <button
+                            type="button"
+                            onClick={() => setTipo('palhaco')}
+                            className={`w-full rounded-lg border p-4 text-left transition-colors ${
+                                tipo === 'palhaco'
+                                    ? 'border-amber-500 bg-amber-50'
+                                    : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                        >
+                            <span className="mr-2">🎪</span>
+                            Palhaço
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setTipo('paisana')}
+                            className={`w-full rounded-lg border p-4 text-left transition-colors ${
+                                tipo === 'paisana'
+                                    ? 'border-amber-500 bg-amber-50'
+                                    : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                        >
+                            <span className="mr-2">👔</span>
+                            Paisana
+                        </button>
+                    </div>
+
+                    <div className="mt-6 flex gap-3">
+                        <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => setPasso('detalhes')}
+                            disabled={enviando}
+                        >
+                            Voltar
+                        </Button>
+                        <Button
+                            className="flex-1"
+                            onClick={handleConfirmar}
+                            disabled={!tipo || enviando}
+                        >
+                            {enviando ? 'Enviando...' : 'Confirmar'}
+                        </Button>
+                    </div>
                 </div>
             )}
         </Modal>

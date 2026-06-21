@@ -1,5 +1,27 @@
 import type { Visita, VisitaStatus } from '@/types'
 
+export const LIMITE_PARTICIPANTES = 5
+
+const STATUS_ATIVOS = ['confirmado', 'pendente']
+
+function listaAtivos(visita: Visita) {
+    return visita.participantes?.filter(
+        (p) => p.papel_na_visita === 'participante' && STATUS_ATIVOS.includes(p.status_participacao),
+    ) ?? []
+}
+
+export function contarParticipantesAtivos(visita: Visita): number {
+    return listaAtivos(visita).length
+}
+
+export function visitaAtingiuLimite(visita: Visita): boolean {
+    return contarParticipantesAtivos(visita) >= LIMITE_PARTICIPANTES
+}
+
+export function usuarioJaInscrito(visita: Visita, usuarioId: number): boolean {
+    return listaAtivos(visita).some((p) => p.voluntario_id === usuarioId)
+}
+
 export function contarParticipantes(visita: Visita) {
     const lista = visita.participantes?.filter((p) => p.papel_na_visita === 'participante') ?? []
 

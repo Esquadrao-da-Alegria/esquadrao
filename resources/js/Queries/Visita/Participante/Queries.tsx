@@ -1,0 +1,39 @@
+import { store } from '@/routes/visitas/participantes'
+import { obterCsrfToken } from '@/utils/form'
+import type { TipoParticipacao } from '@/types'
+
+type RetornoPadrao = {
+    sucesso: boolean
+    dados: unknown
+    erros: string[]
+}
+
+type DadosStore = {
+    visita_id: number
+    tipo_participacao: TipoParticipacao
+}
+
+export class Queries {
+    static async store(dados: DadosStore): Promise<RetornoPadrao> {
+        try {
+            const url = store({ visita: dados.visita_id }).url
+
+            const retorno = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': obterCsrfToken(),
+                },
+                body: JSON.stringify({
+                    tipo_participacao: dados.tipo_participacao,
+                }),
+            })
+
+            return await retorno.json()
+        } catch (error) {
+            console.error(error)
+            return { sucesso: false, dados: [], erros: ['Erro ao participar da visita!'] }
+        }
+    }
+}
