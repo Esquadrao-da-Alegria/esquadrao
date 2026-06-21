@@ -25,16 +25,19 @@ class EventoController extends Controller
     public function index(Request $request)
     {
         $filtrosBusca = [
-            ...$request->only(['tipo', 'data', 'hora_inicio', 'hora_fim', 'minha_relacao']),
+            ...$request->only(['titulo', 'tipo', 'data', 'minha_relacao', 'cidade_id']),
             'status'         => StatusEvento::AGENDADO->value,
             'retornar_lista' => true,
         ];
 
         $retorno = $this->service->index($filtrosBusca);
 
+        $cidades = $this->formService->buscarDados(null)['cidades'];
+
         return Inertia::render('Evento/Index', [
             'eventos' => $retorno['dados'],
-            'filtros' => $request->only(['tipo', 'data', 'hora_inicio', 'hora_fim', 'minha_relacao']),
+            'filtros' => $request->only(['titulo', 'tipo', 'data', 'minha_relacao', 'cidade_id']),
+            'cidades' => $cidades,
         ]);
     }
 

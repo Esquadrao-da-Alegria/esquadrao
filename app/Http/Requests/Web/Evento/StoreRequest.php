@@ -49,7 +49,7 @@ class StoreRequest extends FormRequest
             'cidade_id'          => ['required', 'integer', 'exists:cidades,id'],
             'limite_vagas'       => ['nullable', 'integer', 'min:1'],
             'feedback_habilitado' => ['required', 'boolean'],
-            'responsaveis'       => ['nullable', 'array'],
+            'responsaveis'       => ['required', 'array', 'min:1'],
             'responsaveis.*'     => ['integer', 'exists:users,id'],
         ];
     }
@@ -97,6 +97,8 @@ class StoreRequest extends FormRequest
             'limite_vagas.min'            => 'O limite de vagas deve ser pelo menos 1.',
             'feedback_habilitado.required' => 'O campo de feedback é obrigatório.',
             'feedback_habilitado.boolean' => 'O campo de feedback deve ser verdadeiro ou falso.',
+            'responsaveis.required'      => 'É obrigatório informar ao menos um responsável.',
+            'responsaveis.min'           => 'É obrigatório informar ao menos um responsável.',
         ];
     }
 }

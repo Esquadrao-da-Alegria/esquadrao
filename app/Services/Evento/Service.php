@@ -48,12 +48,10 @@ class Service
                 return $retorno;
             }
 
-            if (!empty($responsaveisIds)) {
-                $retorno['dados']['model']->responsaveis()->createMany(
-                    array_map(fn ($id) => ['voluntario_id' => $id], $responsaveisIds)
-                );
-            }
-
+            $retorno['dados']['model']->responsaveis()->createMany(
+                array_map(fn ($id) => ['voluntario_id' => $id], $responsaveisIds)
+            );
+    
             session()->flash('mensagem_sucesso', 'Evento criado com sucesso!');
             DB::commit();
 
@@ -82,12 +80,9 @@ class Service
 
             $modelo = $retorno['dados']['model'];
             $modelo->responsaveis()->delete();
-
-            if (!empty($responsaveisIds)) {
-                $modelo->responsaveis()->createMany(
-                    array_map(fn ($id) => ['voluntario_id' => $id], $responsaveisIds)
-                );
-            }
+            $modelo->responsaveis()->createMany(
+                array_map(fn ($id) => ['voluntario_id' => $id], $responsaveisIds)
+            );
 
             session()->flash('mensagem_sucesso', 'Evento atualizado com sucesso!');
             DB::commit();

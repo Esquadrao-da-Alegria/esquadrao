@@ -56,7 +56,7 @@ class UpdateRequest extends FormRequest
             'status'             => ['required', 'string', Rule::in(['AGENDADO', 'FINALIZADO', 'CANCELADO'])],
             'limite_vagas'       => ['nullable', 'integer', 'min:1'],
             'feedback_habilitado' => ['required', 'boolean'],
-            'responsaveis'       => ['nullable', 'array'],
+            'responsaveis'       => ['required', 'array', 'min:1'],
             'responsaveis.*'     => ['integer', 'exists:users,id'],
         ];
     }
@@ -100,6 +100,8 @@ class UpdateRequest extends FormRequest
             'limite_vagas.integer'        => 'O limite de vagas deve ser um número inteiro.',
             'limite_vagas.min'            => 'O limite de vagas deve ser pelo menos 1.',
             'feedback_habilitado.boolean' => 'O campo de feedback deve ser verdadeiro ou falso.',
+            'responsaveis.required'      => 'É obrigatório informar ao menos um responsável.',
+            'responsaveis.min'           => 'É obrigatório informar ao menos um responsável.',
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Evento;
 use App\Models\EventoParticipante;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 
 class Queries
 {
@@ -28,7 +29,7 @@ class Queries
                 'erros'   => [],
             ];
         } catch (\Throwable $th) {
-            \Log::error('Queries::index falhou: ' . $th->getMessage(), [
+            Log::error('Queries::index falhou: ' . $th->getMessage(), [
                 'filtros' => $filtros,
                 'sql'     => method_exists($query, 'toSql') ? $query->toSql() : 'indisponível',
             ]);

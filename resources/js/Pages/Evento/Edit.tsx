@@ -269,8 +269,8 @@ const Edit: React.FC<{ evento: any; cidades: any[]; usuarios: Usuario[] }> = ({ 
 
                     {/* Responsáveis */}
                     <div className="md:col-span-2">
-                      <label className={labelClass}>Responsáveis</label>
-                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                      <label className={labelClass}>Responsáveis <span className="text-red-500">*</span></label>
+                      <div className={`mt-1 flex flex-wrap items-center gap-2 rounded-md p-1 ${errors.responsaveis ? 'ring-1 ring-red-400' : ''}`}>
                         {data.responsaveis.map(id => {
                           const nome = usuarios.find(u => u.id === id)?.name ?? ''
                           return (
@@ -316,6 +316,9 @@ const Edit: React.FC<{ evento: any; cidades: any[]; usuarios: Usuario[] }> = ({ 
                           )}
                         </div>
                       </div>
+                      {errors.responsaveis && (
+                        <p className="mt-1 text-sm text-red-500">{errors.responsaveis}</p>
+                      )}
                     </div>
 
                     <div>

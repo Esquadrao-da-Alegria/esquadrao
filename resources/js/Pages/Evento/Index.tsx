@@ -1,7 +1,7 @@
 import PainelLayout from '@/layouts/PainelLayout'
 import { router, useForm } from '@inertiajs/react'
 import { CheckSquare, Eye, Pencil, UserPlus, XCircle } from 'lucide-react'
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import Swal from 'sweetalert2'
 
 interface Evento {
@@ -18,27 +18,44 @@ interface Evento {
   pode_editar?: boolean
 }
 
+interface Cidade {
+  id: number
+  nome: string
+}
+
 interface Filtros {
+  titulo?: string
   tipo?: string
   data?: string
-  hora_inicio?: string
-  hora_fim?: string
   minha_relacao?: string
+  cidade_id?: string
 }
 
 interface Props {
   eventos: Evento[]
   filtros?: Filtros
+  cidades: Cidade[]
 }
 
-const Index: React.FC<Props> = ({ eventos, filtros }) => {
+const Index: React.FC<Props> = ({ eventos, filtros, cidades }) => {
   const { data, setData, get } = useForm({
+    titulo:        filtros?.titulo ?? '',
     tipo:          filtros?.tipo ?? '',
     data:          filtros?.data ?? '',
-    hora_inicio:   filtros?.hora_inicio ?? '',
-    hora_fim:      filtros?.hora_fim ?? '',
     minha_relacao: filtros?.minha_relacao ?? '',
+    cidade_id:     filtros?.cidade_id ?? '',
   })
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleTituloChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = e.target.value
+    setData('titulo', valor)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      router.get('/eventos', { ...data, titulo: valor }, { preserveState: true, replace: true })
+    }, 400)
+  }
 
   const formatDate = (value?: string) => {
     if (!value) return '-'
@@ -98,60 +115,61 @@ const Index: React.FC<Props> = ({ eventos, filtros }) => {
         </div>
 
         {/* Filtros */}
-        <div className="mb-4 flex flex-wrap gap-3">
-          <select
-            value={data.tipo}
-            onChange={(e) => setData('tipo', e.target.value)}
-            className="rounded-md border border-gray-200 px-3 py-2 text-sm"
-          >
-            <option value="">Todos os tipos</option>
-            <option value="OFICINA">Oficina</option>
-            <option value="REUNIAO">Reunião</option>
-          </select>
-
-          <input
-            type="date"
-            value={data.data}
-            onChange={(e) => setData('data', e.target.value)}
-            className="rounded-md border border-gray-200 px-3 py-2 text-sm"
-          />
-
-          <div className="flex items-center gap-1">
-            <span className="text-sm text-gray-500">Começa em</span>
+        <div className="mb-4 overflow-x-auto">
+          <div className="flex min-w-max items-center gap-2">
             <input
-              type="time"
-              value={data.hora_inicio}
-              onChange={(e) => setData('hora_inicio', e.target.value)}
+              type="text"
+              value={data.titulo}
+              onChange={handleTituloChange}
+              placeholder="Buscar por nome..."
+              className="rounded-md border border-gray-200 px-3 py-2 text-sm w-52"
+            />
+
+            <input
+              type="date"
+              value={data.data}
+              onChange={(e) => setData('data', e.target.value)}
               className="rounded-md border border-gray-200 px-3 py-2 text-sm"
             />
-          </div>
 
-          <div className="flex items-center gap-1">
-            <span className="text-sm text-gray-500">Termina em</span>
-            <input
-              type="time"
-              value={data.hora_fim}
-              onChange={(e) => setData('hora_fim', e.target.value)}
+            <select
+              value={data.cidade_id}
+              onChange={(e) => setData('cidade_id', e.target.value)}
               className="rounded-md border border-gray-200 px-3 py-2 text-sm"
-            />
+            >
+              <option value="">Todas as cidades</option>
+              {cidades.map(c => (
+                <option key={c.id} value={c.id}>{c.nome}</option>
+              ))}
+            </select>
+
+            <select
+              value={data.tipo}
+              onChange={(e) => setData('tipo', e.target.value)}
+              className="rounded-md border border-gray-200 px-3 py-2 text-sm"
+            >
+              <option value="">Todos os tipos</option>
+              <option value="OFICINA">Oficina</option>
+              <option value="REUNIAO">Reunião</option>
+            </select>
+
+            <select
+              value={data.minha_relacao}
+              onChange={(e) => setData('minha_relacao', e.target.value)}
+              className="rounded-md border border-gray-200 px-3 py-2 text-sm"
+            >
+              <option value="">Todos os eventos</option>
+              <option value="responsavel">Meus eventos</option>
+              <option value="inscrito">Eventos inscritos</option>
+            </select>
+
+            <button
+              onClick={aplicarFiltros}
+              className="rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+            >
+              Filtrar
+            </button>
           </div>
-
-          <select
-            value={data.minha_relacao}
-            onChange={(e) => setData('minha_relacao', e.target.value)}
-            className="rounded-md border border-gray-200 px-3 py-2 text-sm"
-          >
-            <option value="">Todos os eventos</option>
-            <option value="responsavel">Meus eventos</option>
-            <option value="inscrito">Eventos inscritos</option>
-          </select>
-
-          <button
-            onClick={aplicarFiltros}
-            className="rounded-md bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
-          >
-            Filtrar
-          </button>
         </div>
 
         {/* Tabela */}

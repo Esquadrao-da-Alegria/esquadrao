@@ -121,7 +121,8 @@ class Filtros
         }
 
         if (!isset($filtros['ordenar_por'])) {
-            $query->orderBy('data_inicio', 'asc');
+            $query->orderBy('data_inicio', 'asc')
+                  ->orderBy('titulo', 'asc');
         }
 
         return $query;
