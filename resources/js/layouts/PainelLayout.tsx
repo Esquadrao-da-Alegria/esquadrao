@@ -1,4 +1,5 @@
 // REACT/INERTIA
+import { useEffect, useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 
 // UI
@@ -16,10 +17,11 @@ import { toastAviso, toastErro, toastSucesso } from '@/lib/utils/toast';
 // ROTAS
 import { dashboard, home, login, logout } from '@/routes';
 import { index } from '@/routes/hospitais';
-import { index as patrocinadoresIndex } from '@/routes/patrocinadores';
 import { edit } from '@/routes/profile';
+import { index as eventosIndex } from '@/routes/eventos'
+import { index as visitasIndex } from '@/routes/visitas'
 import { index as voluntariosIndex } from '@/routes/voluntarios';
-import { useEffect, useState } from 'react';
+import { index as patrocinadoresIndex } from '@/routes/patrocinadores';
 
 // TIPOS
 import { type SharedData } from '@/types';
@@ -128,9 +130,16 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
         },
         {
             titulo: 'Eventos',
-            href: '/eventos' as ReturnType<typeof dashboard>,
+            href: eventosIndex(),
             icone: CalendarDays,
             ativo: pathname === '/eventos' || /^\/eventos(\/.*)?$/.test(pathname),
+            visivel: true,
+        },
+        {
+            titulo: 'Visitas',
+            href: visitasIndex(),
+            icone: CalendarDays,
+            ativo: pathname === '/visitas',
             visivel: true,
         },
         {

@@ -68,7 +68,7 @@ Migration: `2026_06_15_000000_create_visitas_table.php`
 | `tipo` | varchar(50) — valores em `VisitaTipo`. |
 | `status` | varchar(50) — valores em `VisitaStatus`. |
 | `origem` | varchar(50) — valores em `VisitaOrigem`. |
-| `observacao` | Texto livre (nullable). |
+| `observacoes` | Texto livre (nullable). |
 | `created_at`, `updated_at` | Auditoria. |
 
 **Índices:** `visitas_inicio_em_index`, `visitas_status_index`. FKs criam índice automático em `hospital_id`, `criado_por_id`, `ala_unidade_id`, `lider_id`.
@@ -157,7 +157,7 @@ Valores persistidos como varchar(50) no banco; cast para enum PHP backed string 
 
 ### Visita (`app/Models/Visita.php`)
 
-**fillable:** `hospital_id`, `ala_unidade_id`, `criado_por_id`, `lider_id`, `inicio_em`, `fim_em`, `tipo`, `status`, `origem`, `observacao`
+**fillable:** `hospital_id`, `ala_unidade_id`, `criado_por_id`, `lider_id`, `inicio_em`, `fim_em`, `tipo`, `status`, `origem`, `observacoes`
 
 **casts:** `inicio_em`/`fim_em` → datetime; `tipo` → `VisitaTipo`; `status` → `VisitaStatus`; `origem` → `VisitaOrigem`
 
@@ -223,7 +223,7 @@ import type { Visita, VisitaStatus, VisitaParticipante } from '@/types';
 | `tipo` | `VisitaTipo` | sim | Tipo da visita. |
 | `status` | `VisitaStatus` | sim | Status da visita. |
 | `origem` | `VisitaOrigem` | sim | Origem do registro. |
-| `observacao` | `string \| null` | não | Texto livre. |
+| `observacoes` | `string \| null` | não | Texto livre. |
 | `created_at` | `string` | não | Auditoria. |
 | `updated_at` | `string` | não | Auditoria. |
 | `hospital` | `Hospital` | não | Relacionamento eager-loaded. |
@@ -330,10 +330,47 @@ VisitaParticipante::query()->create([
 | `tests/Feature/Visita/MigrationTest.php` | Tabelas criadas |
 | `tests/Feature/Visita/VisitaModelTest.php` | Casts e relacionamentos de `Visita` |
 | `tests/Feature/Visita/VisitaParticipanteModelTest.php` | Casts, relacionamentos e unique por comportamento |
+| `tests/Feature/Visita/VisitaIndexTest.php` | Rota index, filtro de mês, auth |
 
 ```bash
 vendor/bin/sail artisan test --compact tests/Unit/Visita tests/Feature/Visita
 ```
+
+---
+
+## Rotas Web
+
+| Método | URI | Action | Nome |
+|--------|-----|--------|------|
+| GET | `/visitas` | `VisitaController@index` | `visitas.index` |
+
+Query string: `?mes=YYYY-MM` — filtra visitas pelo mês de `inicio_em`.
+
+Camadas: `VisitaController` → `Visita\Service` → `Visita\Queries`
+
+---
+
+## Frontend — Calendário (Index)
+
+Página `/visitas` com calendário mensal de visitas para usuários autenticados.
+
+### Arquivos
+
+| Arquivo | Responsabilidade |
+|---------|------------------|
+| `Pages/Visita/Index.tsx` | Page principal — estado de modais, navegação de mês |
+| `components/Painel/Visita/Card/Show.tsx` | Card de visita no calendário |
+| `components/Painel/Visita/Calendario/Show.tsx` | Grade mensal |
+| `components/Painel/Visita/Calendario/Detalhes/Modal/Show.tsx` | Modal de detalhes |
+| `components/Painel/Visita/Calendario/ListaCompleta/Modal/Show.tsx` | Modal lista completa do dia |
+| `lib/visita.ts` | Helpers: `contarParticipantes`, `classeCardPorStatus`, `labelStatus` |
+
+### Regras
+
+- Sem rota `show` — dados de detalhes em memória (props Inertia)
+- Overflow: máximo 2 cards por dia; "+X mais" abre modal de lista completa
+- Navegação de mês via `router.visit` com Inertia (sem reload de página)
+- Estado dos modais centralizado na Page
 
 ---
 

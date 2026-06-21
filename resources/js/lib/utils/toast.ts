@@ -23,6 +23,14 @@ export const toastAviso = (mensagem: string) => {
     });
 }
 
+export const toastInfo = (mensagem: string) => {
+    Swal.fire({
+        title: "Informação",
+        text: mensagem,
+        icon: "info"
+    });
+}
+
 export const toastConfirmacao = async (mensagem: string) => {
 
     const retorno = await Swal.fire({

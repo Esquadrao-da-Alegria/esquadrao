@@ -211,7 +211,7 @@ export interface Visita {
     tipo: VisitaTipo;
     status: VisitaStatus;
     origem: VisitaOrigem;
-    observacao?: string | null;
+    observacoes?: string | null;
     created_at?: string;
     updated_at?: string;
     hospital?: Hospital;

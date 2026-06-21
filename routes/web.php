@@ -4,6 +4,7 @@ use App\Http\Controllers\Web\EventoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\ConviteCadastroController;
+use App\Http\Controllers\Web\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -57,15 +58,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('cidades', [CidadeController::class, 'index'])->name('cidades.index');
     });
 
-
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
     Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
     Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
 
+    // VISITAS
+    Route::resource('/visitas', VisitaController::class)
+        ->parameters(['visitas' => 'visita'])
+        ->only(['index']);
+
     // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
-
 
         Route::get('/eventos/create', [EventoController::class, 'create'])->name('eventos.create');
         Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
