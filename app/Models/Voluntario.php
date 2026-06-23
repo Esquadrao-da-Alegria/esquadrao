@@ -29,6 +29,8 @@ class Voluntario extends Model
         'email_verified_at',
         'convite_enviado_em',
         'convite_expira_em',
+        'convite_status',
+        'convite_utilizado_em',
         'inativado_em',
         'cargos',
     ];
@@ -79,6 +81,16 @@ class Voluntario extends Model
     public function getConviteExpiraEmAttribute(): mixed
     {
         return $this->conviteCadastroAtual?->expira_em ?? $this->user?->convite_expira_em;
+    }
+
+    public function getConviteStatusAttribute(): ?string
+    {
+        return $this->conviteCadastroAtual?->status;
+    }
+
+    public function getConviteUtilizadoEmAttribute(): mixed
+    {
+        return $this->conviteCadastroAtual?->utilizado_em;
     }
 
     public function getInativadoEmAttribute(): mixed

@@ -1,6 +1,6 @@
 import { User } from '@/types';
 
-export type StatusKey = 'pendente' | 'convite_enviado' | 'convite_expirado';
+export type StatusKey = 'pendente' | 'aceito' | 'expirado' | 'cancelado';
 
 export type StatusFiltro = StatusKey | 'todos';
 

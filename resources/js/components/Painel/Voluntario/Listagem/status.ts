@@ -8,14 +8,19 @@ export const statusOptions: StatusOption[] = [
         className: 'bg-gray-100 text-gray-700',
     },
     {
-        key: 'convite_enviado',
-        label: 'Convite Enviado',
-        className: 'bg-indigo-50 text-indigo-700',
+        key: 'aceito',
+        label: 'Aceito',
+        className: 'bg-emerald-50 text-emerald-700',
     },
     {
-        key: 'convite_expirado',
-        label: 'Convite Expirado',
+        key: 'expirado',
+        label: 'Expirado',
         className: 'bg-red-50 text-red-700',
+    },
+    {
+        key: 'cancelado',
+        label: 'Cancelado',
+        className: 'bg-gray-100 text-gray-500',
     },
 ];
 
@@ -24,29 +29,26 @@ export const statusMap = new Map(
 );
 
 export const getStatusKey = (voluntario: User): StatusKey => {
+    if (
+        voluntario.convite_status === 'UTILIZADO' ||
+        voluntario.convite_utilizado_em
+    ) {
+        return 'aceito';
+    }
+
+    if (voluntario.convite_status === 'CANCELADO') {
+        return 'cancelado';
+    }
+
     const conviteExpirado =
-        voluntario.status === 'convite_enviado' &&
+        ['PENDENTE', 'ENVIADO', undefined, null].includes(
+            voluntario.convite_status,
+        ) &&
         voluntario.convite_expira_em &&
         new Date(voluntario.convite_expira_em).getTime() < Date.now();
 
-    if (voluntario.status === 'inativo') {
-        return 'pendente';
-    }
-
-    if (conviteExpirado) {
-        return 'convite_expirado';
-    }
-
-    if (voluntario.status === 'convite_enviado') {
-        return 'convite_enviado';
-    }
-
-    if (voluntario.email_verified_at) {
-        return 'pendente';
-    }
-
-    if (voluntario.status === 'ativo') {
-        return 'pendente';
+    if (voluntario.convite_status === 'EXPIRADO' || conviteExpirado) {
+        return 'expirado';
     }
 
     return 'pendente';
@@ -61,10 +63,11 @@ export const mapVoluntariosStatus = (
     }));
 
 export const podeReenviarConvite = (statusKey: StatusKey) => {
-    return ['pendente', 'convite_enviado', 'convite_expirado'].includes(
-        statusKey,
-    );
+    return ['pendente', 'expirado'].includes(statusKey);
 };
+
+export const podeCancelarConvite = (statusKey: StatusKey) =>
+    statusKey === 'pendente';
 
 export const formatarData = (data?: string) => {
     if (!data) {

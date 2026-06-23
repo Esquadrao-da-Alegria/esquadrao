@@ -96,6 +96,8 @@ Os estados preservados no código são:
 
 Os convites possuem estados próprios em `ConviteCadastro`: pendente, enviado, utilizado, expirado e cancelado.
 
+Na listagem administrativa, esses estados são consolidados como `Pendente`, `Aceito`, `Expirado` e `Cancelado`. Convites enviados e ainda válidos são apresentados como pendentes.
+
 Não introduzir `bloqueado` ou outros estados sem definir antes as regras de login, autorização, listagem e transição. Hoje o login valida credenciais, mas não bloqueia explicitamente a autenticação com base em `users.status`.
 
 ---
@@ -116,6 +118,8 @@ Não introduzir `bloqueado` ou outros estados sem definir antes as regras de log
 3. Cria uma conta vinculada com senha aleatória e cargo `voluntario`.
 4. Cria `convites_cadastro` e envia a notificação conforme o driver de e-mail configurado.
 5. Reenvios cancelam convites pendentes anteriores e geram um token novo.
+
+Cada convite expira sete dias após sua criação ou reenvio.
 
 ### Conclusão pelo convidado
 
@@ -181,6 +185,7 @@ Migrations principais:
 - `2026_06_08_000000_create_voluntarios_table_and_link_users.php`
 - `2026_06_08_010000_create_convites_cadastro_table.php`
 - `2026_06_23_000000_add_complementary_fields_to_voluntarios_table.php`
+- `2026_06_23_010000_extend_pending_invites_to_seven_days.php`
 
 ---
 
@@ -214,4 +219,3 @@ Verificação manual:
 - Avaliar validação matemática do CPF além do formato.
 - Avaliar remoção futura dos campos legados de convite em `users` somente após migração e período de compatibilidade.
 - Manter testes de autorização para usuário comum e administrador quando o runner PHPUnit estiver disponível.
-

@@ -120,7 +120,7 @@ class Queries
             ];
         }
 
-        $status = ['pendente', 'convite_enviado', 'convite_expirado'];
+        $status = ['pendente', 'aceito', 'expirado', 'cancelado'];
 
         $contadores = collect($status)
             ->mapWithKeys(function (string $status) use ($filtros) {
@@ -161,7 +161,8 @@ class Queries
         if ($aba === 'convidados') {
             $query->where(function (Builder $query) {
                 $query
-                    ->whereNull('status')
+                    ->whereHas('convitesCadastro')
+                    ->orWhereNull('status')
                     ->orWhere('status', User::STATUS_CONVITE_ENVIADO);
             });
 
@@ -187,78 +188,76 @@ class Queries
     {
         switch ($status) {
             case 'pendente':
-                $query->whereNull('status');
+                $query->where(function (Builder $query) {
+                    $query
+                        ->whereHas('conviteCadastroAtual', function (Builder $query) {
+                            $query
+                                ->whereIn('status', [
+                                    ConviteCadastro::STATUS_PENDENTE,
+                                    ConviteCadastro::STATUS_ENVIADO,
+                                ])
+                                ->where(function (Builder $query) {
+                                    $query
+                                        ->whereNull('expira_em')
+                                        ->orWhere('expira_em', '>=', now());
+                                });
+                        })
+                        ->orWhere(function (Builder $query) {
+                            $query
+                                ->whereDoesntHave('convitesCadastro')
+                                ->where(function (Builder $query) {
+                                    $query
+                                        ->whereNull('status')
+                                        ->orWhere(function (Builder $query) {
+                                            $query
+                                                ->where('status', User::STATUS_CONVITE_ENVIADO)
+                                                ->whereHas('user', function (Builder $query) {
+                                                    $query
+                                                        ->whereNull('convite_expira_em')
+                                                        ->orWhere('convite_expira_em', '>=', now());
+                                                });
+                                        });
+                                });
+                        });
+                });
 
                 break;
 
-            case 'convite_enviado':
-                $query
-                    ->where('status', User::STATUS_CONVITE_ENVIADO)
-                    ->where(function (Builder $query) {
-                        $query
-                            ->whereHas('convitesCadastro', function (Builder $query) {
-                                $query
-                                    ->whereIn('status', [
-                                        ConviteCadastro::STATUS_PENDENTE,
-                                        ConviteCadastro::STATUS_ENVIADO,
-                                    ])
-                                    ->where(function (Builder $query) {
-                                        $query
-                                            ->whereNull('expira_em')
-                                            ->orWhere('expira_em', '>=', now());
-                                    });
-                            })
-                            ->orWhereHas('user', function (Builder $query) {
-                                $query
-                                    ->whereNull('convite_expira_em')
-                                    ->orWhere('convite_expira_em', '>=', now());
-                            });
-                    });
+            case 'aceito':
+                $query->whereHas('conviteCadastroAtual', function (Builder $query) {
+                    $query
+                        ->where('status', ConviteCadastro::STATUS_UTILIZADO)
+                        ->orWhereNotNull('utilizado_em');
+                });
 
                 break;
 
-            case 'convite_expirado':
-                $query
-                    ->where('status', User::STATUS_CONVITE_ENVIADO)
-                    ->where(function (Builder $query) {
-                        $query
-                            ->whereHas('convitesCadastro', function (Builder $query) {
-                                $query
-                                    ->whereIn('status', [
-                                        ConviteCadastro::STATUS_PENDENTE,
-                                        ConviteCadastro::STATUS_ENVIADO,
-                                        ConviteCadastro::STATUS_EXPIRADO,
-                                    ])
-                                    ->whereNotNull('expira_em')
-                                    ->where('expira_em', '<', now());
-                            })
-                            ->orWhereHas('user', function (Builder $query) {
-                                $query
-                                    ->whereNotNull('convite_expira_em')
-                                    ->where('convite_expira_em', '<', now());
-                            });
-                    });
+            case 'expirado':
+                $query->whereHas('conviteCadastroAtual', function (Builder $query) {
+                    $query
+                        ->where('status', ConviteCadastro::STATUS_EXPIRADO)
+                        ->orWhere(function (Builder $query) {
+                            $query
+                                ->whereIn('status', [
+                                    ConviteCadastro::STATUS_PENDENTE,
+                                    ConviteCadastro::STATUS_ENVIADO,
+                                ])
+                                ->whereNotNull('expira_em')
+                                ->where('expira_em', '<', now());
+                        });
+                });
 
                 break;
 
-            case 'cadastro_completo':
-                $query
-                    ->whereHas('user', fn (Builder $query) => $query->whereNotNull('email_verified_at'))
-                    ->where('status', '!=', User::STATUS_INATIVO);
+            case 'cancelado':
+                $query->whereHas(
+                    'conviteCadastroAtual',
+                    fn (Builder $query) => $query->where('status', ConviteCadastro::STATUS_CANCELADO)
+                );
 
                 break;
 
-            case 'inativo':
-                $query->where('status', User::STATUS_INATIVO);
-
-                break;
-
-            case 'ativo':
             default:
-                $query
-                    ->where('status', User::STATUS_ATIVO)
-                    ->whereHas('user', fn (Builder $query) => $query->whereNull('email_verified_at'));
-
                 break;
         }
 

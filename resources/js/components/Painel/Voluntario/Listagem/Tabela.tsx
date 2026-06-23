@@ -13,6 +13,7 @@ import {
     getCidade,
     getIniciais,
     getStatusVoluntario,
+    podeCancelarConvite,
     podeReenviarConvite,
     statusMap,
 } from './status';
@@ -161,58 +162,63 @@ const Tabela: React.FC<Props> = ({
                                                             <MailPlus className="size-4" />
                                                         </button>
                                                     ) : null}
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger className="inline-flex size-8 items-center justify-center rounded-full transition hover:bg-amber-50 hover:text-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
-                                                            <MoreHorizontal className="size-4" />
-                                                            <span className="sr-only">
-                                                                Ações
-                                                            </span>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            {convidados ? (
-                                                                <DropdownMenuItem
-                                                                    onSelect={() =>
-                                                                        onCancelarConvite(
-                                                                            voluntario,
-                                                                        )
-                                                                    }
-                                                                    className="flex cursor-pointer items-center gap-2 text-red-600 focus:text-red-700"
-                                                                >
-                                                                    <Ban className="size-4" />
-                                                                    Excluir
-                                                                    convite
-                                                                </DropdownMenuItem>
-                                                            ) : (
-                                                                <>
-                                                                    <DropdownMenuItem
-                                                                        asChild
-                                                                    >
-                                                                        <Link
-                                                                            href={edit.url(
-                                                                                voluntario.id,
-                                                                            )}
-                                                                            className="flex cursor-pointer items-center gap-2"
-                                                                        >
-                                                                            <Pencil className="size-4" />
-                                                                            Editar
-                                                                        </Link>
-                                                                    </DropdownMenuItem>
-                                                                    <DropdownMenuSeparator />
+                                                    {(!convidados ||
+                                                        podeCancelarConvite(
+                                                            voluntario.statusKey,
+                                                        )) && (
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger className="inline-flex size-8 items-center justify-center rounded-full transition hover:bg-amber-50 hover:text-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
+                                                                <MoreHorizontal className="size-4" />
+                                                                <span className="sr-only">
+                                                                    Ações
+                                                                </span>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                {convidados ? (
                                                                     <DropdownMenuItem
                                                                         onSelect={() =>
-                                                                            onInativar(
+                                                                            onCancelarConvite(
                                                                                 voluntario,
                                                                             )
                                                                         }
                                                                         className="flex cursor-pointer items-center gap-2 text-red-600 focus:text-red-700"
                                                                     >
                                                                         <Ban className="size-4" />
-                                                                        Inativar
+                                                                        Excluir
+                                                                        convite
                                                                     </DropdownMenuItem>
-                                                                </>
-                                                            )}
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
+                                                                ) : (
+                                                                    <>
+                                                                        <DropdownMenuItem
+                                                                            asChild
+                                                                        >
+                                                                            <Link
+                                                                                href={edit.url(
+                                                                                    voluntario.id,
+                                                                                )}
+                                                                                className="flex cursor-pointer items-center gap-2"
+                                                                            >
+                                                                                <Pencil className="size-4" />
+                                                                                Editar
+                                                                            </Link>
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuSeparator />
+                                                                        <DropdownMenuItem
+                                                                            onSelect={() =>
+                                                                                onInativar(
+                                                                                    voluntario,
+                                                                                )
+                                                                            }
+                                                                            className="flex cursor-pointer items-center gap-2 text-red-600 focus:text-red-700"
+                                                                        >
+                                                                            <Ban className="size-4" />
+                                                                            Inativar
+                                                                        </DropdownMenuItem>
+                                                                    </>
+                                                                )}
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    )}
                                                 </div>
                                             </td>
                                         ) : null}

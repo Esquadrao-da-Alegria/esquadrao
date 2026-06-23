@@ -425,6 +425,6 @@ class Service
 
     private function calcularExpiracaoConvite(): \Illuminate\Support\Carbon
     {
-        return now()->addMinutes((int) config('auth.passwords.users.expire', 60));
+        return now()->addDays(7);
     }
 }

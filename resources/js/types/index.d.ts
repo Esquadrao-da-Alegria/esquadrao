@@ -43,6 +43,14 @@ export interface User {
     status?: 'ativo' | 'convite_enviado' | 'inativo';
     convite_enviado_em?: string | null;
     convite_expira_em?: string | null;
+    convite_status?:
+        | 'PENDENTE'
+        | 'ENVIADO'
+        | 'UTILIZADO'
+        | 'EXPIRADO'
+        | 'CANCELADO'
+        | null;
+    convite_utilizado_em?: string | null;
     inativado_em?: string | null;
     cidade_base_id?: number | null;
     cidade_base?: Cidade | null;
