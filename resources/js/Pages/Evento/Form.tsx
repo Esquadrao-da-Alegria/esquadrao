@@ -1,0 +1,13 @@
+import { type Evento, type User } from '@/types'
+import { useForm } from '@inertiajs/react'
+
+interface Props { evento?: Evento; responsaveis: User[]; action: string; method: 'post' | 'put' }
+export default function Form({ evento, responsaveis, action, method }: Props) {
+  const { data, setData, post, put, processing, errors } = useForm({
+    titulo: evento?.titulo ?? '', tipo: evento?.tipo ?? 'evento', descricao: evento?.descricao ?? '', local: evento?.local ?? '',
+    data_inicio: evento?.data_inicio?.slice(0,16) ?? '', data_fim: evento?.data_fim?.slice(0,16) ?? '', limite_participantes: evento?.limite_participantes?.toString() ?? '', responsavel_id: evento?.responsavel_id?.toString() ?? '',
+  })
+  const submit = (e: React.FormEvent) => { e.preventDefault(); method === 'post' ? post(action) : put(action) }
+  const input = 'mt-1 w-full rounded border p-2'
+  return <form onSubmit={submit} className="space-y-4 rounded-xl border bg-white p-6 shadow-sm"><div><label>Título</label><input className={input} value={data.titulo} onChange={(e) => setData('titulo', e.target.value)} />{errors.titulo}</div><div><label>Tipo</label><select className={input} value={data.tipo} onChange={(e) => setData('tipo', e.target.value as 'oficina' | 'reuniao' | 'evento')}><option value="oficina">Oficina</option><option value="reuniao">Reunião</option><option value="evento">Evento</option></select></div><div><label>Descrição</label><textarea className={input} value={data.descricao} onChange={(e) => setData('descricao', e.target.value)} /></div><div><label>Local</label><input className={input} value={data.local} onChange={(e) => setData('local', e.target.value)} /></div><div className="grid gap-4 sm:grid-cols-2"><div><label>Data início</label><input type="datetime-local" className={input} value={data.data_inicio} onChange={(e) => setData('data_inicio', e.target.value)} />{errors.data_inicio}</div><div><label>Data fim</label><input type="datetime-local" className={input} value={data.data_fim} onChange={(e) => setData('data_fim', e.target.value)} /></div></div><div className="grid gap-4 sm:grid-cols-2"><div><label>Limite</label><input type="number" className={input} value={data.limite_participantes} onChange={(e) => setData('limite_participantes', e.target.value)} />{errors.limite_participantes}</div><div><label>Responsável</label><select className={input} value={data.responsavel_id} onChange={(e) => setData('responsavel_id', e.target.value)}><option value="">Selecione</option>{responsaveis.map((u) => <option value={u.id} key={u.id}>{u.name}</option>)}</select></div></div><button disabled={processing} className="rounded bg-amber-500 px-4 py-2 font-medium text-white">Salvar</button></form>
+}

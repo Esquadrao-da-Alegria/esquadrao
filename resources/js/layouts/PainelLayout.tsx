@@ -25,6 +25,7 @@ import { dashboard, home, login, logout } from '@/routes'
 import { type SharedData } from '@/types'
 import {
     Building2,
+    CalendarDays,
     ChevronDown,
     Handshake,
     LayoutGrid,
@@ -119,6 +120,13 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             href: index(),
             icone: Building2,
             ativo: isHospitaisNav && !isHospitaisCreate,
+            visivel: true,
+        },
+        {
+            titulo: 'Eventos',
+            href: '/eventos' as ReturnType<typeof dashboard>,
+            icone: CalendarDays,
+            ativo: pathname === '/eventos' || /^\/eventos(\/.*)?$/.test(pathname),
             visivel: true,
         },
         {
@@ -286,6 +294,16 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 >
                                     <Building2 className="size-4 shrink-0 opacity-70" aria-hidden />
                                     Hospitais
+                                </Link>
+                                <Link
+                                    href="/eventos"
+                                    className={`${navLinkClass} ${navLinkActive(
+                                        pathname === '/eventos' || /^\/eventos(\/.*)?$/.test(pathname),
+                                    )} flex items-center gap-2`}
+                                    onClick={closeMobile}
+                                >
+                                    <CalendarDays className="size-4 shrink-0 opacity-70" aria-hidden />
+                                    Eventos
                                 </Link>
                                 {ehAdministrador ? (
                                     <Link
