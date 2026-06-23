@@ -13,11 +13,15 @@ class Voluntario extends Model
 
     protected $fillable = [
         'nome_completo',
+        'nome_doutor',
         'email',
         'telefone',
         'data_nascimento',
+        'cpf',
         'cidade_base_id',
+        'data_entrada_ong',
         'status',
+        'observacoes',
     ];
 
     protected $appends = [
@@ -33,6 +37,7 @@ class Voluntario extends Model
     {
         return [
             'data_nascimento' => 'date',
+            'data_entrada_ong' => 'date',
         ];
     }
 

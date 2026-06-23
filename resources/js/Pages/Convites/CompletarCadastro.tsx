@@ -12,9 +12,12 @@ import React from 'react';
 interface ConviteDados {
     email: string;
     nome: string;
+    nome_doutor: string | null;
     telefone: string | null;
     data_nascimento: string | null;
+    cpf: string | null;
     cidade_base_id: number | null;
+    observacoes: string | null;
 }
 
 interface Props {
@@ -26,6 +29,24 @@ interface Props {
 }
 
 const somenteNumeros = (valor: string) => valor.replace(/\D/g, '').slice(0, 11);
+
+const formatarCpf = (valor: string) => {
+    const numeros = somenteNumeros(valor);
+
+    if (numeros.length <= 3) {
+        return numeros;
+    }
+
+    if (numeros.length <= 6) {
+        return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
+    }
+
+    if (numeros.length <= 9) {
+        return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6)}`;
+    }
+
+    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6, 9)}-${numeros.slice(9)}`;
+};
 
 const formatarTelefone = (valor: string) => {
     const numeros = somenteNumeros(valor);
@@ -65,12 +86,15 @@ export default function CompletarCadastro({
 }: Props) {
     const form = useForm({
         nome_completo: convite?.nome ?? '',
+        nome_doutor: convite?.nome_doutor ?? '',
         email: convite?.email ?? '',
         telefone: convite?.telefone ? formatarTelefone(convite.telefone) : '',
         data_nascimento: convite?.data_nascimento ?? '',
+        cpf: convite?.cpf ? formatarCpf(convite.cpf) : '',
         cidade_base_id: convite?.cidade_base_id
             ? String(convite.cidade_base_id)
             : '',
+        observacoes: convite?.observacoes ?? '',
         password: '',
         password_confirmation: '',
     });
@@ -96,9 +120,7 @@ export default function CompletarCadastro({
     return (
         <AuthLayout
             title={
-                conviteValido
-                    ? 'Complete seu cadastro'
-                    : 'Convite indisponível'
+                conviteValido ? 'Complete seu cadastro' : 'Convite indisponível'
             }
             description={
                 conviteValido
@@ -148,6 +170,19 @@ export default function CompletarCadastro({
                     </div>
 
                     <div className="space-y-2">
+                        <Label htmlFor="nome_doutor">Nome do doutor</Label>
+                        <Input
+                            id="nome_doutor"
+                            value={form.data.nome_doutor}
+                            onChange={(event) =>
+                                form.setData('nome_doutor', event.target.value)
+                            }
+                            autoComplete="nickname"
+                        />
+                        <InputError message={form.errors.nome_doutor} />
+                    </div>
+
+                    <div className="space-y-2">
                         <Label htmlFor="telefone">Telefone</Label>
                         <Input
                             id="telefone"
@@ -189,6 +224,25 @@ export default function CompletarCadastro({
                     </div>
 
                     <div className="space-y-2">
+                        <Label htmlFor="cpf">CPF</Label>
+                        <Input
+                            id="cpf"
+                            value={form.data.cpf}
+                            onChange={(event) =>
+                                form.setData(
+                                    'cpf',
+                                    formatarCpf(event.target.value),
+                                )
+                            }
+                            autoComplete="off"
+                            inputMode="numeric"
+                            maxLength={14}
+                            placeholder="000.000.000-00"
+                        />
+                        <InputError message={form.errors.cpf} />
+                    </div>
+
+                    <div className="space-y-2">
                         <Label htmlFor="cidade_base_id">Cidade base</Label>
                         <select
                             id="cidade_base_id"
@@ -200,7 +254,7 @@ export default function CompletarCadastro({
                                 )
                             }
                             required
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <option value="">Selecione uma cidade</option>
                             {cidades.map((cidade) => (
@@ -210,6 +264,20 @@ export default function CompletarCadastro({
                             ))}
                         </select>
                         <InputError message={form.errors.cidade_base_id} />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="observacoes">Observações</Label>
+                        <textarea
+                            id="observacoes"
+                            value={form.data.observacoes}
+                            onChange={(event) =>
+                                form.setData('observacoes', event.target.value)
+                            }
+                            rows={4}
+                            className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                        <InputError message={form.errors.observacoes} />
                     </div>
 
                     <div className="space-y-2">

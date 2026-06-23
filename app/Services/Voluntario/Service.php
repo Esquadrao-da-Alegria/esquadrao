@@ -51,6 +51,7 @@ class Service
             $dadosVoluntario = [
                 'nome_completo' => $dados['name'],
                 'email' => $dados['email'],
+                'data_entrada_ong' => now()->toDateString(),
                 'status' => User::STATUS_ATIVO,
             ];
 

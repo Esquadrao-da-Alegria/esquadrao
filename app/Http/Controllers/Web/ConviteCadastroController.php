@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
@@ -27,9 +28,12 @@ class ConviteCadastroController extends Controller
             'convite' => $validacao['valido'] ? [
                 'email' => $convite->email,
                 'nome' => $convite->voluntario->nome_completo,
+                'nome_doutor' => $convite->voluntario->nome_doutor,
                 'telefone' => $convite->voluntario->telefone,
                 'data_nascimento' => $convite->voluntario->data_nascimento?->format('Y-m-d'),
+                'cpf' => $convite->voluntario->cpf,
                 'cidade_base_id' => $convite->voluntario->cidade_base_id,
+                'observacoes' => $convite->voluntario->observacoes,
             ] : null,
             'cidades' => $this->cidades(),
         ]);
@@ -48,14 +52,26 @@ class ConviteCadastroController extends Controller
 
         $request->merge([
             'telefone' => $this->formatarTelefone((string) $request->input('telefone', '')),
+            'cpf' => $this->formatarCpf((string) $request->input('cpf', '')),
         ]);
+
+        $voluntario = $convite->voluntario;
 
         $dados = $request->validate([
             'nome_completo' => ['required', 'string', 'max:255'],
+            'nome_doutor' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
             'telefone' => ['required', 'string', 'max:15', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
             'data_nascimento' => ['required', 'date', 'before_or_equal:today'],
+            'cpf' => [
+                'nullable',
+                'string',
+                'max:14',
+                'regex:/^\d{3}\.\d{3}\.\d{3}-\d{2}$/',
+                Rule::unique('voluntarios', 'cpf')->ignore($voluntario->id),
+            ],
             'cidade_base_id' => ['required', 'integer', 'exists:cidades,id'],
+            'observacoes' => ['nullable', 'string', 'max:5000'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'password_confirmation' => ['required', 'string'],
         ], [
@@ -65,6 +81,8 @@ class ConviteCadastroController extends Controller
             'data_nascimento.required' => 'Informe sua data de nascimento.',
             'data_nascimento.date' => 'Informe uma data de nascimento válida.',
             'data_nascimento.before_or_equal' => 'A data de nascimento não pode ser futura.',
+            'cpf.regex' => 'Informe um CPF válido no formato 000.000.000-00.',
+            'cpf.unique' => 'Este CPF já está cadastrado.',
             'cidade_base_id.required' => 'Selecione sua cidade base.',
             'cidade_base_id.exists' => 'Selecione uma cidade válida.',
             'password.required' => 'Crie uma senha para acessar o sistema.',
@@ -82,11 +100,15 @@ class ConviteCadastroController extends Controller
             $voluntario = $convite->voluntario;
             $voluntario->update([
                 'nome_completo' => $dados['nome_completo'],
+                'nome_doutor' => $dados['nome_doutor'] ?? null,
                 'email' => $convite->email,
                 'telefone' => $dados['telefone'],
                 'data_nascimento' => $dados['data_nascimento'],
+                'cpf' => $dados['cpf'] ?: null,
                 'cidade_base_id' => $dados['cidade_base_id'],
+                'data_entrada_ong' => $voluntario->data_entrada_ong ?? now()->toDateString(),
                 'status' => User::STATUS_ATIVO,
+                'observacoes' => $dados['observacoes'] ?? null,
             ]);
 
             $usuario = $voluntario->user ?: User::query()->firstOrNew([
@@ -199,5 +221,26 @@ class ConviteCadastroController extends Controller
         }
 
         return $telefone;
+    }
+
+    private function formatarCpf(string $cpf): ?string
+    {
+        $numeros = preg_replace('/\D/', '', $cpf);
+
+        if ($numeros === '') {
+            return null;
+        }
+
+        if (strlen($numeros) !== 11) {
+            return $cpf;
+        }
+
+        return sprintf(
+            '%s.%s.%s-%s',
+            substr($numeros, 0, 3),
+            substr($numeros, 3, 3),
+            substr($numeros, 6, 3),
+            substr($numeros, 9)
+        );
     }
 }
