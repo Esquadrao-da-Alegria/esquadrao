@@ -9,14 +9,15 @@ class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_registration_screen_can_be_rendered()
+    public function test_registration_screen_redirects_to_login()
     {
         $response = $this->get(route('register'));
 
-        $response->assertStatus(200);
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('status', 'Novos cadastros são realizados somente por convite de um administrador.');
     }
 
-    public function test_new_users_can_register()
+    public function test_new_users_cannot_bypass_invitation_flow_with_public_registration()
     {
         $response = $this->post(route('register.store'), [
             'name' => 'Test User',
@@ -25,7 +26,8 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertGuest();
+        $response->assertForbidden();
+        $this->assertDatabaseMissing('users', ['email' => 'test@example.com']);
     }
 }
