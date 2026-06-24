@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react';
 import { type SharedData } from '@/types';
 import {
     Building2,
+    CalendarDays,
     ChevronDown,
     Handshake,
     LayoutGrid,
@@ -124,6 +125,13 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             icone: Building2,
             ativo: isHospitaisNav && !isHospitaisCreate,
             visivel: ehAdministrador,
+        },
+        {
+            titulo: 'Eventos',
+            href: '/eventos' as ReturnType<typeof dashboard>,
+            icone: CalendarDays,
+            ativo: pathname === '/eventos' || /^\/eventos(\/.*)?$/.test(pathname),
+            visivel: true,
         },
         {
             titulo: 'Voluntários',

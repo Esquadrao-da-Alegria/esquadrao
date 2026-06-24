@@ -138,3 +138,38 @@ interface AlaHospital {
     created_at?: string;
     updated_at?: string;
 }
+export type EventoTipo = 'oficina' | 'reuniao' | 'evento';
+export type EventoStatus = 'agendado' | 'cancelado';
+
+export interface EventoParticipante {
+    id: number;
+    name: string;
+    email: string;
+    pivot?: {
+        status: 'inscrito' | 'cancelado';
+        inscrito_em: string | null;
+        cancelado_em: string | null;
+    };
+}
+
+export interface Evento {
+    id: number;
+    titulo: string;
+    tipo: EventoTipo;
+    descricao: string | null;
+    local: string | null;
+    data_inicio: string;
+    data_fim: string | null;
+    limite_participantes: number | null;
+    status: EventoStatus;
+    responsavel_id: number | null;
+    criado_por_id: number;
+    motivo_cancelamento: string | null;
+    cancelado_em: string | null;
+    cancelado_por_id: number | null;
+    participantes_ativos_count?: number;
+    responsavel?: User | null;
+    participantes_ativos?: EventoParticipante[];
+    created_at: string;
+    updated_at: string;
+}

@@ -71,6 +71,14 @@ class User extends Authenticatable
     /**
      * Cargos deste usuário do sistema.
      */
+    public function eventosInscritos(): BelongsToMany
+    {
+        return $this->belongsToMany(Evento::class, 'evento_participantes')
+            ->using(EventoParticipante::class)
+            ->withPivot(['status', 'inscrito_em', 'cancelado_em'])
+            ->withTimestamps();
+    }
+
     public function cargos(): BelongsToMany
     {
         return $this->belongsToMany(Cargo::class, 'voluntario_cargo', 'voluntario_id', 'cargo_id')
