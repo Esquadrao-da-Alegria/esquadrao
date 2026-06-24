@@ -30,6 +30,7 @@ export interface SharedData {
     eh_administrador?: boolean;
     mensagem_sucesso?: string | null;
     mensagem_erro?: string | null;
+    mensagem_alerta?: string | null;
     link_convite?: string | null;
     [key: string]: unknown;
 }

@@ -11,7 +11,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { toastErro, toastSucesso } from '@/lib/utils/toast';
+import { toastAviso, toastErro, toastSucesso } from '@/lib/utils/toast';
 
 // ROTAS
 import { dashboard, home, login, logout } from '@/routes';
@@ -65,10 +65,16 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     useEffect(() => {
         const mensagemSucesso = props.mensagem_sucesso;
         const mensagemErro = props.mensagem_erro;
+        const mensagemAlerta = props.mensagem_alerta;
 
         if (mensagemSucesso) toastSucesso(mensagemSucesso);
         if (mensagemErro) toastErro(mensagemErro);
-    }, [props.mensagem_sucesso, props.mensagem_erro]);
+        if (mensagemAlerta) toastAviso(mensagemAlerta);
+    }, [
+        props.mensagem_sucesso,
+        props.mensagem_erro,
+        props.mensagem_alerta,
+    ]);
 
     const closeMobile = () => setMobileOpen(false);
 
