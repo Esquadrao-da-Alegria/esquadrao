@@ -14,7 +14,7 @@ class UpdateRequest extends FormRequest
 
     public function rules(): array
     {
-        /** @var \App\Models\User $voluntario */
+        /** @var \App\Models\Voluntario $voluntario */
         $voluntario = $this->route('voluntario');
 
         return [
@@ -24,7 +24,8 @@ class UpdateRequest extends FormRequest
                 'string',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($voluntario->id),
+                Rule::unique('voluntarios', 'email')->ignore($voluntario->id),
+                Rule::unique('users', 'email')->ignore($voluntario->user?->id),
             ],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'cargo_ids' => ['required', 'array', 'min:1'],

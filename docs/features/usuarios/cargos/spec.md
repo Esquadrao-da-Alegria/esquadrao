@@ -1,6 +1,6 @@
 # Usuários e cargos — especificação para desenvolvedores
 
-Documento de referência sobre o modelo de **voluntários** (usuários autenticados) e **cargos** (papéis no projeto). Objetivo: regras de negócio claras e decisões técnicas simples de manter.
+Documento de referência sobre o modelo de **usuários do sistema** e **cargos** (papéis no projeto). Objetivo: regras de negócio claras e decisões técnicas simples de manter.
 
 ---
 
@@ -8,10 +8,10 @@ Documento de referência sobre o modelo de **voluntários** (usuários autentica
 
 | Termo        | Significado |
 |-------------|-------------|
-| **User**    | Registro na tabela `users` — pessoa que pode fazer login (Fortify, etc.). |
-| **Voluntário** | No domínio, o voluntário **é** o usuário. A coluna na pivot chama-se `voluntario_id` e aponta para `users.id`. Não existe tabela `voluntarios` separada. |
+| **User**    | Registro na tabela `users` — conta que pode fazer login (Fortify, etc.). |
+| **Voluntário** | Pessoa da ONG registrada na tabela `voluntarios`. Pode possuir uma conta `User` vinculada. |
 | **Cargo**   | Tipo de papel/função (ex.: Artista, Coordenador Local). Catálogo na tabela `cargos`. |
-| **Atribuição** | Ligação usuário ↔ cargo na tabela pivot `voluntario_cargo`. Um usuário pode ter **vários** cargos. |
+| **Atribuição** | Ligação usuário ↔ cargo na tabela pivot histórica `voluntario_cargo`. Um usuário pode ter **vários** cargos. |
 
 ---
 
@@ -20,8 +20,8 @@ Documento de referência sobre o modelo de **voluntários** (usuários autentica
 1. **Cargos são um catálogo controlado**  
    Os cargos iniciais vêm do banco via seeder. **Slug** identifica o cargo de forma estável no código (policies, condições, testes). **Nome** é para exibição (telas, e-mails) e pode ser ajustado sem quebrar lógica, desde que o slug permaneça o mesmo.
 
-2. **Um voluntário pode ter múltiplos cargos**  
-   Relação **N:N** entre `users` e `cargos` via `voluntario_cargo`. Ex.: alguém pode ser Artista e Coordenador Local ao mesmo tempo.
+2. **Uma conta de usuário pode ter múltiplos cargos**
+   Relação **N:N** entre `users` e `cargos` via `voluntario_cargo`. Ex.: a conta vinculada a um voluntário pode ser Artista e Coordenador Local ao mesmo tempo.
 
 3. **Não repetir o mesmo cargo no mesmo usuário**  
    Existe restrição única em `(voluntario_id, cargo_id)`. Tentar inserir o mesmo par duas vezes falha no banco.
@@ -34,8 +34,8 @@ Documento de referência sobre o modelo de **voluntários** (usuários autentica
 5. **Lista inicial de cargos**  
    Definida em `Database\Seeders\CargoSeeder::CARGOS`: Administrador, Diretor, Coordenador Geral, Coordenador Local, Artista, Psicologia, Apoio, Voluntário (ver slugs na constante no código).
 
-6. **O que ainda não é regra automática no código**  
-   Hoje **não** há middleware, Gate ou Policy padrão ligados a cargos no repositório. Autorização (quem pode acessar qual rota ou ação) deve ser implementada de forma explícita usando `User::temCargo()` e/ou `$user->cargos()` (ou consultas equivalentes). Isso evita “mágica” escondida e mantém o fluxo legível.
+6. **Autorização administrativa atual**
+   O middleware `administrador` verifica o cargo de slug `administrador`. As demais decisões de autorização devem continuar explícitas, usando middleware, Policies, Gates, `User::temCargo()` ou consultas equivalentes.
 
 ---
 
@@ -55,7 +55,7 @@ Documento de referência sobre o modelo de **voluntários** (usuários autentica
 | Coluna          | Descrição |
 |-----------------|-----------|
 | `id`            | Chave primária da linha da pivot. |
-| `voluntario_id` | FK → `users.id` |
+| `voluntario_id` | FK → `users.id`. O nome é legado e não referencia a tabela `voluntarios`. |
 | `cargo_id`      | FK → `cargos.id` |
 | `created_at`, `updated_at` | Quando a atribuição foi criada/atualizada. |
 
@@ -90,9 +90,9 @@ Manter regras de “pode ou não pode” em **Policies/Gates** que internamente 
 
 O escopo atual é **cargos + pivot**, sem permissões granulares (ex.: `posts.edit`). Pacotes como Spatie Permission acrescentam conceitos e migrações extras. Enquanto a necessidade for “usuário tem um ou mais papéis”, o modelo atual permanece **fácil de entender**. Se no futuro surgirem dezenas de permissões nomeadas, reavaliar um pacote ou uma tabela `permissoes` separada.
 
-### Nome da pivot `voluntario_cargo`
+### Nome legado da pivot `voluntario_cargo`
 
-Deixa explícito no banco que o vínculo é “voluntário (user) possui cargo”, em português do domínio, em vez de nomes genéricos só em inglês.
+O nome foi preservado para evitar uma migração destrutiva. Apesar de `voluntario_id`, o vínculo pertence à conta e referencia `users.id`; a pessoa voluntária separada fica em `voluntarios`.
 
 ---
 
@@ -152,7 +152,8 @@ $users = User::query()->with('cargos')->get();
 
 | Pergunta | Resposta curta |
 |----------|------------------|
-| Onde está o voluntário? | Na tabela `users`; `voluntario_id` na pivot é FK para `users`. |
+| Onde está o voluntário? | Na tabela `voluntarios`; a conta correspondente usa `users.voluntario_id`. |
+| A quem pertencem os cargos? | Ao `User`; `voluntario_cargo.voluntario_id` ainda é FK para `users.id`. |
 | Como identificar cargo no código? | Pelo **`slug`** (snake_case), preferencialmente via `CargoSeeder::CARGOS` ou `temCargo()`. |
 | Um usuário pode ter vários cargos? | Sim. |
 | Onde não mexer à toa? | Slugs usados em policies e testes — mudança implica refatoração ou migração. |

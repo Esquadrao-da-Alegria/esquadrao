@@ -15,7 +15,7 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:voluntarios,email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'cargo_ids' => ['required', 'array', 'min:1'],
             'cargo_ids.*' => ['integer', 'exists:cargos,id'],
