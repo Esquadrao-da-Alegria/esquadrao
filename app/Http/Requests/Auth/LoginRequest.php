@@ -44,7 +44,7 @@ class LoginRequest extends FormRequest
         /** @var User|null $user */
         $user = Auth::getProvider()->retrieveByCredentials($this->only('email', 'password'));
 
-        if (! $user || ! Auth::getProvider()->validateCredentials($user, $this->only('password'))) {
+        if (! $user || ! Auth::getProvider()->validateCredentials($user, $this->only('password')) || $user->status !== User::STATUS_ATIVO) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

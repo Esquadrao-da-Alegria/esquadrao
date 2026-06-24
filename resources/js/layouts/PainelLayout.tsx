@@ -1,5 +1,5 @@
 // REACT/INERTIA
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react'
 
 // UI
 import {
@@ -9,20 +9,20 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
-import { toastErro, toastSucesso } from '@/lib/utils/toast';
+} from '@/components/ui/dropdown-menu'
+import { toastErro, toastSucesso } from '@/lib/utils/toast'
+import { cn } from '@/lib/utils'
 
 // ROTAS
-import { dashboard, home, login, logout } from '@/routes';
-import { index } from '@/routes/hospitais';
-import { index as patrocinadoresIndex } from '@/routes/patrocinadores';
-import { edit } from '@/routes/profile';
-import { index as voluntariosIndex } from '@/routes/voluntarios';
-import { useEffect, useState } from 'react';
+import { edit } from '@/routes/profile'
+import { index } from '@/routes/hospitais'
+import { index as voluntariosIndex } from '@/routes/voluntarios'
+import { index as patrocinadoresIndex } from '@/routes/patrocinadores'
+import { useEffect, useState } from 'react'
+import { dashboard, home, login, logout } from '@/routes'
 
 // TIPOS
-import { type SharedData } from '@/types';
+import { type SharedData } from '@/types'
 import {
     Building2,
     ChevronDown,
@@ -32,77 +32,79 @@ import {
     User,
     UsersRound,
     type LucideIcon,
-} from 'lucide-react';
+} from 'lucide-react'
 
 interface Props {
-    children: React.ReactNode;
+    children: React.ReactNode
 }
 
 /** OKLCH amarelo (~98°) alinhado ao AppSidebarLayout. */
 const temaPainelAmarelo = cn(
-    '[--primary-foreground:oklch(0.22_0.04_98)] [--primary:oklch(0.82_0.17_98)]',
-    '[--sidebar-primary-foreground:oklch(0.22_0.04_98)] [--sidebar-primary:oklch(0.82_0.17_98)]',
+    '[--primary:oklch(0.82_0.17_98)] [--primary-foreground:oklch(0.22_0.04_98)]',
+    '[--sidebar-primary:oklch(0.82_0.17_98)] [--sidebar-primary-foreground:oklch(0.22_0.04_98)]',
     '[--ring:oklch(0.72_0.16_98)] [--sidebar-ring:oklch(0.72_0.16_98)]',
-    '[--sidebar-accent-foreground:oklch(0.28_0.06_98)] [--sidebar-accent:oklch(0.96_0.07_98)]',
-);
+    '[--sidebar-accent:oklch(0.96_0.07_98)] [--sidebar-accent-foreground:oklch(0.28_0.06_98)]',
+)
 
 interface ItemNavegacaoPainel {
-    titulo: string;
-    href: ReturnType<typeof dashboard>;
-    icone: LucideIcon;
-    ativo: boolean;
-    visivel: boolean;
+    titulo: string
+    href: ReturnType<typeof dashboard>
+    icone: LucideIcon
+    ativo: boolean
+    visivel: boolean
 }
 
 const PainelLayout: React.FC<Props> = ({ children }) => {
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const { props, url } = usePage<SharedData>();
-    const pathname = (url.split('?')[0] ?? '').replace(/\/$/, '') || '/';
+    const [mobileOpen, setMobileOpen] = useState(false)
+    const { props, url } = usePage<SharedData>()
+    const pathname = (url.split('?')[0] ?? '').replace(/\/$/, '') || '/'
 
-    const user = props.auth?.user;
-    const ehAdministrador = props.eh_administrador === true;
+    const user = props.auth?.user
+    const ehAdministrador = props.eh_administrador === true
 
     useEffect(() => {
-        const mensagemSucesso = props.mensagem_sucesso;
-        const mensagemErro = props.mensagem_erro;
+        const mensagemSucesso = props.mensagem_sucesso
+        const mensagemErro = props.mensagem_erro
 
-        if (mensagemSucesso) toastSucesso(mensagemSucesso);
-        if (mensagemErro) toastErro(mensagemErro);
-    }, [props.mensagem_sucesso, props.mensagem_erro]);
+        if (mensagemSucesso) toastSucesso(mensagemSucesso)
+        if (mensagemErro) toastErro(mensagemErro)
+    }, [props.mensagem_sucesso, props.mensagem_erro])
 
-    const closeMobile = () => setMobileOpen(false);
+    const closeMobile = () => setMobileOpen(false)
 
-    const isDashboard = pathname === '/dashboard';
-    const isHospitaisCreate = pathname === '/hospitais/create';
+    const isDashboard = pathname === '/dashboard'
+    const isHospitaisCreate = pathname === '/hospitais/create'
     const isHospitaisNav =
         pathname === '/hospitais' ||
-        /^\/hospitais\/[^/]+\/edit$/.test(pathname);
+        /^\/hospitais\/[^/]+\/edit$/.test(pathname)
 
-    const isVoluntariosCreate = pathname === '/voluntarios/create';
+    const isVoluntariosCreate = pathname === '/voluntarios/create'
     const isVoluntariosNav =
         pathname === '/voluntarios' ||
-        /^\/voluntarios\/[^/]+\/edit$/.test(pathname);
+        /^\/voluntarios\/[^/]+\/edit$/.test(pathname)
 
-    const isPatrocinadoresCreate = pathname === '/patrocinadores/create';
+    const isPatrocinadoresCreate = pathname === '/patrocinadores/create'
     const isPatrocinadoresNav =
         pathname === '/patrocinadores' ||
-        /^\/patrocinadores\/[^/]+\/edit$/.test(pathname);
+        /^\/patrocinadores\/[^/]+\/edit$/.test(pathname)
 
     const handleLogout = () => {
-        router.post(logout.url());
-    };
+        router.post(logout.url())
+    }
 
     const navLinkClass =
-        'rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900';
+        'rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900'
     const navLinkActive = (active: boolean) =>
-        active ? 'bg-amber-50 text-amber-800 ring-1 ring-amber-100' : '';
+        active
+            ? 'bg-amber-50 text-amber-800 ring-1 ring-amber-100'
+            : ''
 
     const sidebarLinkClass =
-        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground';
+        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
     const sidebarLinkActive = (active: boolean) =>
         active
             ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-[inset_3px_0_0_0_var(--primary)]'
-            : '';
+            : ''
 
     const itensNavegacao: ItemNavegacaoPainel[] = [
         {
@@ -117,7 +119,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             href: index(),
             icone: Building2,
             ativo: isHospitaisNav && !isHospitaisCreate,
-            visivel: ehAdministrador,
+            visivel: true,
         },
         {
             titulo: 'Voluntários',
@@ -133,14 +135,14 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             ativo: isPatrocinadoresNav && !isPatrocinadoresCreate,
             visivel: ehAdministrador,
         },
-    ];
+    ]
 
-    const itensVisiveis = itensNavegacao.filter((item) => item.visivel);
+    const itensVisiveis = itensNavegacao.filter((item) => item.visivel)
 
     const menuConta = user ? (
         <DropdownMenu>
             <DropdownMenuTrigger
-                className="flex max-w-[14rem] items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pr-2 pl-2 text-left text-sm shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
+                className="flex max-w-[14rem] items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pl-2 pr-2 text-left text-sm shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                 aria-label="Menu da conta"
             >
                 <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-800">
@@ -174,7 +176,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                 <DropdownMenuItem
                     className="flex cursor-pointer items-center gap-2 text-gray-600 focus:text-gray-900"
                     onSelect={() => {
-                        handleLogout();
+                        handleLogout()
                     }}
                 >
                     <LogOut className="size-4 shrink-0" />
@@ -189,7 +191,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
         >
             Entrar
         </Link>
-    );
+    )
 
     return (
         <div
@@ -215,15 +217,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                         </span>
                     </Link>
                 </div>
-                <nav
-                    className="flex flex-1 flex-col gap-0.5 p-3"
-                    aria-label="Menu do painel"
-                >
+                <nav className="flex flex-1 flex-col gap-0.5 p-3" aria-label="Menu do painel">
                     <p className="mb-1 px-3 text-xs font-medium text-gray-400">
                         Menu principal
                     </p>
                     {itensVisiveis.map((item) => {
-                        const Icone = item.icone;
+                        const Icone = item.icone
 
                         return (
                             <Link
@@ -233,13 +232,10 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     item.ativo,
                                 )}`}
                             >
-                                <Icone
-                                    className="size-4 shrink-0 opacity-70"
-                                    aria-hidden
-                                />
+                                <Icone className="size-4 shrink-0 opacity-70" aria-hidden />
                                 {item.titulo}
                             </Link>
-                        );
+                        )
                     })}
                 </nav>
             </aside>
@@ -266,11 +262,10 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
 
                             {/* Menu mobile — sem alterações */}
                             <div
-                                className={`${
-                                    mobileOpen
-                                        ? 'absolute top-full right-0 left-0 z-50 mx-4 mt-2 flex flex-col rounded-xl border border-gray-200 bg-white p-2 shadow-lg'
-                                        : 'hidden'
-                                } sm:hidden`}
+                                className={`${mobileOpen
+                                    ? 'absolute left-0 right-0 top-full z-50 mx-4 mt-2 flex flex-col rounded-xl border border-gray-200 bg-white p-2 shadow-lg'
+                                    : 'hidden'
+                                    } sm:hidden`}
                             >
                                 <Link
                                     href={dashboard()}
@@ -279,41 +274,28 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     )} flex items-center gap-2`}
                                     onClick={closeMobile}
                                 >
-                                    <LayoutGrid
-                                        className="size-4 shrink-0 opacity-70"
-                                        aria-hidden
-                                    />
+                                    <LayoutGrid className="size-4 shrink-0 opacity-70" aria-hidden />
                                     Início
                                 </Link>
-                                {ehAdministrador ? (
-                                    <Link
-                                        href={index()}
-                                        className={`${navLinkClass} ${navLinkActive(
-                                            isHospitaisNav &&
-                                                !isHospitaisCreate,
-                                        )} flex items-center gap-2`}
-                                        onClick={closeMobile}
-                                    >
-                                        <Building2
-                                            className="size-4 shrink-0 opacity-70"
-                                            aria-hidden
-                                        />
-                                        Hospitais
-                                    </Link>
-                                ) : null}
+                                <Link
+                                    href={index()}
+                                    className={`${navLinkClass} ${navLinkActive(
+                                        isHospitaisNav && !isHospitaisCreate,
+                                    )} flex items-center gap-2`}
+                                    onClick={closeMobile}
+                                >
+                                    <Building2 className="size-4 shrink-0 opacity-70" aria-hidden />
+                                    Hospitais
+                                </Link>
                                 {ehAdministrador ? (
                                     <Link
                                         href={voluntariosIndex()}
                                         className={`${navLinkClass} ${navLinkActive(
-                                            isVoluntariosNav &&
-                                                !isVoluntariosCreate,
+                                            isVoluntariosNav && !isVoluntariosCreate,
                                         )} flex items-center gap-2`}
                                         onClick={closeMobile}
                                     >
-                                        <UsersRound
-                                            className="size-4 shrink-0 opacity-70"
-                                            aria-hidden
-                                        />
+                                        <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
                                         Voluntários
                                     </Link>
                                 ) : null}
@@ -321,15 +303,11 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     <Link
                                         href={patrocinadoresIndex()}
                                         className={`${navLinkClass} ${navLinkActive(
-                                            isPatrocinadoresNav &&
-                                                !isPatrocinadoresCreate,
+                                            isPatrocinadoresNav && !isPatrocinadoresCreate,
                                         )} flex items-center gap-2`}
                                         onClick={closeMobile}
                                     >
-                                        <UsersRound
-                                            className="size-4 shrink-0 opacity-70"
-                                            aria-hidden
-                                        />
+                                        <UsersRound className="size-4 shrink-0 opacity-70" aria-hidden />
                                         Patrocinadores
                                     </Link>
                                 ) : null}
@@ -351,9 +329,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 onClick={() => setMobileOpen(!mobileOpen)}
                                 className="flex items-center justify-center rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 focus:outline-none sm:hidden"
                                 aria-expanded={mobileOpen}
-                                aria-label={
-                                    mobileOpen ? 'Fechar menu' : 'Abrir menu'
-                                }
+                                aria-label={mobileOpen ? 'Fechar menu' : 'Abrir menu'}
                             >
                                 {mobileOpen ? (
                                     <svg
@@ -392,14 +368,11 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                 <main className="flex-1">{children}</main>
 
                 <footer className="border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
-                    <p>
-                        © {new Date().getFullYear()} Esquadrão da Alegria —
-                        Painel administrativo
-                    </p>
+                    <p>© {new Date().getFullYear()} Esquadrão da Alegria — Painel administrativo</p>
                 </footer>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default PainelLayout;
+export default PainelLayout

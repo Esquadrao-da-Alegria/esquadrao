@@ -231,14 +231,22 @@ class Service
                 'email' => $dados['email'],
                 'password' => Str::password(32),
                 'status' => User::STATUS_CONVITE_ENVIADO,
-                'convite_enviado_em' => now(),
-                'convite_expira_em' => $this->calcularExpiracaoConvite(),
             ]);
 
             $usuario->cargos()->sync([$cargoVoluntario->id]);
-            $this->criarEnviarConviteCadastro($model, $dados['email']);
+            $resultadoConvite = $this->criarEnviarConviteCadastro($model, $dados['email']);
+            $convite = $resultadoConvite['convite'];
 
-            session()->flash('mensagem_sucesso', 'Convite enviado com sucesso!');
+            $usuario->update([
+                'convite_enviado_em' => $convite->enviado_em,
+                'convite_expira_em' => $convite->expira_em,
+            ]);
+
+            if ($resultadoConvite['email_enviado']) {
+                session()->flash('mensagem_sucesso', 'Convite enviado com sucesso!');
+            } else {
+                session()->flash('mensagem_alerta', 'Convite criado, mas o e-mail não foi enviado. Compartilhe o link exibido com o convidado.');
+            }
 
             DB::commit();
 
@@ -281,7 +289,8 @@ class Service
 
             DB::beginTransaction();
 
-            $this->criarEnviarConviteCadastro($voluntario, $voluntario->email);
+            $resultadoConvite = $this->criarEnviarConviteCadastro($voluntario, $voluntario->email);
+            $convite = $resultadoConvite['convite'];
 
             $voluntario->update([
                 'status' => User::STATUS_CONVITE_ENVIADO,
@@ -289,13 +298,17 @@ class Service
 
             $usuario->update([
                 'status' => User::STATUS_CONVITE_ENVIADO,
-                'convite_enviado_em' => now(),
-                'convite_expira_em' => $this->calcularExpiracaoConvite(),
+                'convite_enviado_em' => $convite->enviado_em,
+                'convite_expira_em' => $convite->expira_em,
             ]);
 
             DB::commit();
 
-            session()->flash('mensagem_sucesso', 'Convite reenviado com sucesso!');
+            if ($resultadoConvite['email_enviado']) {
+                session()->flash('mensagem_sucesso', 'Convite reenviado com sucesso!');
+            } else {
+                session()->flash('mensagem_alerta', 'Convite reenviado, mas o e-mail não foi enviado. Compartilhe o link exibido com o convidado.');
+            }
 
             return [
                 'sucesso' => true,
@@ -384,7 +397,10 @@ class Service
         }
     }
 
-    private function criarEnviarConviteCadastro(Voluntario $voluntario, string $email): ConviteCadastro
+    /**
+     * @return array{convite: ConviteCadastro, email_enviado: bool}
+     */
+    private function criarEnviarConviteCadastro(Voluntario $voluntario, string $email): array
     {
         $voluntario->convitesCadastro()
             ->whereIn('status', [
@@ -408,10 +424,13 @@ class Service
 
         session()->flash('link_convite', route('convites.show', ['token' => $token]));
 
+        $emailEnviado = true;
+
         try {
             Notification::route('mail', $email)
                 ->notify(new ConviteCadastroNotification($convite, $token));
         } catch (\Throwable $th) {
+            $emailEnviado = false;
             Log::warning('Convite criado, mas o e-mail não foi enviado.', [
                 'erro' => formatarMensagemErro($th),
                 'convite_id' => $convite->id,
@@ -420,7 +439,10 @@ class Service
             ]);
         }
 
-        return $convite;
+        return [
+            'convite' => $convite,
+            'email_enviado' => $emailEnviado,
+        ];
     }
 
     private function calcularExpiracaoConvite(): \Illuminate\Support\Carbon

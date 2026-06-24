@@ -15,6 +15,14 @@ export const toastErro = (mensagem: string) => {
     });
 }
 
+export const toastAviso = (mensagem: string) => {
+    Swal.fire({
+        title: "Atenção!",
+        text: mensagem,
+        icon: "warning"
+    });
+}
+
 export const toastConfirmacao = async (mensagem: string) => {
 
     const retorno = await Swal.fire({
