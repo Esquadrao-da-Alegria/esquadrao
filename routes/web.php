@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\Web\EventoController;
+use App\Http\Controllers\Web\EventoFinalizacaoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
+use App\Http\Controllers\Web\EventoPresencaController;
 use App\Http\Controllers\Web\HospitalController;
+use App\Http\Controllers\Web\MeuEventoController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -54,20 +57,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
 
+    Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
-    Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
-    Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
-    Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
 
     // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
-
-
         Route::get('/eventos/create', [EventoController::class, 'create'])->name('eventos.create');
         Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
         Route::get('/eventos/{evento}/edit', [EventoController::class, 'edit'])->name('eventos.edit');
         Route::put('/eventos/{evento}', [EventoController::class, 'update'])->name('eventos.update');
         Route::post('/eventos/{evento}/cancelar', [EventoController::class, 'cancelar'])->name('eventos.cancelar');
+        Route::delete('/eventos/{evento}', [EventoController::class, 'destroy'])->name('eventos.destroy');
 
         // VOLUNTARIOS
         Route::resource('/voluntarios', VoluntarioController::class)
@@ -80,6 +80,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // patrocinadores
         Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
     });
+
+    Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
+    Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
+    Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
+    Route::post('/eventos/{evento}/finalizar', [EventoFinalizacaoController::class, 'store'])->name('eventos.finalizar');
+    Route::put('/eventos/{evento}/presencas', [EventoPresencaController::class, 'update'])->name('eventos.presencas.update');
 });
 
 require __DIR__ . '/settings.php';

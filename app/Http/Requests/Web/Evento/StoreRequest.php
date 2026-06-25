@@ -17,9 +17,18 @@ class StoreRequest extends FormRequest
             'descricao' => ['nullable', 'string'],
             'local' => ['nullable', 'string', 'max:255'],
             'data_inicio' => ['required', 'date', 'after_or_equal:now'],
-            'data_fim' => ['nullable', 'date', 'after:data_inicio'],
+            'data_fim' => ['required', 'date', 'after:data_inicio'],
+            'limite_inscricao' => ['nullable', 'date', 'before_or_equal:data_inicio'],
             'limite_participantes' => ['nullable', 'integer', 'min:1'],
             'responsavel_id' => ['nullable', 'exists:users,id'],
+            'inscrever_me' => ['boolean'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'data_inicio.after_or_equal' => 'A data de início deve ser a partir de hoje.',
         ];
     }
 }

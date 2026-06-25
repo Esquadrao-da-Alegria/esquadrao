@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 // ROTAS
 import { edit } from '@/routes/profile'
 import { index } from '@/routes/hospitais'
+import { index as eventosIndex } from '@/routes/eventos'
 import { index as voluntariosIndex } from '@/routes/voluntarios'
 import { index as patrocinadoresIndex } from '@/routes/patrocinadores'
 import { useEffect, useState } from 'react'
@@ -124,7 +125,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
         },
         {
             titulo: 'Eventos',
-            href: '/eventos' as ReturnType<typeof dashboard>,
+            href: eventosIndex(),
             icone: CalendarDays,
             ativo: pathname === '/eventos' || /^\/eventos(\/.*)?$/.test(pathname),
             visivel: true,
