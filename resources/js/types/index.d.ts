@@ -30,6 +30,8 @@ export interface SharedData {
     eh_administrador?: boolean;
     mensagem_sucesso?: string | null;
     mensagem_erro?: string | null;
+    mensagem_alerta?: string | null;
+    link_convite?: string | null;
     [key: string]: unknown;
 }
 
@@ -39,6 +41,20 @@ export interface User {
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    status?: 'ativo' | 'convite_enviado' | 'inativo';
+    convite_enviado_em?: string | null;
+    convite_expira_em?: string | null;
+    convite_status?:
+        | 'PENDENTE'
+        | 'ENVIADO'
+        | 'UTILIZADO'
+        | 'EXPIRADO'
+        | 'CANCELADO'
+        | null;
+    convite_utilizado_em?: string | null;
+    inativado_em?: string | null;
+    cidade_base_id?: number | null;
+    cidade_base?: Cidade | null;
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
@@ -49,7 +65,15 @@ export interface User {
 export interface Cargo {
     id: number;
     nome: string;
-    slug: 'administrador' | 'diretor' | 'coordenador_geral' | 'coordenador_local' | 'artista' | 'psicologia' | 'apoio' | 'voluntario';
+    slug:
+        | 'administrador'
+        | 'diretor'
+        | 'coordenador_geral'
+        | 'coordenador_local'
+        | 'artista'
+        | 'psicologia'
+        | 'apoio'
+        | 'voluntario';
     created_at?: string;
     updated_at?: string;
 }
@@ -58,14 +82,14 @@ export interface Cargo {
 
 export interface Estado {
     id: number;
-    nome: string,
-    sigla: number,
+    nome: string;
+    sigla: number;
 }
 
 export interface Cidade {
     id: number;
-    nome: string,
-    estado_id: number,
+    nome: string;
+    estado_id: number;
 }
 
 export interface Endereco {
@@ -91,19 +115,19 @@ export interface Endereco {
 }
 
 export interface Hospital {
-    id?: number
-    cidade_id: number
-    nome: string
-    cnpj: string
-    endereco: string
-    telefone: string
-    email: string
-    ativo: boolean
-    url_foto: string | null
-    observacoes?: string
-    alas?: AlaHospital[]
-    created_at?: string
-    updated_at?: string
+    id?: number;
+    cidade_id: number;
+    nome: string;
+    cnpj: string;
+    endereco: string;
+    telefone: string;
+    email: string;
+    ativo: boolean;
+    url_foto: string | null;
+    observacoes?: string;
+    alas?: AlaHospital[];
+    created_at?: string;
+    updated_at?: string;
 }
 
 interface AlaHospital {

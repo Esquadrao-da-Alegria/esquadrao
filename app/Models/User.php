@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -14,15 +15,24 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
+    public const STATUS_ATIVO = 'ativo';
+    public const STATUS_CONVITE_ENVIADO = 'convite_enviado';
+    public const STATUS_INATIVO = 'inativo';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
+        'voluntario_id',
         'name',
         'email',
         'password',
+        'status',
+        'convite_enviado_em',
+        'convite_expira_em',
+        'inativado_em',
     ];
 
     /**
@@ -45,13 +55,21 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'convite_enviado_em' => 'datetime',
+            'convite_expira_em' => 'datetime',
+            'inativado_em' => 'datetime',
         ];
     }
 
     protected $with = ['cargos'];
 
+    public function voluntario(): BelongsTo
+    {
+        return $this->belongsTo(Voluntario::class);
+    }
+
     /**
-     * Cargos deste voluntário (usuário).
+     * Cargos deste usuário do sistema.
      */
     public function eventosInscritos(): BelongsToMany
     {

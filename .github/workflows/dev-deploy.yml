@@ -37,7 +37,12 @@ jobs:
             git config --global --add safe.directory ${{ secrets.APP_PATH_DEV }}
 
             echo "🔑 Configurando chave SSH para GitHub..."
-            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+            mkdir -p ~/.ssh
+            printf '%s\n' "$GH_DEPLOY_KEY" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
+            ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/id_ed25519
 
             echo "📥 Atualizando branch dev..."
             git fetch origin dev

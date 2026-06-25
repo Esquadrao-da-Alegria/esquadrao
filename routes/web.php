@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\EventoInscricaoController;
 use App\Http\Controllers\Web\EventoPresencaController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\MeuEventoController;
+use App\Http\Controllers\Web\ConviteCadastroController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -13,9 +14,6 @@ use App\Http\Controllers\Web\VoluntarioController;
 use App\Models\Patrocinador;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-// URLs do site estático antigo (index.html, etc.)
-Route::redirect('/index.html', '/', 301);
 
 // HOME PAGE
 Route::get('/', function () {
@@ -44,6 +42,12 @@ Route::get('/fale-conosco', function () {
     return Inertia::render('FaleConosco/Index');
 })->name('fale_conosco.index');
 
+Route::get('/convites/{token}', [ConviteCadastroController::class, 'show'])
+    ->name('convites.show');
+
+Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'concluir'])
+    ->name('convites.concluir');
+
 // AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -53,7 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Listas JSON
     ROUTE::prefix('json')->name('json.')->group(function () {
 
-        Route::get('cidades', [CidadeController::class, 'index'])->name('json.cidades.index');
+        Route::get('cidades', [CidadeController::class, 'index'])->name('cidades.index');
     });
 
 
@@ -70,6 +74,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/eventos/{evento}', [EventoController::class, 'destroy'])->name('eventos.destroy');
 
         // VOLUNTARIOS
+        Route::post('/voluntarios/convite', [VoluntarioController::class, 'storeConvite'])
+            ->name('voluntarios.convite.store');
+
+        Route::post('/voluntarios/{voluntario}/reenviar-convite', [VoluntarioController::class, 'reenviarConvite'])
+            ->name('voluntarios.convite.reenviar');
+
+        Route::delete('/voluntarios/{voluntario}/convite', [VoluntarioController::class, 'cancelarConvite'])
+            ->name('voluntarios.convite.cancelar');
+
         Route::resource('/voluntarios', VoluntarioController::class)
             ->parameters(['voluntarios' => 'voluntario'])
             ->except(['show']);

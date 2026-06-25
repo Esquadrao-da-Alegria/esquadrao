@@ -3,11 +3,11 @@
 namespace App\Services\Voluntario\Form;
 
 use App\Models\Cargo;
-use App\Models\User;
+use App\Models\Voluntario;
 
 class Service
 {
-    public function buscarDados(?User $voluntario): array
+    public function buscarDados(?Voluntario $voluntario): array
     {
         $cargos = Cargo::query()->orderBy('nome')->get();
 
@@ -16,7 +16,7 @@ class Service
         ];
 
         if ($voluntario) {
-            $voluntario->load('cargos');
+            $voluntario->load('user.cargos');
             $retorno['voluntario'] = $voluntario;
         }
 
