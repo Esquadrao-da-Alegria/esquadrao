@@ -1,4 +1,5 @@
-import type { Visita, VisitaStatus } from '@/types'
+import type { User, Visita, VisitaStatus, VisitaTipo } from '@/types'
+import { temCargo } from '@/lib/utils/user'
 
 export const LIMITE_PARTICIPANTES = 5
 
@@ -59,3 +60,50 @@ export function labelStatus(status: VisitaStatus): string {
     }
     return labels[status] ?? status
 }
+
+export function podeEditarVisita(user: User, visita: Visita): boolean {
+    if (visita.lider_id !== null && visita.lider_id !== undefined && user.id === visita.lider_id) {
+        return true
+    }
+
+    if (temCargo(user, 'administrador') || temCargo(user, 'diretor')) {
+        return true
+    }
+
+    return user.cargos?.some((c) => c.slug.includes('coordenador')) ?? false
+}
+
+export function labelTipo(tipo: VisitaTipo): string {
+    const labels: Record<VisitaTipo, string> = {
+        hospital: 'Hospital',
+        residencia: 'Residência',
+        acao_especial: 'Ação especial',
+        oficina: 'Oficina',
+        reuniao: 'Reunião',
+        outro: 'Outro',
+    }
+    return labels[tipo] ?? tipo
+}
+
+export function extrairData(iso: string): string {
+    return iso.slice(0, 10)
+}
+
+export function hojeLocal(): string {
+    const d = new Date()
+    const mes = String(d.getMonth() + 1).padStart(2, '0')
+    const dia = String(d.getDate()).padStart(2, '0')
+    return `${d.getFullYear()}-${mes}-${dia}`
+}
+
+export function extrairHora(iso: string): string {
+    return iso.slice(11, 16)
+}
+
+export const VISITA_TIPOS: VisitaTipo[] = [
+    'hospital', 'residencia', 'acao_especial', 'oficina', 'reuniao', 'outro',
+]
+
+export const VISITA_STATUS: VisitaStatus[] = [
+    'agendada', 'realizada', 'cancelada', 'pendente_relatorio', 'contabilizada', 'nao_contabilizada',
+]

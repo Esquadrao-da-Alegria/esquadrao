@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Services\Visita\Form;
+
+use App\Models\Hospital;
+use App\Models\User;
+use App\Models\Visita;
+use Illuminate\Support\Facades\Auth;
+
+class Service
+{
+    public function buscarDados(?Visita $visita): array
+    {
+        $hospitais = Hospital::query()
+            ->where('ativo', true)
+            ->with(['alas:id,hospital_id,nome'])
+            ->orderBy('nome')
+            ->get(['id', 'nome', 'ativo']);
+
+        if ($visita) {
+            $visita->load(['hospital.alas:id,hospital_id,nome', 'alaUnidade:id,nome,hospital_id']);
+
+            if ($visita->hospital && ! $hospitais->contains('id', $visita->hospital_id)) {
+                $hospitais->push($visita->hospital);
+                $hospitais = $hospitais->sortBy('nome')->values();
+            }
+        }
+
+        $lideres = User::query()
+            ->whereHas('cargos', fn ($q) => $q->where('slug', 'voluntario'))
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        $idsExtras = collect([Auth::id(), $visita?->lider_id])->filter()->unique();
+        foreach ($idsExtras as $id) {
+            if (! $lideres->contains('id', $id)) {
+                $user = User::query()->find($id, ['id', 'name']);
+                if ($user) {
+                    $lideres->push($user);
+                }
+            }
+        }
+        $lideres = $lideres->sortBy('name')->values();
+
+        $retorno = [
+            'hospitais' => $hospitais,
+            'lideres'   => $lideres,
+        ];
+
+        if ($visita) {
+            $retorno['visita'] = $visita;
+        }
+
+        return $retorno;
+    }
+}

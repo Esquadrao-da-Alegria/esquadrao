@@ -1,4 +1,4 @@
-import { usePage } from '@inertiajs/react'
+import { Link, usePage } from '@inertiajs/react'
 import { type FC, useEffect, useState } from 'react'
 
 import Modal from '@/components/Modal/Show'
@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button'
 import {
     contarParticipantes,
     labelStatus,
+    podeEditarVisita,
     usuarioJaInscrito,
     visitaAtingiuLimite,
 } from '@/lib/visita'
 import { toastInfo } from '@/lib/utils/toast'
+import { edit } from '@/routes/visitas'
 import { Service } from '@/Services/Visita/Participante/Service'
 import type { SharedData, TipoParticipacao, Visita } from '@/types'
 
@@ -166,6 +168,18 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                             </div>
                         )}
                     </dl>
+
+                    {podeEditarVisita(auth.user, visita) && (
+                        <div className="mt-6">
+                            <Link
+                                href={edit({ visita: visita.id! }).url}
+                                onClick={fecharModal}
+                                className="inline-flex w-full items-center justify-center rounded-lg border border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
+                            >
+                                Visualizar Detalhes
+                            </Link>
+                        </div>
+                    )}
 
                     {visitaAgendada && (
                         <div className="mt-6">

@@ -67,6 +67,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // VISITAS
     Route::prefix('visitas')->name('visitas.')->group(function () {
         Route::get('/', [VisitaController::class, 'index'])->name('index');
+        Route::get('create', [VisitaController::class, 'create'])->name('create');
+        Route::post('/', [VisitaController::class, 'store'])->name('store');
+        Route::get('{visita}/edit', [VisitaController::class, 'edit'])->name('edit');
+        Route::put('{visita}', [VisitaController::class, 'update'])->name('update');
 
         Route::post('{visita}/participantes', [VisitaParticipanteController::class, 'store'])
             ->name('participantes.store');

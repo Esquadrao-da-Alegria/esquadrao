@@ -2,27 +2,21 @@
 
 namespace App\Queries\Visita;
 
+use App\Models\Visita;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Models\Visita;
 
 class Queries
 {
     public function index(array $filtros): array
     {
         try {
-            $query = Visita::query()
-                ->with([
-                    'hospital:id,nome',
-                    'alaUnidade:id,nome',
-                    'lider:id,name',
-                    'participantes.voluntario:id,name',
-                ]);
+            $query = Visita::query();
 
+            $this->carregarRelacionamentos($query);
             $this->aplicarFiltros($query, $filtros);
-
-            $query->orderBy('inicio_em');
+            $this->aplicarOrdenacao($query);
 
             $dados = $query->get();
 
@@ -36,6 +30,75 @@ class Queries
         }
     }
 
+    public function show(array $filtros): array
+    {
+        try {
+            $query = Visita::query();
+
+            $this->carregarRelacionamentos($query);
+            $this->aplicarFiltros($query, $filtros);
+
+            $dados = $query->first();
+
+            return ['sucesso' => true, 'dados' => $dados, 'erros' => []];
+        } catch (\Throwable $th) {
+            return [
+                'sucesso' => false,
+                'dados'   => null,
+                'erros'   => [formatarMensagemErro($th)],
+            ];
+        }
+    }
+
+    public function store(array $dados): array
+    {
+        try {
+            $model = Visita::query()->create($dados);
+
+            return [
+                'sucesso' => true,
+                'dados'   => ['id' => $model->id, 'model' => $model],
+                'erros'   => [],
+            ];
+        } catch (\Throwable $th) {
+            return [
+                'sucesso' => false,
+                'dados'   => [],
+                'erros'   => [formatarMensagemErro($th)],
+            ];
+        }
+    }
+
+    public function update(int $id, array $dados): array
+    {
+        try {
+            $model = Visita::query()->findOrFail($id);
+            $model->update($dados);
+
+            return [
+                'sucesso' => true,
+                'dados'   => ['model' => $model->fresh()],
+                'erros'   => [],
+            ];
+        } catch (\Throwable $th) {
+            return [
+                'sucesso' => false,
+                'dados'   => [],
+                'erros'   => [formatarMensagemErro($th)],
+            ];
+        }
+    }
+
+    private function carregarRelacionamentos(Builder $query): void
+    {
+        $query->with([
+            'hospital:id,nome',
+            'alaUnidade:id,nome',
+            'lider:id,name',
+            'participantes.voluntario:id,name',
+        ]);
+    }
+
     private function aplicarFiltros(Builder $query, array $filtros): void
     {
         foreach ($filtros as $campo => $valor) {
@@ -44,6 +107,10 @@ class Queries
             }
 
             switch ($campo) {
+                case 'id':
+                    $query->where('id', $valor);
+                    break;
+
                 case 'mes':
                     $inicio = Carbon::createFromFormat('Y-m', $valor)->startOfMonth();
                     $fim    = $inicio->copy()->endOfMonth();
@@ -51,5 +118,10 @@ class Queries
                     break;
             }
         }
+    }
+
+    private function aplicarOrdenacao(Builder $query): void
+    {
+        $query->orderBy('inicio_em');
     }
 }

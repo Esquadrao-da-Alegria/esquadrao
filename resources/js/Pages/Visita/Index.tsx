@@ -1,13 +1,12 @@
 // REACT/INERTIA
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { type FC, useState } from 'react';
 
 // UI
 import PainelLayout from '@/layouts/PainelLayout';
-import { toastInfo } from '@/lib/utils/toast';
 
 // ROTAS
-import { index } from '@/routes/visitas';
+import { create, index } from '@/routes/visitas';
 
 // TIPOS
 import type { Visita } from '@/types';
@@ -115,11 +114,8 @@ const Index: FC<Props> = ({ visitas, mes }) => {
                         </div>
 
                         {/* Botão nova visita */}
-                        <button
-                            type="button"
-                            onClick={() =>
-                                toastInfo('Função disponível em breve ;)')
-                            }
+                        <Link
+                            href={create().url}
                             className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
                         >
                             <Plus
@@ -128,7 +124,7 @@ const Index: FC<Props> = ({ visitas, mes }) => {
                                 aria-hidden
                             />
                             Nova visita
-                        </button>
+                        </Link>
                     </div>
                 </header>
 

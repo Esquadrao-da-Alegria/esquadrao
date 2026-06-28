@@ -338,6 +338,8 @@ VisitaParticipante::query()->create([
 | `tests/Feature/Visita/VisitaParticipanteModelTest.php` | Casts, relacionamentos e unique por comportamento |
 | `tests/Feature/Visita/VisitaIndexTest.php` | Rota index, filtro de mês, auth |
 | `tests/Feature/Visita/ParticipanteStoreTest.php` | Inscrição self-service, limite, duplicata, visita cancelada, auth |
+| `tests/Feature/Visita/VisitaStoreTest.php` | Create visita, validação, hospital inativo, auth |
+| `tests/Feature/Visita/VisitaUpdateTest.php` | Permissões `podeEditarVisita`, update, hospital imutável |
 
 ```bash
 vendor/bin/sail artisan test --compact tests/Unit/Visita tests/Feature/Visita
@@ -352,6 +354,10 @@ Grupo `visitas.` (middleware `auth` + `verified`):
 | Método | URI | Action | Nome |
 |--------|-----|--------|------|
 | GET | `/visitas` | `VisitaController@index` | `visitas.index` |
+| GET | `/visitas/create` | `VisitaController@create` | `visitas.create` |
+| POST | `/visitas` | `VisitaController@store` | `visitas.store` |
+| GET | `/visitas/{visita}/edit` | `VisitaController@edit` | `visitas.edit` |
+| PUT | `/visitas/{visita}` | `VisitaController@update` | `visitas.update` |
 | POST | `/visitas/{visita}/participantes` | `VisitaParticipanteController@store` | `visitas.participantes.store` |
 | DELETE | `/visitas/{visita}/participantes/{participante}` | `VisitaParticipanteController@destroy` | `visitas.participantes.destroy` |
 
@@ -359,7 +365,69 @@ Query string (index): `?mes=YYYY-MM` — filtra visitas pelo mês de `inicio_em`
 
 Camadas index: `VisitaController` → `Visita\Service` → `Visita\Queries`
 
+Camadas create/edit: `VisitaController` → `Visita\Form\Service` (props Inertia) + `Visita\Service` (store/update)
+
 Camadas participantes: `VisitaParticipanteController` → `Visita\Participante\Service` → `Visita\Participante\Queries`
+
+---
+
+## Permissões de edição
+
+`podeEditarVisita(user, visita)` — verdadeiro se **qualquer**:
+
+- `user.id === visita.lider_id` (quando `lider_id` não é null)
+- cargo `administrador` ou `diretor`
+- slug do cargo contém `coordenador`
+
+**Visita sem líder (`lider_id = null`):** apenas administrador, diretor ou coordenador editam e veem o botão no modal.
+
+Implementação: `App\Services\Visita\Service::podeEditarVisita` (backend) e `lib/visita.ts::podeEditarVisita` (frontend).
+
+Sem permissão em `edit`/`update`: redirect `/visitas` + flash `mensagem_erro`.
+
+---
+
+## Frontend — Formulário (Create/Edit)
+
+### Arquivos
+
+| Arquivo | Responsabilidade |
+|---------|------------------|
+| `Pages/Visita/Create.tsx` | Cadastro — título "Cadastrar visita" |
+| `Pages/Visita/Edit.tsx` | Edição — título "Alterar visita" |
+| `components/Painel/Visita/Formulario/Form.tsx` | Campos compartilhados (create + edit) |
+| `lib/visita.ts` | `podeEditarVisita`, `labelTipo`, `extrairData`, `extrairHora`, `hojeLocal`, `VISITA_TIPOS`, `VISITA_STATUS` |
+
+### Campos
+
+| Campo | Create | Edit |
+|-------|--------|------|
+| Hospital | select (ativos) | select **disabled** |
+| Ala / Unidade | select opcional; limpa ao trocar hospital | select **disabled** |
+| Data | date; default hoje | date |
+| Horário início / fim | time; vazios no create | time |
+| Tipo | select; default `hospital` | select |
+| Líder | select; default = user logado | select |
+| Status | oculto (backend: `agendada`) | select (6 valores) |
+| Observações | textarea opcional | textarea |
+
+### Regras create
+
+- Qualquer usuário autenticado pode criar.
+- Backend define `criado_por_id`, `origem = sistema`, `status = agendada`.
+- `StoreRequest` rejeita hospital inativo e ala de outro hospital.
+- Líderes: users com cargo `voluntario`; usuário logado sempre incluído no select (exceção sem cargo).
+
+### Regras edit
+
+- `UpdateRequest` não aceita `hospital_id` nem `ala_unidade_id` — imutáveis.
+- `Visita\Form\Service` inclui hospital atual mesmo se inativo.
+- Horários extraídos via `extrairData`/`extrairHora` (slice na string ISO, sem `Date` no browser).
+- Pós-salvar: redirect `/visitas` + flash `mensagem_sucesso`.
+
+### Timezone
+
+`APP_TIMEZONE=America/Sao_Paulo` — datetimes serializados refletem horário Brasil.
 
 ---
 
@@ -376,7 +444,7 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 | `components/Painel/Visita/Calendario/Show.tsx` | Grade mensal |
 | `components/Painel/Visita/Calendario/Detalhes/Modal/Show.tsx` | Modal de detalhes + inscrição em 2 passos |
 | `components/Painel/Visita/Calendario/ListaCompleta/Modal/Show.tsx` | Modal lista completa do dia |
-| `lib/visita.ts` | Helpers: `contarParticipantes`, `contarParticipantesAtivos`, `usuarioJaInscrito`, `visitaAtingiuLimite`, `classeCardPorStatus`, `labelStatus` |
+| `lib/visita.ts` | Helpers: `contarParticipantes`, `contarParticipantesAtivos`, `usuarioJaInscrito`, `visitaAtingiuLimite`, `classeCardPorStatus`, `labelStatus`, `podeEditarVisita`, `labelTipo`, `extrairData`, `extrairHora` |
 | `Queries/Visita/Participante/Queries.tsx` | `fetch` POST para `visitas.participantes.store` |
 | `Services/Visita/Participante/Service.tsx` | Orquestra inscrição, toasts e reload Inertia |
 | `utils/form.ts` | Helper `obterCsrfToken` |
@@ -390,7 +458,10 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 
 ### Modal de detalhes — fluxo de inscrição
 
-**Passo 1 (detalhes):** exibe dados da visita. Botão **Participar**:
+**Passo 1 (detalhes):** exibe dados da visita.
+
+- Botão **Visualizar Detalhes** (acima): visível só para quem passa em `podeEditarVisita`; navega para `/visitas/{id}/edit` e fecha o modal.
+- Botão **Participar** (abaixo):
 - Oculto se `status !== agendada`
 - Desabilitado com texto "Você já está inscrito" se o usuário autenticado já é participante ativo
 - Ao clicar: se limite de 5 atingido → `toastInfo`; senão → passo 2
