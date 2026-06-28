@@ -39,9 +39,15 @@ const Index: React.FC<Props> = ({ voluntarios, contadores, filtros }) => {
         email: '',
     });
 
+    const listaVoluntarios = useMemo(
+        () =>
+            Array.isArray(voluntarios?.data) ? voluntarios.data : [],
+        [voluntarios],
+    );
+
     const voluntariosComStatus = useMemo(
-        () => mapVoluntariosStatus(voluntarios.data),
-        [voluntarios.data],
+        () => mapVoluntariosStatus(listaVoluntarios),
+        [listaVoluntarios],
     );
 
     useEffect(() => {

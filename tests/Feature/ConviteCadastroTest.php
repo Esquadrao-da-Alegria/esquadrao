@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class ConviteCadastroTest extends TestCase
@@ -95,6 +96,19 @@ class ConviteCadastroTest extends TestCase
 
         $this->assertTrue($usuario->convite_expira_em->equalTo($convite->expira_em));
         $this->assertTrue($usuario->convite_enviado_em->equalTo($convite->enviado_em));
+    }
+
+    public function test_admin_lista_voluntarios_com_paginacao(): void
+    {
+        $this->actingAs($this->admin())
+            ->get(route('voluntarios.index'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Voluntario/Index')
+                ->has('voluntarios.data')
+                ->has('voluntarios.links')
+                ->has('contadores')
+            );
     }
 
     public function test_nao_admin_nao_cria_reenvia_ou_cancela_convite(): void
