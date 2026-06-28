@@ -7,12 +7,12 @@ interface Props {
 
 const Header: React.FC<Props> = ({ ehAdministrador, onCadastrar }) => {
     return (
-        <header className="mb-7 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <header className="mb-10 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-gray-950 sm:text-3xl">
+                <h1 className="text-2xl font-semibold tracking-tight text-amber-950 sm:text-3xl">
                     Voluntários
                 </h1>
-                <p className="mt-1 max-w-xl text-sm text-gray-500">
+                <p className="mt-1 max-w-md text-sm text-amber-900/55">
                     Gerencie convites e acompanhe o status de cada voluntário
                 </p>
             </div>

@@ -5,7 +5,7 @@ import Header from '@/components/Painel/Voluntario/Listagem/Header';
 import Paginacao from '@/components/Painel/Voluntario/Listagem/Paginacao';
 import { mapVoluntariosStatus } from '@/components/Painel/Voluntario/Listagem/status';
 import StatusCards from '@/components/Painel/Voluntario/Listagem/StatusCards';
-import Tabela from '@/components/Painel/Voluntario/Listagem/Tabela';
+import Cards from '@/components/Painel/Voluntario/Listagem/Cards';
 import {
     AbaKey,
     PaginatedVoluntarios,
@@ -190,7 +190,7 @@ const Index: React.FC<Props> = ({ voluntarios, contadores, filtros }) => {
                     onBuscaChange={setBusca}
                     onStatusChange={handleStatusChange}
                 />
-                <Tabela
+                <Cards
                     aba={aba}
                     voluntarios={voluntariosComStatus}
                     ehAdministrador={ehAdministrador}
