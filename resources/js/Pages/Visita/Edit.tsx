@@ -1,17 +1,31 @@
 import VisitaForm, { type VisitaFormValues } from '@/components/Painel/Visita/Formulario/Form'
 import PainelLayout from '@/layouts/PainelLayout'
+import { painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { extrairData, extrairHora } from '@/lib/visita'
 import { index, update } from '@/routes/visitas'
-import type { Hospital, User, Visita } from '@/types'
+import type { Hospital, User, Visita, VisitaParticipante } from '@/types'
 import { Link, router, useForm } from '@inertiajs/react'
 import { ArrowLeft, Check } from 'lucide-react'
-import { type FC } from 'react'
+import { type FC, useMemo } from 'react'
 import { toast } from 'react-toastify'
 
 interface Props {
     hospitais: Hospital[]
     lideres: User[]
     visita: Visita
+}
+
+const labelTipoParticipacao = (tipo: VisitaParticipante['tipo_participacao']) =>
+    tipo === 'palhaco' ? 'Palhaço' : 'Paisana'
+
+const labelStatusParticipacao = (status: VisitaParticipante['status_participacao']) => {
+    const labels: Record<VisitaParticipante['status_participacao'], string> = {
+        confirmado: 'Confirmado',
+        pendente: 'Pendente',
+        cancelado: 'Cancelado',
+        falta: 'Falta',
+    }
+    return labels[status] ?? status
 }
 
 const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
@@ -30,6 +44,14 @@ const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
     const handleFieldChange = <K extends keyof VisitaFormValues>(campo: K, valor: VisitaFormValues[K]) => {
         setData((prev) => ({ ...prev, [campo]: valor }))
     }
+
+    const participantes = useMemo(
+        () =>
+            (visita.participantes ?? [])
+                .filter((p) => p.status_participacao !== 'cancelado')
+                .sort((a, b) => (a.voluntario?.name ?? '').localeCompare(b.voluntario?.name ?? '')),
+        [visita.participantes],
+    )
 
     const handleSubmit = () => {
         if (!data.data || !data.hora_inicio || !data.hora_fim || !data.tipo || !data.lider_id || !data.status) {
@@ -78,6 +100,31 @@ const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
                                         lideres={lideres}
                                         onFieldChange={handleFieldChange}
                                     />
+
+                                    <div>
+                                        <h3 className={painelLabelClass}>Participantes</h3>
+                                        {participantes.length === 0 ? (
+                                            <p className="text-sm text-gray-400">Nenhum participante inscrito.</p>
+                                        ) : (
+                                            <ul className="divide-y divide-gray-100 rounded-lg border border-gray-100 shadow-sm">
+                                                {participantes.map((p) => (
+                                                    <li
+                                                        key={p.id ?? p.voluntario_id}
+                                                        className="flex items-center justify-between px-3 py-2 text-sm"
+                                                    >
+                                                        <span className="text-gray-900">
+                                                            {p.voluntario?.name ?? '—'}
+                                                        </span>
+                                                        <span className="text-gray-500">
+                                                            {labelTipoParticipacao(p.tipo_participacao)}
+                                                            {' · '}
+                                                            {labelStatusParticipacao(p.status_participacao)}
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
                                 </form>
                             </div>
 

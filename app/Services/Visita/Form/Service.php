@@ -18,7 +18,11 @@ class Service
             ->get(['id', 'nome', 'ativo']);
 
         if ($visita) {
-            $visita->load(['hospital.alas:id,hospital_id,nome', 'alaUnidade:id,nome,hospital_id']);
+            $visita->load([
+                'hospital.alas:id,hospital_id,nome',
+                'alaUnidade:id,nome,hospital_id',
+                'participantes.voluntario:id,name',
+            ]);
 
             if ($visita->hospital && ! $hospitais->contains('id', $visita->hospital_id)) {
                 $hospitais->push($visita->hospital);
