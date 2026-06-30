@@ -20,4 +20,17 @@ export class Service {
         toastErro(retorno.erros[0] ?? 'Erro ao participar da visita!')
         return false
     }
+
+    static async cancelar(visitaId: number, participanteId: number): Promise<boolean> {
+        const retorno = await Queries.destroy(visitaId, participanteId)
+
+        if (retorno.sucesso) {
+            toastSucesso('Inscrição cancelada com sucesso!')
+            router.reload()
+            return true
+        }
+
+        toastErro(retorno.erros[0] ?? 'Erro ao cancelar inscrição!')
+        return false
+    }
 }

@@ -1,4 +1,4 @@
-import { store } from '@/routes/visitas/participantes'
+import { destroy, store } from '@/routes/visitas/participantes'
 import { obterCsrfToken } from '@/utils/form'
 import type { TipoParticipacao } from '@/types'
 
@@ -18,7 +18,7 @@ export class Queries {
         try {
             const url = store({ visita: dados.visita_id }).url
 
-            const retorno = await fetch(url, {
+            const options = {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -28,12 +28,38 @@ export class Queries {
                 body: JSON.stringify({
                     tipo_participacao: dados.tipo_participacao,
                 }),
-            })
+            }
+
+            const retorno = await fetch(url, options)
 
             return await retorno.json()
         } catch (error) {
             console.error(error)
+
             return { sucesso: false, dados: [], erros: ['Erro ao participar da visita!'] }
+        }
+    }
+
+    static async destroy(visitaId: number, participanteId: number): Promise<RetornoPadrao> {
+        try {
+            const url = destroy({ visita: visitaId, participante: participanteId }).url
+
+            const options = {
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': obterCsrfToken(),
+                },
+            }
+
+            const retorno = await fetch(url, options)
+
+            return await retorno.json()
+        } catch (error) {
+            console.error(error)
+
+            return { sucesso: false, dados: [], erros: ['Erro ao cancelar inscrição!'] }
         }
     }
 }

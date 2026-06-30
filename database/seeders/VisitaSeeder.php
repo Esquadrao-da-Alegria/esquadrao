@@ -8,7 +8,6 @@ use App\Enums\TipoParticipacao;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
-use App\Models\Cargo;
 use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
@@ -25,11 +24,7 @@ class VisitaSeeder extends Seeder
             ->where('email', 'esquadraodaalegria.dados@gmail.com')
             ->firstOrFail();
 
-        $cargoVoluntario = Cargo::query()
-            ->where('slug', 'voluntario')
-            ->firstOrFail();
-
-        $voluntarios = $this->criarVoluntarios($cargoVoluntario);
+        $voluntarios = $this->buscarVoluntariosElegiveis();
 
         $hospitais = Hospital::query()
             ->where('ativo', true)
@@ -58,29 +53,19 @@ class VisitaSeeder extends Seeder
     }
 
     /** @return list<User> */
-    private function criarVoluntarios(Cargo $cargoVoluntario): array
+    private function buscarVoluntariosElegiveis(): array
     {
-        $lista = [
-            ['name' => 'Maria Palhaça',   'email' => 'maria.palhaca@esquadrao.test'],
-            ['name' => 'João Risadinha',  'email' => 'joao.risadinha@esquadrao.test'],
-            ['name' => 'Ana Alegria',     'email' => 'ana.alegria@esquadrao.test'],
-            ['name' => 'Pedro Sorriso',   'email' => 'pedro.sorriso@esquadrao.test'],
-            ['name' => 'Luiza Fantasia',  'email' => 'luiza.fantasia@esquadrao.test'],
-        ];
+        $voluntarios = User::query()
+            ->whereNotNull('voluntario_id')
+            ->where('status', User::STATUS_ATIVO)
+            ->orderBy('name')
+            ->get()
+            ->all();
 
-        $voluntarios = [];
-
-        foreach ($lista as $dados) {
-            $voluntario = User::query()->updateOrCreate(
-                ['email' => $dados['email']],
-                [
-                    'name'     => $dados['name'],
-                    'password' => 'esquadrao123',
-                ],
+        if ($voluntarios === []) {
+            throw new \RuntimeException(
+                'VisitaSeeder exige usuários ativos com voluntario_id. Execute VoluntarioSeeder antes.',
             );
-
-            $voluntario->cargos()->syncWithoutDetaching([$cargoVoluntario->id]);
-            $voluntarios[] = $voluntario;
         }
 
         return $voluntarios;
@@ -131,14 +116,14 @@ class VisitaSeeder extends Seeder
                 'dia'        => 5,
                 'hora_inicio' => 19,
                 'hora_fim'    => 21,
-                'tipo'       => VisitaTipo::Reuniao,
+                'tipo'       => VisitaTipo::Outro,
                 'observacoes' => 'Reunião mensal de coordenação da equipe.',
             ],
             [
                 'dia'        => 10,
                 'hora_inicio' => 14,
                 'hora_fim'    => 16,
-                'tipo'       => VisitaTipo::Oficina,
+                'tipo'       => VisitaTipo::AcaoEspecial,
                 'observacoes' => 'Oficina de maquiagem e improviso teatral.',
             ],
             [

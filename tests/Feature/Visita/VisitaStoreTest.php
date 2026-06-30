@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Visita;
 
+use App\Enums\PapelNaVisita;
+use App\Enums\StatusParticipacao;
+use App\Enums\TipoParticipacao;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
@@ -11,6 +14,7 @@ use App\Models\Cidade;
 use App\Models\Estado;
 use App\Models\Hospital;
 use App\Models\User;
+use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -115,16 +119,98 @@ class VisitaStoreTest extends TestCase
             ->assertSessionHasErrors('hospital_id');
     }
 
+    public function test_permite_lider_ativo_com_voluntario_sem_cargo_voluntario(): void
+    {
+        $user     = $this->criarVoluntario();
+        $hospital = $this->criarHospital();
+        $lider    = $this->criarUsuarioVoluntarioAtivoComCargo('artista');
+
+        $payload = [
+            'hospital_id' => $hospital->id,
+            'data'        => '2026-06-20',
+            'hora_inicio' => '10:00',
+            'hora_fim'    => '12:00',
+            'tipo'        => VisitaTipo::Hospital->value,
+            'lider_id'    => $lider->id,
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertRedirect(route('visitas.index'));
+    }
+
+    public function test_rejeita_lider_sem_voluntario_vinculado(): void
+    {
+        $user     = $this->criarVoluntario();
+        $hospital = $this->criarHospital();
+        $lider    = User::factory()->create(['status' => User::STATUS_ATIVO]);
+
+        $payload = [
+            'hospital_id' => $hospital->id,
+            'data'        => '2026-06-20',
+            'hora_inicio' => '10:00',
+            'hora_fim'    => '12:00',
+            'tipo'        => VisitaTipo::Hospital->value,
+            'lider_id'    => $lider->id,
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertSessionHasErrors('lider_id');
+    }
+
+    public function test_cria_visita_com_lider_como_participante(): void
+    {
+        $user     = $this->criarVoluntario();
+        $hospital = $this->criarHospital();
+        $lider    = $this->criarVoluntario();
+
+        $payload = [
+            'hospital_id' => $hospital->id,
+            'data'        => '2026-06-20',
+            'hora_inicio' => '10:00',
+            'hora_fim'    => '12:00',
+            'tipo'        => VisitaTipo::Hospital->value,
+            'lider_id'    => $lider->id,
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertRedirect(route('visitas.index'));
+
+        $this->assertDatabaseHas('visita_participante', [
+            'voluntario_id'       => $lider->id,
+            'tipo_participacao'   => TipoParticipacao::Palhaco->value,
+            'papel_na_visita'     => PapelNaVisita::Participante->value,
+            'status_participacao' => StatusParticipacao::Confirmado->value,
+        ]);
+    }
+
     private function criarVoluntario(): User
     {
+        return $this->criarUsuarioVoluntarioAtivoComCargo('voluntario');
+    }
+
+    private function criarUsuarioVoluntarioAtivoComCargo(string $slug): User
+    {
         $cargo = Cargo::query()->firstOrCreate(
-            ['slug' => 'voluntario'],
-            ['nome' => 'Voluntário'],
+            ['slug' => $slug],
+            ['nome' => ucfirst(str_replace('_', ' ', $slug))],
         );
-        $user = User::factory()->create();
+
+        $voluntario = Voluntario::query()->create([
+            'nome_completo' => 'Voluntário ' . uniqid(),
+            'email'         => uniqid('vol_') . '@test.com',
+            'status'        => User::STATUS_ATIVO,
+        ]);
+
+        $user = User::factory()->create([
+            'voluntario_id' => $voluntario->id,
+            'status'        => User::STATUS_ATIVO,
+        ]);
         $user->cargos()->syncWithoutDetaching([$cargo->id]);
 
-        return $user;
+        return $user->fresh('cargos');
     }
 
     private function criarHospital(bool $ativo = true): Hospital

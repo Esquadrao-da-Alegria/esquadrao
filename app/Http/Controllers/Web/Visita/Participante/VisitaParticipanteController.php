@@ -21,8 +21,11 @@ class VisitaParticipanteController extends Controller
         return response()->json($retorno, $status);
     }
 
-    public function destroy(Visita $visita, VisitaParticipante $participante)
+    public function destroy(Visita $visita, VisitaParticipante $participante): JsonResponse
     {
-        //
+        $retorno = $this->service->destroy($visita, $participante);
+        $status  = $retorno['sucesso'] ? 200 : 422;
+
+        return response()->json($retorno, $status);
     }
 }

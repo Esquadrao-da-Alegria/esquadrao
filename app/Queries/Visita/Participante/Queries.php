@@ -136,6 +136,10 @@ class Queries
                 case 'status_participacao_in':
                     $query->whereIn('status_participacao', $valor);
                     break;
+
+                case 'status_participacao':
+                    $query->where('status_participacao', $valor);
+                    break;
             }
         }
     }

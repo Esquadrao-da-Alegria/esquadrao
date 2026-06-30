@@ -92,7 +92,7 @@ class Queries
     private function carregarRelacionamentos(Builder $query): void
     {
         $query->with([
-            'hospital:id,nome',
+            'hospital:id,nome,cidade_id',
             'alaUnidade:id,nome',
             'lider:id,name',
             'participantes.voluntario:id,name',

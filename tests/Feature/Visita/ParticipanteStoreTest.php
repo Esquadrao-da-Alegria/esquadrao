@@ -14,6 +14,7 @@ use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
 use App\Models\VisitaParticipante;
+use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -33,7 +34,7 @@ class ParticipanteStoreTest extends TestCase
 
     public function test_inscreve_voluntario_com_sucesso(): void
     {
-        $user   = $this->criarUsuario();
+        $user   = $this->criarUsuarioVoluntarioAtivo();
         $visita = $this->criarVisita();
 
         $this->participar($user, $visita)
@@ -49,7 +50,7 @@ class ParticipanteStoreTest extends TestCase
     public function test_rejeita_quando_limite_atingido(): void
     {
         $visita = $this->criarVisita();
-        $user   = $this->criarUsuario();
+        $user   = $this->criarUsuarioVoluntarioAtivo();
 
         $this->lotarVisita($visita);
 
@@ -60,7 +61,7 @@ class ParticipanteStoreTest extends TestCase
 
     public function test_rejeita_usuario_ja_inscrito(): void
     {
-        $user   = $this->criarUsuario();
+        $user   = $this->criarUsuarioVoluntarioAtivo();
         $visita = $this->criarVisita();
 
         $this->participar($user, $visita)->assertOk();
@@ -72,12 +73,48 @@ class ParticipanteStoreTest extends TestCase
 
     public function test_rejeita_visita_cancelada(): void
     {
-        $user   = $this->criarUsuario();
+        $user   = $this->criarUsuarioVoluntarioAtivo();
         $visita = $this->criarVisita(VisitaStatus::Cancelada);
 
         $this->participar($user, $visita)
             ->assertStatus(422)
             ->assertJson(['sucesso' => false]);
+    }
+
+    public function test_rejeita_usuario_sem_voluntario_ativo(): void
+    {
+        $user   = User::factory()->create(['status' => User::STATUS_ATIVO]);
+        $visita = $this->criarVisita();
+
+        $this->participar($user, $visita)
+            ->assertStatus(422)
+            ->assertJsonPath('erros.0', 'Apenas voluntários ativos podem se inscrever.');
+    }
+
+    public function test_reativa_participacao_cancelada(): void
+    {
+        $user   = $this->criarUsuarioVoluntarioAtivo();
+        $visita = $this->criarVisita();
+
+        VisitaParticipante::query()->create([
+            'visita_id'           => $visita->id,
+            'voluntario_id'       => $user->id,
+            'tipo_participacao'   => TipoParticipacao::Paisana->value,
+            'papel_na_visita'     => PapelNaVisita::Participante->value,
+            'status_participacao' => StatusParticipacao::Cancelado->value,
+        ]);
+
+        $this->participar($user, $visita, 'palhaco')
+            ->assertOk()
+            ->assertJson(['sucesso' => true]);
+
+        $this->assertDatabaseCount('visita_participante', 1);
+        $this->assertDatabaseHas('visita_participante', [
+            'visita_id'           => $visita->id,
+            'voluntario_id'       => $user->id,
+            'tipo_participacao'   => TipoParticipacao::Palhaco->value,
+            'status_participacao' => StatusParticipacao::Confirmado->value,
+        ]);
     }
 
     private function participar(User $user, Visita $visita, string $tipo = 'palhaco'): TestResponse
@@ -104,6 +141,20 @@ class ParticipanteStoreTest extends TestCase
     private function criarUsuario(): User
     {
         return User::factory()->create();
+    }
+
+    private function criarUsuarioVoluntarioAtivo(): User
+    {
+        $voluntario = Voluntario::query()->create([
+            'nome_completo' => 'Voluntário ' . uniqid(),
+            'email'         => uniqid('vol_') . '@test.com',
+            'status'        => User::STATUS_ATIVO,
+        ]);
+
+        return User::factory()->create([
+            'voluntario_id' => $voluntario->id,
+            'status'        => User::STATUS_ATIVO,
+        ]);
     }
 
     private function criarHospital(): Hospital

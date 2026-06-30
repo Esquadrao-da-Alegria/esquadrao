@@ -39,12 +39,13 @@ class StoreRequest extends FormRequest
             $liderId = $this->input('lider_id');
 
             if ($liderId) {
-                $ehVoluntario = User::query()->whereKey($liderId)
-                    ->whereHas('cargos', fn ($q) => $q->where('slug', 'voluntario'))
+                $liderValido = User::query()
+                    ->whereKey($liderId)
+                    ->where('status', User::STATUS_ATIVO)
+                    ->whereNotNull('voluntario_id')
                     ->exists();
-                $ehAuth = (int) $liderId === (int) $this->user()?->id;
 
-                if (! $ehVoluntario && ! $ehAuth) {
+                if (! $liderValido) {
                     $validator->errors()->add('lider_id', 'O líder deve ser um voluntário cadastrado.');
                 }
             }

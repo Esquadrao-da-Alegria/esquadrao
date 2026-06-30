@@ -11,6 +11,7 @@ use App\Models\Estado;
 use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
+use App\Models\Voluntario;
 use App\Services\Visita\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -64,6 +65,27 @@ class VisitaUpdateTest extends TestCase
         $this->assertTrue(app(Service::class)->podeEditarVisita($diretor, $visita));
     }
 
+    public function test_coordenador_local_nao_edita_visita_de_outra_cidade(): void
+    {
+        $cidadeA       = $this->criarCidade('Cidade A');
+        $cidadeB       = $this->criarCidade('Cidade B');
+        $coordenador   = $this->criarUsuarioComCargoCidade('coordenador_local', $cidadeA->id);
+        $lider         = $this->criarVoluntario();
+        $visita        = $this->criarVisita($lider, liderId: $lider->id, cidadeId: $cidadeB->id);
+
+        $this->assertFalse(app(Service::class)->podeEditarVisita($coordenador, $visita));
+    }
+
+    public function test_coordenador_local_edita_visita_da_sua_cidade(): void
+    {
+        $cidade        = $this->criarCidade('Cidade A');
+        $coordenador   = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $lider         = $this->criarVoluntario();
+        $visita        = $this->criarVisita($lider, liderId: $lider->id, cidadeId: $cidade->id);
+
+        $this->assertTrue(app(Service::class)->podeEditarVisita($coordenador, $visita));
+    }
+
     public function test_edit_redireciona_sem_permissao(): void
     {
         $lider   = $this->criarVoluntario();
@@ -105,7 +127,7 @@ class VisitaUpdateTest extends TestCase
             'data'        => '2026-06-25',
             'hora_inicio' => '09:00',
             'hora_fim'    => '11:00',
-            'tipo'        => VisitaTipo::Oficina->value,
+            'tipo'        => VisitaTipo::AcaoEspecial->value,
             'lider_id'    => $lider->id,
             'status'      => VisitaStatus::Realizada->value,
             'observacoes' => 'Atualizado',
@@ -120,12 +142,29 @@ class VisitaUpdateTest extends TestCase
 
         $this->assertSame($hospitalIdOriginal, $visita->hospital_id);
         $this->assertSame(VisitaStatus::Realizada, $visita->status);
-        $this->assertSame(VisitaTipo::Oficina, $visita->tipo);
+        $this->assertSame(VisitaTipo::AcaoEspecial, $visita->tipo);
     }
 
     private function criarVoluntario(): User
     {
-        return $this->criarUsuarioComCargo('voluntario');
+        $cargo = Cargo::query()->firstOrCreate(
+            ['slug' => 'voluntario'],
+            ['nome' => 'Voluntário'],
+        );
+
+        $voluntario = Voluntario::query()->create([
+            'nome_completo' => 'Voluntário ' . uniqid(),
+            'email'         => uniqid('vol_') . '@test.com',
+            'status'        => User::STATUS_ATIVO,
+        ]);
+
+        $user = User::factory()->create([
+            'voluntario_id' => $voluntario->id,
+            'status'        => User::STATUS_ATIVO,
+        ]);
+        $user->cargos()->syncWithoutDetaching([$cargo->id]);
+
+        return $user->fresh('cargos');
     }
 
     private function criarUsuarioComCargo(string $slug): User
@@ -140,17 +179,66 @@ class VisitaUpdateTest extends TestCase
         return $user->fresh('cargos');
     }
 
-    private function criarHospital(bool $ativo = true): Hospital
+    private function criarCidade(string $nome): Cidade
     {
         $estado = Estado::query()->firstOrCreate(
             ['sigla' => 'RS'],
             ['nome' => 'RS'],
         );
-        $cidade = Cidade::query()
-            ->where('nome', 'POA')
+
+        $existente = Cidade::query()
+            ->where('nome', $nome)
             ->where('estado_id', $estado->id)
-            ->first()
-            ?? Cidade::query()->forceCreate(['nome' => 'POA', 'estado_id' => $estado->id]);
+            ->first();
+
+        if ($existente) {
+            return $existente;
+        }
+
+        return Cidade::query()->forceCreate([
+            'nome'      => $nome,
+            'estado_id' => $estado->id,
+        ]);
+    }
+
+    private function criarUsuarioComCargoCidade(string $slug, int $cidadeId): User
+    {
+        $cargo = Cargo::query()->firstOrCreate(
+            ['slug' => $slug],
+            ['nome' => ucfirst(str_replace('_', ' ', $slug))],
+        );
+
+        $voluntario = Voluntario::query()->create([
+            'nome_completo'  => 'Voluntário ' . uniqid(),
+            'email'          => uniqid('vol_') . '@test.com',
+            'status'         => User::STATUS_ATIVO,
+            'cidade_base_id' => $cidadeId,
+        ]);
+
+        $user = User::factory()->create([
+            'voluntario_id' => $voluntario->id,
+            'status'        => User::STATUS_ATIVO,
+        ]);
+        $user->cargos()->syncWithoutDetaching([$cargo->id]);
+
+        return $user->fresh(['cargos', 'voluntario']);
+    }
+
+    private function criarHospital(bool $ativo = true, ?int $cidadeId = null): Hospital
+    {
+        $estado = Estado::query()->firstOrCreate(
+            ['sigla' => 'RS'],
+            ['nome' => 'RS'],
+        );
+        $cidade = $cidadeId
+            ? Cidade::query()->findOrFail($cidadeId)
+            : (
+                Cidade::query()
+                    ->where('nome', 'POA')
+                    ->where('estado_id', $estado->id)
+                    ->first()
+                ?? Cidade::query()->forceCreate(['nome' => 'POA', 'estado_id' => $estado->id])
+            );
 
         return Hospital::query()->create([
             'cidade_id' => $cidade->id,
@@ -163,9 +251,9 @@ class VisitaUpdateTest extends TestCase
         ]);
     }
 
-    private function criarVisita(User $criador, int|null|false $liderId = false): Visita
+    private function criarVisita(User $criador, int|null|false $liderId = false, ?int $cidadeId = null): Visita
     {
-        $hospital = $this->criarHospital();
+        $hospital = $this->criarHospital(cidadeId: $cidadeId);
 
         return Visita::query()->create([
             'hospital_id'   => $hospital->id,

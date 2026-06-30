@@ -2,13 +2,18 @@
 
 namespace App\Services\Visita;
 
+use App\Enums\PapelNaVisita;
+use App\Enums\StatusParticipacao;
+use App\Enums\TipoParticipacao;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Models\User;
 use App\Models\Visita;
+use App\Models\VisitaParticipante;
 use App\Queries\Visita\Queries;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class Service
@@ -40,15 +45,18 @@ class Service
             return true;
         }
 
-        $user->loadMissing('cargos');
+        $user->loadMissing(['cargos', 'voluntario']);
+        $visita->loadMissing('hospital');
 
         foreach ($user->cargos as $cargo) {
-            if (in_array($cargo->slug, ['administrador', 'diretor'], true)) {
+            if (in_array($cargo->slug, ['administrador', 'diretor', 'coordenador_geral'], true)) {
                 return true;
             }
 
-            if (str_contains($cargo->slug, 'coordenador')) {
-                return true;
+            if ($cargo->slug === 'coordenador_local') {
+                return $user->voluntario?->cidade_base_id !== null
+                    && $visita->hospital?->cidade_id !== null
+                    && (int) $user->voluntario->cidade_base_id === (int) $visita->hospital->cidade_id;
             }
         }
 
@@ -64,7 +72,33 @@ class Service
                 return $this->erroEnvelope('O horário de fim deve ser posterior ao início.');
             }
 
-            $retorno = $this->queries->store($payload);
+            DB::beginTransaction();
+
+            try {
+                $retorno = $this->queries->store($payload);
+
+                if (! $retorno['sucesso']) {
+                    DB::rollBack();
+
+                    return $retorno;
+                }
+
+                $visita = $retorno['dados']['model'];
+
+                VisitaParticipante::query()->create([
+                    'visita_id'           => $visita->id,
+                    'voluntario_id'       => $payload['lider_id'],
+                    'tipo_participacao'   => TipoParticipacao::Palhaco->value,
+                    'papel_na_visita'     => PapelNaVisita::Participante->value,
+                    'status_participacao' => StatusParticipacao::Confirmado->value,
+                ]);
+
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollBack();
+
+                throw $th;
+            }
 
             if ($retorno['sucesso']) {
                 session()->flash('mensagem_sucesso', 'Visita cadastrada com sucesso!');
@@ -94,7 +128,7 @@ class Service
             }
 
             return $retorno;
-        } catch (\Throwable $th) {
+        } catch (\Throwable $th) {dd($th);
             $this->logarErro(['visita_id' => $visita->id, ...$dados], 'atualizar', formatarMensagemErro($th));
 
             return $this->erroEnvelope(formatarMensagemErro($th));

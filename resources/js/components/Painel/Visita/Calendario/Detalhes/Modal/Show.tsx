@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button'
 import {
     contarParticipantes,
     labelStatus,
+    participacaoAtivaDoUsuario,
     podeEditarVisita,
+    usuarioEhLiderDaVisita,
     usuarioJaInscrito,
     visitaAtingiuLimite,
 } from '@/lib/visita'
@@ -27,9 +29,12 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
     const [passo, setPasso] = useState<Passo>('detalhes')
     const [tipo, setTipo] = useState<TipoParticipacao | null>(null)
     const [enviando, setEnviando] = useState(false)
+    const [cancelando, setCancelando] = useState(false)
 
     const participantes = visita ? contarParticipantes(visita) : null
     const jaInscrito = visita ? usuarioJaInscrito(visita, auth.user.id) : false
+    const participacaoAtiva = visita ? participacaoAtivaDoUsuario(visita, auth.user.id) : null
+    const ehLider = visita ? usuarioEhLiderDaVisita(visita, auth.user.id) : false
     const visitaAgendada = visita?.status === 'agendada'
 
     useEffect(() => {
@@ -37,6 +42,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
             setPasso('detalhes')
             setTipo(null)
             setEnviando(false)
+            setCancelando(false)
         }
     }, [visita])
 
@@ -44,6 +50,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
         setPasso('detalhes')
         setTipo(null)
         setEnviando(false)
+        setCancelando(false)
         onFechar()
     }
 
@@ -70,6 +77,22 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
         const sucesso = await Service.participar(visita.id!, tipo)
 
         setEnviando(false)
+
+        if (sucesso) {
+            fecharModal()
+        }
+    }
+
+    const handleCancelarInscricao = async () => {
+        if (!visita || !participacaoAtiva?.id || cancelando) {
+            return
+        }
+
+        setCancelando(true)
+
+        const sucesso = await Service.cancelar(visita.id!, participacaoAtiva.id)
+
+        setCancelando(false)
 
         if (sucesso) {
             fecharModal()
@@ -184,9 +207,20 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                     {visitaAgendada && (
                         <div className="mt-6">
                             {jaInscrito ? (
-                                <Button className="w-full" disabled>
-                                    Você já está inscrito
-                                </Button>
+                                ehLider ? (
+                                    <Button className="w-full" disabled>
+                                        Altere o líder antes de cancelar
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        className="w-full"
+                                        variant="outline"
+                                        onClick={handleCancelarInscricao}
+                                        disabled={cancelando}
+                                    >
+                                        {cancelando ? 'Cancelando...' : 'Cancelar inscrição'}
+                                    </Button>
+                                )
                             ) : (
                                 <Button className="w-full" onClick={handleParticipar}>
                                     Participar

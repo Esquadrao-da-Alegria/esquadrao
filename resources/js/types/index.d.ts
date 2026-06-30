@@ -59,6 +59,10 @@ export interface User {
     created_at: string;
     updated_at: string;
     cargos?: Cargo[];
+    voluntario?: {
+        id: number;
+        cidade_base_id?: number | null;
+    };
     [key: string]: unknown; // This allows for additional properties...
 }
 
@@ -180,8 +184,6 @@ export type VisitaTipo =
     | 'hospital'
     | 'residencia'
     | 'acao_especial'
-    | 'oficina'
-    | 'reuniao'
     | 'outro';
 
 export type VisitaStatus =

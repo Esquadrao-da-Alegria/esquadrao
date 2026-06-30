@@ -17,10 +17,16 @@ class EnumsTest extends TestCase
         $this->assertSame('hospital', VisitaTipo::Hospital->value);
         $this->assertSame('residencia', VisitaTipo::Residencia->value);
         $this->assertSame('acao_especial', VisitaTipo::AcaoEspecial->value);
-        $this->assertSame('oficina', VisitaTipo::Oficina->value);
-        $this->assertSame('reuniao', VisitaTipo::Reuniao->value);
         $this->assertSame('outro', VisitaTipo::Outro->value);
-        $this->assertCount(6, VisitaTipo::cases());
+        $this->assertCount(4, VisitaTipo::cases());
+    }
+
+    public function test_visita_tipo_nao_inclui_oficina_nem_reuniao(): void
+    {
+        $valores = array_map(fn (VisitaTipo $tipo) => $tipo->value, VisitaTipo::cases());
+
+        $this->assertNotContains('oficina', $valores);
+        $this->assertNotContains('reuniao', $valores);
     }
 
     public function test_visita_status_tem_valores_esperados(): void

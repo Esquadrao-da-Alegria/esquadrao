@@ -8,7 +8,7 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 
 | Termo | Significado |
 |-------|-------------|
-| **Visita** | Registro na tabela `visitas` — evento agendado ou realizado (hospital, residência, oficina, etc.). |
+| **Visita** | Registro na tabela `visitas` — evento agendado ou realizado (hospital, residência, ação especial, etc.). Oficinas e reuniões ficam no módulo de **eventos**, não em visitas. |
 | **VisitaParticipante** | Linha na pivot enriquecida `visita_participante` — liga visita a um voluntário com tipo, papel e status de participação. |
 | **Voluntário** | No domínio, o voluntário **é** o usuário. A coluna na pivot chama-se `voluntario_id` e aponta para `users.id`. |
 | **Líder** | Usuário responsável pela visita, referenciado em `visitas.lider_id` (nullable). **Não** é um valor de `PapelNaVisita`. |
@@ -52,7 +52,22 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
    Máximo 5 inscrições ativas por visita (`papel_na_visita = participante`, `status_participacao ∈ {confirmado, pendente}`).
 
 8. **Inscrição self-service**  
-   Voluntário autenticado pode se inscrever em visita `agendada` via modal do calendário.
+   Voluntário autenticado e **ativo** com `voluntario_id` preenchido pode se inscrever em visita `agendada` via modal do calendário.
+
+9. **Líder elegível**  
+   Líder da visita: `User` com `status = ativo` e `voluntario_id` NOT NULL. Cargo `voluntario` **não** é requisito.
+
+10. **Participante automático na criação**  
+    Ao criar visita (`store`), o service insere na mesma transaction uma linha em `visita_participante` para o `lider_id`: `papel_na_visita = participante`, `tipo_participacao = palhaco`, `status_participacao = confirmado` (via `create`, não `firstOrCreate`).
+
+11. **Cancelamento lógico de inscrição**  
+    `DELETE participantes` não remove a linha — atualiza `status_participacao = cancelado`. Participante pode auto-cancelar, exceto o líder atual (deve trocar o líder antes). Gestores com `podeEditarVisita` podem cancelar qualquer participante.
+
+12. **Reativação de inscrição cancelada**  
+    Nova inscrição self-service reutiliza a linha existente `(visita_id, voluntario_id)` via `update`, reativando com `status_participacao = confirmado` e novo `tipo_participacao`.
+
+13. **Erro seguro ao validar vagas**  
+    Falha ao consultar participantes ativos retorna: `Não foi possível validar as vagas desta visita. Tente novamente.` — nunca assume zero vagas ocupadas.
 
 ---
 
@@ -109,9 +124,9 @@ Valores persistidos como varchar(50) no banco; cast para enum PHP backed string 
 | `Hospital` | `hospital` |
 | `Residencia` | `residencia` |
 | `AcaoEspecial` | `acao_especial` |
-| `Oficina` | `oficina` |
-| `Reuniao` | `reuniao` |
 | `Outro` | `outro` |
+
+> `oficina` e `reuniao` **não** são tipos de visita — pertencem ao módulo de eventos (`EventoTipo`).
 
 ### VisitaStatus
 
@@ -206,7 +221,7 @@ import type { Visita, VisitaStatus, VisitaParticipante } from '@/types';
 
 | Tipo TS | Valores | Enum PHP |
 |---------|---------|----------|
-| `VisitaTipo` | `'hospital' \| 'residencia' \| 'acao_especial' \| 'oficina' \| 'reuniao' \| 'outro'` | `VisitaTipo` |
+| `VisitaTipo` | `'hospital' \| 'residencia' \| 'acao_especial' \| 'outro'` | `VisitaTipo` |
 | `VisitaStatus` | `'agendada' \| 'realizada' \| 'cancelada' \| 'pendente_relatorio' \| 'contabilizada' \| 'nao_contabilizada'` | `VisitaStatus` |
 | `VisitaOrigem` | `'sistema' \| 'importacao' \| 'outro'` | `VisitaOrigem` |
 | `TipoParticipacao` | `'palhaco' \| 'paisana'` | `TipoParticipacao` |
@@ -281,7 +296,7 @@ O codebase usa model `Ala` com table `alas_hospitais`, não `AlaHospital`. Relac
 `Hospital` pode carregar `alas` por default (`protected $with`). Em listagens de visitas, preferir:
 
 ```php
-Visita::with(['hospital:id,nome'])->get();
+Visita::with(['hospital:id,nome,cidade_id'])->get();
 ```
 
 ---
@@ -337,9 +352,10 @@ VisitaParticipante::query()->create([
 | `tests/Feature/Visita/VisitaModelTest.php` | Casts e relacionamentos de `Visita` |
 | `tests/Feature/Visita/VisitaParticipanteModelTest.php` | Casts, relacionamentos e unique por comportamento |
 | `tests/Feature/Visita/VisitaIndexTest.php` | Rota index, filtro de mês, auth |
-| `tests/Feature/Visita/ParticipanteStoreTest.php` | Inscrição self-service, limite, duplicata, visita cancelada, auth |
+| `tests/Feature/Visita/ParticipanteStoreTest.php` | Inscrição self-service, limite, duplicata, visita cancelada, voluntário ativo, reativação, auth |
+| `tests/Feature/Visita/ParticipanteDestroyTest.php` | Cancelamento lógico, auto-cancelamento, bloqueio do líder, gestor, visita errada |
 | `tests/Feature/Visita/VisitaStoreTest.php` | Create visita, validação, hospital inativo, auth |
-| `tests/Feature/Visita/VisitaUpdateTest.php` | Permissões `podeEditarVisita`, update, hospital imutável |
+| `tests/Feature/Visita/VisitaUpdateTest.php` | Permissões `podeEditarVisita` (incl. coordenador_local por cidade), update, hospital imutável |
 
 ```bash
 vendor/bin/sail artisan test --compact tests/Unit/Visita tests/Feature/Visita
@@ -376,12 +392,14 @@ Camadas participantes: `VisitaParticipanteController` → `Visita\Participante\S
 `podeEditarVisita(user, visita)` — verdadeiro se **qualquer**:
 
 - `user.id === visita.lider_id` (quando `lider_id` não é null)
-- cargo `administrador` ou `diretor`
-- slug do cargo contém `coordenador`
+- cargo `administrador`, `diretor` ou `coordenador_geral`
+- cargo `coordenador_local` **e** `user.voluntario.cidade_base_id === visita.hospital.cidade_id` (ambos não null)
 
-**Visita sem líder (`lider_id = null`):** apenas administrador, diretor ou coordenador editam e veem o botão no modal.
+**Visita sem líder (`lider_id = null`):** apenas administrador, diretor, coordenador_geral ou coordenador_local da cidade do hospital editam e veem o botão no modal.
 
 Implementação: `App\Services\Visita\Service::podeEditarVisita` (backend) e `lib/visita.ts::podeEditarVisita` (frontend).
+
+`HandleInertiaRequests` carrega `voluntario:id,cidade_base_id` no user compartilhado para espelhar a regra no frontend.
 
 Sem permissão em `edit`/`update`: redirect `/visitas` + flash `mensagem_erro`.
 
@@ -416,7 +434,8 @@ Sem permissão em `edit`/`update`: redirect `/visitas` + flash `mensagem_erro`.
 - Qualquer usuário autenticado pode criar.
 - Backend define `criado_por_id`, `origem = sistema`, `status = agendada`.
 - `StoreRequest` rejeita hospital inativo e ala de outro hospital.
-- Líderes: users com cargo `voluntario`; usuário logado sempre incluído no select (exceção sem cargo).
+- Líderes: users **ativos** com `voluntario_id` preenchido (sem exigir cargo `voluntario`); líder atual e usuário logado sempre incluídos no select quando ausentes da lista.
+- Na criação, o service insere automaticamente o líder como participante confirmado na mesma transaction.
 
 ### Regras edit
 
@@ -444,9 +463,9 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 | `components/Painel/Visita/Calendario/Show.tsx` | Grade mensal |
 | `components/Painel/Visita/Calendario/Detalhes/Modal/Show.tsx` | Modal de detalhes + inscrição em 2 passos |
 | `components/Painel/Visita/Calendario/ListaCompleta/Modal/Show.tsx` | Modal lista completa do dia |
-| `lib/visita.ts` | Helpers: `contarParticipantes`, `contarParticipantesAtivos`, `usuarioJaInscrito`, `visitaAtingiuLimite`, `classeCardPorStatus`, `labelStatus`, `podeEditarVisita`, `labelTipo`, `extrairData`, `extrairHora` |
-| `Queries/Visita/Participante/Queries.tsx` | `fetch` POST para `visitas.participantes.store` |
-| `Services/Visita/Participante/Service.tsx` | Orquestra inscrição, toasts e reload Inertia |
+| `lib/visita.ts` | Helpers: `contarParticipantes`, `contarParticipantesAtivos`, `usuarioJaInscrito`, `participacaoAtivaDoUsuario`, `usuarioEhLiderDaVisita`, `visitaAtingiuLimite`, `classeCardPorStatus`, `labelStatus`, `podeEditarVisita`, `labelTipo`, `extrairData`, `extrairHora` |
+| `Queries/Visita/Participante/Queries.tsx` | `fetch` POST/DELETE para `visitas.participantes.store` / `visitas.participantes.destroy` |
+| `Services/Visita/Participante/Service.tsx` | Orquestra inscrição/cancelamento, toasts e reload Inertia |
 | `utils/form.ts` | Helper `obterCsrfToken` |
 
 ### Regras
@@ -461,10 +480,13 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 **Passo 1 (detalhes):** exibe dados da visita.
 
 - Botão **Visualizar Detalhes** (acima): visível só para quem passa em `podeEditarVisita`; navega para `/visitas/{id}/edit` e fecha o modal.
-- Botão **Participar** (abaixo):
+- Botão **Participar** / **Cancelar inscrição** (abaixo):
 - Oculto se `status !== agendada`
-- Desabilitado com texto "Você já está inscrito" se o usuário autenticado já é participante ativo
-- Ao clicar: se limite de 5 atingido → `toastInfo`; senão → passo 2
+- Se inscrito e **não** líder: botão **Cancelar inscrição** (estado `cancelando`)
+- Se inscrito e **líder**: botão desabilitado com texto "Altere o líder antes de cancelar"
+- Se não inscrito: botão **Participar**
+- Ao clicar em Participar: se limite de 5 atingido → `toastInfo`; senão → passo 2
+- **Cancelar inscrição** chama `Services/Visita/Participante/Service.cancelar` → em sucesso: toast, reload Inertia, fecha modal
 
 **Passo 2 (inscrição):** escolha palhaço/paisana + **Confirmar** + **Voltar**.
 - **Confirmar** chama `Services/Visita/Participante/Service.participar` → em sucesso: toast, reload Inertia, fecha modal
@@ -481,6 +503,8 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 | Onde está o voluntário inscrito? | Em `visita_participante.voluntario_id` → `users.id`. |
 | Quem é o líder? | `visitas.lider_id` → `users.id` (nullable). |
 | Hospital é obrigatório? | Sim, `hospital_id` NOT NULL. |
-| Como evitar duplicata de inscrito? | Unique `(visita_id, voluntario_id)` no banco. |
+| Como evitar duplicata de inscrito? | Unique `(visita_id, voluntario_id)` no banco; reativação via `update` se status era `cancelado`. |
+| Quem pode ser líder? | User ativo com `voluntario_id` (cargo voluntário não é requisito). |
+| Como cancelar inscrição? | `DELETE participantes` → `status_participacao = cancelado` (lógico). |
 | Onde validar `fim_em > inicio_em`? | No service/form request (não no banco). |
 | Onde estão os tipos TS de visita? | `resources/js/types/index.d.ts` — seção `// VISITAS`. |

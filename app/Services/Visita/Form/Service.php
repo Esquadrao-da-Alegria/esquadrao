@@ -27,7 +27,8 @@ class Service
         }
 
         $lideres = User::query()
-            ->whereHas('cargos', fn ($q) => $q->where('slug', 'voluntario'))
+            ->where('status', User::STATUS_ATIVO)
+            ->whereNotNull('voluntario_id')
             ->orderBy('name')
             ->get(['id', 'name']);
 

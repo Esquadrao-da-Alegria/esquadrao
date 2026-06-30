@@ -1,4 +1,4 @@
-import type { User, Visita, VisitaStatus, VisitaTipo } from '@/types'
+import type { User, Visita, VisitaParticipante, VisitaStatus, VisitaTipo } from '@/types'
 import { temCargo } from '@/lib/utils/user'
 
 export const LIMITE_PARTICIPANTES = 5
@@ -21,6 +21,14 @@ export function visitaAtingiuLimite(visita: Visita): boolean {
 
 export function usuarioJaInscrito(visita: Visita, usuarioId: number): boolean {
     return listaAtivos(visita).some((p) => p.voluntario_id === usuarioId)
+}
+
+export function participacaoAtivaDoUsuario(visita: Visita, usuarioId: number): VisitaParticipante | null {
+    return listaAtivos(visita).find((p) => p.voluntario_id === usuarioId) ?? null
+}
+
+export function usuarioEhLiderDaVisita(visita: Visita, usuarioId: number): boolean {
+    return visita.lider_id !== null && visita.lider_id !== undefined && visita.lider_id === usuarioId
 }
 
 export function contarParticipantes(visita: Visita) {
@@ -66,11 +74,20 @@ export function podeEditarVisita(user: User, visita: Visita): boolean {
         return true
     }
 
-    if (temCargo(user, 'administrador') || temCargo(user, 'diretor')) {
+    if (temCargo(user, 'administrador') || temCargo(user, 'diretor') || temCargo(user, 'coordenador_geral')) {
         return true
     }
 
-    return user.cargos?.some((c) => c.slug.includes('coordenador')) ?? false
+    if (temCargo(user, 'coordenador_local')) {
+        const cidadeUsuario = user.voluntario?.cidade_base_id
+        const cidadeHospital = visita.hospital?.cidade_id
+
+        return cidadeUsuario != null
+            && cidadeHospital != null
+            && cidadeUsuario === cidadeHospital
+    }
+
+    return false
 }
 
 export function labelTipo(tipo: VisitaTipo): string {
@@ -78,8 +95,6 @@ export function labelTipo(tipo: VisitaTipo): string {
         hospital: 'Hospital',
         residencia: 'Residência',
         acao_especial: 'Ação especial',
-        oficina: 'Oficina',
-        reuniao: 'Reunião',
         outro: 'Outro',
     }
     return labels[tipo] ?? tipo
@@ -101,7 +116,7 @@ export function extrairHora(iso: string): string {
 }
 
 export const VISITA_TIPOS: VisitaTipo[] = [
-    'hospital', 'residencia', 'acao_especial', 'oficina', 'reuniao', 'outro',
+    'hospital', 'residencia', 'acao_especial', 'outro',
 ]
 
 export const VISITA_STATUS: VisitaStatus[] = [
