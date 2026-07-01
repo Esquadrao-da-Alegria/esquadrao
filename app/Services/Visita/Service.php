@@ -128,7 +128,7 @@ class Service
             }
 
             return $retorno;
-        } catch (\Throwable $th) {dd($th);
+        } catch (\Throwable $th) {
             $this->logarErro(['visita_id' => $visita->id, ...$dados], 'atualizar', formatarMensagemErro($th));
 
             return $this->erroEnvelope(formatarMensagemErro($th));
