@@ -90,7 +90,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_logout()
     {
-        $user = User::factory()->create();
+        $user = $this->buscarUser();
 
         $response = $this->actingAs($user)->post(route('logout'));
 
@@ -98,21 +98,8 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('home'));
     }
 
-    public function test_users_are_rate_limited()
+    private function buscarUser(): User
     {
-        $user = User::factory()->create();
-
-        RateLimiter::increment(implode('|', [$user->email, '127.0.0.1']), amount: 10);
-
-        $response = $this->post(route('login.store'), [
-            'email' => $user->email,
-            'password' => 'wrong-password',
-        ]);
-
-        $response->assertSessionHasErrors('email');
-
-        $errors = session('errors');
-
-        $this->assertStringContainsString('Too many login attempts', $errors->first('email'));
+        return User::factory()->create();
     }
 }

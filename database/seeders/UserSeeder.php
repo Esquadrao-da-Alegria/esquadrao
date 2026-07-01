@@ -17,8 +17,9 @@ class UserSeeder extends Seeder
         $user = User::query()->updateOrCreate(
             ['email' => 'esquadraodaalegria.dados@gmail.com'],
             [
-                'name' => 'Administrador',
+                'name'     => 'Administrador',
                 'password' => 'esquadrao123',
+                'status'   => User::STATUS_ATIVO,
             ],
         );
 

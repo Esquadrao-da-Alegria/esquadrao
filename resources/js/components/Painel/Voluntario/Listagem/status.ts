@@ -55,9 +55,9 @@ export const getStatusKey = (voluntario: User): StatusKey => {
 };
 
 export const mapVoluntariosStatus = (
-    voluntarios: User[],
+    voluntarios: User[] | null | undefined,
 ): VoluntarioListagem[] =>
-    voluntarios.map((voluntario) => ({
+    (Array.isArray(voluntarios) ? voluntarios : []).map((voluntario) => ({
         ...voluntario,
         statusKey: getStatusKey(voluntario),
     }));
