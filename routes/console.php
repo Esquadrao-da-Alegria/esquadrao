@@ -9,4 +9,4 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command(FinalizarEventosPassados::class)->hourly();
+Schedule::command(FinalizarEventosPassados::class)->monthlyOn(1, '00:00');

@@ -138,7 +138,7 @@ interface AlaHospital {
     created_at?: string;
     updated_at?: string;
 }
-export type EventoTipo = 'oficina' | 'reuniao' | 'evento';
+export type EventoTipo = 'oficina' | 'reuniao';
 export type EventoStatus = 'agendado' | 'cancelado' | 'finalizado';
 export type PresencaStatus = 'presente' | 'ausente';
 
@@ -163,6 +163,8 @@ export interface Evento {
     tipo: EventoTipo;
     descricao: string | null;
     local: string | null;
+    cidade_id: number | null;
+    cidade?: Cidade | null;
     data_inicio: string;
     data_fim: string | null;
     limite_inscricao: string | null;

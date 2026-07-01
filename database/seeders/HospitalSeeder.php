@@ -78,11 +78,11 @@ class HospitalSeeder extends Seeder
             ],
 
             // ---------------------------------------------------------
-            // CANOAS — cidade_id: 4304606
+            // PORTO ALEGRE (região metropolitana) — cidade_id: 4314902
             // ---------------------------------------------------------
 
             [
-                'cidade_id' => 4304606,
+                'cidade_id' => 4314902,
                 'nome' => 'Ulbra Canoas',
                 'cnpj' => '44444444000199',
                 'endereco' => 'Av. Farroupilha, 8001 - São José, Canoas - RS',
@@ -96,11 +96,11 @@ class HospitalSeeder extends Seeder
             ],
 
             // ---------------------------------------------------------
-            // SÃO LEOPOLDO — cidade_id: 4318705
+            // PORTO ALEGRE (região metropolitana) — cidade_id: 4314902
             // ---------------------------------------------------------
 
             [
-                'cidade_id' => 4318705,
+                'cidade_id' => 4314902,
                 'nome' => 'Hospital Centenário',
                 'cnpj' => '66666666000199',
                 'endereco' => 'Av. Theodomiro Porto da Fonseca, 799 - Fião, São Leopoldo - RS',

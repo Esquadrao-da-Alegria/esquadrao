@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Evento extends Model
 {
     protected $fillable = [
-        'titulo', 'tipo', 'descricao', 'local', 'data_inicio', 'data_fim', 'limite_inscricao',
+        'titulo', 'tipo', 'descricao', 'local', 'cidade_id', 'data_inicio', 'data_fim', 'limite_inscricao',
         'limite_participantes', 'status', 'responsavel_id', 'criado_por_id',
         'motivo_cancelamento', 'cancelado_em', 'cancelado_por_id',
         'finalizado_em', 'finalizado_por_id', 'observacoes_finalizacao',
@@ -31,6 +31,7 @@ class Evento extends Model
     public function criadoPor(): BelongsTo { return $this->belongsTo(User::class, 'criado_por_id'); }
     public function canceladoPor(): BelongsTo { return $this->belongsTo(User::class, 'cancelado_por_id'); }
     public function finalizadoPor(): BelongsTo { return $this->belongsTo(User::class, 'finalizado_por_id'); }
+    public function cidade(): BelongsTo { return $this->belongsTo(Cidade::class); }
 
     public function estaAgendado(): bool { return $this->status === 'agendado'; }
     public function estaCancelado(): bool { return $this->status === 'cancelado'; }

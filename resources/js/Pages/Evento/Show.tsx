@@ -132,11 +132,13 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
   const agora = new Date()
   const jaComecou = new Date(evento.data_inicio) < agora
   const limitePassou = evento.limite_inscricao ? new Date(evento.limite_inscricao) < agora : false
+  const temParticipantes = (evento.participantes_ativos_count ?? 0) > 0
   const podeFinalizar = pode_gerenciar && evento.status === 'agendado' && jaComecou
   const podeRegistrarPresenca = pode_gerenciar && evento.status !== 'cancelado'
   const podeEditar = props.eh_administrador && evento.status === 'agendado'
   const podeCancelar = props.eh_administrador && evento.status === 'agendado'
   const podeInscrever = evento.status === 'agendado' && !jaComecou && !limitePassou
+  const podeExcluir = props.eh_administrador && !temParticipantes
 
   return (
     <PainelLayout>
@@ -185,6 +187,7 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
             <p className="text-sm text-amber-900/70">{evento.descricao ?? 'Sem descrição.'}</p>
 
             <dl className="grid gap-3 sm:grid-cols-2 text-sm">
+              <div><dt className="font-medium text-amber-900">Cidade</dt><dd className="text-amber-900/70">{evento.cidade?.nome ?? '-'}</dd></div>
               <div><dt className="font-medium text-amber-900">Local</dt><dd className="text-amber-900/70">{evento.local ?? '-'}</dd></div>
               <div><dt className="font-medium text-amber-900">Início</dt><dd className="text-amber-900/70">{fmt(evento.data_inicio)}</dd></div>
               <div><dt className="font-medium text-amber-900">Fim</dt><dd className="text-amber-900/70">{fmt(evento.data_fim)}</dd></div>
@@ -308,18 +311,28 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
               <h2 className="font-semibold text-red-700">Zona de perigo</h2>
             </div>
             <div className="p-6">
-              <p className="mb-4 text-sm text-red-600/70">Esta ação é permanente e não pode ser desfeita.</p>
-              <button
-                className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-red-300 bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
-                onClick={() => {
-                  if (window.confirm('Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.')) {
-                    router.delete(`/eventos/${evento.id}`)
-                  }
-                }}
-              >
-                <Trash2 className="size-4" aria-hidden />
-                Excluir evento
-              </button>
+              {podeExcluir ? (
+                <>
+                  <p className="mb-4 text-sm text-red-600/70">Esta ação é permanente e não pode ser desfeita.</p>
+                  <button
+                    className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-red-300 bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                    onClick={() => {
+                      if (window.confirm('Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.')) {
+                        router.delete(`/eventos/${evento.id}`)
+                      }
+                    }}
+                  >
+                    <Trash2 className="size-4" aria-hidden />
+                    Excluir evento
+                  </button>
+                </>
+              ) : (
+                <p className="text-sm text-red-600/70">
+                  {evento.status === 'cancelado'
+                    ? 'Este evento possui inscrições registradas e não pode ser excluído.'
+                    : 'Este evento possui participantes e não pode ser excluído. Para encerrá-lo, use a opção de cancelar.'}
+                </p>
+              )}
             </div>
           </section>
         )}

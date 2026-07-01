@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Cargo;
+use App\Models\Cidade;
+use App\Models\Estado;
 use App\Models\Evento;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,6 +16,14 @@ class EventoTest extends TestCase
 {
     use RefreshDatabase;
 
+    private ?int $cidadeId = null;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     private function usuarioAdmin(): User
     {
         $user = User::factory()->create();
@@ -22,15 +32,30 @@ class EventoTest extends TestCase
         return $user;
     }
 
+    private function criarCidade(): Cidade
+    {
+        $estado = Estado::create(['nome' => 'São Paulo', 'sigla' => 'SP']);
+        $cidade = new Cidade();
+        $cidade->nome = 'Campinas';
+        $cidade->estado_id = $estado->id;
+        $cidade->save();
+        return $cidade;
+    }
+
     private function dadosEvento(array $overrides = []): array
     {
+        if ($this->cidadeId === null) {
+            $this->cidadeId = $this->criarCidade()->id;
+        }
+
         return array_merge([
-            'titulo'              => 'Oficina de alegria',
-            'tipo'                => 'oficina',
-            'descricao'           => 'Descrição',
-            'local'               => 'Sede',
-            'data_inicio'         => now()->addDay()->format('Y-m-d H:i:s'),
-            'data_fim'            => now()->addDays(2)->format('Y-m-d H:i:s'),
+            'titulo'               => 'Oficina de alegria',
+            'tipo'                 => 'oficina',
+            'descricao'            => 'Descrição',
+            'local'                => 'Sede',
+            'cidade_id'            => $this->cidadeId,
+            'data_inicio'          => now()->addDay()->format('Y-m-d H:i:s'),
+            'data_fim'             => now()->addDays(2)->format('Y-m-d H:i:s'),
             'limite_participantes' => 10,
         ], $overrides);
     }
@@ -99,6 +124,15 @@ class EventoTest extends TestCase
 
     // ─── Validações de criação ────────────────────────────────────────────────
 
+    public function test_tipo_evento_e_rejeitado(): void
+    {
+        $admin = $this->usuarioAdmin();
+
+        $this->actingAs($admin)
+            ->post(route('eventos.store'), $this->dadosEvento(['tipo' => 'evento']))
+            ->assertSessionHasErrors('tipo');
+    }
+
     public function test_data_fim_e_obrigatoria_ao_criar_evento(): void
     {
         $admin = $this->usuarioAdmin();
@@ -125,6 +159,28 @@ class EventoTest extends TestCase
         $this->actingAs($admin)->post(route('eventos.store'), $this->dadosEvento([
             'limite_inscricao' => now()->addDays(5)->format('Y-m-d H:i:s'),
         ]))->assertSessionHasErrors('limite_inscricao');
+    }
+
+    public function test_cidade_e_obrigatoria_ao_criar_evento(): void
+    {
+        $admin = $this->usuarioAdmin();
+
+        $this->actingAs($admin)
+            ->post(route('eventos.store'), $this->dadosEvento(['cidade_id' => null]))
+            ->assertSessionHasErrors('cidade_id');
+    }
+
+    public function test_admin_cria_evento_com_cidade(): void
+    {
+        $admin = $this->usuarioAdmin();
+
+        $this->actingAs($admin)->post(route('eventos.store'), $this->dadosEvento())
+            ->assertRedirect(route('eventos.index'));
+
+        $this->assertDatabaseHas('eventos', [
+            'titulo'    => 'Oficina de alegria',
+            'cidade_id' => $this->cidadeId,
+        ]);
     }
 
     // ─── Inscrição básica ────────────────────────────────────────────────────
@@ -210,7 +266,7 @@ class EventoTest extends TestCase
         $user = User::factory()->create();
         $evento = Evento::create([
             ...$this->dadosEvento(),
-            'criado_por_id'   => $user->id,
+            'criado_por_id'    => $user->id,
             'limite_inscricao' => now()->subHour(),
         ]);
 
@@ -223,7 +279,7 @@ class EventoTest extends TestCase
         $user = User::factory()->create();
         $evento = Evento::create([
             ...$this->dadosEvento(),
-            'criado_por_id'   => $user->id,
+            'criado_por_id'    => $user->id,
             'limite_inscricao' => now()->addHours(2),
         ]);
 
@@ -475,6 +531,57 @@ class EventoTest extends TestCase
         ]);
     }
 
+    public function test_responsavel_consegue_registrar_presenca_apos_data_fim(): void
+    {
+        $responsavel = User::factory()->create();
+        $user = User::factory()->create();
+        $evento = Evento::create([
+            ...$this->dadosEvento(),
+            'criado_por_id'  => $responsavel->id,
+            'responsavel_id' => $responsavel->id,
+            'data_inicio'    => now()->subDays(2),
+            'data_fim'       => now()->subHour(),
+            'status'         => 'finalizado',
+        ]);
+        $evento->participantes()->attach($user->id, ['status' => 'inscrito', 'inscrito_em' => now()->subDays(2)]);
+
+        $this->actingAs($responsavel)->put(route('eventos.presencas.update', $evento), [
+            'participantes' => [
+                ['user_id' => $user->id, 'presenca' => 'presente', 'observacao_presenca' => null],
+            ],
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('evento_participantes', [
+            'evento_id' => $evento->id,
+            'user_id'   => $user->id,
+            'presenca'  => 'presente',
+        ]);
+    }
+
+    public function test_admin_consegue_registrar_presenca_apos_finalizacao(): void
+    {
+        $admin = $this->usuarioAdmin();
+        $user = User::factory()->create();
+        $evento = Evento::create([
+            ...$this->dadosEvento(['status' => 'finalizado']),
+            'criado_por_id' => $admin->id,
+            'data_inicio'   => now()->subDays(2),
+        ]);
+        $evento->participantes()->attach($user->id, ['status' => 'inscrito', 'inscrito_em' => now()->subDays(2)]);
+
+        $this->actingAs($admin)->put(route('eventos.presencas.update', $evento), [
+            'participantes' => [
+                ['user_id' => $user->id, 'presenca' => 'presente', 'observacao_presenca' => null],
+            ],
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('evento_participantes', [
+            'evento_id' => $evento->id,
+            'user_id'   => $user->id,
+            'presenca'  => 'presente',
+        ]);
+    }
+
     public function test_usuario_comum_nao_consegue_registrar_presenca(): void
     {
         $user = User::factory()->create();
@@ -502,7 +609,7 @@ class EventoTest extends TestCase
 
     // ─── Exclusão ─────────────────────────────────────────────────────────────
 
-    public function test_admin_consegue_excluir_evento(): void
+    public function test_admin_consegue_excluir_evento_sem_participantes(): void
     {
         $admin = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
@@ -511,6 +618,36 @@ class EventoTest extends TestCase
             ->assertRedirect(route('eventos.index'));
 
         $this->assertDatabaseMissing('eventos', ['id' => $evento->id]);
+    }
+
+    public function test_admin_nao_consegue_excluir_evento_com_participantes(): void
+    {
+        $admin = $this->usuarioAdmin();
+        $user = User::factory()->create();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
+        $evento->participantes()->attach($user->id, ['status' => 'inscrito', 'inscrito_em' => now()]);
+
+        $this->actingAs($admin)->delete(route('eventos.destroy', $evento))
+            ->assertSessionHas('mensagem_erro');
+
+        $this->assertDatabaseHas('eventos', ['id' => $evento->id]);
+    }
+
+    public function test_admin_nao_consegue_excluir_evento_com_presenca_registrada(): void
+    {
+        $admin = $this->usuarioAdmin();
+        $user = User::factory()->create();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
+        $evento->participantes()->attach($user->id, [
+            'status'      => 'inscrito',
+            'inscrito_em' => now(),
+            'presenca'    => 'presente',
+        ]);
+
+        $this->actingAs($admin)->delete(route('eventos.destroy', $evento))
+            ->assertSessionHas('mensagem_erro');
+
+        $this->assertDatabaseHas('eventos', ['id' => $evento->id]);
     }
 
     public function test_usuario_comum_nao_consegue_excluir_evento(): void
@@ -582,7 +719,7 @@ class EventoTest extends TestCase
         $this->assertDatabaseHas('eventos', ['id' => $evento->id, 'status' => 'cancelado']);
     }
 
-    // ─── Listagem separada ────────────────────────────────────────────────────
+    // ─── Listagem em 3 grupos ────────────────────────────────────────────────
 
     public function test_listagem_separa_inscricoes_abertas_dos_demais(): void
     {
@@ -590,7 +727,7 @@ class EventoTest extends TestCase
         $admin = $this->usuarioAdmin();
 
         $aberto = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id, 'status' => 'agendado']);
-        $finalizado = Evento::create([
+        Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id' => $admin->id,
             'status'        => 'finalizado',
@@ -604,19 +741,20 @@ class EventoTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Evento/Index')
                 ->has('abertas', 1)
+                ->has('encerradas', 0)
                 ->has('demais', 1)
             );
     }
 
-    public function test_evento_com_prazo_encerrado_vai_para_demais(): void
+    public function test_evento_futuro_com_prazo_encerrado_vai_para_grupo_encerradas(): void
     {
         $user = User::factory()->create();
         $admin = $this->usuarioAdmin();
 
         Evento::create([
             ...$this->dadosEvento(),
-            'criado_por_id'   => $admin->id,
-            'status'          => 'agendado',
+            'criado_por_id'    => $admin->id,
+            'status'           => 'agendado',
             'limite_inscricao' => now()->subHour(),
         ]);
 
@@ -625,7 +763,27 @@ class EventoTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->has('abertas', 0)
-                ->has('demais', 1)
+                ->has('encerradas', 1)
+                ->has('demais', 0)
+            );
+    }
+
+    public function test_evento_futuro_com_prazo_encerrado_nao_aparece_em_demais(): void
+    {
+        $user = User::factory()->create();
+        $admin = $this->usuarioAdmin();
+
+        Evento::create([
+            ...$this->dadosEvento(),
+            'criado_por_id'    => $admin->id,
+            'status'           => 'agendado',
+            'limite_inscricao' => now()->subHour(),
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('eventos.index'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('demais', 0)
             );
     }
 }

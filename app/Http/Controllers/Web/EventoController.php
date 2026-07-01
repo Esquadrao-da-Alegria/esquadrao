@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Evento\CancelarRequest;
 use App\Http\Requests\Web\Evento\StoreRequest;
 use App\Http\Requests\Web\Evento\UpdateRequest;
+use App\Models\Cidade;
 use App\Models\Evento;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,8 +18,10 @@ class EventoController extends Controller
     {
         $tipo = $request->filled('tipo') ? $request->string('tipo') : null;
 
-        $abertas = Evento::with('responsavel')->withCount('participantesAtivos')
-            ->when($tipo, fn ($q) => $q->where('tipo', $tipo))
+        $base = fn () => Evento::with(['responsavel', 'cidade'])->withCount('participantesAtivos')
+            ->when($tipo, fn ($q) => $q->where('tipo', $tipo));
+
+        $abertas = $base()
             ->where('status', 'agendado')
             ->where('data_inicio', '>', now())
             ->where(function ($q) {
@@ -27,20 +30,25 @@ class EventoController extends Controller
             ->orderBy('data_inicio')
             ->get();
 
-        $demais = Evento::with('responsavel')->withCount('participantesAtivos')
-            ->when($tipo, fn ($q) => $q->where('tipo', $tipo))
+        $encerradas = $base()
+            ->where('status', 'agendado')
+            ->where('data_inicio', '>', now())
+            ->whereNotNull('limite_inscricao')
+            ->where('limite_inscricao', '<=', now())
+            ->orderBy('data_inicio')
+            ->get();
+
+        $demais = $base()
             ->where(function ($q) {
                 $q->where('status', '!=', 'agendado')
-                    ->orWhere('data_inicio', '<=', now())
-                    ->orWhere(function ($q2) {
-                        $q2->whereNotNull('limite_inscricao')->where('limite_inscricao', '<=', now());
-                    });
+                    ->orWhere('data_inicio', '<=', now());
             })
             ->orderByDesc('data_inicio')
             ->get();
 
         return Inertia::render('Evento/Index', [
             'abertas' => $abertas,
+            'encerradas' => $encerradas,
             'demais' => $demais,
             'filtros' => $request->only(['tipo']),
         ]);
@@ -48,7 +56,10 @@ class EventoController extends Controller
 
     public function create()
     {
-        return Inertia::render('Evento/Create', ['responsaveis' => User::orderBy('name')->get(['id', 'name', 'email'])]);
+        return Inertia::render('Evento/Create', [
+            'responsaveis' => User::orderBy('name')->get(['id', 'name', 'email']),
+            'cidades' => Cidade::orderBy('nome')->get(['id', 'nome', 'estado_id']),
+        ]);
     }
 
     public function store(StoreRequest $request)
@@ -70,7 +81,7 @@ class EventoController extends Controller
 
     public function show(Request $request, Evento $evento)
     {
-        $evento->load(['responsavel:id,name,email', 'participantesAtivos:id,name,email'])->loadCount('participantesAtivos');
+        $evento->load(['responsavel:id,name,email', 'participantesAtivos:id,name,email', 'cidade'])->loadCount('participantesAtivos');
         $user = $request->user();
         $participacao = $evento->participantes()->where('users.id', $user->id)->first();
         $inscrito = $participacao?->pivot->status === 'inscrito';
@@ -89,7 +100,11 @@ class EventoController extends Controller
         if (! $evento->estaAgendado()) {
             return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Apenas eventos agendados podem ser editados.');
         }
-        return Inertia::render('Evento/Edit', ['evento' => $evento, 'responsaveis' => User::orderBy('name')->get(['id', 'name', 'email'])]);
+        return Inertia::render('Evento/Edit', [
+            'evento' => $evento,
+            'responsaveis' => User::orderBy('name')->get(['id', 'name', 'email']),
+            'cidades' => Cidade::orderBy('nome')->get(['id', 'nome', 'estado_id']),
+        ]);
     }
 
     public function update(UpdateRequest $request, Evento $evento)
@@ -108,6 +123,10 @@ class EventoController extends Controller
 
     public function destroy(Evento $evento)
     {
+        if ($evento->participantes()->exists()) {
+            return back()->with('mensagem_erro', 'Não é possível excluir um evento que possui participantes. Cancele o evento em vez disso.');
+        }
+
         $evento->delete();
         return redirect()->route('eventos.index')->with('mensagem_sucesso', 'Evento excluído com sucesso.');
     }

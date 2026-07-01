@@ -14,11 +14,6 @@ class EventoPresencaController extends Controller
             return back()->with('mensagem_erro', 'Evento cancelado não permite registrar presença.');
         }
 
-        // Apenas administrador pode corrigir presença após finalização
-        if ($evento->estaFinalizado() && ! $request->user()->temCargo('administrador')) {
-            return back()->with('mensagem_erro', 'Apenas administradores podem alterar a presença após a finalização do evento.');
-        }
-
         $registradoPor = $request->user()->id;
 
         foreach ($request->validated('participantes') as $participante) {

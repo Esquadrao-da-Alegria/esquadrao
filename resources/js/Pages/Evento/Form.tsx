@@ -1,8 +1,8 @@
-import { type Evento, type User } from '@/types'
+import { type Cidade, type Evento, type User } from '@/types'
 import { Link, useForm } from '@inertiajs/react'
 import { ArrowLeft, Check } from 'lucide-react'
 
-interface Props { evento?: Evento; responsaveis: User[]; action: string; method: 'post' | 'put'; backHref: string }
+interface Props { evento?: Evento; responsaveis: User[]; cidades: Cidade[]; action: string; method: 'post' | 'put'; backHref: string }
 
 const inputClass = 'w-full rounded-xl border bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400'
 const labelClass = 'mb-2 block text-sm font-medium text-amber-900'
@@ -18,16 +18,17 @@ function joinDateTime(date: string, time: string): string {
   return `${date}T${time || '00:00'}`
 }
 
-export default function Form({ evento, responsaveis, action, method, backHref }: Props) {
+export default function Form({ evento, responsaveis, cidades, action, method, backHref }: Props) {
   const inicioSplit = splitDateTime(evento?.data_inicio)
   const fimSplit = splitDateTime(evento?.data_fim)
   const limiteInscricaoSplit = splitDateTime(evento?.limite_inscricao)
 
   const form = useForm({
     titulo: evento?.titulo ?? '',
-    tipo: (evento?.tipo ?? 'evento') as 'oficina' | 'reuniao' | 'evento',
+    tipo: (evento?.tipo ?? 'oficina') as 'oficina' | 'reuniao',
     descricao: evento?.descricao ?? '',
     local: evento?.local ?? '',
+    cidade_id: evento?.cidade_id?.toString() ?? '',
     data_inicio_date: inicioSplit.date,
     data_inicio_time: inicioSplit.time,
     data_fim_date: fimSplit.date,
@@ -46,6 +47,7 @@ export default function Form({ evento, responsaveis, action, method, backHref }:
       tipo: d.tipo,
       descricao: d.descricao,
       local: d.local,
+      cidade_id: d.cidade_id || null,
       data_inicio: joinDateTime(d.data_inicio_date, d.data_inicio_time),
       data_fim: joinDateTime(d.data_fim_date, d.data_fim_time || '23:59'),
       limite_inscricao: d.limite_inscricao_date ? joinDateTime(d.limite_inscricao_date, d.limite_inscricao_time) : null,
@@ -87,10 +89,9 @@ export default function Form({ evento, responsaveis, action, method, backHref }:
             <div>
               <label htmlFor="tipo" className={labelClass}>Tipo *</label>
               <select id="tipo" required className={`${inputClass} cursor-pointer`} value={data.tipo}
-                onChange={(e) => setData('tipo', e.target.value as 'oficina' | 'reuniao' | 'evento')}>
+                onChange={(e) => setData('tipo', e.target.value as 'oficina' | 'reuniao')}>
                 <option value="oficina">Oficina</option>
                 <option value="reuniao">Reunião</option>
-                <option value="evento">Evento</option>
               </select>
             </div>
             <div>
@@ -110,10 +111,21 @@ export default function Form({ evento, responsaveis, action, method, backHref }:
               onChange={(e) => setData('descricao', e.target.value)} />
           </div>
 
-          <div>
-            <label htmlFor="local" className={labelClass}>Local</label>
-            <input id="local" type="text" placeholder="Ex: Sede da ONG" className={inputClass}
-              value={data.local} onChange={(e) => setData('local', e.target.value)} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="cidade_id" className={labelClass}>Cidade *</label>
+              <select id="cidade_id" required className={`${inputClass} cursor-pointer`} value={data.cidade_id}
+                onChange={(e) => setData('cidade_id', e.target.value)}>
+                <option value="">Selecione a cidade</option>
+                {cidades.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
+              </select>
+              {errors.cidade_id && <p className="mt-1 text-sm text-red-600">{errors.cidade_id}</p>}
+            </div>
+            <div>
+              <label htmlFor="local" className={labelClass}>Local <span className="text-amber-900/40 font-normal">(complemento)</span></label>
+              <input id="local" type="text" placeholder="Ex: Sala 3, Bloco B" className={inputClass}
+                value={data.local} onChange={(e) => setData('local', e.target.value)} />
+            </div>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">

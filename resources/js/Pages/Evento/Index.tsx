@@ -3,7 +3,7 @@ import { type Evento, type SharedData } from '@/types'
 import { Link, usePage } from '@inertiajs/react'
 import { CalendarDays, MapPin, Plus, Settings, Users } from 'lucide-react'
 
-interface Props { abertas: Evento[]; demais: Evento[] }
+interface Props { abertas: Evento[]; encerradas: Evento[]; demais: Evento[] }
 
 const fmt = (v: string) => new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(v))
 
@@ -16,7 +16,6 @@ const badgeStatus: Record<string, string> = {
 const labelTipo: Record<string, string> = {
   oficina: 'Oficina',
   reuniao: 'Reunião',
-  evento: 'Evento',
 }
 
 function vagasLabel(count: number, limite: number | null): string {
@@ -26,6 +25,7 @@ function vagasLabel(count: number, limite: number | null): string {
 }
 
 function EventoCard({ e, admin, subdued }: { e: Evento; admin: boolean; subdued?: boolean }) {
+  const cidadeLocal = [e.cidade?.nome, e.local].filter(Boolean).join(' — ')
   return (
     <li>
       <article className={`w-full overflow-hidden rounded-2xl border bg-white shadow-sm transition duration-300 ${subdued ? 'border-gray-100 opacity-75 hover:opacity-100 hover:border-gray-200 hover:shadow' : 'border-amber-100 hover:border-amber-200 hover:shadow-md'}`}>
@@ -45,10 +45,10 @@ function EventoCard({ e, admin, subdued }: { e: Evento; admin: boolean; subdued?
                 <CalendarDays className="size-3.5" strokeWidth={2} aria-hidden />
                 {fmt(e.data_inicio)}
               </span>
-              {e.local && (
+              {cidadeLocal && (
                 <span className="flex items-center gap-1.5">
                   <MapPin className="size-3.5" strokeWidth={2} aria-hidden />
-                  {e.local}
+                  {cidadeLocal}
                 </span>
               )}
               <span className="flex items-center gap-1.5">
@@ -77,10 +77,10 @@ function EventoCard({ e, admin, subdued }: { e: Evento; admin: boolean; subdued?
   )
 }
 
-export default function Index({ abertas, demais }: Props) {
+export default function Index({ abertas, encerradas, demais }: Props) {
   const { props } = usePage<SharedData>()
   const admin = !!props.eh_administrador
-  const total = abertas.length + demais.length
+  const total = abertas.length + encerradas.length + demais.length
 
   return (
     <PainelLayout>
@@ -134,6 +134,20 @@ export default function Index({ abertas, demais }: Props) {
                 <ul className="flex w-full flex-col gap-5">
                   {abertas.map((e) => (
                     <EventoCard key={e.id} e={e} admin={admin} />
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {encerradas.length > 0 && (
+              <section>
+                <h2 className="mb-5 text-sm font-semibold uppercase tracking-widest text-orange-500">
+                  Inscrições encerradas
+                </h2>
+                <p className="mb-4 -mt-2 text-xs text-orange-400/80">O evento ainda vai acontecer, mas não aceita mais inscrições.</p>
+                <ul className="flex w-full flex-col gap-4">
+                  {encerradas.map((e) => (
+                    <EventoCard key={e.id} e={e} admin={admin} subdued />
                   ))}
                 </ul>
               </section>
