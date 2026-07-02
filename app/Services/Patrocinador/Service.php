@@ -30,7 +30,6 @@ class Service
         }
     }
 
-    //A função store retorna um erro caso a logo do patrocinador seja maior que 2MB, isso acontece porque o método salvarLogotipo é chamado dentro do store, e ele não tem tratamento para arquivos grandes. Para resolver isso, podemos adicionar uma validação no método store para verificar o tamanho do arquivo antes de chamar salvarLogotipo. Se o arquivo for maior que 2MB, podemos retornar um erro específico para o usuário posteriormente.
     public function store(array $dados): array
     {
         try {
@@ -42,12 +41,26 @@ class Service
                 throw new \Exception("Falha ao salvar no banco de dados.");
             }
 
-            mensagemFlashSalvar(true);
+            if (!empty($dados['logotipo'])) {
+                $retornoLogo = $this->salvarLogotipo([
+                    'logotipo' => $dados['logotipo'],
+                    'patrocinador_id' => $id,
+                ]);
 
-            if (isset($dados['logotipo'])) {
-                $retornoLogo = $this->salvarLogotipo(['logotipo' => $dados['logotipo'], 'patrocinador_id' => $id]);
-                $this->queries->update((string) $id, ['logo_path' => $retornoLogo['dados']['url'] ?? null]);
+                $urlLogo = $retornoLogo['dados']['url'] ?? null;
+
+                if (!$urlLogo) {
+                    throw new \Exception('Falha ao gerar URL do logotipo.');
+                }
+
+                $atualizouLogo = $this->queries->update((string) $id, ['logo_path' => $urlLogo]);
+
+                if (!$atualizouLogo) {
+                    throw new \Exception("Falha ao atualizar logo_path do patrocinador {$id}.");
+                }
             }
+
+            mensagemFlashSalvar(true);
 
             return [
                 'sucesso' => true,
@@ -72,12 +85,22 @@ class Service
 
             $sucesso = $this->queries->update($id, $dadosDatabase);
 
-            mensagemFlashSalvar($sucesso);
-
             if ($logotipo) {
-                $retornoLogo = $this->salvarLogotipo(['logotipo' => $logotipo, 'patrocinador_id' => $id]);
-                $this->queries->update($id, ['logo_path' => $retornoLogo['dados']['url'] ?? null]);
+                $retornoLogo = $this->salvarLogotipo([
+                    'logotipo' => $logotipo,
+                    'patrocinador_id' => $id,
+                ]);
+
+                $urlLogo = $retornoLogo['dados']['url'] ?? null;
+
+                if (!$urlLogo) {
+                    throw new \Exception('Falha ao gerar URL do logotipo.');
+                }
+
+                $sucesso = $this->queries->update($id, ['logo_path' => $urlLogo]) && $sucesso;
             }
+
+            mensagemFlashSalvar($sucesso);
 
             return [
                 'sucesso' => $sucesso,
@@ -122,13 +145,18 @@ class Service
     public function salvarLogotipo(array $dados): array
     {
         $logotipo = $dados['logotipo'];
-        $patrocinadorId = $dados['patrocinador_id'];
 
-        if (!$logotipo) return ['sucesso' => true, 'dados' => [], 'erros' => []];
+        if (!$logotipo) {
+            return ['sucesso' => true, 'dados' => [], 'erros' => []];
+        }
 
-        $extensao = "." . $logotipo->getClientOriginalExtension();
-        $nomeLogo = "logo-{$patrocinadorId}-" . uniqid() . "$extensao";
-        $caminho = "imagens/patrocinadores/{$nomeLogo}";
+        $extensao = $logotipo->getClientOriginalExtension()
+            ?: $logotipo->guessExtension()
+            ?: 'jpg';
+
+        $extensao = strtolower(trim($extensao, '.'));
+        $nomeLogo = 'logo-' . uniqid() . ".{$extensao}";
+        $caminho = "patrocinadores/{$nomeLogo}";
 
         /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
         $storage = Storage::disk('public');
@@ -136,7 +164,7 @@ class Service
 
         return [
             'sucesso' => true,
-            'dados'   => ['url' => $storage->url($caminho)],
+            'dados'   => ['url' => "/storage/{$caminho}"],
             'erros'   => []
         ];
     }
