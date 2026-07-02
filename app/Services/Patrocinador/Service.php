@@ -55,7 +55,6 @@ class Service
                 'erros'   => []
             ];
         } catch (\Throwable $th) {
-            dd($th->getMessage());
             mensagemFlashSalvar(false);
             return [
                 'sucesso' => false,
