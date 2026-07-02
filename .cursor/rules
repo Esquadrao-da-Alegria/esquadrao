@@ -1,0 +1,218 @@
+# Project Coding Standards
+
+## REGRAS DE AGENTS
+- Foco SEMPRE na economia de tokens, gerando o melhor código dentro do possível. Atualmente meu plano pago é Pro, então preciso controlar bem o limite de uso.
+- Refatorações solicitadas devem ser minimalista, mantendo 100% da funcionalidade anterior (a menos que o contrário seja solicitado)
+- Novas features/telas/funções devem utilizar padrões de código de arquivos já existentes como referência SEMPRE.
+- Nunca rode comandos npm build/dev. Eu uso pnpm no projeto, e quando for necessário, eu mesmo vou roda rmanualmente os comandos.
+- Não altere formatação ou estética do código (PHP/TS ou outro) sem pedido explícito. Detalhes na seção **Formatação e legibilidade** abaixo.
+- Sempre que alterar algo, procure a feature respectiva em docs/ e atualize o spec.md
+- Se faltar contexto ou informação para você prosseguir, busque em /docs.
+
+## REGRAS DE CÓDIGO
+- Seguir princípios SOLID e melhores práticas de programação
+- Seguir princípios KISS (Keep It Simple, Stupid)
+- Documentação de features/specs em docs/features/feature-x/spec.md
+
+## Formatação e legibilidade (preservar; não "normalizar")
+
+Ao editar qualquer arquivo, **o diff deve mudar só o necessário** para a tarefa. É proibido "limpar" ou padronizar estilo de propósito.
+
+**Não remover nem evitar:**
+
+- **Alinhamento com espaços** em atribuições consecutivas (`=` na mesma coluna).
+- **Alinhamento** de `=>` em arrays quando o trecho já usa esse padrão.
+- **Estrutura de `if` com chaves e quebra de linha** para `continue` / `return` antecipado. Não trocar por `if ($x) continue;` ou `if ($x) return $y;` na mesma linha quando o arquivo usa bloco com chaves.
+
+**Não executar** Pint, Prettier ou format-on-save em arquivos tocados **só** para reformatar, a menos que o usuário peça.
+
+**Exemplo (atribuições alinhadas — manter o "ANTES", não impor o "DEPOIS"):**
+
+```php
+// Manter quando já existir no arquivo:
+$tipo1     = 'ruim';
+$mensagem1 = "Atenção: você está com {$percentual}%, abaixo da meta…";
+
+// Evitar introduzir por hábito:
+$tipo1 = 'ruim';
+$mensagem1 = "Atenção: você está com {$percentual}%, abaixo da meta…";
+```
+
+**Princípio:** preserve espaçamento, alinhamento e quebras de linha do contexto; reformate apenas onde a nova lógica exigir ou onde o usuário pedir formatação explicitamente.
+
+---
+
+## 🇧🇷 IDIOMA DE NOMENCLATURA
+
+Todos os nomes de métodos, classes, variáveis, arquivos e afins devem ser escritos em **português**, de forma **breve e concisa**.
+
+- ✅ `buscarMarca()`, `calcularImposto()`, `$valorTotal`, `HospitalService`
+- ❌ `fetchBrand()`, `calculateTax()`, `$totalValue`, `HospitalService` (em inglês)
+
+**Exceções permitidas:**
+- Termos técnicos sem tradução natural: `index`, `show`, `store`, `update`, `destroy`, `token`, `payload`, `id`
+- Nomes de bibliotecas, interfaces externas ou contratos de API que exigem inglês
+
+---
+
+## 🏷️ NOMENCLATURA DE FUNÇÕES (index/show/store/update/destroy)
+
+Usar a nomenclatura RESTful padrão ao máximo, tanto no PHP quanto no React/TS:
+
+| Função    | Propósito                        |
+|-----------|----------------------------------|
+| `index`   | Listar recursos                  |
+| `show`    | Exibir um recurso específico     |
+| `store`   | Criar novo recurso               |
+| `update`  | Atualizar recurso existente      |
+| `destroy` | Remover recurso                  |
+
+**Exceções permitidas** apenas para operações muito específicas sem equivalente REST claro:
+- ✅ `buscarMarcaCarro()`, `calcularImpostoProduto()`, `gerarRelatorioPdf()`
+- ❌ `listar()`, `salvar()`, `buscar()`, `deletar()` — use os nomes padrão
+
+### PHP — Services e Queries
+
+Os métodos de Services e Queries devem seguir essa nomenclatura como padrão:
+
+```php
+// ✅ Correto
+class Service
+{
+    public function index(): Collection {}
+    public function show(int $id): Model {}
+    public function store(array $data): Model {}
+    public function update(int $id, array $data): Model {}
+    public function destroy(int $id): bool {}
+
+    // Exceção válida — operação muito específica
+    public function buscarMarcaCarro(int $carroId): string {}
+}
+```
+
+```php
+// ❌ Evitar
+class Service
+{
+    public function listar(): Collection {}
+    public function buscar(int $id): Model {}
+    public function salvar(array $data): Model {}
+    public function editar(int $id, array $data): Model {}
+    public function deletar(int $id): bool {}
+}
+```
+
+### React — Pages e Queries
+
+**Pages** seguem a mesma lógica de nomenclatura nos arquivos:
+
+```
+Pages/Hospitais/Index.tsx   → listagem de hospitais
+Pages/Hospitais/Show.tsx    → exibir um hospital
+Pages/Hospitais/Create.tsx  → criar hospital
+Pages/Hospitais/Edit.tsx    → editar hospital
+```
+
+**Queries** (em `resources/js/Queries`) devem expor somente funções nomeadas com o padrão REST, agrupadas por recurso em um único arquivo:
+
+```
+Queries/Hospital/Queries.tsx
+```
+
+```ts
+// ✅ Correto
+export const index  = async (): Promise<Hospital[]> => { ... }
+export const show   = async (id: number): Promise<Hospital> => { ... }
+export const store  = async (data: HospitalForm): Promise<Hospital> => { ... }
+export const update = async (id: number, data: HospitalForm): Promise<Hospital> => { ... }
+export const destroy = async (id: number): Promise<void> => { ... }
+
+// Exceção válida
+export const buscarPorCNES = async (cnes: string): Promise<Hospital> => { ... }
+```
+
+```ts
+// ❌ Evitar
+export const listarHospitais = async () => { ... }
+export const salvarHospital  = async () => { ... }
+```
+
+---
+
+## 🎯 ESTRUTURA DE DIRETÓRIOS PHP
+- Models: `app/Models`
+- Queries: `app/Queries`
+- Services: `app/Services`
+- Controllers: `app/Http/Controllers/`
+- Migrations: `database/migrations/`
+- Seeds: `database/seeds/`
+- Views: `resources/views/`
+
+## 🎯 ESTRUTURA DE DIRETÓRIOS TYPESCRIPT
+- Queries: `resources/js/Queries`
+- Services: `resources/js/Services`
+- Pages: `resources/js/Pages`
+
+---
+
+## 🐘 PHP RULES
+
+### Padrões Gerais
+- Use PSR-12 coding style
+- Declare `strict_types=1` em todos os arquivos
+- Use namespaces compatíveis com PSR-4
+- Use Type Hints em todos os métodos e propriedades
+- Pratique Dependency Injection sempre
+- Nunca use SQL bruto sem prepared statements
+
+### Services e Queries
+- **Services** sempre devem ter nome de arquivo `Service.php` e nome de classe `Service`
+- O que diferencia services deve ser os **diretórios** em que estão inseridos
+  - Exemplo: `App/Services/Recurso/Service.php`
+- **Queries** são consultas reutilizáveis entre serviços
+  - Exemplo: `App/Queries/Recurso/Query.php`
+- Nunca use classes com métodos estáticos — sempre use Dependency Injection
+
+### Melhores Práticas 2026
+- Sempre que encontrar código duvidoso, analise as melhores práticas PHP/Laravel 2026 e sugira refatoração
+- Use type hints com retorno tipado em todos os métodos
+- Use Collections ao invés de arrays raw quando possível
+- Prefira Eloquent relationships ao invés de queries manuais
+
+---
+
+## 🔷 TYPESCRIPT RULES
+
+### Padrões Gerais
+- Use TypeScript obrigatoriamente (sem `any`)
+- Prefira programação funcional
+- Use `const` por padrão, `let` apenas quando necessário
+- Async/await com try/catch sempre
+- Use nullish coalescing (`??`) e optional chaining (`?.`)
+
+### Componentes React
+- **TODOS** os componentes TSX devem seguir padrão de nomenclatura: `Index.tsx` / `Show.tsx` / `Create.tsx` / `Edit.tsx`
+  - `Create` — criar novo recurso
+  - `Edit` — editar recurso existente
+  - `Show` — exibir dados (de qualquer coisa)
+  - `Index` — listar recursos (de qualquer coisa)
+- **Exemplos:**
+  - `resources/js/components/ModalPremium/Show.tsx`
+  - `resources/js/Pages/Questao/Iterativa/Create.tsx`
+- O nome do arquivo deve ser igual ao do componente exportado
+  - Exemplo: `Show.tsx` exporta `const Show: React.FC<Props> = () => {}`
+
+### Funções
+- **SEMPRE** use arrow functions para definir componentes e funções
+- **NUNCA** use `function` declaration
+- Exemplos:
+  - ✅ `const Show: React.FC<Props> = () => {}`
+  - ✅ `const handleClick = async () => {}`
+  - ❌ `function Show() {}`
+  - ❌ `function Show(props) {}`
+
+### Melhores Práticas 2026
+- Sempre que encontrar código duvidoso, analise as melhores práticas React/TS 2026 e sugira refatoração
+- Use hooks customizados para lógica reutilizável
+- Prefira composição sobre props drilling
+- Use Suspense e Error Boundaries quando apropriado

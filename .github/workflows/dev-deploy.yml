@@ -1,19 +1,77 @@
-name: 🚀 Deploy website on push
+name: 🚀 Deploy website on DEV
+
 on:
   push:
     branches:
       - dev
-jobs:
-  web-deploy:
-    name: 🎉 Deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: 🚚 Get latest code
-        uses: actions/checkout@v2
+  workflow_dispatch:
 
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.2
+jobs:
+  deploy:
+    name: 🔥 Deploy completo no servidor DEV
+    runs-on: ubuntu-latest
+
+    env:
+      GH_DEPLOY_KEY: ${{ secrets.SSH_KEY_DEPLOY }}
+
+    steps:
+      - name: 🚚 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🔑 Conectar via SSH e executar deploy completo
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          server: ftp.bprates.com.br
-          username: esq@dev.esquadraodaalegria.org.br
-          password: ${{ secrets.FTP_PASSWORD_DEV }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY_DEPLOY }}
+          port: ${{ secrets.SSH_PORT }}
+          envs: GH_DEPLOY_KEY
+          script_stop: true
+          script: |
+            set -e
+            export COMPOSER_ALLOW_SUPERUSER=1
+
+            echo "📦 Iniciando deploy no servidor DEV..."
+            cd ${{ secrets.APP_PATH_DEV }}
+
+            echo "🔐 Configurando safe directory..."
+            git config --global --add safe.directory ${{ secrets.APP_PATH_DEV }}
+
+            echo "🔑 Configurando chave SSH para GitHub..."
+            mkdir -p ~/.ssh
+            printf '%s\n' "$GH_DEPLOY_KEY" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
+            ssh-keyscan -t rsa,ecdsa,ed25519 github.com >> ~/.ssh/known_hosts
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/id_ed25519
+
+            echo "📥 Atualizando branch dev..."
+            git fetch origin dev
+            git reset --hard origin/dev
+
+            echo "📦 Instalando dependências PHP..."
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "🧹 Limpando cache e otimizações..."
+            php artisan optimize:clear
+
+            echo "🔍 Gerando Rotas Wayfinder..."
+            php artisan wayfinder:generate
+
+            echo "🟢 Instalando dependências JS (React/Vite)..."
+            npm ci
+
+            echo "🔨 Compilando assets..."
+            npm run build
+
+            echo "🗄️ Executando migrações..."
+            php artisan migrate --force
+
+            echo "🔗 Atualizando links e reiniciando filas..."
+            php artisan storage:link
+            php artisan queue:restart
+            
+            echo "🔍 Gerando cache de otimização..."
+            php artisan optimize
+
+            echo "🚀 Deploy finalizado com sucesso!"
