@@ -29,6 +29,7 @@ jobs:
           script_stop: true
           script: |
             set -e
+            export COMPOSER_ALLOW_SUPERUSER=1
 
             echo "📦 Iniciando deploy no servidor DEV..."
             cd ${{ secrets.APP_PATH_DEV }}
@@ -61,7 +62,7 @@ jobs:
             npm ci
 
             echo "🔨 Compilando assets..."
-            pnpm run build
+            npm run build
 
             echo "🗄️ Executando migrações..."
             php artisan migrate --force

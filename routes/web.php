@@ -7,6 +7,8 @@ use App\Http\Controllers\Web\EventoPresencaController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\MeuEventoController;
 use App\Http\Controllers\Web\ConviteCadastroController;
+use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
+use App\Http\Controllers\Web\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -60,13 +62,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('cidades', [CidadeController::class, 'index'])->name('cidades.index');
     });
 
-
     Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
+    Route::get('/eventos/create', [EventoController::class, 'create'])->middleware('administrador')->name('eventos.create');
+    Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
+    Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
+    Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
+
+    // VISITAS
+    Route::prefix('visitas')->name('visitas.')->group(function () {
+        Route::get('/', [VisitaController::class, 'index'])->name('index');
+        Route::get('create', [VisitaController::class, 'create'])->name('create');
+        Route::post('/', [VisitaController::class, 'store'])->name('store');
+        Route::get('{visita}/edit', [VisitaController::class, 'edit'])->name('edit');
+        Route::put('{visita}', [VisitaController::class, 'update'])->name('update');
+
+        Route::post('{visita}/participantes', [VisitaParticipanteController::class, 'store'])
+            ->name('participantes.store');
+
+        Route::delete('{visita}/participantes/{participante}', [VisitaParticipanteController::class, 'destroy'])
+            ->name('participantes.destroy');
+    });
 
     // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
-        Route::get('/eventos/create', [EventoController::class, 'create'])->name('eventos.create');
         Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
         Route::get('/eventos/{evento}/edit', [EventoController::class, 'edit'])->name('eventos.edit');
         Route::put('/eventos/{evento}', [EventoController::class, 'update'])->name('eventos.update');
@@ -94,9 +113,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
     });
 
-    Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
-    Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
-    Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
     Route::post('/eventos/{evento}/finalizar', [EventoFinalizacaoController::class, 'store'])->name('eventos.finalizar');
     Route::put('/eventos/{evento}/presencas', [EventoPresencaController::class, 'update'])->name('eventos.presencas.update');
 });

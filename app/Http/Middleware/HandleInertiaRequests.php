@@ -41,7 +41,7 @@ class HandleInertiaRequests extends Middleware
         $user = $request->user();
 
         if ($user) {
-            $user->loadMissing('cargos');
+            $user->loadMissing(['cargos', 'voluntario:id,cidade_base_id']);
         }
 
         return [

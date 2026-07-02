@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Voluntario;
 use App\Notifications\ConviteCadastroNotification;
 use App\Queries\Voluntario\Queries;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -34,7 +35,12 @@ class Service
 
             return [
                 'sucesso' => false,
-                'dados' => [],
+                'dados' => new LengthAwarePaginator(
+                    [],
+                    0,
+                    (int) ($filtros['por_pagina'] ?? 10),
+                ),
+                'contadores' => [],
                 'erros' => [formatarMensagemErro($th)],
             ];
         }

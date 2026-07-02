@@ -14,7 +14,7 @@ const normalizarLabel = (label: string) => {
 };
 
 const Paginacao: React.FC<Props> = ({ paginacao }) => {
-    if (paginacao.last_page <= 1) {
+    if (!paginacao?.links || paginacao.last_page <= 1) {
         return null;
     }
 

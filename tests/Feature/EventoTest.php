@@ -9,7 +9,6 @@ use App\Models\Evento;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class EventoTest extends TestCase
@@ -24,11 +23,17 @@ class EventoTest extends TestCase
         $this->withoutVite();
     }
 
+    private function criarUsuario(): User
+    {
+        return User::factory()->createOne();
+    }
+
     private function usuarioAdmin(): User
     {
-        $user = User::factory()->create();
+        $user  = $this->criarUsuario();
         $cargo = Cargo::create(['nome' => 'Administrador', 'slug' => 'administrador']);
         $user->cargos()->attach($cargo);
+
         return $user;
     }
 
@@ -64,7 +69,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_autenticado_consegue_listar_eventos(): void
     {
-        $user = User::factory()->create();
+        $user = $this->criarUsuario();
         Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
 
         $this->actingAs($user)->get(route('eventos.index'))->assertOk();
@@ -86,7 +91,7 @@ class EventoTest extends TestCase
 
     public function test_admin_consegue_editar_evento(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
 
         $this->actingAs($admin)
@@ -98,7 +103,7 @@ class EventoTest extends TestCase
 
     public function test_admin_consegue_cancelar_evento(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
 
         $this->actingAs($admin)
@@ -114,7 +119,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_comum_nao_consegue_criar_editar_ou_cancelar(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
 
         $this->actingAs($user)->get(route('eventos.create'))->assertForbidden();
@@ -187,7 +192,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_consegue_se_inscrever(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
 
         $this->actingAs($user)->post(route('eventos.inscricao.store', $evento))->assertRedirect();
@@ -201,7 +206,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_nao_consegue_se_inscrever_duas_vezes(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
 
         $this->actingAs($user)->post(route('eventos.inscricao.store', $evento));
@@ -218,7 +223,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_nao_consegue_se_inscrever_em_evento_cancelado(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(['status' => 'cancelado']), 'criado_por_id' => $user->id]);
 
         $this->actingAs($user)->post(route('eventos.inscricao.store', $evento))
@@ -227,7 +232,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_nao_consegue_se_inscrever_em_evento_finalizado(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(['status' => 'finalizado']), 'criado_por_id' => $user->id]);
 
         $this->actingAs($user)->post(route('eventos.inscricao.store', $evento))
@@ -236,7 +241,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_nao_consegue_se_inscrever_em_evento_que_ja_comecou(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id' => $user->id,
@@ -249,12 +254,12 @@ class EventoTest extends TestCase
 
     public function test_usuario_nao_consegue_se_inscrever_em_evento_lotado(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(['limite_participantes' => 1]), 'criado_por_id' => $admin->id]);
-        $outro = User::factory()->create();
+        $outro  = $this->criarUsuario();
         $evento->participantes()->attach($outro->id, ['status' => 'inscrito', 'inscrito_em' => now()]);
 
-        $user = User::factory()->create();
+        $user = $this->criarUsuario();
         $this->actingAs($user)->post(route('eventos.inscricao.store', $evento))
             ->assertSessionHas('mensagem_erro', 'Não há vagas disponíveis.');
     }
@@ -263,7 +268,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_nao_consegue_se_inscrever_apos_prazo(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id'    => $user->id,
@@ -276,7 +281,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_consegue_se_inscrever_antes_do_prazo(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id'    => $user->id,
@@ -296,7 +301,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_consegue_cancelar_inscricao(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
         $evento->participantes()->attach($user->id, ['status' => 'inscrito', 'inscrito_em' => now()]);
 
@@ -311,7 +316,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_nao_consegue_cancelar_inscricao_apos_inicio_do_evento(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id' => $user->id,
@@ -325,7 +330,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_nao_consegue_cancelar_inscricao_com_presenca_registrada(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
         $evento->participantes()->attach($user->id, [
             'status'      => 'inscrito',
@@ -373,7 +378,7 @@ class EventoTest extends TestCase
 
     public function test_admin_consegue_finalizar_evento_que_ja_comecou(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id' => $admin->id,
@@ -393,8 +398,8 @@ class EventoTest extends TestCase
 
     public function test_responsavel_consegue_finalizar_evento(): void
     {
-        $responsavel = User::factory()->create();
-        $evento = Evento::create([
+        $responsavel = $this->criarUsuario();
+        $evento      = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id'  => $responsavel->id,
             'responsavel_id' => $responsavel->id,
@@ -410,7 +415,7 @@ class EventoTest extends TestCase
 
     public function test_nao_e_possivel_finalizar_evento_que_ainda_nao_comecou(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
 
         $this->actingAs($admin)
@@ -422,7 +427,7 @@ class EventoTest extends TestCase
 
     public function test_evento_cancelado_nao_pode_ser_finalizado(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([
             ...$this->dadosEvento(['status' => 'cancelado']),
             'criado_por_id' => $admin->id,
@@ -436,7 +441,7 @@ class EventoTest extends TestCase
 
     public function test_evento_ja_finalizado_nao_pode_ser_finalizado_novamente(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([
             ...$this->dadosEvento(['status' => 'finalizado']),
             'criado_por_id' => $admin->id,
@@ -450,7 +455,7 @@ class EventoTest extends TestCase
 
     public function test_usuario_comum_nao_consegue_finalizar_evento(): void
     {
-        $user = User::factory()->create();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id' => $user->id,
@@ -462,7 +467,7 @@ class EventoTest extends TestCase
 
     public function test_evento_finalizado_nao_pode_ser_editado(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(['status' => 'finalizado']), 'criado_por_id' => $admin->id]);
 
         $this->actingAs($admin)
@@ -474,7 +479,7 @@ class EventoTest extends TestCase
 
     public function test_evento_finalizado_nao_pode_ser_cancelado(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(['status' => 'finalizado']), 'criado_por_id' => $admin->id]);
 
         $this->actingAs($admin)
@@ -488,8 +493,8 @@ class EventoTest extends TestCase
 
     public function test_admin_consegue_registrar_presenca(): void
     {
-        $admin = $this->usuarioAdmin();
-        $user = User::factory()->create();
+        $admin  = $this->usuarioAdmin();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id, 'data_inicio' => now()->subHour()]);
         $evento->participantes()->attach($user->id, ['status' => 'inscrito', 'inscrito_em' => now()]);
 
@@ -508,9 +513,9 @@ class EventoTest extends TestCase
 
     public function test_responsavel_consegue_registrar_presenca(): void
     {
-        $responsavel = User::factory()->create();
-        $user = User::factory()->create();
-        $evento = Evento::create([
+        $responsavel = $this->criarUsuario();
+        $user        = $this->criarUsuario();
+        $evento      = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id'  => $responsavel->id,
             'responsavel_id' => $responsavel->id,
@@ -533,9 +538,9 @@ class EventoTest extends TestCase
 
     public function test_responsavel_consegue_registrar_presenca_apos_data_fim(): void
     {
-        $responsavel = User::factory()->create();
-        $user = User::factory()->create();
-        $evento = Evento::create([
+        $responsavel = $this->criarUsuario();
+        $user        = $this->criarUsuario();
+        $evento      = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id'  => $responsavel->id,
             'responsavel_id' => $responsavel->id,
@@ -560,8 +565,8 @@ class EventoTest extends TestCase
 
     public function test_admin_consegue_registrar_presenca_apos_finalizacao(): void
     {
-        $admin = $this->usuarioAdmin();
-        $user = User::factory()->create();
+        $admin  = $this->usuarioAdmin();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([
             ...$this->dadosEvento(['status' => 'finalizado']),
             'criado_por_id' => $admin->id,
@@ -584,8 +589,8 @@ class EventoTest extends TestCase
 
     public function test_usuario_comum_nao_consegue_registrar_presenca(): void
     {
-        $user = User::factory()->create();
-        $admin = $this->usuarioAdmin();
+        $user   = $this->criarUsuario();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
 
         $this->actingAs($user)->put(route('eventos.presencas.update', $evento), [
@@ -595,8 +600,8 @@ class EventoTest extends TestCase
 
     public function test_evento_cancelado_nao_permite_registrar_presenca(): void
     {
-        $admin = $this->usuarioAdmin();
-        $user = User::factory()->create();
+        $admin  = $this->usuarioAdmin();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(['status' => 'cancelado']), 'criado_por_id' => $admin->id]);
         $evento->participantes()->attach($user->id, ['status' => 'inscrito', 'inscrito_em' => now()]);
 
@@ -611,7 +616,7 @@ class EventoTest extends TestCase
 
     public function test_admin_consegue_excluir_evento_sem_participantes(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
 
         $this->actingAs($admin)->delete(route('eventos.destroy', $evento))
@@ -622,8 +627,8 @@ class EventoTest extends TestCase
 
     public function test_admin_nao_consegue_excluir_evento_com_participantes(): void
     {
-        $admin = $this->usuarioAdmin();
-        $user = User::factory()->create();
+        $admin  = $this->usuarioAdmin();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
         $evento->participantes()->attach($user->id, ['status' => 'inscrito', 'inscrito_em' => now()]);
 
@@ -635,8 +640,8 @@ class EventoTest extends TestCase
 
     public function test_admin_nao_consegue_excluir_evento_com_presenca_registrada(): void
     {
-        $admin = $this->usuarioAdmin();
-        $user = User::factory()->create();
+        $admin  = $this->usuarioAdmin();
+        $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
         $evento->participantes()->attach($user->id, [
             'status'      => 'inscrito',
@@ -652,8 +657,8 @@ class EventoTest extends TestCase
 
     public function test_usuario_comum_nao_consegue_excluir_evento(): void
     {
-        $user = User::factory()->create();
-        $admin = $this->usuarioAdmin();
+        $user   = $this->criarUsuario();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
 
         $this->actingAs($user)->delete(route('eventos.destroy', $evento))->assertForbidden();
@@ -665,7 +670,7 @@ class EventoTest extends TestCase
 
     public function test_comando_finaliza_eventos_cuja_data_fim_passou(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id' => $admin->id,
@@ -681,7 +686,7 @@ class EventoTest extends TestCase
 
     public function test_comando_finaliza_evento_sem_data_fim_quando_data_inicio_passou(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([
             ...$this->dadosEvento(),
             'criado_por_id' => $admin->id,
@@ -696,7 +701,7 @@ class EventoTest extends TestCase
 
     public function test_comando_nao_finaliza_eventos_que_ainda_nao_terminaram(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
 
         $this->artisan('eventos:finalizar-passados');
@@ -706,7 +711,7 @@ class EventoTest extends TestCase
 
     public function test_comando_nao_finaliza_eventos_cancelados(): void
     {
-        $admin = $this->usuarioAdmin();
+        $admin  = $this->usuarioAdmin();
         $evento = Evento::create([
             ...$this->dadosEvento(['status' => 'cancelado']),
             'criado_por_id' => $admin->id,
@@ -717,73 +722,5 @@ class EventoTest extends TestCase
         $this->artisan('eventos:finalizar-passados');
 
         $this->assertDatabaseHas('eventos', ['id' => $evento->id, 'status' => 'cancelado']);
-    }
-
-    // ─── Listagem em 3 grupos ────────────────────────────────────────────────
-
-    public function test_listagem_separa_inscricoes_abertas_dos_demais(): void
-    {
-        $user = User::factory()->create();
-        $admin = $this->usuarioAdmin();
-
-        $aberto = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id, 'status' => 'agendado']);
-        Evento::create([
-            ...$this->dadosEvento(),
-            'criado_por_id' => $admin->id,
-            'status'        => 'finalizado',
-            'data_inicio'   => now()->subDays(2),
-            'data_fim'      => now()->subDay(),
-        ]);
-
-        $this->actingAs($user)
-            ->get(route('eventos.index'))
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->component('Evento/Index')
-                ->has('abertas', 1)
-                ->has('encerradas', 0)
-                ->has('demais', 1)
-            );
-    }
-
-    public function test_evento_futuro_com_prazo_encerrado_vai_para_grupo_encerradas(): void
-    {
-        $user = User::factory()->create();
-        $admin = $this->usuarioAdmin();
-
-        Evento::create([
-            ...$this->dadosEvento(),
-            'criado_por_id'    => $admin->id,
-            'status'           => 'agendado',
-            'limite_inscricao' => now()->subHour(),
-        ]);
-
-        $this->actingAs($user)
-            ->get(route('eventos.index'))
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->has('abertas', 0)
-                ->has('encerradas', 1)
-                ->has('demais', 0)
-            );
-    }
-
-    public function test_evento_futuro_com_prazo_encerrado_nao_aparece_em_demais(): void
-    {
-        $user = User::factory()->create();
-        $admin = $this->usuarioAdmin();
-
-        Evento::create([
-            ...$this->dadosEvento(),
-            'criado_por_id'    => $admin->id,
-            'status'           => 'agendado',
-            'limite_inscricao' => now()->subHour(),
-        ]);
-
-        $this->actingAs($user)
-            ->get(route('eventos.index'))
-            ->assertInertia(fn (Assert $page) => $page
-                ->has('demais', 0)
-            );
     }
 }

@@ -17,8 +17,11 @@ class DatabaseSeeder extends Seeder
                 CidadeSeeder::class,
                 CargoSeeder::class,
                 UserSeeder::class,
+                VoluntarioSeeder::class,
                 HospitalSeeder::class,
                 PatrocinadorSeeder::class,
+                VisitaSeeder::class,
+                EventoSeeder::class,
             ]
         );
     }

@@ -9,6 +9,7 @@ use App\Http\Requests\Web\Evento\UpdateRequest;
 use App\Models\Cidade;
 use App\Models\Evento;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,42 +17,18 @@ class EventoController extends Controller
 {
     public function index(Request $request)
     {
-        $tipo = $request->filled('tipo') ? $request->string('tipo') : null;
+        $mes = $this->normalizarMes($request->query('mes'));
 
-        $base = fn () => Evento::with(['responsavel', 'cidade'])->withCount('participantesAtivos')
-            ->when($tipo, fn ($q) => $q->where('tipo', $tipo));
+        $inicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
+        $fim = $inicio->copy()->endOfMonth();
 
-        $abertas = $base()
-            ->where('status', 'agendado')
-            ->where('data_inicio', '>', now())
-            ->where(function ($q) {
-                $q->whereNull('limite_inscricao')->orWhere('limite_inscricao', '>', now());
-            })
-            ->orderBy('data_inicio')
-            ->get();
+        $eventos = Evento::with(['responsavel', 'cidade'])->withCount('participantesAtivos')
+            ->whereBetween('data_inicio', [$inicio, $fim])
+            ->when($request->filled('tipo'), fn ($q) => $q->where('tipo', $request->string('tipo')))
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
+            ->orderBy('data_inicio')->get();
 
-        $encerradas = $base()
-            ->where('status', 'agendado')
-            ->where('data_inicio', '>', now())
-            ->whereNotNull('limite_inscricao')
-            ->where('limite_inscricao', '<=', now())
-            ->orderBy('data_inicio')
-            ->get();
-
-        $demais = $base()
-            ->where(function ($q) {
-                $q->where('status', '!=', 'agendado')
-                    ->orWhere('data_inicio', '<=', now());
-            })
-            ->orderByDesc('data_inicio')
-            ->get();
-
-        return Inertia::render('Evento/Index', [
-            'abertas' => $abertas,
-            'encerradas' => $encerradas,
-            'demais' => $demais,
-            'filtros' => $request->only(['tipo']),
-        ]);
+        return Inertia::render('Evento/Index', ['eventos' => $eventos, 'mes' => $mes]);
     }
 
     public function create()
@@ -87,6 +64,7 @@ class EventoController extends Controller
         $inscrito = $participacao?->pivot->status === 'inscrito';
         $presencaMarcada = $participacao?->pivot->presenca !== null;
         $podeGerenciar = $user->temCargo('administrador') || $evento->responsavel_id === $user->id;
+
         return Inertia::render('Evento/Show', [
             'evento' => $evento,
             'inscrito' => $inscrito,
@@ -100,6 +78,7 @@ class EventoController extends Controller
         if (! $evento->estaAgendado()) {
             return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Apenas eventos agendados podem ser editados.');
         }
+
         return Inertia::render('Evento/Edit', [
             'evento' => $evento,
             'responsaveis' => User::orderBy('name')->get(['id', 'name', 'email']),
@@ -118,6 +97,7 @@ class EventoController extends Controller
             return back()->withErrors(['limite_participantes' => 'O limite não pode ser menor que os participantes ativos.'])->withInput();
         }
         $evento->update($request->validated());
+
         return redirect()->route('eventos.show', $evento)->with('mensagem_sucesso', 'Evento atualizado com sucesso.');
     }
 
@@ -140,6 +120,22 @@ class EventoController extends Controller
             return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Este evento já foi cancelado.');
         }
         $evento->update(['status' => 'cancelado', 'motivo_cancelamento' => $request->validated('motivo_cancelamento'), 'cancelado_em' => now(), 'cancelado_por_id' => $request->user()->id]);
+
         return redirect()->route('eventos.show', $evento)->with('mensagem_sucesso', 'Evento cancelado com sucesso.');
+    }
+
+    private function normalizarMes(?string $mes): string
+    {
+        if (! $mes) {
+            return now()->format('Y-m');
+        }
+
+        try {
+            Carbon::createFromFormat('Y-m', $mes);
+
+            return $mes;
+        } catch (\Throwable) {
+            return now()->format('Y-m');
+        }
     }
 }
