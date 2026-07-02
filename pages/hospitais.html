@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitais</title>
+    <link rel="stylesheet" href="../css/pages/hospitaisStyle.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <script src="../js/script.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Icones da rede social-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!--Favicon-->
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/favicon-32x32.png">
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+</head>
+
+<body>
+
+    <!-- Container Global-->
+    <div class="container-global">
+
+        <!-- Navigation bar-->
+        <header>
+            <nav class="navbar navbar-expand-lg fixed-top">
+                <div class="container">
+                    <a href="../index.html" class="navbar-brand d-flex align-items-center">
+                        <img src="../assets/img/logo-colorida.png" alt="Logo Esquadrão">
+                    </a>
+                    <button class="navbar-toggler navbar-light" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbar-links" aria-controls="navbar-links" aria-expanded="false"
+                        aria-label="toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-end" id="navbar-links">
+                        <div class="navbar-nav">
+                            <a href="../index.html" class="nav-item nav-link" id="about-menu">Página inicial</a>
+                            <a href="../pages/conheca.html" class="nav-item nav-link" id="about-menu">Conheça</a>
+                            <a href="../pages/hospitais.html" class="nav-item nav-link"
+                                id="hospitals-menu">Hospitais</a>
+                            <a href="../pages/docacao.html" class="nav-item nav-link" id="partners-menu">Doação</a>
+                            <a href="../index.html#fale-conosco" class="nav-item nav-link" id="contact-menu">Fale
+                                Conosco</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Banner principal-->
+        <section class="banner">
+            <div class="container">
+                <img src="../assets/img/bandeiras-banner.png" alt="Bandeirinhas" class="bandeirinhas">
+                <div class="row">
+                    <div class="col-md-6 banner-text">
+                        <div class="text-wrapper">
+                            <h1 class="hospitais-text">HOSPITAIS</h1>
+                            <h3 class="sub-text">CIDADES EM QUE ATUAMOS</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <img src="../assets/img/imagem_palhacos.png" alt="Palhaços no hospital" class="img-palhaco">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <div class="nav-hospitais">
+            <div class="nav-hospitais-item" onclick="showContent('portoAlegre', this)">
+                PORTO ALEGRE
+                <div class="arrow">▲</div>
+            </div>
+            <div class="nav-hospitais-item" onclick="showContent('santaMaria', this)">
+                SANTA MARIA
+                <div class="arrow">▲</div>
+            </div>
+            <div class="nav-hospitais-item" onclick="showContent('pelotas', this)">
+                PELOTAS
+                <div class="arrow">▲</div>
+            </div>
+        </div>
+
+        <div id="content-area">
+            <div id="portoAlegre" class="content" style="display: block;">
+                <div class="container my-5">
+                    <!-- Hospital Santa Clara -->
+                    <div class="row">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Santa Clara<br>Complexo Santa Casa</h3>
+                                <p>Rua Professor Annes Dias, 135<br>Centro Histórico, Porto Alegre - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital-santa-clara.png" alt="Hospital Santa Clara"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info" style="margin-left: auto;">
+                                <h3>Hospital Ernesto Dornelles</h3>
+                                <p>Av. Ipiranga, 1801<br>Azenha, Porto Alegre - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img">
+                                <img src="../assets/img/hospital-ernesto-dornelli.png" alt="Hospital Ernesto Dornelles"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instituto de Cardiologia -->
+                    <div class="row mt-5">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Instituto de Cardiologia</h3>
+                                <p>Av. Princesa Isabel, 395<br>Santana, Porto Alegre - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/instituto-de-cardiologia.png" alt="Instituto de Cardiologia"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ulbra Canoas -->
+                    <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Ulbra Canoas</h3>
+                                <p>Av. Farroupilha, 8001<br>São José, Canoas - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/ulbra-canoas.png" alt="Ulbra Canoas" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hospital da Brigada Militar -->
+                    <div class="row mt-5">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital da Brigada Militar</h3>
+                                <p>R. Dr. Castro de Menezes, 155<br>Vila Assunção, Porto Alegre - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img">
+                                <img src="../assets/img/brigada-militar.png" alt="Hospital da Brigada Militar"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hospital Centenário -->
+                    <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Centenário</h3>
+                                <p>Av. Theodomiro Porto da Fonseca, 799<br>Fião, São Leopoldo - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital_centenario.png" alt="Hospital Centenário" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <!-- Hospital Santa Maria -->
+            <div id="santaMaria" class="content">
+                <div class="container my-5">
+                    <div class="row">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Geral<br>de Santa Maria (HGSM)</h3>
+                                <p>R. Mal. Hermes, 190 <br>Passo D'areia, Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital-geral-santa-maria.png" alt="Hospital Santa Clara"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Unidade de Pronto Atendimento 24HR</h3>
+                                <p> R. Venâncio Aires, 1078 - Centro, <br>Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/unimed_24h.png" alt="Ulbra Canoas" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instituto de Cardiologia -->
+                    <div class="row mt-5">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital de São Francisco</h3>
+                                <p>R. Joana D Arc, 465 <br>Nossa Sra. de Lourdes, Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital-sao-francisco-de-assis.png"
+                                    alt="Instituto de Cardiologia" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ulbra Canoas -->
+                    <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Universitário de Santa Maria (HUSM)</h3>
+                                <p>Universidade Federal de Santa Maria - UFSM - Av. Roraima, 1000 Prédio 22 <br>Camobi,
+                                    Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital-universitario.png" alt="Ulbra Canoas"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hospital da Brigada Militar -->
+                    <div class="row mt-5">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Casa de Saúde</h3>
+                                <p>R. Gen. Neto, 477 Nossa Sra. de Lourdes<br>Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img">
+                                <img src="../assets/img/hospital-casa-de-saude.png" alt="Hospital da Brigada Militar"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Regional de Santa Maria</h3>
+                                <p> R. Florianópolis, 1041 - Pinheiro Machado<br>Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital_regional.png" alt="Ulbra Canoas" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital da Brigada Militar de Santa Maria</h3>
+                                <p>R. Euclídes da Cunha, 1800 - Pres. Joao Goulart<br>Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img">
+                                <img src="../assets/img/hospital-da-brigada-sm.png" alt="Hospital da Brigada Militar"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital de Caridade Alcides Brum</h3>
+                                <p>R. Floriano Peixoto, 1745 - Centro <br>Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital-de-caridade.png" alt="Ulbra Canoas" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>UPA 24</h3>
+                                <p>R. Ari Lagranha Domingues, 188 <br>Santa Maria - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img">
+                                <img src="../assets/img/upa-sm.png" alt="Hospital da Brigada Militar"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pelotas -->
+            <div id="pelotas" class="content">
+                <div class="container my-5">
+                    <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Universitário São Francisco de Paula</h3>
+                                <p>R. Mal. Deodoro, 1123 <br>Centro, Pelotas - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital-sao-francisco-de-paula.png" alt="Ulbra Canoas"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-5">
+                        <div class="col-md-6 d-flex align-items-center justify-content-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Escola da UFPel</h3>
+                                <p>R. Prof. Dr. Araújo, 538<br>Centro, Pelotas - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img">
+                                <img src="../assets/img/hospital-escola-ufpel.png" alt="Hospital da Brigada Militar"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="row mt-5">
+                        <div class="col-md-7 order-md-2 d-flex align-items-center">
+                            <div class="hospital-info">
+                                <h3>Hospital Espírita de Pelotas</h3>
+                                <p>Av. Domingos de Almeida, 2969 <br>Areal, Pelotas - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <div class="hospital-img ">
+                                <img src="../assets/img/hospital-espirita-de-pelotas.png" alt="Hospital espirita de Pelotas"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-5">
+                        <div class="col-md-6 d-flex align-items-center justify-content-center">
+                            <div class="hospital-info">
+                                <h3>Santa Casa de Misericórdia de Pelotas</h3>
+                                <p>Rua General Neto, 1725<br>Centro, Pelotas - RS</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="hospital-img">
+                                <img src="../assets/img/hospital-santa-casa-de-misericordia.png" alt="Hospital da Brigada Militar"
+                                    class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="bg-danger text-white py-5" style="background-color: #ED1B24; margin-top: 150px;">
+                <div class="container position-relative mx-auto">
+                    <div class="row justify-content-center align-items-center">
+                        <!-- Logo à esquerda -->
+                        <div class="col-md-3 col-12 text-center text-md-start">
+                            <img src="../assets/img/logo_png_branco.png" alt="Esquadrão da Alegria"
+                                class="footer-image">
+                        </div>
+
+                        <!-- Links centrais -->
+                        <div class="col-md-4 col-12 text-center">
+                            <h5 class="mb-3" style="font-size: 1.2rem;">Esquadrão da Alegria</h5>
+                            <ul class="list-unstyled">
+                                <li><a href="../pages/conheca.html" class="text-white">Nossos Doutores</a></li>
+                                <li><a href="../pages/hospitais.html" class="text-white">Onde atuamos</a></li>
+                                <li><a href="../pages/docacao.html" class="text-white">Como Apoiar</a></li>
+                                <a href="../index.html#fale-conosco" class="text-white" id="contact-menu">Fale
+                                    Conosco</a>
+                            </ul>
+                        </div>
+
+                        <!-- Ícones de redes sociais -->
+                        <div class="col-md-1 col-12 text-center text-md-end mt-4 mt-md-0">
+                            <div class="social-icons">
+                                <a href="https://www.facebook.com/ongesquadraodaalegria?mibextid=LQQJ4d&rdid=b31OduKmz2bXRUu6&share_url=https%253A%252F%252Fwww.facebook.com%252Fshare%252F18rsKxc1ev%252F%253Fmibextid%253DLQQJ4d"
+                                    class="text-white" target="_blank"><i class="fab fa-facebook"></i></a>
+                                <a href="https://www.instagram.com/ongesquadraodaalegria/" class="text-white"
+                                    target="_blank"><i class="fab fa-instagram" target="_blank"></i></a>
+                                <a href="https://www.linkedin.com/company/ong-esquadr%C3%A3o-da-alegria/"
+                                    class="text-white" target="_blank"><i class="fab fa-linkedin"></i></a>
+                                <a href="https://qrcode.esquadraodaalegria.org.br/" class="text-white" target="_blank">
+                                    <img src="../assets/img/icons8-white-clown-30.png" alt="Palhaço"></a>
+                            </div>
+                        </div>
+
+                        <!-- Texto no rodapé -->
+                        <div class="text-center mt-5">
+                            <p class="mb-0">© Esquadrão da Alegria</p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+</body>
+
+</html>
