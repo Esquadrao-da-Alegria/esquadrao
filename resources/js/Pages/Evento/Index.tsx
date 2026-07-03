@@ -44,9 +44,7 @@ function mesSeguinte(mes: string): string {
 
 const Index: FC<Props> = ({ eventos, mes }) => {
     const { props } = usePage<SharedData>();
-    const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(
-        null,
-    );
+    const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(null);
     const [diaOverflow, setDiaOverflow] = useState<Date | null>(null);
     const [eventosOverflow, setEventosOverflow] = useState<Evento[]>([]);
 
@@ -117,11 +115,7 @@ const Index: FC<Props> = ({ eventos, mes }) => {
                                 href={create().url}
                                 className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
                             >
-                                <Plus
-                                    className="size-5"
-                                    strokeWidth={2}
-                                    aria-hidden
-                                />
+                                <Plus className="size-5" strokeWidth={2} aria-hidden />
                                 Novo evento
                             </Link>
                         ) : null}

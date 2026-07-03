@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Evento\CancelarRequest;
 use App\Http\Requests\Web\Evento\StoreRequest;
 use App\Http\Requests\Web\Evento\UpdateRequest;
+use App\Models\Cidade;
 use App\Models\Evento;
 use App\Models\User;
 use Carbon\Carbon;
@@ -21,7 +22,7 @@ class EventoController extends Controller
         $inicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
         $fim = $inicio->copy()->endOfMonth();
 
-        $eventos = Evento::with('responsavel')->withCount('participantesAtivos')
+        $eventos = Evento::with(['responsavel', 'cidade'])->withCount('participantesAtivos')
             ->whereBetween('data_inicio', [$inicio, $fim])
             ->when($request->filled('tipo'), fn ($q) => $q->where('tipo', $request->string('tipo')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
@@ -32,37 +33,63 @@ class EventoController extends Controller
 
     public function create()
     {
-        return Inertia::render('Evento/Create', ['responsaveis' => User::orderBy('name')->get(['id', 'name', 'email'])]);
+        return Inertia::render('Evento/Create', [
+            'responsaveis' => User::orderBy('name')->get(['id', 'name', 'email']),
+            'cidades' => Cidade::orderBy('nome')->get(['id', 'nome', 'estado_id']),
+        ]);
     }
 
     public function store(StoreRequest $request)
     {
-        Evento::create([...$request->validated(), 'status' => 'agendado', 'criado_por_id' => $request->user()->id]);
+        $validated = $request->validated();
+        $inscreverMe = (bool) ($validated['inscrever_me'] ?? false);
+        unset($validated['inscrever_me']);
+
+        $evento = Evento::create([...$validated, 'status' => 'agendado', 'criado_por_id' => $request->user()->id]);
+
+        if ($inscreverMe) {
+            $evento->participantes()->syncWithoutDetaching([
+                $request->user()->id => ['status' => 'inscrito', 'inscrito_em' => now()],
+            ]);
+        }
 
         return redirect()->route('eventos.index')->with('mensagem_sucesso', 'Evento criado com sucesso.');
     }
 
     public function show(Request $request, Evento $evento)
     {
-        $evento->load(['responsavel:id,name,email', 'participantesAtivos:id,name,email'])->loadCount('participantesAtivos');
-        $inscrito = $evento->participantesAtivos()->where('users.id', $request->user()->id)->exists();
+        $evento->load(['responsavel:id,name,email', 'participantesAtivos:id,name,email', 'cidade'])->loadCount('participantesAtivos');
+        $user = $request->user();
+        $participacao = $evento->participantes()->where('users.id', $user->id)->first();
+        $inscrito = $participacao?->pivot->status === 'inscrito';
+        $presencaMarcada = $participacao?->pivot->presenca !== null;
+        $podeGerenciar = $user->temCargo('administrador') || $evento->responsavel_id === $user->id;
 
-        return Inertia::render('Evento/Show', ['evento' => $evento, 'inscrito' => $inscrito]);
+        return Inertia::render('Evento/Show', [
+            'evento' => $evento,
+            'inscrito' => $inscrito,
+            'presenca_marcada' => $presencaMarcada,
+            'pode_gerenciar' => $podeGerenciar,
+        ]);
     }
 
     public function edit(Evento $evento)
     {
-        if ($evento->status === 'cancelado') {
-            return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Este evento foi cancelado.');
+        if (! $evento->estaAgendado()) {
+            return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Apenas eventos agendados podem ser editados.');
         }
 
-        return Inertia::render('Evento/Edit', ['evento' => $evento, 'responsaveis' => User::orderBy('name')->get(['id', 'name', 'email'])]);
+        return Inertia::render('Evento/Edit', [
+            'evento' => $evento,
+            'responsaveis' => User::orderBy('name')->get(['id', 'name', 'email']),
+            'cidades' => Cidade::orderBy('nome')->get(['id', 'nome', 'estado_id']),
+        ]);
     }
 
     public function update(UpdateRequest $request, Evento $evento)
     {
-        if ($evento->status === 'cancelado') {
-            return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Este evento foi cancelado.');
+        if (! $evento->estaAgendado()) {
+            return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Apenas eventos agendados podem ser editados.');
         }
         $ativos = $evento->participantesAtivos()->count();
         $limite = $request->validated('limite_participantes');
@@ -74,10 +101,23 @@ class EventoController extends Controller
         return redirect()->route('eventos.show', $evento)->with('mensagem_sucesso', 'Evento atualizado com sucesso.');
     }
 
+    public function destroy(Evento $evento)
+    {
+        if ($evento->participantes()->exists()) {
+            return back()->with('mensagem_erro', 'Não é possível excluir um evento que possui participantes. Cancele o evento em vez disso.');
+        }
+
+        $evento->delete();
+        return redirect()->route('eventos.index')->with('mensagem_sucesso', 'Evento excluído com sucesso.');
+    }
+
     public function cancelar(CancelarRequest $request, Evento $evento)
     {
-        if ($evento->status === 'cancelado') {
-            return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Este evento foi cancelado.');
+        if ($evento->estaFinalizado()) {
+            return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Evento finalizado não pode ser cancelado.');
+        }
+        if ($evento->estaCancelado()) {
+            return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Este evento já foi cancelado.');
         }
         $evento->update(['status' => 'cancelado', 'motivo_cancelamento' => $request->validated('motivo_cancelamento'), 'cancelado_em' => now(), 'cancelado_por_id' => $request->user()->id]);
 
