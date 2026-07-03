@@ -142,8 +142,9 @@ export interface AlaHospital {
     created_at?: string;
     updated_at?: string;
 }
-export type EventoTipo = 'oficina' | 'reuniao' | 'evento';
-export type EventoStatus = 'agendado' | 'cancelado';
+export type EventoTipo = 'oficina' | 'reuniao';
+export type EventoStatus = 'agendado' | 'cancelado' | 'finalizado';
+export type PresencaStatus = 'presente' | 'ausente';
 
 export interface EventoParticipante {
     id: number;
@@ -153,6 +154,10 @@ export interface EventoParticipante {
         status: 'inscrito' | 'cancelado';
         inscrito_em: string | null;
         cancelado_em: string | null;
+        presenca: PresencaStatus | null;
+        presenca_registrada_em: string | null;
+        presenca_registrada_por_id: number | null;
+        observacao_presenca: string | null;
     };
 }
 
@@ -162,8 +167,11 @@ export interface Evento {
     tipo: EventoTipo;
     descricao: string | null;
     local: string | null;
+    cidade_id: number | null;
+    cidade?: Cidade | null;
     data_inicio: string;
     data_fim: string | null;
+    limite_inscricao: string | null;
     limite_participantes: number | null;
     status: EventoStatus;
     responsavel_id: number | null;
@@ -171,11 +179,28 @@ export interface Evento {
     motivo_cancelamento: string | null;
     cancelado_em: string | null;
     cancelado_por_id: number | null;
+    finalizado_em: string | null;
+    finalizado_por_id: number | null;
+    observacoes_finalizacao: string | null;
     participantes_ativos_count?: number;
     responsavel?: User | null;
     participantes_ativos?: EventoParticipante[];
     created_at: string;
     updated_at: string;
+}
+
+export interface MeuEvento {
+    id: number;
+    titulo: string;
+    tipo: EventoTipo;
+    data_inicio: string;
+    data_fim: string | null;
+    local: string | null;
+    status: EventoStatus;
+    responsavel: User | null;
+    inscricao_status: 'inscrito' | 'cancelado';
+    presenca: PresencaStatus | null;
+    presenca_registrada_em: string | null;
 }
 
 // VISITAS

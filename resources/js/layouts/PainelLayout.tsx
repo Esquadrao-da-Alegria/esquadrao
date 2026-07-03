@@ -18,8 +18,8 @@ import { toastAviso, toastErro, toastSucesso } from '@/lib/utils/toast';
 import { dashboard, home, login, logout } from '@/routes';
 import { index } from '@/routes/hospitais';
 import { edit } from '@/routes/profile';
-import { index as eventosIndex } from '@/routes/eventos'
-import { index as visitasIndex } from '@/routes/visitas'
+import { index as eventosIndex } from '@/routes/eventos';
+import { index as visitasIndex } from '@/routes/visitas';
 import { index as voluntariosIndex } from '@/routes/voluntarios';
 import { index as patrocinadoresIndex } from '@/routes/patrocinadores';
 

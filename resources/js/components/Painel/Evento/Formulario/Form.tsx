@@ -1,6 +1,6 @@
 import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { EVENTO_TIPOS, labelTipo } from '@/lib/evento'
-import type { EventoTipo, User } from '@/types'
+import type { Cidade, EventoTipo, User } from '@/types'
 import { type FC } from 'react'
 
 export interface EventoFormValues {
@@ -8,10 +8,13 @@ export interface EventoFormValues {
     tipo: EventoTipo | ''
     descricao: string
     local: string
+    cidade_id: string
     data: string
     hora_inicio: string
     data_fim: string
     hora_fim: string
+    limite_inscricao_data: string
+    limite_inscricao_hora: string
     limite_participantes: string
     responsavel_id: number | ''
 }
@@ -20,10 +23,11 @@ interface Props {
     data: EventoFormValues
     errors: Record<string, string | undefined>
     responsaveis: User[]
+    cidades: Cidade[]
     onFieldChange: <K extends keyof EventoFormValues>(campo: K, valor: EventoFormValues[K]) => void
 }
 
-const Form: FC<Props> = ({ data, errors, responsaveis, onFieldChange }) => {
+const Form: FC<Props> = ({ data, errors, responsaveis, cidades, onFieldChange }) => {
     return (
         <div className="space-y-6">
             <div>
@@ -71,7 +75,25 @@ const Form: FC<Props> = ({ data, errors, responsaveis, onFieldChange }) => {
             </div>
 
             <div>
-                <label htmlFor="local" className={painelLabelClass}>Local</label>
+                <label htmlFor="cidade_id" className={painelLabelClass}>Cidade *</label>
+                <select
+                    id="cidade_id"
+                    name="cidade_id"
+                    required
+                    value={data.cidade_id}
+                    onChange={(e) => onFieldChange('cidade_id', e.target.value)}
+                    className={painelInputClass}
+                >
+                    <option value="">Selecione...</option>
+                    {cidades.map((c) => (
+                        <option key={c.id} value={c.id}>{c.nome}</option>
+                    ))}
+                </select>
+                {errors.cidade_id ? <p className="mt-1 text-sm text-red-600">{errors.cidade_id}</p> : null}
+            </div>
+
+            <div>
+                <label htmlFor="local" className={painelLabelClass}>Local (complemento)</label>
                 <input
                     id="local"
                     name="local"
@@ -114,11 +136,12 @@ const Form: FC<Props> = ({ data, errors, responsaveis, onFieldChange }) => {
 
             <div className="grid gap-6 sm:grid-cols-2">
                 <div>
-                    <label htmlFor="data_fim" className={painelLabelClass}>Data fim</label>
+                    <label htmlFor="data_fim" className={painelLabelClass}>Data fim *</label>
                     <input
                         type="date"
                         id="data_fim"
                         name="data_fim"
+                        required
                         value={data.data_fim}
                         onChange={(e) => onFieldChange('data_fim', e.target.value)}
                         className={painelInputClass}
@@ -135,7 +158,35 @@ const Form: FC<Props> = ({ data, errors, responsaveis, onFieldChange }) => {
                         onChange={(e) => onFieldChange('hora_fim', e.target.value)}
                         className={painelInputClass}
                     />
+                    <p className="mt-1 text-xs text-gray-500">Se vazio, será usado 23:59.</p>
                     {errors.hora_fim ? <p className="mt-1 text-sm text-red-600">{errors.hora_fim}</p> : null}
+                </div>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+                <div>
+                    <label htmlFor="limite_inscricao_data" className={painelLabelClass}>Inscrições até</label>
+                    <input
+                        type="date"
+                        id="limite_inscricao_data"
+                        name="limite_inscricao_data"
+                        value={data.limite_inscricao_data}
+                        onChange={(e) => onFieldChange('limite_inscricao_data', e.target.value)}
+                        className={painelInputClass}
+                    />
+                    {errors.limite_inscricao ? <p className="mt-1 text-sm text-red-600">{errors.limite_inscricao}</p> : null}
+                </div>
+                <div>
+                    <label htmlFor="limite_inscricao_hora" className={painelLabelClass}>Horário limite</label>
+                    <input
+                        type="time"
+                        id="limite_inscricao_hora"
+                        name="limite_inscricao_hora"
+                        value={data.limite_inscricao_hora}
+                        onChange={(e) => onFieldChange('limite_inscricao_hora', e.target.value)}
+                        className={painelInputClass}
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Se vazio, será usado 23:59.</p>
                 </div>
             </div>
 
