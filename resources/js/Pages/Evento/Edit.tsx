@@ -15,8 +15,6 @@ interface Props {
 }
 
 function montarPayload(data: EventoFormValues) {
-    const temFim = data.data_fim !== '' && data.hora_fim !== ''
-
     return {
         titulo: data.titulo,
         tipo: data.tipo,
@@ -24,7 +22,10 @@ function montarPayload(data: EventoFormValues) {
         local: data.local || null,
         cidade_id: data.cidade_id ? Number(data.cidade_id) : null,
         data_inicio: montarDatetime(data.data, data.hora_inicio),
-        data_fim: temFim ? montarDatetime(data.data_fim, data.hora_fim) : null,
+        data_fim: montarDatetime(data.data_fim, data.hora_fim || '23:59'),
+        limite_inscricao: data.limite_inscricao_data
+            ? montarDatetime(data.limite_inscricao_data, data.limite_inscricao_hora || '23:59')
+            : null,
         limite_participantes: data.limite_participantes ? Number(data.limite_participantes) : null,
         responsavel_id: data.responsavel_id ? Number(data.responsavel_id) : null,
     }
@@ -39,8 +40,10 @@ const Edit: FC<Props> = ({ evento, responsaveis, cidades }) => {
         cidade_id: evento.cidade_id?.toString() ?? '',
         data: extrairData(evento.data_inicio),
         hora_inicio: extrairHora(evento.data_inicio),
-        data_fim: evento.data_fim ? extrairData(evento.data_fim) : '',
+        data_fim: evento.data_fim ? extrairData(evento.data_fim) : extrairData(evento.data_inicio),
         hora_fim: evento.data_fim ? extrairHora(evento.data_fim) : '',
+        limite_inscricao_data: evento.limite_inscricao ? extrairData(evento.limite_inscricao) : '',
+        limite_inscricao_hora: evento.limite_inscricao ? extrairHora(evento.limite_inscricao) : '',
         limite_participantes: evento.limite_participantes?.toString() ?? '',
         responsavel_id: evento.responsavel_id ?? '',
     })
@@ -50,13 +53,13 @@ const Edit: FC<Props> = ({ evento, responsaveis, cidades }) => {
     }
 
     const handleSubmit = () => {
-        if (!data.titulo || !data.tipo || !data.data || !data.hora_inicio) {
+        if (!data.titulo || !data.tipo || !data.cidade_id || !data.data || !data.hora_inicio || !data.data_fim) {
             toast.error('Preencha todos os campos obrigatórios.')
             return
         }
 
-        if ((data.data_fim && !data.hora_fim) || (!data.data_fim && data.hora_fim)) {
-            toast.error('Informe data e horário de fim juntos, ou deixe ambos em branco.')
+        if (data.limite_inscricao_hora && !data.limite_inscricao_data) {
+            toast.error('Informe a data limite de inscrição junto com o horário.')
             return
         }
 
