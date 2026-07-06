@@ -4,38 +4,62 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  web-deploy:
-    name: 🎉 Deploy estático para PROD via SSH
+  deploy:
+    name: 🔥 Deploy completo no servidor PROD
     runs-on: ubuntu-latest
 
     steps:
       - name: 🚚 Checkout do código
         uses: actions/checkout@v4
 
-      - name: 🔑 Conectar via SSH e iniciar deploy PROD
+      - name: 🔑 Conectar via SSH e executar deploy completo
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_KEY_DEPLOY }}
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
           script: |
-            echo "🔐 Conexão SSH estabelecida com sucesso!"
-            echo "🚀 Iniciando deploy PROD..."
+            set -e
+            export COMPOSER_ALLOW_SUPERUSER=1
 
-      - name: 🔁 Sincronizar arquivos com rsync
-        uses: burnett01/rsync-deploy@v1.1
-        with:
-          switches: -avzr --delete
-          path: prod/                      
-          remote_path: ${{ secrets.APP_PATH_PRD }}   
-          remote_host: ${{ secrets.SSH_HOST }}
-          remote_user: ${{ secrets.SSH_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          remote_port: ${{ secrets.SSH_PORT }}
+            echo "📦 Iniciando deploy no servidor PROD..."
+            cd ${{ secrets.APP_PATH_PRD }}
 
-      - name: ✅ Finalizado
-        run: echo "Deploy de produção concluído!"
+            echo "🔐 Configurando safe directory..."
+            git config --global --add safe.directory ${{ secrets.APP_PATH_PRD }}
+
+            echo "📥 Atualizando branch main..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "📦 Instalando dependências PHP..."
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "🧹 Limpando cache e otimizações..."
+            php artisan optimize:clear
+
+            echo "🔍 Gerando Rotas Wayfinder..."
+            php artisan wayfinder:generate
+
+            echo "🟢 Instalando dependências JS (React/Vite)..."
+            npm ci
+
+            echo "🔨 Compilando assets..."
+            npm run build
+
+            echo "🗄️ Executando migrações..."
+            php artisan migrate --force
+
+            echo "🔗 Atualizando storage e reiniciando filas..."
+            php artisan storage:link
+            php artisan queue:restart
+
+            echo "🔍 Gerando cache de otimização..."
+            php artisan optimize
+
+            echo "🚀 Deploy PROD finalizado com sucesso!"
