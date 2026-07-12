@@ -27,3 +27,8 @@ yarn-error.log
 /.vscode
 /.zed
 .pnpm-store/*
+
+# DOCS
+docs/superpowers
+docs/plans
+docs/designs
