@@ -1,4 +1,6 @@
 import MarketingLayout from '@/layouts/MarketingLayout';
+import fale_conosco from '@/routes/fale_conosco';
+import { Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 const Index: React.FC = () => {
@@ -525,12 +527,12 @@ const Index: React.FC = () => {
 
                     {/* Botão */}
                     <div className="text-center">
-                        <a
-                            href="../index.html#fale-conosco"
+                        <Link
+                            href={fale_conosco.index()}
                             className="mx-auto inline-flex max-w-xs transform items-center justify-center rounded-full border-2 border-blue-600 px-8 py-4 text-lg font-semibold text-blue-600 shadow-sm transition-all duration-300 hover:scale-105 hover:bg-blue-600 hover:text-white hover:shadow-md"
                         >
                             Entre em Contato
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Elementos decorativos */}

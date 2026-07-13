@@ -17,6 +17,9 @@ use App\Models\Patrocinador;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// URLs do site estático antigo (index.html, etc.)
+Route::redirect('/index.html', '/', 301);
+
 // HOME PAGE
 Route::get('/', function () {
     return Inertia::render('Home', [
