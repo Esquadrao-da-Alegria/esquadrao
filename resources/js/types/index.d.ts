@@ -235,3 +235,24 @@ export interface VisitaParticipante {
     visita?: Visita;
     voluntario?: User;
 }
+
+export type TipoRelatorio = 'palhaco' | 'paisana' | 'geral';
+
+export interface VisitaRelatorio {
+    id?: number;
+    visita_id: number;
+    autor_id: number;
+    tipo_relatorio: TipoRelatorio;
+    resumo: string;
+    feedback?: string | null;
+    quartos_visitados?: number | null;
+    pessoas_impactadas?: number | null;
+    observacao_visitantes_externos?: string | null;
+    observacoes_gerais?: string | null;
+    enviado_em: string;
+    fora_do_prazo: boolean;
+    created_at?: string;
+    updated_at?: string;
+    autor?: User;
+    visita?: Visita;
+}

@@ -14,6 +14,7 @@ import {
 } from '@/lib/visita'
 import { toastInfo } from '@/lib/utils/toast'
 import { edit } from '@/routes/visitas'
+import { create, index as relatoriosIndex } from '@/routes/visitas/relatorios'
 import { Service } from '@/Services/Visita/Participante/Service'
 import type { SharedData, TipoParticipacao, Visita } from '@/types'
 
@@ -203,6 +204,25 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                             </Link>
                         </div>
                     )}
+
+                    <div className="mt-3 flex flex-col gap-2">
+                        <Link
+                            href={relatoriosIndex.url({ visita: visita.id! })}
+                            onClick={fecharModal}
+                            className="inline-flex w-full items-center justify-center rounded-lg border border-amber-200 bg-white px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50"
+                        >
+                            Ver relatórios
+                        </Link>
+                        {visita.status !== 'cancelada' && (
+                            <Link
+                                href={create.url({ visita: visita.id! })}
+                                onClick={fecharModal}
+                                className="inline-flex w-full items-center justify-center rounded-lg border border-amber-600 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-100"
+                            >
+                                Criar relatório
+                            </Link>
+                        )}
+                    </div>
 
                     {visitaAgendada && (
                         <div className="mt-6">

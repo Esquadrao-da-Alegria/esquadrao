@@ -5,7 +5,8 @@ use App\Http\Controllers\Web\EventoInscricaoController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\ConviteCadastroController;
 use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
-use App\Http\Controllers\Web\VisitaController;
+use App\Http\Controllers\Web\Visita\Relatorio\VisitaRelatorioController;
+use App\Http\Controllers\Web\Visita\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -77,6 +78,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/', [VisitaController::class, 'store'])->name('store');
         Route::get('{visita}/edit', [VisitaController::class, 'edit'])->name('edit');
         Route::put('{visita}', [VisitaController::class, 'update'])->name('update');
+
+        Route::prefix('{visita}/relatorios')->scopeBindings()->name('relatorios.')->group(function () {
+            Route::get('/', [VisitaRelatorioController::class, 'index'])->name('index');
+            Route::get('create', [VisitaRelatorioController::class, 'create'])->name('create');
+            Route::post('/', [VisitaRelatorioController::class, 'store'])->name('store');
+            Route::get('{relatorio}', [VisitaRelatorioController::class, 'show'])->name('show');
+            Route::get('{relatorio}/edit', [VisitaRelatorioController::class, 'edit'])->name('edit');
+            Route::put('{relatorio}', [VisitaRelatorioController::class, 'update'])->name('update');
+            Route::get('{relatorio}/pdf', [VisitaRelatorioController::class, 'pdf'])->name('pdf');
+        });
 
         Route::post('{visita}/participantes', [VisitaParticipanteController::class, 'store'])
             ->name('participantes.store');

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Web;
+namespace App\Http\Controllers\Web\Visita;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Visita\StoreRequest;

@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\TipoRelatorio;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class VisitaRelatorio extends Model
+{
+    protected $table = 'visitas_relatorios';
+
+    protected $fillable = [
+        'visita_id',
+        'autor_id',
+        'tipo_relatorio',
+        'resumo',
+        'feedback',
+        'quartos_visitados',
+        'pessoas_impactadas',
+        'observacao_visitantes_externos',
+        'observacoes_gerais',
+        'enviado_em',
+        'fora_do_prazo',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'tipo_relatorio' => TipoRelatorio::class,
+            'enviado_em'     => 'datetime',
+            'fora_do_prazo'  => 'boolean',
+        ];
+    }
+
+    public function visita(): BelongsTo
+    {
+        return $this->belongsTo(Visita::class, 'visita_id');
+    }
+
+    public function autor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'autor_id');
+    }
+}

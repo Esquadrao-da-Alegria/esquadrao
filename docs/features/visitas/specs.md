@@ -2,6 +2,8 @@
 
 Documento de referência sobre o modelo de **visitas** e **participantes** (inscrições de voluntários em visitas). Objetivo: regras de negócio claras e decisões técnicas simples de manter.
 
+**Relatórios:** ver [`docs/features/visitas/relatorios/specs.md`](relatorios/specs.md).
+
 ---
 
 ## Vocabulário
