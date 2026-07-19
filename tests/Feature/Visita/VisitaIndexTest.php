@@ -18,6 +18,12 @@ class VisitaIndexTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     public function test_convidado_e_redirecionado_para_login(): void
     {
         $this->get(route('visitas.index'))->assertRedirect(route('login'));

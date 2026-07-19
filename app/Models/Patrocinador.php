@@ -15,6 +15,11 @@ class Patrocinador extends Model
      */
 
     protected $table = 'patrocinadores';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     protected $fillable = [
         'nome',
         'site',

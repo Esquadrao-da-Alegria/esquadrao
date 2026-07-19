@@ -17,6 +17,7 @@ export function labelStatus(status: EventoStatus): string {
     const labels: Record<EventoStatus, string> = {
         agendado: 'Agendado',
         cancelado: 'Cancelado',
+        finalizado: 'Finalizado',
     }
     return labels[status] ?? status
 }
