@@ -150,6 +150,7 @@ A exclusão administrativa é lógica no fluxo de serviço: o voluntário e sua 
 - `/voluntarios`, `/hospitais` e `/patrocinadores` exigem o middleware `administrador`.
 - O middleware considera administrador quem possui cargo com slug `administrador`.
 - `HandleInertiaRequests` compartilha `eh_administrador` com o frontend.
+- Ao compartilhar o usuário autenticado, `HandleInertiaRequests` carrega `id`, `cidade_base_id` e `nome_completo` do voluntário. O `nome_completo` é necessário para serializar o accessor de compatibilidade `Voluntario::name`.
 - O `PainelLayout` deve ocultar links administrativos de usuários comuns. Isso melhora a navegação, mas o middleware continua sendo a proteção efetiva.
 
 ---
