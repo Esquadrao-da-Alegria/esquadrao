@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('relatorios_visita', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('visita_id')->constrained('visitas')->cascadeOnDelete();
+            $table->foreignId('visita_id')->constrained('visitas')->restrictOnDelete();
             $table->foreignId('autor_id')->constrained('users')->restrictOnDelete();
             $table->string('tipo_relatorio', 20);
             $table->text('resumo');
