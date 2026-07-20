@@ -61,4 +61,9 @@ class Visita extends Model
     {
         return $this->hasMany(VisitaParticipante::class, 'visita_id');
     }
+
+    public function relatorios(): HasMany
+    {
+        return $this->hasMany(RelatorioVisita::class, 'visita_id');
+    }
 }
