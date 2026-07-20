@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Visita;
 
+use App\Enums\PapelNaVisita;
+use App\Enums\StatusParticipacao;
+use App\Enums\TipoParticipacao;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
@@ -11,6 +14,7 @@ use App\Models\Estado;
 use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
+use App\Models\VisitaParticipante;
 use App\Models\Voluntario;
 use App\Services\Visita\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -26,6 +30,24 @@ class VisitaUpdateTest extends TestCase
         $visita = $this->criarVisita($lider, liderId: $lider->id);
 
         $this->assertTrue(app(Service::class)->podeEditarVisita($lider, $visita));
+    }
+
+    public function test_administrador_pode_editar(): void
+    {
+        $lider         = $this->criarVoluntario();
+        $administrador = $this->criarUsuarioComCargo('administrador');
+        $visita        = $this->criarVisita($lider, liderId: $lider->id);
+
+        $this->assertTrue(app(Service::class)->podeEditarVisita($administrador, $visita));
+    }
+
+    public function test_voluntario_comum_nao_pode_editar(): void
+    {
+        $lider      = $this->criarVoluntario();
+        $voluntario = $this->criarVoluntario();
+        $visita     = $this->criarVisita($lider, liderId: $lider->id);
+
+        $this->assertFalse(app(Service::class)->podeEditarVisita($voluntario, $visita));
     }
 
     public function test_artista_nao_pode_editar(): void
@@ -145,6 +167,71 @@ class VisitaUpdateTest extends TestCase
         $this->assertSame(VisitaTipo::AcaoEspecial, $visita->tipo);
     }
 
+    public function test_troca_lider_e_preserva_participacao_do_lider_anterior(): void
+    {
+        $liderAnterior = $this->criarVoluntario();
+        $novoLider     = $this->criarVoluntario();
+        $visita        = $this->criarVisita($liderAnterior, liderId: $liderAnterior->id);
+
+        $this->inscreverParticipante($visita, $liderAnterior);
+
+        $this->actingAs($liderAnterior)
+            ->put(route('visitas.update', $visita), $this->payloadAtualizacao($novoLider))
+            ->assertRedirect(route('visitas.index'));
+
+        $this->assertDatabaseHas('visita_participante', [
+            'visita_id'           => $visita->id,
+            'voluntario_id'       => $liderAnterior->id,
+            'status_participacao' => StatusParticipacao::Confirmado->value,
+        ]);
+        $this->assertDatabaseHas('visita_participante', [
+            'visita_id'           => $visita->id,
+            'voluntario_id'       => $novoLider->id,
+            'status_participacao' => StatusParticipacao::Confirmado->value,
+        ]);
+        $this->assertSame($novoLider->id, $visita->fresh()->lider_id);
+    }
+
+    public function test_troca_lider_reativa_participacao_cancelada(): void
+    {
+        $liderAnterior = $this->criarVoluntario();
+        $novoLider     = $this->criarVoluntario();
+        $visita        = $this->criarVisita($liderAnterior, liderId: $liderAnterior->id);
+
+        $this->inscreverParticipante($visita, $novoLider, StatusParticipacao::Cancelado);
+
+        $this->actingAs($liderAnterior)
+            ->put(route('visitas.update', $visita), $this->payloadAtualizacao($novoLider))
+            ->assertRedirect(route('visitas.index'));
+
+        $this->assertDatabaseCount('visita_participante', 1);
+        $this->assertDatabaseHas('visita_participante', [
+            'visita_id'           => $visita->id,
+            'voluntario_id'       => $novoLider->id,
+            'status_participacao' => StatusParticipacao::Confirmado->value,
+        ]);
+    }
+
+    public function test_novo_lider_pode_exceder_limite_de_participantes(): void
+    {
+        $liderAnterior = $this->criarVoluntario();
+        $novoLider     = $this->criarVoluntario();
+        $visita        = $this->criarVisita($liderAnterior, liderId: $liderAnterior->id);
+
+        foreach (range(1, 5) as $_) {
+            $this->inscreverParticipante($visita, User::factory()->create());
+        }
+
+        $this->actingAs($liderAnterior)
+            ->put(route('visitas.update', $visita), $this->payloadAtualizacao($novoLider))
+            ->assertRedirect(route('visitas.index'));
+
+        $this->assertSame(6, VisitaParticipante::query()
+            ->where('visita_id', $visita->id)
+            ->where('status_participacao', StatusParticipacao::Confirmado->value)
+            ->count());
+    }
+
     private function criarVoluntario(): User
     {
         $cargo = Cargo::query()->firstOrCreate(
@@ -165,6 +252,32 @@ class VisitaUpdateTest extends TestCase
         $user->cargos()->syncWithoutDetaching([$cargo->id]);
 
         return $user->fresh('cargos');
+    }
+
+    private function payloadAtualizacao(User $lider): array
+    {
+        return [
+            'data'        => '2026-06-25',
+            'hora_inicio' => '09:00',
+            'hora_fim'    => '11:00',
+            'tipo'        => VisitaTipo::Hospital->value,
+            'lider_id'    => $lider->id,
+            'status'      => VisitaStatus::Agendada->value,
+        ];
+    }
+
+    private function inscreverParticipante(
+        Visita $visita,
+        User $user,
+        StatusParticipacao $status = StatusParticipacao::Confirmado,
+    ): VisitaParticipante {
+        return VisitaParticipante::query()->create([
+            'visita_id'           => $visita->id,
+            'voluntario_id'       => $user->id,
+            'tipo_participacao'   => TipoParticipacao::Palhaco->value,
+            'papel_na_visita'     => PapelNaVisita::Participante->value,
+            'status_participacao' => $status->value,
+        ]);
     }
 
     private function criarUsuarioComCargo(string $slug): User
