@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\EventoPresencaController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\MeuEventoController;
 use App\Http\Controllers\Web\ConviteCadastroController;
+use App\Http\Controllers\Web\RelatorioVisitaController;
 use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
 use App\Http\Controllers\Web\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
@@ -17,10 +18,8 @@ use App\Models\Patrocinador;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// URLs do site estático antigo (index.html, etc.)
 Route::redirect('/index.html', '/', 301);
 
-// HOME PAGE
 Route::get('/', function () {
     return Inertia::render('Home', [
         'patrocinadores' => Patrocinador::where('ativo', true)
@@ -29,39 +28,18 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-// Hospitais
 Route::get('/onde-atuamos', [OndeAtuamosController::class, 'index'])->name('onde_atuamos.index');
+Route::get('/conheça', fn () => Inertia::render('Conheca/Index'))->name('conheca.index');
+Route::get('/doacoes', fn () => Inertia::render('Doacao/Index'))->name('doacoes.index');
+Route::get('/fale-conosco', fn () => Inertia::render('FaleConosco/Index'))->name('fale_conosco.index');
 
-// Conheça
-Route::get('/conheça', function () {
-    return Inertia::render('Conheca/Index');
-})->name('conheca.index');
+Route::get('/convites/{token}', [ConviteCadastroController::class, 'show'])->name('convites.show');
+Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'concluir'])->name('convites.concluir');
 
-// Conheça
-Route::get('/doacoes', function () {
-    return Inertia::render('Doacao/Index');
-})->name('doacoes.index');
-
-// Fale Conosco
-Route::get('/fale-conosco', function () {
-    return Inertia::render('FaleConosco/Index');
-})->name('fale_conosco.index');
-
-Route::get('/convites/{token}', [ConviteCadastroController::class, 'show'])
-    ->name('convites.show');
-
-Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'concluir'])
-    ->name('convites.concluir');
-
-// AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard');
 
-    // Listas JSON
-    ROUTE::prefix('json')->name('json.')->group(function () {
-
+    Route::prefix('json')->name('json.')->group(function () {
         Route::get('cidades', [CidadeController::class, 'index'])->name('cidades.index');
     });
 
@@ -72,7 +50,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
     Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
 
-    // VISITAS
     Route::prefix('visitas')->name('visitas.')->group(function () {
         Route::get('/', [VisitaController::class, 'index'])->name('index');
         Route::get('create', [VisitaController::class, 'create'])->name('create');
@@ -80,14 +57,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{visita}/edit', [VisitaController::class, 'edit'])->name('edit');
         Route::put('{visita}', [VisitaController::class, 'update'])->name('update');
 
-        Route::post('{visita}/participantes', [VisitaParticipanteController::class, 'store'])
-            ->name('participantes.store');
+        Route::prefix('{visita}/relatorios')->scopeBindings()->name('relatorios.')->group(function () {
+            Route::get('/', [RelatorioVisitaController::class, 'index'])->name('index');
+            Route::get('/create', [RelatorioVisitaController::class, 'create'])->name('create');
+            Route::post('/', [RelatorioVisitaController::class, 'store'])->name('store');
+            Route::get('/{relatorio}/edit', [RelatorioVisitaController::class, 'edit'])->name('edit');
+            Route::put('/{relatorio}', [RelatorioVisitaController::class, 'update'])->name('update');
+            Route::get('/{relatorio}', [RelatorioVisitaController::class, 'show'])->name('show');
+        });
 
-        Route::delete('{visita}/participantes/{participante}', [VisitaParticipanteController::class, 'destroy'])
-            ->name('participantes.destroy');
+        Route::post('{visita}/participantes', [VisitaParticipanteController::class, 'store'])->name('participantes.store');
+        Route::delete('{visita}/participantes/{participante}', [VisitaParticipanteController::class, 'destroy'])->name('participantes.destroy');
     });
 
-    // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
         Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
         Route::get('/eventos/{evento}/edit', [EventoController::class, 'edit'])->name('eventos.edit');
@@ -95,24 +77,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/eventos/{evento}/cancelar', [EventoController::class, 'cancelar'])->name('eventos.cancelar');
         Route::delete('/eventos/{evento}', [EventoController::class, 'destroy'])->name('eventos.destroy');
 
-        // VOLUNTARIOS
-        Route::post('/voluntarios/convite', [VoluntarioController::class, 'storeConvite'])
-            ->name('voluntarios.convite.store');
-
-        Route::post('/voluntarios/{voluntario}/reenviar-convite', [VoluntarioController::class, 'reenviarConvite'])
-            ->name('voluntarios.convite.reenviar');
-
-        Route::delete('/voluntarios/{voluntario}/convite', [VoluntarioController::class, 'cancelarConvite'])
-            ->name('voluntarios.convite.cancelar');
-
-        Route::resource('/voluntarios', VoluntarioController::class)
-            ->parameters(['voluntarios' => 'voluntario'])
-            ->except(['show']);
-
-        // Hospitais
+        Route::post('/voluntarios/convite', [VoluntarioController::class, 'storeConvite'])->name('voluntarios.convite.store');
+        Route::post('/voluntarios/{voluntario}/reenviar-convite', [VoluntarioController::class, 'reenviarConvite'])->name('voluntarios.convite.reenviar');
+        Route::delete('/voluntarios/{voluntario}/convite', [VoluntarioController::class, 'cancelarConvite'])->name('voluntarios.convite.cancelar');
+        Route::resource('/voluntarios', VoluntarioController::class)->parameters(['voluntarios' => 'voluntario'])->except(['show']);
         Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
-
-        // patrocinadores
         Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
     });
 
