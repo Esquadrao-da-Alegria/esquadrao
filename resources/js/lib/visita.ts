@@ -5,14 +5,14 @@ export const LIMITE_PARTICIPANTES = 5
 
 const STATUS_ATIVOS = ['confirmado', 'pendente']
 
-function listaAtivos(visita: Visita) {
+export function listarParticipantesAtivos(visita: Visita): VisitaParticipante[] {
     return visita.participantes?.filter(
         (p) => p.papel_na_visita === 'participante' && STATUS_ATIVOS.includes(p.status_participacao),
     ) ?? []
 }
 
 export function contarParticipantesAtivos(visita: Visita): number {
-    return listaAtivos(visita).length
+    return listarParticipantesAtivos(visita).length
 }
 
 export function visitaAtingiuLimite(visita: Visita): boolean {
@@ -20,11 +20,11 @@ export function visitaAtingiuLimite(visita: Visita): boolean {
 }
 
 export function usuarioJaInscrito(visita: Visita, usuarioId: number): boolean {
-    return listaAtivos(visita).some((p) => p.voluntario_id === usuarioId)
+    return listarParticipantesAtivos(visita).some((p) => p.voluntario_id === usuarioId)
 }
 
 export function participacaoAtivaDoUsuario(visita: Visita, usuarioId: number): VisitaParticipante | null {
-    return listaAtivos(visita).find((p) => p.voluntario_id === usuarioId) ?? null
+    return listarParticipantesAtivos(visita).find((p) => p.voluntario_id === usuarioId) ?? null
 }
 
 export function usuarioEhLiderDaVisita(visita: Visita, usuarioId: number): boolean {
@@ -32,7 +32,7 @@ export function usuarioEhLiderDaVisita(visita: Visita, usuarioId: number): boole
 }
 
 export function contarParticipantes(visita: Visita) {
-    const lista = visita.participantes?.filter((p) => p.papel_na_visita === 'participante') ?? []
+    const lista = listarParticipantesAtivos(visita)
 
     return {
         palhaco: lista.filter((p) => p.tipo_participacao === 'palhaco').length,

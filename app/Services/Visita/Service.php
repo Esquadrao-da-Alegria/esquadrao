@@ -121,7 +121,25 @@ class Service
                 return $this->erroEnvelope('O horário de fim deve ser posterior ao início.');
             }
 
-            $retorno = $this->queries->update($visita->id, $payload);
+            DB::beginTransaction();
+
+            try {
+                $retorno = $this->queries->update($visita->id, $payload);
+
+                if (! $retorno['sucesso']) {
+                    DB::rollBack();
+
+                    return $retorno;
+                }
+
+                $this->garantirParticipacaoDoLider($visita->id, $payload['lider_id']);
+
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollBack();
+
+                throw $th;
+            }
 
             if ($retorno['sucesso']) {
                 session()->flash('mensagem_sucesso', 'Visita atualizada com sucesso!');
@@ -133,6 +151,35 @@ class Service
 
             return $this->erroEnvelope(formatarMensagemErro($th));
         }
+    }
+
+    private function garantirParticipacaoDoLider(int $visitaId, int $liderId): void
+    {
+        $participacao = VisitaParticipante::query()
+            ->where('visita_id', $visitaId)
+            ->where('voluntario_id', $liderId)
+            ->first();
+
+        if ($participacao) {
+            if (! in_array($participacao->status_participacao, [
+                StatusParticipacao::Confirmado,
+                StatusParticipacao::Pendente,
+            ], true)) {
+                $participacao->update([
+                    'status_participacao' => StatusParticipacao::Confirmado->value,
+                ]);
+            }
+
+            return;
+        }
+
+        VisitaParticipante::query()->create([
+            'visita_id'           => $visitaId,
+            'voluntario_id'       => $liderId,
+            'tipo_participacao'   => TipoParticipacao::Palhaco->value,
+            'papel_na_visita'     => PapelNaVisita::Participante->value,
+            'status_participacao' => StatusParticipacao::Confirmado->value,
+        ]);
     }
 
     private function formatarDatabase(array $dados, string $acao): array

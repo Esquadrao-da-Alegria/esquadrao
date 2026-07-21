@@ -12,6 +12,7 @@ export interface EventoFormValues {
     data: string
     hora_inicio: string
     data_fim: string
+    sem_hora_fim: boolean
     hora_fim: string
     limite_inscricao_data: string
     limite_inscricao_hora: string
@@ -149,17 +150,33 @@ const Form: FC<Props> = ({ data, errors, responsaveis, cidades, onFieldChange })
                     {errors.data_fim ? <p className="mt-1 text-sm text-red-600">{errors.data_fim}</p> : null}
                 </div>
                 <div>
-                    <label htmlFor="hora_fim" className={painelLabelClass}>Horário fim</label>
-                    <input
-                        type="time"
-                        id="hora_fim"
-                        name="hora_fim"
-                        value={data.hora_fim}
-                        onChange={(e) => onFieldChange('hora_fim', e.target.value)}
-                        className={painelInputClass}
-                    />
-                    <p className="mt-1 text-xs text-gray-500">Se vazio, será usado 23:59.</p>
-                    {errors.hora_fim ? <p className="mt-1 text-sm text-red-600">{errors.hora_fim}</p> : null}
+                    {!data.sem_hora_fim && (
+                        <>
+                            <label htmlFor="hora_fim" className={painelLabelClass}>Horário fim *</label>
+                            <input
+                                type="time"
+                                id="hora_fim"
+                                name="hora_fim"
+                                required
+                                value={data.hora_fim}
+                                onChange={(e) => onFieldChange('hora_fim', e.target.value)}
+                                className={painelInputClass}
+                            />
+                            {errors.hora_fim ? <p className="mt-1 text-sm text-red-600">{errors.hora_fim}</p> : null}
+                        </>
+                    )}
+                    <label className="mt-2 flex cursor-pointer items-center gap-2">
+                        <input
+                            type="checkbox"
+                            checked={data.sem_hora_fim}
+                            onChange={(e) => {
+                                onFieldChange('sem_hora_fim', e.target.checked)
+                                if (e.target.checked) onFieldChange('hora_fim', '')
+                            }}
+                            className="h-4 w-4 cursor-pointer accent-amber-600"
+                        />
+                        <span className="text-sm text-gray-600">Sem horário final</span>
+                    </label>
                 </div>
             </div>
 

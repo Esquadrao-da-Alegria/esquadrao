@@ -1,4 +1,5 @@
 import PainelLayout from '@/layouts/PainelLayout'
+import { labelStatus, labelTipo } from '@/lib/evento'
 import { type Evento, type EventoParticipante, type SharedData } from '@/types'
 import { Link, router, usePage } from '@inertiajs/react'
 import { ArrowLeft, Settings, Trash2, UserCheck, UserX, Users } from 'lucide-react'
@@ -132,12 +133,14 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
   const agora = new Date()
   const jaComecou = new Date(evento.data_inicio) < agora
   const limitePassou = evento.limite_inscricao ? new Date(evento.limite_inscricao) < agora : false
+  const lotado = evento.limite_participantes !== null && (evento.participantes_ativos_count ?? 0) >= evento.limite_participantes
   const temParticipantes = (evento.participantes_ativos_count ?? 0) > 0
   const podeFinalizar = pode_gerenciar && evento.status === 'agendado' && jaComecou
   const podeRegistrarPresenca = pode_gerenciar && evento.status !== 'cancelado'
   const podeEditar = props.eh_administrador && evento.status === 'agendado'
   const podeCancelar = props.eh_administrador && evento.status === 'agendado'
-  const podeInscrever = evento.status === 'agendado' && !jaComecou && !limitePassou
+  const podeInscrever = evento.status === 'agendado' && !jaComecou && !limitePassou && !lotado
+  const podeCancelarInscricao = inscrito && evento.status === 'agendado' && !jaComecou && !presenca_marcada
   const podeExcluir = props.eh_administrador && !temParticipantes
 
   return (
@@ -158,10 +161,10 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
                 <h1 className="text-2xl font-semibold tracking-tight text-amber-950 sm:text-3xl">{evento.titulo}</h1>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide ${badgeStatus[evento.status] ?? ''}`}>
-                    {evento.status}
+                    {labelStatus(evento.status)}
                   </span>
                   <span className="inline-flex rounded-full border border-amber-100 bg-amber-50 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-amber-700">
-                    {evento.tipo}
+                    {labelTipo(evento.tipo)}
                   </span>
                 </div>
               </div>
@@ -219,7 +222,7 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
             )}
 
             {/* Inscrição */}
-            {(podeInscrever || inscrito) && (
+            {(podeInscrever || podeCancelarInscricao || inscrito || (evento.status === 'agendado' && !inscrito)) && (
               <div className="border-t border-amber-50 pt-5 flex items-center gap-3 flex-wrap">
                 {podeInscrever && !inscrito && (
                   <button
@@ -230,7 +233,12 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
                     Participar do evento
                   </button>
                 )}
-                {inscrito && podeInscrever && !presenca_marcada && (
+                {!inscrito && evento.status === 'agendado' && !podeInscrever && (
+                  <span className="text-sm text-amber-900/60">
+                    {lotado ? 'Vagas esgotadas.' : limitePassou ? 'Prazo de inscrições encerrado.' : 'Evento já iniciado.'}
+                  </span>
+                )}
+                {podeCancelarInscricao && (
                   <button
                     className="cursor-pointer inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-600 transition hover:bg-gray-50"
                     onClick={() => router.delete(`/eventos/${evento.id}/inscricao`)}

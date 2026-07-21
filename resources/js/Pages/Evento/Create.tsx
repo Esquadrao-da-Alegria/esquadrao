@@ -22,7 +22,7 @@ function montarPayload(data: EventoFormValues) {
         local: data.local || null,
         cidade_id: data.cidade_id ? Number(data.cidade_id) : null,
         data_inicio: montarDatetime(data.data, data.hora_inicio),
-        data_fim: montarDatetime(data.data_fim, data.hora_fim || '23:59'),
+        data_fim: montarDatetime(data.data_fim, data.sem_hora_fim ? '23:59' : data.hora_fim),
         limite_inscricao: data.limite_inscricao_data
             ? montarDatetime(data.limite_inscricao_data, data.limite_inscricao_hora || '23:59')
             : null,
@@ -42,6 +42,7 @@ const Create: FC<Props> = ({ responsaveis, cidades }) => {
         data: hoje,
         hora_inicio: '',
         data_fim: hoje,
+        sem_hora_fim: true,
         hora_fim: '',
         limite_inscricao_data: '',
         limite_inscricao_hora: '',
@@ -56,6 +57,11 @@ const Create: FC<Props> = ({ responsaveis, cidades }) => {
     const handleSubmit = () => {
         if (!data.titulo || !data.tipo || !data.cidade_id || !data.data || !data.hora_inicio || !data.data_fim) {
             toast.error('Preencha todos os campos obrigatórios.')
+            return
+        }
+
+        if (!data.sem_hora_fim && !data.hora_fim) {
+            toast.error('Informe o horário de fim ou marque "Sem horário final".')
             return
         }
 
