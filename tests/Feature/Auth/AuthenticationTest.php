@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
@@ -30,6 +31,27 @@ class AuthenticationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_user_with_linked_volunteer_can_access_dashboard_after_login(): void
+    {
+        $voluntario = Voluntario::query()->create([
+            'nome_completo' => 'Voluntário Teste',
+            'email'         => 'voluntario@test.com',
+            'status'        => User::STATUS_ATIVO,
+        ]);
+
+        $user = User::factory()->create([
+            'voluntario_id' => $voluntario->id,
+            'status'        => User::STATUS_ATIVO,
+        ]);
+
+        $this->post(route('login.store'), [
+            'email'    => $user->email,
+            'password' => 'password',
+        ])->assertRedirect(route('dashboard', absolute: false));
+
+        $this->get(route('dashboard'))->assertOk();
     }
 
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()

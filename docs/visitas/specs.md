@@ -50,6 +50,7 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 
 7. **Limite de participantes**  
    Máximo 5 inscrições ativas por visita (`papel_na_visita = participante`, `status_participacao ∈ {confirmado, pendente}`).
+   A troca de líder é exceção: o novo líder deve ser incluído como participante confirmado mesmo que isso exceda temporariamente o limite.
 
 8. **Inscrição self-service**  
    Voluntário autenticado e **ativo** com `voluntario_id` preenchido pode se inscrever em visita `agendada` via modal do calendário.
@@ -60,14 +61,23 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 10. **Participante automático na criação**  
     Ao criar visita (`store`), o service insere na mesma transaction uma linha em `visita_participante` para o `lider_id`: `papel_na_visita = participante`, `tipo_participacao = palhaco`, `status_participacao = confirmado` (via `create`, não `firstOrCreate`).
 
-11. **Cancelamento lógico de inscrição**  
+11. **Participante automático na troca de líder**  
+    Ao atualizar a visita com outro `lider_id`, o service garante na mesma transaction que o novo líder tenha participação ativa. Se não houver inscrição, cria uma participação confirmada do tipo `palhaco`; se houver participação cancelada ou marcada como falta, reativa como confirmada. O líder anterior permanece participante e pode cancelar a própria inscrição após a troca.
+
+12. **Cancelamento lógico de inscrição**  
     `DELETE participantes` não remove a linha — atualiza `status_participacao = cancelado`. Participante pode auto-cancelar, exceto o líder atual (deve trocar o líder antes). Gestores com `podeEditarVisita` podem cancelar qualquer participante.
 
-12. **Reativação de inscrição cancelada**  
+13. **Reativação de inscrição cancelada**  
     Nova inscrição self-service reutiliza a linha existente `(visita_id, voluntario_id)` via `update`, reativando com `status_participacao = confirmado` e novo `tipo_participacao`.
 
-13. **Erro seguro ao validar vagas**  
+14. **Erro seguro ao validar vagas**  
     Falha ao consultar participantes ativos retorna: `Não foi possível validar as vagas desta visita. Tente novamente.` — nunca assume zero vagas ocupadas.
+
+15. **Hospital e ala na edição**  
+    `hospital_id` e `ala_unidade_id` não podem ser alterados após a criação da visita. Os campos permanecem somente para consulta no formulário de edição.
+
+16. **Participantes no modal de detalhes**  
+    O modal lista nominalmente apenas participantes ativos (`confirmado` ou `pendente`) e não inclui inscrições canceladas ou faltas na listagem e na contagem.
 
 ---
 
