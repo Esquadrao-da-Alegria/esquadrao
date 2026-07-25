@@ -10,6 +10,7 @@ use App\Queries\Visita\Relatorio\Queries;
 use App\Services\Visita\Service as VisitaService;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Facades\Pdf;
@@ -25,9 +26,25 @@ class Service
     public function index(Visita $visita): array
     {
         try {
-            return $this->queries->index($visita->id);
+            $retornoDatabase = $this->queries->index($visita->id);
+
+            if (! $retornoDatabase['sucesso']) {
+                $this->logarErro(
+                    $this->payloadLogErro($visita->id),
+                    'listar',
+                    $retornoDatabase['erros'][0] ?? 'Erro desconhecido',
+                );
+
+                return $retornoDatabase;
+            }
+
+            return $retornoDatabase;
         } catch (\Throwable $th) {
-            $this->logarErro(['visita_id' => $visita->id], 'listar', formatarMensagemErro($th));
+            $this->logarErro(
+                $this->payloadLogErro($visita->id),
+                'listar',
+                formatarMensagemErro($th),
+            );
 
             return $this->erro(formatarMensagemErro($th));
         }
@@ -40,18 +57,25 @@ class Service
                 return $this->erro('Relatório não pertence a esta visita.');
             }
 
-            $retorno = $this->queries->show($relatorio->id);
+            $retornoDatabase = $this->queries->show($relatorio->id);
 
-            if (! $retorno['sucesso']) {
-                return $retorno;
+            if (! $retornoDatabase['sucesso']) {
+                $this->logarErro(
+                    $this->payloadLogErro($visita->id, $relatorio->id, $relatorio->autor_id),
+                    'exibir',
+                    $retornoDatabase['erros'][0] ?? 'Erro desconhecido',
+                );
+
+                return $retornoDatabase;
             }
 
-            return $retorno;
+            return $retornoDatabase;
         } catch (\Throwable $th) {
-            $this->logarErro([
-                'visita_id'    => $visita->id,
-                'relatorio_id' => $relatorio->id,
-            ], 'exibir', formatarMensagemErro($th));
+            $this->logarErro(
+                $this->payloadLogErro($visita->id, $relatorio->id, $relatorio->autor_id),
+                'exibir',
+                formatarMensagemErro($th),
+            );
 
             return $this->erro(formatarMensagemErro($th));
         }
@@ -59,16 +83,42 @@ class Service
 
     public function store(Visita $visita, array $dados): array
     {
+        DB::beginTransaction();
+
         try {
             if ($visita->status === VisitaStatus::Cancelada) {
+                DB::rollBack();
+
                 return $this->erro('Não é possível criar relatório para visita cancelada.');
             }
 
             $payload = $this->formatarDatabase($visita, $dados, 'store');
 
-            return $this->queries->store($payload);
+            $retornoDatabase = $this->queries->store($payload);
+
+            if (! $retornoDatabase['sucesso']) {
+                DB::rollBack();
+
+                $this->logarErro(
+                    $this->payloadLogErro($visita->id, null, Auth::id()),
+                    'criar',
+                    $retornoDatabase['erros'][0] ?? 'Erro desconhecido',
+                );
+
+                return $retornoDatabase;
+            }
+
+            DB::commit();
+
+            return $retornoDatabase;
         } catch (\Throwable $th) {
-            $this->logarErro(['visita_id' => $visita->id, ...$dados], 'criar', formatarMensagemErro($th));
+            DB::rollBack();
+
+            $this->logarErro(
+                $this->payloadLogErro($visita->id, null, Auth::id()),
+                'criar',
+                formatarMensagemErro($th),
+            );
 
             return $this->erro(formatarMensagemErro($th));
         }
@@ -76,28 +126,54 @@ class Service
 
     public function update(Visita $visita, VisitaRelatorio $relatorio, array $dados, User $user): array
     {
+        DB::beginTransaction();
+
         try {
             if ((int) $relatorio->visita_id !== (int) $visita->id) {
+                DB::rollBack();
+
                 return $this->erro('Relatório não pertence a esta visita.');
             }
 
             if ($visita->status === VisitaStatus::Cancelada) {
+                DB::rollBack();
+
                 return $this->erro('Não é possível editar relatório de visita cancelada.');
             }
 
             if (! $this->podeEditarRelatorio($user, $visita, $relatorio)) {
+                DB::rollBack();
+
                 return $this->erro('Você não tem permissão para editar este relatório.');
             }
 
             $payload = $this->formatarDatabase($visita, $dados, 'update');
 
-            return $this->queries->update($relatorio->id, $payload);
+            $retornoDatabase = $this->queries->update($relatorio->id, $payload);
+
+            if (! $retornoDatabase['sucesso']) {
+                DB::rollBack();
+
+                $this->logarErro(
+                    $this->payloadLogErro($visita->id, $relatorio->id, $relatorio->autor_id),
+                    'atualizar',
+                    $retornoDatabase['erros'][0] ?? 'Erro desconhecido',
+                );
+
+                return $retornoDatabase;
+            }
+
+            DB::commit();
+
+            return $retornoDatabase;
         } catch (\Throwable $th) {
-            $this->logarErro([
-                'visita_id'    => $visita->id,
-                'relatorio_id' => $relatorio->id,
-                ...$dados,
-            ], 'atualizar', formatarMensagemErro($th));
+            DB::rollBack();
+
+            $this->logarErro(
+                $this->payloadLogErro($visita->id, $relatorio->id, $relatorio->autor_id),
+                'atualizar',
+                formatarMensagemErro($th),
+            );
 
             return $this->erro(formatarMensagemErro($th));
         }
@@ -182,6 +258,25 @@ class Service
     private function erro(string $mensagem): array
     {
         return ['sucesso' => false, 'dados' => [], 'erros' => [$mensagem]];
+    }
+
+    private function payloadLogErro(?int $visitaId = null, ?int $relatorioId = null, ?int $autorId = null): array
+    {
+        $payload = [];
+
+        if ($visitaId !== null) {
+            $payload['visita_id'] = $visitaId;
+        }
+
+        if ($relatorioId !== null) {
+            $payload['relatorio_id'] = $relatorioId;
+        }
+
+        if ($autorId !== null) {
+            $payload['autor_id'] = $autorId;
+        }
+
+        return $payload;
     }
 
     private function logarErro(array $dados, string $acao, string $mensagemErro): void

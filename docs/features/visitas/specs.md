@@ -387,6 +387,13 @@ Camadas create/edit: `VisitaController` → `Visita\Form\Service` (props Inertia
 
 Camadas participantes: `VisitaParticipanteController` → `Visita\Participante\Service` → `Visita\Participante\Queries`
 
+### Logs de erro (`Visita\Service`)
+
+- Queries retornam o envelope; o Service grava em `$retornoDatabase`, valida `sucesso` e, se falso, chama `logarErro` antes de devolver o envelope (mantém rollback/flash onde já existem).
+- Exceptions no Service também passam por `logarErro`.
+- Payload do log via `payloadLogErro`: `visita_id` (quando existir) mais contexto operacional (`lider_id`, `hospital_id`, `ala_unidade_id`, `criado_por_id`, `status`, `tipo`, `origem`, `inicio_em`, `fim_em`, filtros de listagem) — **nunca** o conteúdo de campos de texto (ex.: `observacoes`).
+- Detalhe técnico do erro: mensagem da query (`erros[0]`) ou `formatarMensagemErro($th)`.
+
 ---
 
 ## Permissões de edição

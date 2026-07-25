@@ -23,14 +23,26 @@ class Service
     public function index(array $filtros): array
     {
         try {
-            $retorno = $this->queries->index($filtros);
+            $retornoDatabase = $this->queries->index($filtros);
 
-            if (!$retorno['sucesso']) {
+            if (! $retornoDatabase['sucesso']) {
+                $this->logarErro(
+                    $this->payloadLogErro(null, $filtros),
+                    'listar',
+                    $retornoDatabase['erros'][0] ?? 'Erro desconhecido',
+                );
+
                 session()->flash('mensagem_erro', 'Erro ao listar visitas!');
             }
 
-            return $retorno;
+            return $retornoDatabase;
         } catch (\Throwable $th) {
+            $this->logarErro(
+                $this->payloadLogErro(null, $filtros),
+                'listar',
+                formatarMensagemErro($th),
+            );
+
             return [
                 'sucesso' => false,
                 'dados'   => [],
@@ -65,48 +77,57 @@ class Service
 
     public function store(array $dados): array
     {
+        DB::beginTransaction();
+
+        $contextoLog = [];
+
         try {
-            $payload = $this->formatarDatabase($dados, 'store');
+            $payload     = $this->formatarDatabase($dados, 'store');
+            $contextoLog = $payload;
 
             if (Carbon::parse($payload['fim_em'])->lte(Carbon::parse($payload['inicio_em']))) {
+                DB::rollBack();
+
                 return $this->erroEnvelope('O horário de fim deve ser posterior ao início.');
             }
 
-            DB::beginTransaction();
+            $retornoDatabase = $this->queries->store($payload);
 
-            try {
-                $retorno = $this->queries->store($payload);
-
-                if (! $retorno['sucesso']) {
-                    DB::rollBack();
-
-                    return $retorno;
-                }
-
-                $visita = $retorno['dados']['model'];
-
-                VisitaParticipante::query()->create([
-                    'visita_id'           => $visita->id,
-                    'voluntario_id'       => $payload['lider_id'],
-                    'tipo_participacao'   => TipoParticipacao::Palhaco->value,
-                    'papel_na_visita'     => PapelNaVisita::Participante->value,
-                    'status_participacao' => StatusParticipacao::Confirmado->value,
-                ]);
-
-                DB::commit();
-            } catch (\Throwable $th) {
+            if (! $retornoDatabase['sucesso']) {
                 DB::rollBack();
 
-                throw $th;
+                $this->logarErro(
+                    $this->payloadLogErro(null, $contextoLog),
+                    'criar',
+                    $retornoDatabase['erros'][0] ?? 'Erro desconhecido',
+                );
+
+                return $retornoDatabase;
             }
 
-            if ($retorno['sucesso']) {
-                session()->flash('mensagem_sucesso', 'Visita cadastrada com sucesso!');
-            }
+            $visita = $retornoDatabase['dados']['model'];
 
-            return $retorno;
+            VisitaParticipante::query()->create([
+                'visita_id'           => $visita->id,
+                'voluntario_id'       => $payload['lider_id'],
+                'tipo_participacao'   => TipoParticipacao::Palhaco->value,
+                'papel_na_visita'     => PapelNaVisita::Participante->value,
+                'status_participacao' => StatusParticipacao::Confirmado->value,
+            ]);
+
+            DB::commit();
+
+            session()->flash('mensagem_sucesso', 'Visita cadastrada com sucesso!');
+
+            return $retornoDatabase;
         } catch (\Throwable $th) {
-            $this->logarErro($dados, 'criar', formatarMensagemErro($th));
+            DB::rollBack();
+
+            $this->logarErro(
+                $this->payloadLogErro(null, $contextoLog),
+                'criar',
+                formatarMensagemErro($th),
+            );
 
             return $this->erroEnvelope(formatarMensagemErro($th));
         }
@@ -114,40 +135,49 @@ class Service
 
     public function update(Visita $visita, array $dados): array
     {
+        DB::beginTransaction();
+
+        $contextoLog = [];
+
         try {
-            $payload = $this->formatarDatabase($dados, 'update');
+            $payload     = $this->formatarDatabase($dados, 'update');
+            $contextoLog = $payload;
 
             if (Carbon::parse($payload['fim_em'])->lte(Carbon::parse($payload['inicio_em']))) {
+                DB::rollBack();
+
                 return $this->erroEnvelope('O horário de fim deve ser posterior ao início.');
             }
 
-            DB::beginTransaction();
+            $retornoDatabase = $this->queries->update($visita->id, $payload);
 
-            try {
-                $retorno = $this->queries->update($visita->id, $payload);
-
-                if (! $retorno['sucesso']) {
-                    DB::rollBack();
-
-                    return $retorno;
-                }
-
-                $this->garantirParticipacaoDoLider($visita->id, $payload['lider_id']);
-
-                DB::commit();
-            } catch (\Throwable $th) {
+            if (! $retornoDatabase['sucesso']) {
                 DB::rollBack();
 
-                throw $th;
+                $this->logarErro(
+                    $this->payloadLogErro($visita->id, $contextoLog),
+                    'atualizar',
+                    $retornoDatabase['erros'][0] ?? 'Erro desconhecido',
+                );
+
+                return $retornoDatabase;
             }
 
-            if ($retorno['sucesso']) {
-                session()->flash('mensagem_sucesso', 'Visita atualizada com sucesso!');
-            }
+            $this->garantirParticipacaoDoLider($visita->id, $payload['lider_id']);
 
-            return $retorno;
+            DB::commit();
+
+            session()->flash('mensagem_sucesso', 'Visita atualizada com sucesso!');
+
+            return $retornoDatabase;
         } catch (\Throwable $th) {
-            $this->logarErro(['visita_id' => $visita->id, ...$dados], 'atualizar', formatarMensagemErro($th));
+            DB::rollBack();
+
+            $this->logarErro(
+                $this->payloadLogErro($visita->id, $contextoLog),
+                'atualizar',
+                formatarMensagemErro($th),
+            );
 
             return $this->erroEnvelope(formatarMensagemErro($th));
         }
@@ -218,6 +248,37 @@ class Service
     private function erroEnvelope(string $mensagem): array
     {
         return ['sucesso' => false, 'dados' => [], 'erros' => [$mensagem]];
+    }
+
+    private function payloadLogErro(?int $visitaId = null, array $contexto = []): array
+    {
+        $payload = [];
+
+        if ($visitaId !== null) {
+            $payload['visita_id'] = $visitaId;
+        }
+
+        $camposPermitidos = [
+            'lider_id',
+            'hospital_id',
+            'ala_unidade_id',
+            'criado_por_id',
+            'status',
+            'tipo',
+            'origem',
+            'inicio_em',
+            'fim_em',
+            'mes',
+            'id',
+        ];
+
+        foreach ($camposPermitidos as $campo) {
+            if (array_key_exists($campo, $contexto)) {
+                $payload[$campo] = $contexto[$campo];
+            }
+        }
+
+        return $payload;
     }
 
     private function logarErro(array $dados, string $acao, string $mensagemErro): void

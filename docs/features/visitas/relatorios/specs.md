@@ -87,6 +87,13 @@ Envelope padrão: `['sucesso' => bool, 'dados' => ..., 'erros' => []]`.
 - `store` → bloqueia visita cancelada; define `autor_id`, `enviado_em`, `fora_do_prazo`
 - `pdf` → valida pertencimento; gera download síncrono via Spatie Laravel PDF
 
+### Logs de erro
+
+- Queries retornam o envelope; o Service grava em `$retornoDatabase`, valida `sucesso` e, se falso, chama `logarErro` antes de devolver o envelope.
+- Exceptions no Service também passam por `logarErro`.
+- Payload do log via `payloadLogErro`: somente `visita_id`, `relatorio_id` e `autor_id` (quando existirem) — **nunca** resumo, feedback nem observações.
+- Detalhe técnico do erro: mensagem da query (`erros[0]`) ou `formatarMensagemErro($th)`.
+
 ### Route model binding
 
 Grupo `visitas.{visita}.relatorios.*` usa `scopeBindings()` — `{relatorio}` deve pertencer à `{visita}`.
