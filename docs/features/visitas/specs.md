@@ -44,6 +44,7 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 
 5. **Políticas de exclusão (onDelete)**  
    - **restrict:** `hospital_id`, `criado_por_id`, `voluntario_id` — não é possível excluir hospital/user com visitas ou participações vinculadas. Preferir inativar no service.  
+   - **restrict:** `visita_id` em `visitas_relatorios` — não é possível excluir fisicamente visita que possui relatório(s); relatórios são histórico.  
    - **nullOnDelete:** `ala_unidade_id`, `lider_id` — FK vira `null` se o registro referenciado for removido.  
    - **cascade:** `visita_id` em `visita_participante` — excluir visita remove participantes.
 

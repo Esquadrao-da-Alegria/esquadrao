@@ -28,6 +28,7 @@ Documento de referência do submódulo **relatórios** vinculados a uma visita. 
 9. **Contexto da visita** — Hospital, datas, líder, ala cadastrada na visita e participantes são **read-only** na UI e no PDF (não persistidos no relatório).
 10. **Ala do relatório** — Campo opcional `ala_unidade_id` (FK → `alas_hospitais`), independente da ala da visita; exibido na seção do relatório (UI e PDF).
 11. **Sem destroy** — Não há rota nem query `destroy` nesta v1.
+12. **Histórico preservado** — Relatórios impedem exclusão física da visita (`visita_id` com `restrictOnDelete`). Visita com relatório(s) não pode ser removida do banco; o histórico não desaparece em cascata.
 
 ---
 
@@ -40,7 +41,7 @@ Migration: `2026_07_19_135423_create_visitas_relatorios_table.php`
 | Coluna | Descrição |
 |--------|-----------|
 | `id` | PK |
-| `visita_id` | FK → `visitas` (cascadeOnDelete) |
+| `visita_id` | FK → `visitas` (restrictOnDelete) |
 | `autor_id` | FK → `users` (restrictOnDelete) |
 | `tipo_relatorio` | `palhaco` \| `paisana` \| `geral` |
 | `ala_unidade_id` | FK → `alas_hospitais.id` (nullable, nullOnDelete) |
@@ -174,6 +175,7 @@ Botão desabilitado com estado local `baixando` enquanto a navegação para a ro
 | `tests/Feature/Visita/Relatorio/RelatorioUpdateTest.php` | Permissões de edição |
 | `tests/Feature/Visita/Relatorio/RelatorioIndexShowTest.php` | Index/show, cancelada |
 | `tests/Feature/Visita/Relatorio/RelatorioPdfTest.php` | PDF com `Pdf::fake()` |
+| `tests/Feature/Visita/Relatorio/RelatorioExclusaoVisitaTest.php` | Visita com relatório não pode ser excluída fisicamente |
 
 ```bash
 vendor/bin/sail artisan test --compact --filter=Relatorio
