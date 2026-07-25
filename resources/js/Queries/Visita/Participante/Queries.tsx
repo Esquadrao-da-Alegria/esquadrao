@@ -32,7 +32,7 @@ export class Queries {
 
             const retorno = await fetch(url, options)
 
-            return await retorno.json()
+            return await this.processarRetorno(retorno, 'Erro ao participar da visita!')
         } catch (error) {
             console.error(error)
 
@@ -55,11 +55,25 @@ export class Queries {
 
             const retorno = await fetch(url, options)
 
-            return await retorno.json()
+            return await this.processarRetorno(retorno, 'Erro ao cancelar inscrição!')
         } catch (error) {
             console.error(error)
 
             return { sucesso: false, dados: [], erros: ['Erro ao cancelar inscrição!'] }
         }
+    }
+
+    private static async processarRetorno(retorno: Response, mensagemPadrao: string): Promise<RetornoPadrao> {
+        try {
+            const dados = await retorno.json() as RetornoPadrao
+
+            if (typeof dados.sucesso === 'boolean' && Array.isArray(dados.erros)) {
+                return dados
+            }
+        } catch {
+            return { sucesso: false, dados: [], erros: [mensagemPadrao] }
+        }
+
+        return { sucesso: false, dados: [], erros: [mensagemPadrao] }
     }
 }

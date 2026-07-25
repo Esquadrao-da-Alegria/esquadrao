@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import {
     contarParticipantes,
     labelStatus,
+    listarParticipantesAtivos,
     participacaoAtivaDoUsuario,
     podeEditarVisita,
     usuarioEhLiderDaVisita,
@@ -32,6 +33,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
     const [cancelando, setCancelando] = useState(false)
 
     const participantes = visita ? contarParticipantes(visita) : null
+    const participantesAtivos = visita ? listarParticipantesAtivos(visita) : []
     const jaInscrito = visita ? usuarioJaInscrito(visita, auth.user.id) : false
     const participacaoAtiva = visita ? participacaoAtivaDoUsuario(visita, auth.user.id) : null
     const ehLider = visita ? usuarioEhLiderDaVisita(visita, auth.user.id) : false
@@ -174,13 +176,23 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                         <div>
                             <dt className="text-xs font-medium uppercase text-gray-400">Participantes</dt>
                             <dd className="mt-0.5 text-gray-700">
-                                {participantes && participantes.palhaco > 0 && (
-                                    <span className="mr-2">🎪 {participantes.palhaco} palhaço{participantes.palhaco !== 1 ? 's' : ''}</span>
+                                {participantesAtivos.length > 0 ? (
+                                    <ul className="space-y-1">
+                                        {participantesAtivos.map((participante) => (
+                                            <li key={participante.id ?? participante.voluntario_id}>
+                                                {participante.tipo_participacao === 'palhaco' ? '🎪' : '👔'}{' '}
+                                                {participante.voluntario?.name ?? '—'}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : '—'}
+                                {participantes && participantesAtivos.length > 0 && (
+                                    <span className="mt-1 block text-xs text-gray-400">
+                                        {participantes.palhaco} palhaço{participantes.palhaco !== 1 ? 's' : ''}
+                                        {' · '}
+                                        {participantes.paisana} paisana{participantes.paisana !== 1 ? 's' : ''}
+                                    </span>
                                 )}
-                                {participantes && participantes.paisana > 0 && (
-                                    <span>👔 {participantes.paisana} paisana{participantes.paisana !== 1 ? 's' : ''}</span>
-                                )}
-                                {participantes && participantes.palhaco === 0 && participantes.paisana === 0 && '—'}
                             </dd>
                         </div>
 
