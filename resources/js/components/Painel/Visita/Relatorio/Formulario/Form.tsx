@@ -1,28 +1,23 @@
+// REACT
+import { type FC } from 'react'
+
+// UI
 import ContextoVisita from '@/components/Painel/Visita/Relatorio/Contexto/Show'
 import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { labelTipoRelatorio, TIPOS_RELATORIO } from '@/lib/visita'
-import type { TipoRelatorio } from '@/types'
-import { type FC } from 'react'
 
-export interface RelatorioFormValues {
-    tipo_relatorio: TipoRelatorio | ''
-    ala_unidade_id: number | '' | null
-    resumo: string
-    feedback: string
-    quartos_visitados: number | ''
-    pessoas_impactadas: number | ''
-    observacao_visitantes_externos: string
-    observacoes_gerais: string
-}
+// TIPOS
+import type { TipoRelatorio } from '@/types'
+import type { DadosFormulario } from '@/types/relatorio'
 
 export type RelatorioFormErrors = Record<string, string | undefined>
 
 interface Props {
     visita: import('@/types').Visita
-    data: RelatorioFormValues
+    data: DadosFormulario
     errors: RelatorioFormErrors
     foraDoPrazoAviso: boolean
-    onFieldChange: <K extends keyof RelatorioFormValues>(campo: K, valor: RelatorioFormValues[K]) => void
+    onFieldChange: <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => void
 }
 
 const Form: FC<Props> = ({ visita, data, errors, foraDoPrazoAviso, onFieldChange }) => {

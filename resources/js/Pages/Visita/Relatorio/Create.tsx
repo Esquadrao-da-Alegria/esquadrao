@@ -1,11 +1,22 @@
-import RelatorioForm, { type RelatorioFormErrors, type RelatorioFormValues } from '@/components/Painel/Visita/Relatorio/Formulario/Form'
-import PainelLayout from '@/layouts/PainelLayout'
-import { index, store } from '@/routes/visitas/relatorios'
-import type { Visita } from '@/types'
-import { Link, router, useForm } from '@inertiajs/react'
-import { ArrowLeft, Check } from 'lucide-react'
+// REACT
 import { type FC } from 'react'
+import { Link, useForm } from '@inertiajs/react'
+
+// UI
+import RelatorioForm, { type RelatorioFormErrors } from '@/components/Painel/Visita/Relatorio/Formulario/Form'
+import PainelLayout from '@/layouts/PainelLayout'
+import { ArrowLeft, Check } from 'lucide-react'
 import { toast } from 'react-toastify'
+
+// TIPOS
+import type { Visita } from '@/types'
+import type { DadosFormulario } from '@/types/relatorio'
+
+// ROTAS
+import { index, store } from '@/routes/visitas/relatorios'
+
+// SERVICES
+import { Service } from '@/Services/Visita/Relatorio/Service'
 
 interface Props {
     visita: Visita
@@ -13,7 +24,7 @@ interface Props {
 }
 
 const Create: FC<Props> = ({ visita, foraDoPrazoAviso }) => {
-    const { data, setData, processing, errors } = useForm<RelatorioFormValues>({
+    const { data, setData, transform, post, processing, errors } = useForm<DadosFormulario>({
         tipo_relatorio: '',
         ala_unidade_id: null,
         resumo: '',
@@ -25,7 +36,7 @@ const Create: FC<Props> = ({ visita, foraDoPrazoAviso }) => {
     })
     const erroGeral = (errors as RelatorioFormErrors).geral
 
-    const handleFieldChange = <K extends keyof RelatorioFormValues>(campo: K, valor: RelatorioFormValues[K]) => {
+    const handleFieldChange = <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => {
         setData((prev) => ({ ...prev, [campo]: valor }))
     }
 
@@ -35,15 +46,8 @@ const Create: FC<Props> = ({ visita, foraDoPrazoAviso }) => {
             return
         }
 
-        router.post(store.url({ visita: visita.id! }), {
-            ...data,
-            ala_unidade_id: data.ala_unidade_id || null,
-            quartos_visitados: data.quartos_visitados === '' ? null : data.quartos_visitados,
-            pessoas_impactadas: data.pessoas_impactadas === '' ? null : data.pessoas_impactadas,
-            feedback: data.feedback || null,
-            observacao_visitantes_externos: data.observacao_visitantes_externos || null,
-            observacoes_gerais: data.observacoes_gerais || null,
-        })
+        transform(() => Service.montarPayload(data))
+        post(store.url({ visita: visita.id! }))
     }
 
     return (
