@@ -1,6 +1,8 @@
+// REACT/INERTIA
 import { Link, usePage } from '@inertiajs/react'
 import { type FC, useEffect, useState } from 'react'
 
+// UI
 import Modal from '@/components/Modal/Show'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,9 +16,16 @@ import {
     visitaAtingiuLimite,
 } from '@/lib/visita'
 import { toastInfo } from '@/lib/utils/toast'
+
+// ROTAS
 import { edit } from '@/routes/visitas'
-import { Service } from '@/Services/Visita/Participante/Service'
+import { create, index as relatoriosIndex } from '@/routes/visitas/relatorios'
+
+// TIPOS
 import type { SharedData, TipoParticipacao, Visita } from '@/types'
+
+// SERVICES
+import { Service } from '@/Services/Visita/Participante/Service'
 
 interface Props {
     visita: Visita | null
@@ -203,6 +212,30 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                             </div>
                         )}
                     </dl>
+
+                    <div className="mt-6 rounded-2xl border border-amber-100 bg-amber-50/40 p-4">
+                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-900/70">
+                            Relatórios
+                        </h3>
+                        <div className="flex flex-col gap-2">
+                            <Link
+                                href={relatoriosIndex.url({ visita: visita.id! })}
+                                onClick={fecharModal}
+                                className="inline-flex items-center justify-center rounded-full border border-amber-200 bg-white px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50"
+                            >
+                                Ver relatórios
+                            </Link>
+                            {visita.status !== 'cancelada' && (
+                                <Link
+                                    href={create.url({ visita: visita.id! })}
+                                    onClick={fecharModal}
+                                    className="inline-flex items-center justify-center rounded-full border-2 border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
+                                >
+                                    Criar relatório
+                                </Link>
+                            )}
+                        </div>
+                    </div>
 
                     {podeEditarVisita(auth.user, visita) && (
                         <div className="mt-6">
