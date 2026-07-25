@@ -6,6 +6,7 @@ use App\Enums\TipoRelatorio;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
+use App\Models\Ala;
 use App\Models\Cargo;
 use App\Models\Cidade;
 use App\Models\Estado;
@@ -142,6 +143,51 @@ class RelatorioStoreTest extends TestCase
         $this->assertDatabaseHas('visitas', [
             'id'     => $visita->id,
             'status' => VisitaStatus::Realizada->value,
+        ]);
+    }
+
+    public function test_store_persiste_ala_unidade_id(): void
+    {
+        $autor  = $this->criarVoluntario();
+        $visita = $this->criarVisita($autor);
+        $ala    = $this->criarAla($visita->hospital_id, 'Pediatria');
+
+        $this->actingAs($autor)
+            ->post(route('visitas.relatorios.store', $visita), $this->payloadRelatorio([
+                'ala_unidade_id' => $ala->id,
+            ]))
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('visitas_relatorios', [
+            'visita_id'      => $visita->id,
+            'ala_unidade_id' => $ala->id,
+        ]);
+    }
+
+    public function test_store_rejeita_ala_de_outro_hospital(): void
+    {
+        $autor        = $this->criarVoluntario();
+        $visita       = $this->criarVisita($autor);
+        $outroHospital = $this->criarHospital();
+        $alaOutro     = $this->criarAla($outroHospital->id, 'UTI externa');
+
+        $this->actingAs($autor)
+            ->from(route('visitas.relatorios.create', $visita))
+            ->post(route('visitas.relatorios.store', $visita), $this->payloadRelatorio([
+                'ala_unidade_id' => $alaOutro->id,
+            ]))
+            ->assertRedirect(route('visitas.relatorios.create', $visita))
+            ->assertSessionHasErrors('ala_unidade_id');
+
+        $this->assertDatabaseCount('visitas_relatorios', 0);
+    }
+
+    private function criarAla(int $hospitalId, string $nome): Ala
+    {
+        return Ala::query()->create([
+            'hospital_id' => $hospitalId,
+            'nome'        => $nome,
         ]);
     }
 

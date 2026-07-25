@@ -15,6 +15,7 @@ interface Props {
 const Create: FC<Props> = ({ visita, foraDoPrazoAviso }) => {
     const { data, setData, processing, errors } = useForm<RelatorioFormValues>({
         tipo_relatorio: '',
+        ala_unidade_id: null,
         resumo: '',
         feedback: '',
         quartos_visitados: '',
@@ -36,6 +37,7 @@ const Create: FC<Props> = ({ visita, foraDoPrazoAviso }) => {
 
         router.post(store.url({ visita: visita.id! }), {
             ...data,
+            ala_unidade_id: data.ala_unidade_id || null,
             quartos_visitados: data.quartos_visitados === '' ? null : data.quartos_visitados,
             pessoas_impactadas: data.pessoas_impactadas === '' ? null : data.pessoas_impactadas,
             feedback: data.feedback || null,

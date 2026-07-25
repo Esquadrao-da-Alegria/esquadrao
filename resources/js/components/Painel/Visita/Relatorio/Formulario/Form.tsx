@@ -6,6 +6,7 @@ import { type FC } from 'react'
 
 export interface RelatorioFormValues {
     tipo_relatorio: TipoRelatorio | ''
+    ala_unidade_id: number | '' | null
     resumo: string
     feedback: string
     quartos_visitados: number | ''
@@ -57,6 +58,23 @@ const Form: FC<Props> = ({ visita, data, errors, foraDoPrazoAviso, onFieldChange
                     ))}
                 </select>
                 {errors.tipo_relatorio ? <p className="mt-1 text-sm text-red-600">{errors.tipo_relatorio}</p> : null}
+            </div>
+
+            <div>
+                <label htmlFor="ala_unidade_id" className={painelLabelClass}>Ala / Unidade</label>
+                <select
+                    id="ala_unidade_id"
+                    name="ala_unidade_id"
+                    value={data.ala_unidade_id ?? ''}
+                    onChange={(e) => onFieldChange('ala_unidade_id', e.target.value ? Number(e.target.value) : null)}
+                    className={painelInputClass}
+                >
+                    <option value="">Nenhuma</option>
+                    {(visita.hospital?.alas ?? []).map((ala) => (
+                        <option key={ala.id} value={ala.id}>{ala.nome}</option>
+                    ))}
+                </select>
+                {errors.ala_unidade_id ? <p className="mt-1 text-sm text-red-600">{errors.ala_unidade_id}</p> : null}
             </div>
 
             <div>

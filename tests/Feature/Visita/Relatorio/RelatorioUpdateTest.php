@@ -6,6 +6,7 @@ use App\Enums\TipoRelatorio;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
+use App\Models\Ala;
 use App\Models\Cargo;
 use App\Models\Cidade;
 use App\Models\Estado;
@@ -121,6 +122,34 @@ class RelatorioUpdateTest extends TestCase
         $this->actingAs($autor)
             ->put(route('visitas.relatorios.update', [$visitaA, $relatorioB]), $this->payloadRelatorio())
             ->assertNotFound();
+    }
+
+    public function test_update_persiste_ala_unidade_id(): void
+    {
+        $autor     = $this->criarVoluntario();
+        $visita    = $this->criarVisita($autor);
+        $relatorio = $this->criarRelatorio($visita, $autor);
+        $ala       = $this->criarAla($visita->hospital_id, 'Oncologia');
+
+        $this->actingAs($autor)
+            ->put(route('visitas.relatorios.update', [$visita, $relatorio]), $this->payloadRelatorio([
+                'ala_unidade_id' => $ala->id,
+            ]))
+            ->assertRedirect(route('visitas.relatorios.show', [$visita, $relatorio]))
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('visitas_relatorios', [
+            'id'             => $relatorio->id,
+            'ala_unidade_id' => $ala->id,
+        ]);
+    }
+
+    private function criarAla(int $hospitalId, string $nome): Ala
+    {
+        return Ala::query()->create([
+            'hospital_id' => $hospitalId,
+            'nome'        => $nome,
+        ]);
     }
 
     private function payloadRelatorio(array $override = []): array

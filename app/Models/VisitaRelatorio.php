@@ -14,6 +14,7 @@ class VisitaRelatorio extends Model
         'visita_id',
         'autor_id',
         'tipo_relatorio',
+        'ala_unidade_id',
         'resumo',
         'feedback',
         'quartos_visitados',
@@ -36,6 +37,11 @@ class VisitaRelatorio extends Model
     public function visita(): BelongsTo
     {
         return $this->belongsTo(Visita::class, 'visita_id');
+    }
+
+    public function alaUnidade(): BelongsTo
+    {
+        return $this->belongsTo(Ala::class, 'ala_unidade_id');
     }
 
     public function autor(): BelongsTo

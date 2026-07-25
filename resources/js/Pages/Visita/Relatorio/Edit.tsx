@@ -16,6 +16,7 @@ interface Props {
 const Edit: FC<Props> = ({ visita, relatorio, foraDoPrazoAviso }) => {
     const { data, setData, processing, errors } = useForm<RelatorioFormValues>({
         tipo_relatorio: relatorio.tipo_relatorio,
+        ala_unidade_id: relatorio.ala_unidade_id ?? null,
         resumo: relatorio.resumo,
         feedback: relatorio.feedback ?? '',
         quartos_visitados: relatorio.quartos_visitados ?? '',
@@ -38,6 +39,7 @@ const Edit: FC<Props> = ({ visita, relatorio, foraDoPrazoAviso }) => {
         router.post(update.url({ visita: visita.id!, relatorio: relatorio.id! }), {
             ...data,
             _method: 'put',
+            ala_unidade_id: data.ala_unidade_id || null,
             quartos_visitados: data.quartos_visitados === '' ? null : data.quartos_visitados,
             pessoas_impactadas: data.pessoas_impactadas === '' ? null : data.pessoas_impactadas,
             feedback: data.feedback || null,

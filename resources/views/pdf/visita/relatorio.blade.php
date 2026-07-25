@@ -143,6 +143,12 @@
             <dt>Tipo</dt>
             <dd>{{ $relatorio->tipo_relatorio->value }}</dd>
         </div>
+        @if ($relatorio->alaUnidade)
+            <div>
+                <dt>Ala / Unidade</dt>
+                <dd>{{ $relatorio->alaUnidade->nome }}</dd>
+            </div>
+        @endif
         <div>
             <dt>Autor</dt>
             <dd>{{ $relatorio->autor?->name ?? '—' }}</dd>

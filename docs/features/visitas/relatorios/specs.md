@@ -25,8 +25,9 @@ Documento de referência do submódulo **relatórios** vinculados a uma visita. 
 6. **Status da visita** — Store/update de relatório **não** altera `visitas.status`.
 7. **Campos imutáveis na edição** — `visita_id`, `autor_id`, `enviado_em`, `fora_do_prazo` removidos do payload no service.
 8. **Campos obrigatórios** — `tipo_relatorio` e `resumo` (validação `max:5000` nos textos).
-9. **Contexto da visita** — Hospital, datas, líder, ala e participantes são **read-only** na UI e no PDF (não persistidos no relatório).
-10. **Sem destroy** — Não há rota nem query `destroy` nesta v1.
+9. **Contexto da visita** — Hospital, datas, líder, ala cadastrada na visita e participantes são **read-only** na UI e no PDF (não persistidos no relatório).
+10. **Ala do relatório** — Campo opcional `ala_unidade_id` (FK → `alas_hospitais`), independente da ala da visita; exibido na seção do relatório (UI e PDF).
+11. **Sem destroy** — Não há rota nem query `destroy` nesta v1.
 
 ---
 
@@ -42,6 +43,7 @@ Migration: `2026_07_19_135423_create_visitas_relatorios_table.php`
 | `visita_id` | FK → `visitas` (cascadeOnDelete) |
 | `autor_id` | FK → `users` (restrictOnDelete) |
 | `tipo_relatorio` | `palhaco` \| `paisana` \| `geral` |
+| `ala_unidade_id` | FK → `alas_hospitais.id` (nullable, nullOnDelete) |
 | `resumo` | text, obrigatório |
 | `feedback` | text nullable |
 | `quartos_visitados` | unsigned int nullable |
@@ -55,6 +57,7 @@ Migration: `2026_07_19_135423_create_visitas_relatorios_table.php`
 ### Relacionamentos
 
 - `VisitaRelatorio::visita()` → BelongsTo `Visita`
+- `VisitaRelatorio::alaUnidade()` → BelongsTo `Ala` (`ala_unidade_id`)
 - `VisitaRelatorio::autor()` → BelongsTo `User` (`autor_id`)
 - `Visita::relatorios()` → HasMany `VisitaRelatorio`
 

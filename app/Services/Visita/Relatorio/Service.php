@@ -134,7 +134,10 @@ class Service
             'participantes.voluntario:id,name',
         ]);
 
-        $relatorio->loadMissing('autor:id,name');
+        $relatorio->loadMissing([
+            'autor:id,name',
+            'alaUnidade:id,nome,hospital_id',
+        ]);
 
         return Pdf::view('pdf.visita.relatorio', [
             'visita'    => $visita,
@@ -155,6 +158,7 @@ class Service
     {
         $payload = [
             'tipo_relatorio'                 => $dados['tipo_relatorio'],
+            'ala_unidade_id'                 => $dados['ala_unidade_id'] ?? null,
             'resumo'                         => $dados['resumo'],
             'feedback'                       => $dados['feedback'] ?? null,
             'quartos_visitados'              => $dados['quartos_visitados'] ?? null,

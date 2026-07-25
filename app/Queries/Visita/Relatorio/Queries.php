@@ -99,6 +99,7 @@ class Queries
     {
         $query->with([
             'autor:id,name',
+            'alaUnidade:id,nome,hospital_id',
         ]);
     }
 

@@ -254,6 +254,7 @@ export interface VisitaRelatorio {
     visita_id: number;
     autor_id: number;
     tipo_relatorio: TipoRelatorio;
+    ala_unidade_id?: number | null;
     resumo: string;
     feedback?: string | null;
     quartos_visitados?: number | null;
@@ -265,5 +266,6 @@ export interface VisitaRelatorio {
     created_at?: string;
     updated_at?: string;
     autor?: User;
+    alaUnidade?: AlaHospital | null;
     visita?: Visita;
 }

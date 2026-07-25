@@ -122,6 +122,7 @@ class VisitaRelatorioController extends Controller
     {
         $visita->loadMissing([
             'hospital:id,nome,cidade_id',
+            'hospital.alas:id,hospital_id,nome',
             'alaUnidade:id,nome,hospital_id',
             'lider:id,name',
             'participantes.voluntario:id,name',

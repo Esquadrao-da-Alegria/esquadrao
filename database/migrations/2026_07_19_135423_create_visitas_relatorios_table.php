@@ -20,6 +20,12 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             $table->string('tipo_relatorio', 50);
+
+            $table->foreignId('ala_unidade_id')
+                ->nullable()
+                ->constrained('alas_hospitais', 'id', 'visitas_relatorios_ala_unidade_id_foreign')
+                ->nullOnDelete();
+
             $table->text('resumo');
             $table->text('feedback')->nullable();
             $table->unsignedInteger('quartos_visitados')->nullable();
