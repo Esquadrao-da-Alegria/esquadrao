@@ -7,13 +7,13 @@ import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses
 import { labelTipoRelatorio, TIPOS_RELATORIO } from '@/lib/visita'
 
 // TIPOS
-import type { TipoRelatorio } from '@/types'
 import type { DadosFormulario } from '@/types/relatorio'
+import type { TipoRelatorio, Visita } from '@/types/visita'
 
 export type RelatorioFormErrors = Record<string, string | undefined>
 
 interface Props {
-    visita: import('@/types').Visita
+    visita: Visita
     data: DadosFormulario
     errors: RelatorioFormErrors
     foraDoPrazoAviso: boolean

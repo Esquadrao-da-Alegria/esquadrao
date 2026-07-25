@@ -1,30 +1,24 @@
-import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
-import { labelStatus, labelTipo, VISITA_STATUS, VISITA_TIPOS } from '@/lib/visita'
-import type { AlaHospital, Hospital, User, VisitaStatus, VisitaTipo } from '@/types'
+// REACT
 import { type FC, useMemo } from 'react'
 
-export interface VisitaFormValues {
-    hospital_id: number | ''
-    ala_unidade_id: number | '' | null
-    data: string
-    hora_inicio: string
-    hora_fim: string
-    tipo: VisitaTipo | ''
-    lider_id: number | ''
-    status?: VisitaStatus
-    observacoes: string
-}
+// UI
+import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
+import { labelStatus, labelTipo, VISITA_STATUS, VISITA_TIPOS } from '@/lib/visita'
+
+// TIPOS
+import type { AlaHospital, Hospital, User } from '@/types'
+import type { DadosFormulario, VisitaStatus, VisitaTipo } from '@/types/visita'
 
 interface Props {
-    data: VisitaFormValues
+    data: DadosFormulario
     errors: Record<string, string | undefined>
     mode: 'create' | 'edit'
     hospitais: Hospital[]
     lideres: User[]
-    onFieldChange: <K extends keyof VisitaFormValues>(campo: K, valor: VisitaFormValues[K]) => void
+    onCampoChange: <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => void
 }
 
-const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onFieldChange }) => {
+const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onCampoChange }) => {
     const alasDisponiveis = useMemo(() => {
         if (!data.hospital_id) return [] as AlaHospital[]
         const hospital = hospitais.find((h) => h.id === Number(data.hospital_id))
@@ -32,8 +26,8 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onFieldChange
     }, [data.hospital_id, hospitais])
 
     const handleHospitalChange = (valor: number | '') => {
-        onFieldChange('hospital_id', valor)
-        onFieldChange('ala_unidade_id', null)
+        onCampoChange('hospital_id', valor)
+        onCampoChange('ala_unidade_id', null)
     }
 
     return (
@@ -64,7 +58,7 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onFieldChange
                     name="ala_unidade_id"
                     disabled={mode === 'edit' || !data.hospital_id}
                     value={data.ala_unidade_id ?? ''}
-                    onChange={(e) => onFieldChange('ala_unidade_id', e.target.value ? Number(e.target.value) : null)}
+                    onChange={(e) => onCampoChange('ala_unidade_id', e.target.value ? Number(e.target.value) : null)}
                     className={painelInputClass}
                 >
                     <option value="">Nenhuma</option>
@@ -79,19 +73,19 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onFieldChange
                 <div>
                     <label htmlFor="data" className={painelLabelClass}>Data *</label>
                     <input type="date" id="data" required value={data.data}
-                        onChange={(e) => onFieldChange('data', e.target.value)} className={painelInputClass} />
+                        onChange={(e) => onCampoChange('data', e.target.value)} className={painelInputClass} />
                     {errors.data ? <p className="mt-1 text-sm text-red-600">{errors.data}</p> : null}
                 </div>
                 <div>
                     <label htmlFor="hora_inicio" className={painelLabelClass}>Início *</label>
                     <input type="time" id="hora_inicio" required value={data.hora_inicio}
-                        onChange={(e) => onFieldChange('hora_inicio', e.target.value)} className={painelInputClass} />
+                        onChange={(e) => onCampoChange('hora_inicio', e.target.value)} className={painelInputClass} />
                     {errors.hora_inicio ? <p className="mt-1 text-sm text-red-600">{errors.hora_inicio}</p> : null}
                 </div>
                 <div>
                     <label htmlFor="hora_fim" className={painelLabelClass}>Fim *</label>
                     <input type="time" id="hora_fim" required value={data.hora_fim}
-                        onChange={(e) => onFieldChange('hora_fim', e.target.value)} className={painelInputClass} />
+                        onChange={(e) => onCampoChange('hora_fim', e.target.value)} className={painelInputClass} />
                     {errors.hora_fim ? <p className="mt-1 text-sm text-red-600">{errors.hora_fim}</p> : null}
                 </div>
             </div>
@@ -99,7 +93,7 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onFieldChange
             <div>
                 <label htmlFor="tipo" className={painelLabelClass}>Tipo *</label>
                 <select id="tipo" required value={data.tipo}
-                    onChange={(e) => onFieldChange('tipo', e.target.value as VisitaTipo)} className={painelInputClass}>
+                    onChange={(e) => onCampoChange('tipo', e.target.value as VisitaTipo)} className={painelInputClass}>
                     <option value="">Selecione...</option>
                     {VISITA_TIPOS.map((t) => (
                         <option key={t} value={t}>{labelTipo(t)}</option>
@@ -111,7 +105,7 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onFieldChange
             <div>
                 <label htmlFor="lider_id" className={painelLabelClass}>Líder *</label>
                 <select id="lider_id" required value={data.lider_id}
-                    onChange={(e) => onFieldChange('lider_id', e.target.value ? Number(e.target.value) : '')}
+                    onChange={(e) => onCampoChange('lider_id', e.target.value ? Number(e.target.value) : '')}
                     className={painelInputClass}>
                     <option value="">Selecione...</option>
                     {lideres.map((l) => (
@@ -125,7 +119,7 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onFieldChange
                 <div>
                     <label htmlFor="status" className={painelLabelClass}>Status *</label>
                     <select id="status" required value={data.status}
-                        onChange={(e) => onFieldChange('status', e.target.value as VisitaStatus)}
+                        onChange={(e) => onCampoChange('status', e.target.value as VisitaStatus)}
                         className={painelInputClass}>
                         {VISITA_STATUS.map((s) => (
                             <option key={s} value={s}>{labelStatus(s)}</option>
@@ -138,7 +132,7 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onFieldChange
             <div>
                 <label htmlFor="observacoes" className={painelLabelClass}>Observações</label>
                 <textarea id="observacoes" rows={4} value={data.observacoes}
-                    onChange={(e) => onFieldChange('observacoes', e.target.value)}
+                    onChange={(e) => onCampoChange('observacoes', e.target.value)}
                     className={`${painelInputClass} resize-none`} />
             </div>
         </div>

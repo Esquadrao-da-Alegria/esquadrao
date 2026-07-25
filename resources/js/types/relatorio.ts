@@ -1,4 +1,4 @@
-import type { TipoRelatorio } from '@/types'
+import type { TipoRelatorio } from '@/types/visita'
 
 export type DadosFormulario = {
     tipo_relatorio: TipoRelatorio | ''

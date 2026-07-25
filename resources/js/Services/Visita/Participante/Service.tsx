@@ -2,7 +2,7 @@ import { router } from '@inertiajs/react'
 
 import { Queries } from '@/Queries/Visita/Participante/Queries'
 import { toastErro, toastSucesso } from '@/lib/utils/toast'
-import type { TipoParticipacao } from '@/types'
+import type { TipoParticipacao } from '@/types/visita'
 
 export class Service {
     static async participar(visitaId: number, tipoParticipacao: TipoParticipacao): Promise<boolean> {

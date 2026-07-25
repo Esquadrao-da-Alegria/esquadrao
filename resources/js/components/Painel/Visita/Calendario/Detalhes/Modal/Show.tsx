@@ -22,7 +22,8 @@ import { edit } from '@/routes/visitas'
 import { create, index as relatoriosIndex } from '@/routes/visitas/relatorios'
 
 // TIPOS
-import type { SharedData, TipoParticipacao, Visita } from '@/types'
+import type { SharedData } from '@/types'
+import type { TipoParticipacao, Visita } from '@/types/visita'
 
 // SERVICES
 import { Service } from '@/Services/Visita/Participante/Service'

@@ -9,8 +9,8 @@ import { ArrowLeft, Check } from 'lucide-react'
 import { toast } from 'react-toastify'
 
 // TIPOS
-import type { Visita, VisitaRelatorio } from '@/types'
 import type { DadosFormulario } from '@/types/relatorio'
+import type { Visita, VisitaRelatorio } from '@/types/visita'
 
 // ROTAS
 import { show, update } from '@/routes/visitas/relatorios'

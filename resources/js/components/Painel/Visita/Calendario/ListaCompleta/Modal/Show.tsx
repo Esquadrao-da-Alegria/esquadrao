@@ -2,7 +2,7 @@ import { type FC } from 'react'
 
 import Modal from '@/components/Modal/Show'
 import { classeCardPorStatus, labelStatus } from '@/lib/visita'
-import type { Visita } from '@/types'
+import type { Visita } from '@/types/visita'
 
 interface Props {
     dia: Date | null

@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import type { Visita } from '@/types'
+import type { Visita } from '@/types/visita'
 import CardShow from '@/components/Painel/Visita/Card/Show'
 
 const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']

@@ -1,5 +1,5 @@
 import { contarParticipantes, formatarDataHora, labelStatus } from '@/lib/visita'
-import type { Visita } from '@/types'
+import type { Visita } from '@/types/visita'
 import { type FC } from 'react'
 
 interface Props {

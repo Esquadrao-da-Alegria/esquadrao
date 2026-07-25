@@ -1,4 +1,12 @@
-import type { User, Visita, VisitaParticipante, VisitaRelatorio, VisitaStatus, VisitaTipo, TipoRelatorio } from '@/types'
+import type { User } from '@/types'
+import type {
+    TipoRelatorio,
+    Visita,
+    VisitaParticipante,
+    VisitaRelatorio,
+    VisitaStatus,
+    VisitaTipo,
+} from '@/types/visita'
 import { temCargo } from '@/lib/utils/user'
 
 export const LIMITE_PARTICIPANTES = 5
