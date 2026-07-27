@@ -1,4 +1,12 @@
-import type { User, Visita, VisitaParticipante, VisitaStatus, VisitaTipo } from '@/types'
+import type { User } from '@/types'
+import type {
+    TipoRelatorio,
+    Visita,
+    VisitaParticipante,
+    VisitaRelatorio,
+    VisitaStatus,
+    VisitaTipo,
+} from '@/types/visita'
 import { temCargo } from '@/lib/utils/user'
 
 export const LIMITE_PARTICIPANTES = 5
@@ -122,3 +130,36 @@ export const VISITA_TIPOS: VisitaTipo[] = [
 export const VISITA_STATUS: VisitaStatus[] = [
     'agendada', 'realizada', 'cancelada', 'pendente_relatorio', 'contabilizada', 'nao_contabilizada',
 ]
+
+export const TIPOS_RELATORIO: TipoRelatorio[] = ['palhaco', 'paisana', 'geral']
+
+export function labelTipoRelatorio(tipo: TipoRelatorio): string {
+    const labels: Record<TipoRelatorio, string> = {
+        palhaco: 'Palhaço',
+        paisana: 'Paisana',
+        geral: 'Geral',
+    }
+    return labels[tipo] ?? tipo
+}
+
+export function podeEditarRelatorio(user: User, visita: Visita, relatorio: VisitaRelatorio): boolean {
+    if (visita.status === 'cancelada') {
+        return false
+    }
+
+    if (relatorio.autor_id === user.id) {
+        return true
+    }
+
+    return podeEditarVisita(user, visita)
+}
+
+export function formatarDataHora(iso: string): string {
+    return new Date(iso).toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    })
+}

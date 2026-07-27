@@ -1,6 +1,6 @@
 import type { EventoStatus, EventoTipo } from '@/types'
 
-export const EVENTO_TIPOS: EventoTipo[] = ['oficina', 'reuniao']
+export const EVENTO_TIPOS: EventoTipo[] = ['oficina', 'reuniao', 'evento']
 
 export function classeCardPorStatus(status: EventoStatus): string {
     switch (status) {
@@ -26,6 +26,7 @@ export function labelTipo(tipo: EventoTipo): string {
     const labels: Record<EventoTipo, string> = {
         oficina: 'Oficina',
         reuniao: 'Reunião',
+        evento: 'Evento',
     }
     return labels[tipo] ?? tipo
 }

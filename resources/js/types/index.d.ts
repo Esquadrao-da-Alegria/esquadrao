@@ -142,7 +142,7 @@ export interface AlaHospital {
     created_at?: string;
     updated_at?: string;
 }
-export type EventoTipo = 'oficina' | 'reuniao';
+export type EventoTipo = 'oficina' | 'reuniao' | 'evento';
 export type EventoStatus = 'agendado' | 'cancelado' | 'finalizado';
 export type PresencaStatus = 'presente' | 'ausente';
 
@@ -189,74 +189,3 @@ export interface Evento {
     updated_at: string;
 }
 
-export interface MeuEvento {
-    id: number;
-    titulo: string;
-    tipo: EventoTipo;
-    data_inicio: string;
-    data_fim: string | null;
-    local: string | null;
-    status: EventoStatus;
-    responsavel: User | null;
-    inscricao_status: 'inscrito' | 'cancelado';
-    presenca: PresencaStatus | null;
-    presenca_registrada_em: string | null;
-}
-
-// VISITAS
-
-export type VisitaTipo =
-    | 'hospital'
-    | 'residencia'
-    | 'acao_especial'
-    | 'outro';
-
-export type VisitaStatus =
-    | 'agendada'
-    | 'realizada'
-    | 'cancelada'
-    | 'pendente_relatorio'
-    | 'contabilizada'
-    | 'nao_contabilizada';
-
-export type VisitaOrigem = 'sistema' | 'importacao' | 'outro';
-
-export type TipoParticipacao = 'palhaco' | 'paisana';
-
-export type PapelNaVisita = 'participante' | 'relator';
-
-export type StatusParticipacao = 'confirmado' | 'pendente' | 'cancelado' | 'falta';
-
-export interface Visita {
-    id?: number;
-    hospital_id: number;
-    ala_unidade_id?: number | null;
-    criado_por_id: number;
-    lider_id?: number | null;
-    inicio_em: string;
-    fim_em: string;
-    tipo: VisitaTipo;
-    status: VisitaStatus;
-    origem: VisitaOrigem;
-    observacoes?: string | null;
-    created_at?: string;
-    updated_at?: string;
-    hospital?: Hospital;
-    alaUnidade?: AlaHospital | null;
-    criadoPor?: User;
-    lider?: User | null;
-    participantes?: VisitaParticipante[];
-}
-
-export interface VisitaParticipante {
-    id?: number;
-    visita_id: number;
-    voluntario_id: number;
-    tipo_participacao: TipoParticipacao;
-    papel_na_visita: PapelNaVisita;
-    status_participacao: StatusParticipacao;
-    created_at?: string;
-    updated_at?: string;
-    visita?: Visita;
-    voluntario?: User;
-}

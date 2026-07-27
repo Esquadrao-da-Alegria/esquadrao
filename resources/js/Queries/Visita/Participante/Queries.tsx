@@ -1,6 +1,6 @@
 import { destroy, store } from '@/routes/visitas/participantes'
 import { obterCsrfToken } from '@/utils/form'
-import type { TipoParticipacao } from '@/types'
+import type { TipoParticipacao } from '@/types/visita'
 
 type RetornoPadrao = {
     sucesso: boolean

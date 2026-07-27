@@ -1,13 +1,25 @@
-import VisitaForm, { type VisitaFormValues } from '@/components/Painel/Visita/Formulario/Form'
+// REACT
+import { type FC, useMemo } from 'react'
+import { Link, useForm } from '@inertiajs/react'
+
+// UI
+import VisitaForm from '@/components/Painel/Visita/Formulario/Form'
 import PainelLayout from '@/layouts/PainelLayout'
 import { painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { extrairData, extrairHora } from '@/lib/visita'
-import { index, update } from '@/routes/visitas'
-import type { Hospital, User, Visita, VisitaParticipante } from '@/types'
-import { Link, router, useForm } from '@inertiajs/react'
 import { ArrowLeft, Check } from 'lucide-react'
-import { type FC, useMemo } from 'react'
 import { toast } from 'react-toastify'
+
+// TIPOS
+import type { Hospital, User } from '@/types'
+import type { DadosFormulario, Visita, VisitaParticipante } from '@/types/visita'
+
+// ROTAS
+import { index, update } from '@/routes/visitas'
+import { create, index as relatoriosIndex } from '@/routes/visitas/relatorios'
+
+// SERVICES
+import { Service } from '@/Services/Visita/Service'
 
 interface Props {
     hospitais: Hospital[]
@@ -29,7 +41,7 @@ const labelStatusParticipacao = (status: VisitaParticipante['status_participacao
 }
 
 const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
-    const { data, setData, processing, errors } = useForm<VisitaFormValues>({
+    const { data, setData, transform, put, processing, errors } = useForm<DadosFormulario>({
         hospital_id: visita.hospital_id,
         ala_unidade_id: visita.ala_unidade_id ?? null,
         data: extrairData(visita.inicio_em),
@@ -41,7 +53,7 @@ const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
         observacoes: visita.observacoes ?? '',
     })
 
-    const handleFieldChange = <K extends keyof VisitaFormValues>(campo: K, valor: VisitaFormValues[K]) => {
+    const handleCampoChange = <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => {
         setData((prev) => ({ ...prev, [campo]: valor }))
     }
 
@@ -59,8 +71,8 @@ const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
             return
         }
 
-        const url = update({ visita: visita.id! }).url
-        router.post(url, { ...data, _method: 'put' })
+        transform(() => Service.montarPayload(data, 'editar'))
+        put(update({ visita: visita.id! }).url)
     }
 
     return (
@@ -98,7 +110,7 @@ const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
                                         mode="edit"
                                         hospitais={hospitais}
                                         lideres={lideres}
-                                        onFieldChange={handleFieldChange}
+                                        onCampoChange={handleCampoChange}
                                     />
 
                                     <div>
@@ -124,6 +136,28 @@ const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
                                                 ))}
                                             </ul>
                                         )}
+                                    </div>
+
+                                    <div className="rounded-2xl border border-amber-100 bg-amber-50/40 p-5">
+                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-900/70">
+                                            Relatórios
+                                        </h3>
+                                        <div className="flex flex-col gap-2 sm:flex-row">
+                                            <Link
+                                                href={relatoriosIndex.url({ visita: visita.id! })}
+                                                className="inline-flex flex-1 items-center justify-center rounded-full border border-amber-200 bg-white px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50"
+                                            >
+                                                Ver relatórios
+                                            </Link>
+                                            {visita.status !== 'cancelada' && (
+                                                <Link
+                                                    href={create.url({ visita: visita.id! })}
+                                                    className="inline-flex flex-1 items-center justify-center rounded-full border-2 border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
+                                                >
+                                                    Criar relatório
+                                                </Link>
+                                            )}
+                                        </div>
                                     </div>
                                 </form>
                             </div>
