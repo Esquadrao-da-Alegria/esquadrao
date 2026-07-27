@@ -106,18 +106,53 @@ class EventoTest extends TestCase
         $admin  = $this->usuarioAdmin();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
 
-        $this->actingAs($admin)
-            ->post(route('eventos.cancelar', $evento), ['motivo_cancelamento' => 'Sem quórum'])
+        $this->actingAs($admin)->post(route('eventos.cancelar', $evento), ['motivo_cancelamento' => 'Sem quórum'])
             ->assertRedirect(route('eventos.show', $evento));
 
-        $this->assertDatabaseHas('eventos', [
-            'id'                  => $evento->id,
-            'status'              => 'cancelado',
-            'motivo_cancelamento' => 'Sem quórum',
-        ]);
+        $this->assertDatabaseHas('eventos', ['id' => $evento->id, 'status' => 'cancelado', 'motivo_cancelamento' => 'Sem quórum']);
     }
 
-    public function test_usuario_comum_nao_consegue_criar_editar_ou_cancelar(): void
+    public function test_usuario_autenticado_consegue_se_inscrever(): void
+    {
+        $user   = $this->criarUsuario();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
+
+        $this->actingAs($user)->post(route('eventos.inscricao.store', $evento))->assertRedirect();
+
+        $this->assertDatabaseHas('evento_participantes', ['evento_id' => $evento->id, 'user_id' => $user->id, 'status' => 'inscrito']);
+    }
+
+    public function test_usuario_nao_consegue_se_inscrever_duas_vezes_ativamente(): void
+    {
+        $user   = $this->criarUsuario();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
+
+        $this->actingAs($user)->post(route('eventos.inscricao.store', $evento));
+        $this->actingAs($user)->post(route('eventos.inscricao.store', $evento));
+
+        $this->assertSame(1, DB::table('evento_participantes')->where('evento_id', $evento->id)->where('user_id', $user->id)->count());
+    }
+
+    public function test_usuario_nao_consegue_se_inscrever_em_evento_cancelado(): void
+    {
+        $user   = $this->criarUsuario();
+        $evento = Evento::create([...$this->dadosEvento(['status' => 'cancelado']), 'criado_por_id' => $user->id]);
+
+        $this->actingAs($user)->post(route('eventos.inscricao.store', $evento))->assertSessionHas('mensagem_erro', 'Este evento foi cancelado.');
+    }
+
+    public function test_usuario_consegue_cancelar_sua_inscricao(): void
+    {
+        $user   = $this->criarUsuario();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
+        $evento->participantes()->attach($user->id, ['status' => 'inscrito', 'inscrito_em' => now()]);
+
+        $this->actingAs($user)->delete(route('eventos.inscricao.destroy', $evento))->assertRedirect();
+
+        $this->assertDatabaseHas('evento_participantes', ['evento_id' => $evento->id, 'user_id' => $user->id, 'status' => 'cancelado']);
+    }
+
+    public function test_usuario_comum_nao_consegue_acessar_criacao_edicao_e_cancelamento(): void
     {
         $user   = $this->criarUsuario();
         $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $user->id]);
@@ -219,15 +254,6 @@ class EventoTest extends TestCase
                 ->where('user_id', $user->id)
                 ->count()
         );
-    }
-
-    public function test_usuario_nao_consegue_se_inscrever_em_evento_cancelado(): void
-    {
-        $user   = $this->criarUsuario();
-        $evento = Evento::create([...$this->dadosEvento(['status' => 'cancelado']), 'criado_por_id' => $user->id]);
-
-        $this->actingAs($user)->post(route('eventos.inscricao.store', $evento))
-            ->assertSessionHas('mensagem_erro', 'Este evento foi cancelado.');
     }
 
     public function test_usuario_nao_consegue_se_inscrever_em_evento_finalizado(): void

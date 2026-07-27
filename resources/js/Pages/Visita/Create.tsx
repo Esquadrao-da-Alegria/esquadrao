@@ -1,12 +1,23 @@
-import VisitaForm, { type VisitaFormValues } from '@/components/Painel/Visita/Formulario/Form'
+// REACT
+import { type FC } from 'react'
+import { Link, useForm, usePage } from '@inertiajs/react'
+
+// UI
+import VisitaForm from '@/components/Painel/Visita/Formulario/Form'
 import PainelLayout from '@/layouts/PainelLayout'
 import { hojeLocal } from '@/lib/visita'
-import { index, store } from '@/routes/visitas'
-import type { Hospital, SharedData, User } from '@/types'
-import { Link, useForm, usePage } from '@inertiajs/react'
 import { ArrowLeft, Check } from 'lucide-react'
-import { type FC } from 'react'
 import { toast } from 'react-toastify'
+
+// TIPOS
+import type { Hospital, SharedData, User } from '@/types'
+import type { DadosFormulario } from '@/types/visita'
+
+// ROTAS
+import { index, store } from '@/routes/visitas'
+
+// SERVICES
+import { Service } from '@/Services/Visita/Service'
 
 interface Props {
     hospitais: Hospital[]
@@ -16,7 +27,7 @@ interface Props {
 const Create: FC<Props> = ({ hospitais, lideres }) => {
     const { auth } = usePage<SharedData>().props
 
-    const { data, setData, post, processing, errors } = useForm<VisitaFormValues>({
+    const { data, setData, transform, post, processing, errors } = useForm<DadosFormulario>({
         hospital_id: '',
         ala_unidade_id: null,
         data: hojeLocal(),
@@ -27,7 +38,7 @@ const Create: FC<Props> = ({ hospitais, lideres }) => {
         observacoes: '',
     })
 
-    const handleFieldChange = <K extends keyof VisitaFormValues>(campo: K, valor: VisitaFormValues[K]) => {
+    const handleCampoChange = <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => {
         setData((prev) => ({ ...prev, [campo]: valor }))
     }
 
@@ -36,6 +47,8 @@ const Create: FC<Props> = ({ hospitais, lideres }) => {
             toast.error('Preencha todos os campos obrigatórios.')
             return
         }
+
+        transform(() => Service.montarPayload(data, 'criar'))
         post(store().url)
     }
 
@@ -74,7 +87,7 @@ const Create: FC<Props> = ({ hospitais, lideres }) => {
                                         mode="create"
                                         hospitais={hospitais}
                                         lideres={lideres}
-                                        onFieldChange={handleFieldChange}
+                                        onCampoChange={handleCampoChange}
                                     />
                                 </form>
                             </div>

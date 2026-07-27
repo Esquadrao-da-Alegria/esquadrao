@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import type { Visita } from '@/types'
+import type { Visita } from '@/types/visita'
 import { classeCardPorStatus } from '@/lib/visita'
 
 interface Props {

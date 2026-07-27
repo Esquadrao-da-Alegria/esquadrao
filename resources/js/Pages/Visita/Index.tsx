@@ -9,7 +9,7 @@ import PainelLayout from '@/layouts/PainelLayout';
 import { create, index } from '@/routes/visitas';
 
 // TIPOS
-import type { Visita } from '@/types';
+import type { Visita } from '@/types/visita';
 
 // COMPONENTES
 import DetalhesModalShow from '@/components/Painel/Visita/Calendario/Detalhes/Modal/Show';
