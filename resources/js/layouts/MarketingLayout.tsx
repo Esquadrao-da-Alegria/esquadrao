@@ -1,4 +1,4 @@
-import { home } from '@/routes'
+import { dashboard, home, login } from '@/routes'
 import conheca from '@/routes/conheca'
 import doacoes from '@/routes/doacoes'
 import fale_conosco from '@/routes/fale_conosco'
@@ -16,6 +16,7 @@ interface Props {
 const MarketingLayout: React.FC<Props> = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false)
   const { props } = usePage<SharedData>()
+  const isAuthenticated = Boolean(props.auth?.user)
 
   useEffect(() => {
     const mensagemSucesso = props.mensagem_sucesso
@@ -69,6 +70,12 @@ const MarketingLayout: React.FC<Props> = ({ children }) => {
               className="rounded-xl px-5 py-3 font-medium text-gray-700 transition hover:text-orange-600 hover:bg-orange-50 md:hover:bg-transparent"
             >
               Fale Conosco
+            </Link>
+            <Link
+              href={isAuthenticated ? dashboard() : login()}
+              className="mt-2 rounded-xl bg-amber-500 px-6 py-2.5 font-semibold text-white shadow-md transition hover:bg-amber-600 md:mt-0 md:ml-4"
+            >
+              {isAuthenticated ? 'Painel' : 'Entrar'}
             </Link>
           </div>
 

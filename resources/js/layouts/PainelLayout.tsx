@@ -29,6 +29,7 @@ import {
     Building2,
     CalendarDays,
     ChevronDown,
+    CircleHelp,
     Handshake,
     LayoutGrid,
     LogOut,
@@ -51,7 +52,7 @@ const temaPainelAmarelo = cn(
 
 interface ItemNavegacaoPainel {
     titulo: string;
-    href: ReturnType<typeof dashboard>;
+    href: any;
     icone: LucideIcon;
     ativo: boolean;
     visivel: boolean;
@@ -82,6 +83,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const closeMobile = () => setMobileOpen(false);
 
     const isDashboard = pathname === '/dashboard';
+    const isAjuda = pathname === '/ajuda';
     const isHospitaisCreate = pathname === '/hospitais/create';
     const isHospitaisNav =
         pathname === '/hospitais' ||
@@ -155,6 +157,13 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             icone: Handshake,
             ativo: isPatrocinadoresNav && !isPatrocinadoresCreate,
             visivel: ehAdministrador,
+        },
+        {
+            titulo: 'Ajuda / Tutoriais',
+            href: '/ajuda',
+            icone: CircleHelp,
+            ativo: isAjuda,
+            visivel: true,
         },
     ];
 
@@ -356,6 +365,19 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                         Patrocinadores
                                     </Link>
                                 ) : null}
+                                <Link
+                                    href="/ajuda"
+                                    className={`${navLinkClass} ${navLinkActive(
+                                        isAjuda,
+                                    )} flex items-center gap-2`}
+                                    onClick={closeMobile}
+                                >
+                                    <CircleHelp
+                                        className="size-4 shrink-0 opacity-70"
+                                        aria-hidden
+                                    />
+                                    Ajuda / Tutoriais
+                                </Link>
                             </div>
                         </div>
 
