@@ -296,7 +296,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 Painel administrativo
                             </span>
 
-                            {/* Menu mobile — sem alterações */}
+                            {/* Menu mobile — mapeamento dinâmico dos itens visíveis */}
                             <div
                                 className={`${
                                     mobileOpen
@@ -304,80 +304,26 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                         : 'hidden'
                                 } sm:hidden`}
                             >
-                                <Link
-                                    href={dashboard()}
-                                    className={`${navLinkClass} ${navLinkActive(
-                                        isDashboard,
-                                    )} flex items-center gap-2`}
-                                    onClick={closeMobile}
-                                >
-                                    <LayoutGrid
-                                        className="size-4 shrink-0 opacity-70"
-                                        aria-hidden
-                                    />
-                                    Início
-                                </Link>
-                                {ehAdministrador ? (
-                                    <Link
-                                        href={index()}
-                                        className={`${navLinkClass} ${navLinkActive(
-                                            isHospitaisNav &&
-                                                !isHospitaisCreate,
-                                        )} flex items-center gap-2`}
-                                        onClick={closeMobile}
-                                    >
-                                        <Building2
-                                            className="size-4 shrink-0 opacity-70"
-                                            aria-hidden
-                                        />
-                                        Hospitais
-                                    </Link>
-                                ) : null}
-                                {ehAdministrador ? (
-                                    <Link
-                                        href={voluntariosIndex()}
-                                        className={`${navLinkClass} ${navLinkActive(
-                                            isVoluntariosNav &&
-                                                !isVoluntariosCreate,
-                                        )} flex items-center gap-2`}
-                                        onClick={closeMobile}
-                                    >
-                                        <UsersRound
-                                            className="size-4 shrink-0 opacity-70"
-                                            aria-hidden
-                                        />
-                                        Voluntários
-                                    </Link>
-                                ) : null}
-                                {ehAdministrador ? (
-                                    <Link
-                                        href={patrocinadoresIndex()}
-                                        className={`${navLinkClass} ${navLinkActive(
-                                            isPatrocinadoresNav &&
-                                                !isPatrocinadoresCreate,
-                                        )} flex items-center gap-2`}
-                                        onClick={closeMobile}
-                                    >
-                                        <UsersRound
-                                            className="size-4 shrink-0 opacity-70"
-                                            aria-hidden
-                                        />
-                                        Patrocinadores
-                                    </Link>
-                                ) : null}
-                                <Link
-                                    href="/ajuda"
-                                    className={`${navLinkClass} ${navLinkActive(
-                                        isAjuda,
-                                    )} flex items-center gap-2`}
-                                    onClick={closeMobile}
-                                >
-                                    <CircleHelp
-                                        className="size-4 shrink-0 opacity-70"
-                                        aria-hidden
-                                    />
-                                    Ajuda / Tutoriais
-                                </Link>
+                                {itensVisiveis.map((item) => {
+                                    const Icone = item.icone;
+
+                                    return (
+                                        <Link
+                                            key={item.titulo}
+                                            href={item.href}
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                item.ativo,
+                                            )} flex items-center gap-2`}
+                                            onClick={closeMobile}
+                                        >
+                                            <Icone
+                                                className="size-4 shrink-0 opacity-70"
+                                                aria-hidden
+                                            />
+                                            {item.titulo}
+                                        </Link>
+                                    );
+                                })}
                             </div>
                         </div>
 
