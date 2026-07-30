@@ -60,6 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
+    Route::get('ajuda', function () {
+        return Inertia::render('Ajuda/Index');
+    })->name('ajuda.index');
+
     // Listas JSON
     ROUTE::prefix('json')->name('json.')->group(function () {
 
