@@ -11,7 +11,7 @@ import { ArrowLeft, Check } from 'lucide-react'
 import { toast } from 'react-toastify'
 
 // TIPOS
-import type { Hospital, User } from '@/types'
+import type { Cidade, Hospital, User } from '@/types'
 import type { DadosFormulario, Visita, VisitaParticipante } from '@/types/visita'
 
 // ROTAS
@@ -23,6 +23,7 @@ import { Service } from '@/Services/Visita/Service'
 
 interface Props {
     hospitais: Hospital[]
+    cidades?: Cidade[]
     lideres: User[]
     visita: Visita
 }
@@ -40,7 +41,7 @@ const labelStatusParticipacao = (status: VisitaParticipante['status_participacao
     return labels[status] ?? status
 }
 
-const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
+const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
     const { data, setData, transform, put, processing, errors } = useForm<DadosFormulario>({
         hospital_id: visita.hospital_id,
         ala_unidade_id: visita.ala_unidade_id ?? null,
@@ -109,6 +110,7 @@ const Edit: FC<Props> = ({ hospitais, lideres, visita }) => {
                                         errors={errors}
                                         mode="edit"
                                         hospitais={hospitais}
+                                        cidades={cidades}
                                         lideres={lideres}
                                         onCampoChange={handleCampoChange}
                                     />

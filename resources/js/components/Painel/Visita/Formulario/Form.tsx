@@ -1,12 +1,12 @@
 // REACT
-import { type FC, useMemo } from 'react'
+import { type FC, useMemo, useState } from 'react'
 
 // UI
 import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { labelStatus, labelTipo, VISITA_STATUS, VISITA_TIPOS } from '@/lib/visita'
 
 // TIPOS
-import type { AlaHospital, Hospital, User } from '@/types'
+import type { AlaHospital, Cidade, Hospital, User } from '@/types'
 import type { DadosFormulario, VisitaStatus, VisitaTipo } from '@/types/visita'
 
 interface Props {
@@ -14,16 +14,35 @@ interface Props {
     errors: Record<string, string | undefined>
     mode: 'create' | 'edit'
     hospitais: Hospital[]
+    cidades?: Cidade[]
     lideres: User[]
     onCampoChange: <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => void
 }
 
-const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onCampoChange }) => {
-    const alasDisponiveis = useMemo(() => {
-        if (!data.hospital_id) return [] as AlaHospital[]
-        const hospital = hospitais.find((h) => h.id === Number(data.hospital_id))
-        return hospital?.alas ?? []
+const Form: FC<Props> = ({ data, errors, mode, hospitais, cidades = [], lideres, onCampoChange }) => {
+    const hospitalSelecionado = useMemo(() => {
+        if (!data.hospital_id) return null
+        return hospitais.find((h) => h.id === Number(data.hospital_id)) ?? null
     }, [data.hospital_id, hospitais])
+
+    const [cidadeFiltroId, setCidadeFiltroId] = useState<number | ''>(
+        hospitalSelecionado?.cidade_id ?? '',
+    )
+
+    const hospitaisFiltrados = useMemo(() => {
+        if (!cidadeFiltroId) return hospitais
+        return hospitais.filter((h) => Number(h.cidade_id) === Number(cidadeFiltroId))
+    }, [cidadeFiltroId, hospitais])
+
+    const alasDisponiveis = useMemo(() => {
+        return hospitalSelecionado?.alas ?? []
+    }, [hospitalSelecionado])
+
+    const handleCidadeChange = (valor: number | '') => {
+        setCidadeFiltroId(valor)
+        onCampoChange('hospital_id', '')
+        onCampoChange('ala_unidade_id', null)
+    }
 
     const handleHospitalChange = (valor: number | '') => {
         onCampoChange('hospital_id', valor)
@@ -32,6 +51,25 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onCampoChange
 
     return (
         <div className="space-y-6">
+            {cidades.length > 0 && (
+                <div>
+                    <label htmlFor="cidade_filtro_id" className={painelLabelClass}>Filtrar por Cidade</label>
+                    <select
+                        id="cidade_filtro_id"
+                        name="cidade_filtro_id"
+                        disabled={mode === 'edit'}
+                        value={cidadeFiltroId}
+                        onChange={(e) => handleCidadeChange(e.target.value ? Number(e.target.value) : '')}
+                        className={painelInputClass}
+                    >
+                        <option value="">Todas as Cidades</option>
+                        {cidades.map((c) => (
+                            <option key={c.id} value={c.id}>{c.nome}</option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
             <div>
                 <label htmlFor="hospital_id" className={painelLabelClass}>Hospital *</label>
                 <select
@@ -43,8 +81,12 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, lideres, onCampoChange
                     onChange={(e) => handleHospitalChange(e.target.value ? Number(e.target.value) : '')}
                     className={painelInputClass}
                 >
-                    <option value="">Selecione...</option>
-                    {hospitais.map((h) => (
+                    <option value="">
+                        {cidadeFiltroId
+                            ? 'Selecione um hospital da cidade...'
+                            : 'Selecione...'}
+                    </option>
+                    {hospitaisFiltrados.map((h) => (
                         <option key={h.id} value={h.id}>{h.nome}</option>
                     ))}
                 </select>
