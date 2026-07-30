@@ -10,7 +10,7 @@ import { ArrowLeft, Check } from 'lucide-react'
 import { toast } from 'react-toastify'
 
 // TIPOS
-import type { Hospital, SharedData, User } from '@/types'
+import type { Cidade, Hospital, SharedData, User } from '@/types'
 import type { DadosFormulario } from '@/types/visita'
 
 // ROTAS
@@ -21,10 +21,11 @@ import { Service } from '@/Services/Visita/Service'
 
 interface Props {
     hospitais: Hospital[]
+    cidades?: Cidade[]
     lideres: User[]
 }
 
-const Create: FC<Props> = ({ hospitais, lideres }) => {
+const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
     const { auth } = usePage<SharedData>().props
 
     const { data, setData, transform, post, processing, errors } = useForm<DadosFormulario>({
@@ -86,6 +87,7 @@ const Create: FC<Props> = ({ hospitais, lideres }) => {
                                         errors={errors}
                                         mode="create"
                                         hospitais={hospitais}
+                                        cidades={cidades}
                                         lideres={lideres}
                                         onCampoChange={handleCampoChange}
                                     />

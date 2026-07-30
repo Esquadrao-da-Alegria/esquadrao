@@ -2,6 +2,7 @@
 
 namespace App\Services\Visita\Form;
 
+use App\Models\Cidade;
 use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
@@ -15,7 +16,12 @@ class Service
             ->where('ativo', true)
             ->with(['alas:id,hospital_id,nome'])
             ->orderBy('nome')
-            ->get(['id', 'nome', 'ativo']);
+            ->get(['id', 'nome', 'cidade_id', 'ativo']);
+
+        $cidades = Cidade::query()
+            ->whereIn('nome', ['Santa Maria', 'Porto Alegre', 'Pelotas'])
+            ->orderBy('nome')
+            ->get(['id', 'nome']);
 
         if ($visita) {
             $visita->load([
@@ -49,6 +55,7 @@ class Service
 
         $retorno = [
             'hospitais' => $hospitais,
+            'cidades'   => $cidades,
             'lideres'   => $lideres,
         ];
 
