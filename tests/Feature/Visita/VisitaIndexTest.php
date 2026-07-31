@@ -99,6 +99,153 @@ class VisitaIndexTest extends TestCase
             );
     }
 
+    public function test_filtra_visitas_automaticamente_pela_cidade_base_do_voluntario(): void
+    {
+        $estado = Estado::query()->create(['nome' => 'RS', 'sigla' => 'RS']);
+        $cidadePOA = Cidade::query()->forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
+        $cidadeSM  = Cidade::query()->forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
+
+        $voluntario = \App\Models\Voluntario::query()->create([
+            'nome_completo'   => 'Voluntario Teste',
+            'email'           => 'voluntario@teste.com',
+            'cidade_base_id'  => $cidadePOA->id,
+            'status'          => 'ativo',
+        ]);
+        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+
+        $hospitalPOA = Hospital::query()->create([
+            'cidade_id' => $cidadePOA->id,
+            'nome'      => 'Hospital POA',
+            'cnpj'      => '12345678000101',
+            'endereco'  => 'Rua POA, 1',
+            'telefone'  => '51999999991',
+            'email'     => 'poa@hospital.com',
+            'ativo'     => true,
+        ]);
+
+        $hospitalSM = Hospital::query()->create([
+            'cidade_id' => $cidadeSM->id,
+            'nome'      => 'Hospital SM',
+            'cnpj'      => '12345678000102',
+            'endereco'  => 'Rua SM, 1',
+            'telefone'  => '55999999992',
+            'email'     => 'sm@hospital.com',
+            'ativo'     => true,
+        ]);
+
+        $dataHoje = now()->format('Y-m-d H:i:s');
+        $visitaPOA = $this->criarVisita($hospitalPOA, $user, $dataHoje);
+        $visitaSM  = $this->criarVisita($hospitalSM, $user, $dataHoje);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Index')
+                ->where('cidadeId', $cidadePOA->id)
+                ->where('cidadeUsuarioId', $cidadePOA->id)
+                ->has('visitas', 1)
+                ->where('visitas.0.id', $visitaPOA->id)
+            );
+    }
+
+    public function test_permite_selecionar_outra_cidade_manualmente(): void
+    {
+        $estado = Estado::query()->create(['nome' => 'RS', 'sigla' => 'RS']);
+        $cidadePOA = Cidade::query()->forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
+        $cidadeSM  = Cidade::query()->forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
+
+        $voluntario = \App\Models\Voluntario::query()->create([
+            'nome_completo'   => 'Voluntario Teste',
+            'email'           => 'voluntario2@teste.com',
+            'cidade_base_id'  => $cidadePOA->id,
+            'status'          => 'ativo',
+        ]);
+        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+
+        $hospitalPOA = Hospital::query()->create([
+            'cidade_id' => $cidadePOA->id,
+            'nome'      => 'Hospital POA',
+            'cnpj'      => '12345678000103',
+            'endereco'  => 'Rua POA, 1',
+            'telefone'  => '51999999993',
+            'email'     => 'poa2@hospital.com',
+            'ativo'     => true,
+        ]);
+
+        $hospitalSM = Hospital::query()->create([
+            'cidade_id' => $cidadeSM->id,
+            'nome'      => 'Hospital SM',
+            'cnpj'      => '12345678000104',
+            'endereco'  => 'Rua SM, 1',
+            'telefone'  => '55999999994',
+            'email'     => 'sm2@hospital.com',
+            'ativo'     => true,
+        ]);
+
+        $dataHoje = now()->format('Y-m-d H:i:s');
+        $visitaPOA = $this->criarVisita($hospitalPOA, $user, $dataHoje);
+        $visitaSM  = $this->criarVisita($hospitalSM, $user, $dataHoje);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['cidade_id' => $cidadeSM->id]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Index')
+                ->where('cidadeId', $cidadeSM->id)
+                ->has('visitas', 1)
+                ->where('visitas.0.id', $visitaSM->id)
+            );
+    }
+
+    public function test_permite_selecionar_todas_as_cidades_manualmente(): void
+    {
+        $estado = Estado::query()->create(['nome' => 'RS', 'sigla' => 'RS']);
+        $cidadePOA = Cidade::query()->forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
+        $cidadeSM  = Cidade::query()->forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
+
+        $voluntario = \App\Models\Voluntario::query()->create([
+            'nome_completo'   => 'Voluntario Teste',
+            'email'           => 'voluntario3@teste.com',
+            'cidade_base_id'  => $cidadePOA->id,
+            'status'          => 'ativo',
+        ]);
+        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+
+        $hospitalPOA = Hospital::query()->create([
+            'cidade_id' => $cidadePOA->id,
+            'nome'      => 'Hospital POA',
+            'cnpj'      => '12345678000105',
+            'endereco'  => 'Rua POA, 1',
+            'telefone'  => '51999999995',
+            'email'     => 'poa3@hospital.com',
+            'ativo'     => true,
+        ]);
+
+        $hospitalSM = Hospital::query()->create([
+            'cidade_id' => $cidadeSM->id,
+            'nome'      => 'Hospital SM',
+            'cnpj'      => '12345678000106',
+            'endereco'  => 'Rua SM, 1',
+            'telefone'  => '55999999996',
+            'email'     => 'sm3@hospital.com',
+            'ativo'     => true,
+        ]);
+
+        $dataHoje = now()->format('Y-m-d H:i:s');
+        $this->criarVisita($hospitalPOA, $user, $dataHoje);
+        $this->criarVisita($hospitalSM, $user, $dataHoje);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['cidade_id' => 'todas']))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Index')
+                ->where('cidadeId', 'todas')
+                ->has('visitas', 2)
+            );
+    }
+
     private function criarUsuario(): User
     {
         return User::factory()->createOne();
