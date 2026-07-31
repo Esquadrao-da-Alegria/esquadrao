@@ -1,12 +1,13 @@
 // REACT
 import { type FC, useMemo, useState } from 'react'
+import { usePage } from '@inertiajs/react'
 
 // UI
 import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { labelStatus, labelTipo, VISITA_STATUS, VISITA_TIPOS } from '@/lib/visita'
 
 // TIPOS
-import type { AlaHospital, Cidade, Hospital, User } from '@/types'
+import type { AlaHospital, Cidade, Hospital, SharedData, User } from '@/types'
 import type { DadosFormulario, VisitaStatus, VisitaTipo } from '@/types/visita'
 
 const OPCOES_HORARIOS = (() => {
@@ -29,13 +30,16 @@ interface Props {
 }
 
 const Form: FC<Props> = ({ data, errors, mode, hospitais, cidades = [], lideres, onCampoChange }) => {
+    const { auth } = usePage<SharedData>().props
+    const userCidadeId = (auth?.user?.cidade_base_id ?? auth?.user?.voluntario?.cidade_base_id ?? '') as number | ''
+
     const hospitalSelecionado = useMemo(() => {
         if (!data.hospital_id) return null
         return hospitais.find((h) => h.id === Number(data.hospital_id)) ?? null
     }, [data.hospital_id, hospitais])
 
     const [cidadeFiltroId, setCidadeFiltroId] = useState<number | ''>(
-        hospitalSelecionado?.cidade_id ?? '',
+        hospitalSelecionado?.cidade_id ?? userCidadeId ?? '',
     )
 
     const hospitaisFiltrados = useMemo(() => {

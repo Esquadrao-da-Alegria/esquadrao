@@ -3,8 +3,8 @@ import PainelLayout from '@/layouts/PainelLayout'
 import { montarDatetime } from '@/lib/evento'
 import { hojeLocal } from '@/lib/visita'
 import { index, store } from '@/routes/eventos'
-import type { Cidade, User } from '@/types'
-import { Link, useForm } from '@inertiajs/react'
+import type { Cidade, SharedData, User } from '@/types'
+import { Link, useForm, usePage } from '@inertiajs/react'
 import { ArrowLeft, Check } from 'lucide-react'
 import { type FC } from 'react'
 import { toast } from 'react-toastify'
@@ -32,13 +32,16 @@ function montarPayload(data: EventoFormValues) {
 }
 
 const Create: FC<Props> = ({ responsaveis, cidades }) => {
+    const { auth } = usePage<SharedData>().props
+    const userCidadeId = String(auth?.user?.cidade_base_id ?? auth?.user?.voluntario?.cidade_base_id ?? '')
     const hoje = hojeLocal()
+
     const { data, setData, transform, post, processing, errors } = useForm<EventoFormValues>({
         titulo: '',
         tipo: '',
         descricao: '',
         local: '',
-        cidade_id: '',
+        cidade_id: userCidadeId,
         data: hoje,
         hora_inicio: '',
         data_fim: hoje,
