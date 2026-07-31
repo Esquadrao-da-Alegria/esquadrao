@@ -13,11 +13,13 @@
         }
     </style>
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <title inertia>{{ config('app.name', 'Esquadrão da Alegria') }}</title>
 
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <!-- Ícones e Favicon Esquadrão da Alegria -->
+    <link rel="icon" type="image/png" href="/assets/images/logo-colorida.png">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/logo-colorida.png">
+    <link rel="apple-touch-icon" href="/assets/images/logo-colorida.png">
+    <link rel="manifest" href="/manifest.json">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
@@ -27,8 +29,6 @@
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <!--Favicon-->
-    <link rel="icon" type="image/png" sizes="32x32" href="./assets/img/favicon-32x32.png">
     <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 
     <!-- Bootstrap -->
