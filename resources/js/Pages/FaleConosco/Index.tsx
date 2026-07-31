@@ -7,6 +7,7 @@ const Index: React.FC = () => {
         nome: '',
         email: '',
         mensagem: '',
+        honeypot: '',
     });
     const [enviando, setEnviando] = useState(false);
 
@@ -39,10 +40,18 @@ const Index: React.FC = () => {
             nome: '',
             email: '',
             mensagem: '',
+            honeypot: '',
         });
     };
 
     const handleSubmit = async () => {
+        // Proteção Anti-Bot (Honeypot): se preenchido, ignora silenciosamente
+        if (formData.honeypot) {
+            toast.success('Mensagem enviada com sucesso!');
+            resetarFormulario();
+            return;
+        }
+
         if (!formData.nome || !formData.email || !formData.mensagem) {
             toast.error('Por favor, preencha todos os campos.');
             return;
@@ -97,6 +106,18 @@ const Index: React.FC = () => {
                                         onSubmit={(e) => e.preventDefault()}
                                         className="space-y-6"
                                     >
+                                        {/* Campo Honeypot (Armadilha Anti-Bot) */}
+                                        <div className="hidden" aria-hidden="true">
+                                            <input
+                                                type="text"
+                                                name="honeypot"
+                                                tabIndex={-1}
+                                                autoComplete="off"
+                                                value={formData.honeypot}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+
                                         {/* Nome */}
                                         <div>
                                             <label
