@@ -116,6 +116,12 @@ class Queries
                     $fim    = $inicio->copy()->endOfMonth();
                     $query->whereBetween('inicio_em', [$inicio, $fim]);
                     break;
+
+                case 'cidade_id':
+                    $query->whereHas('hospital', function (Builder $q) use ($valor) {
+                        $q->where('cidade_id', $valor);
+                    });
+                    break;
             }
         }
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web\Visita;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Visita\StoreRequest;
 use App\Http\Requests\Web\Visita\UpdateRequest;
+use App\Models\Cidade;
 use App\Models\Visita;
 use App\Services\Visita\Form\Service as FormService;
 use App\Services\Visita\Service;
@@ -24,15 +25,38 @@ class VisitaController extends Controller
     {
         $mes = $this->normalizarMes($request->query('mes'));
 
+        $user = Auth::user();
+        $user?->loadMissing('voluntario');
+        $cidadeUsuarioId = $user?->voluntario?->cidade_base_id;
+
+        if ($request->has('cidade_id')) {
+            $cidadeFiltro = $request->query('cidade_id');
+            if ($cidadeFiltro === 'todas' || $cidadeFiltro === '' || $cidadeFiltro === null) {
+                $cidadeId = 'todas';
+            } else {
+                $cidadeId = (int) $cidadeFiltro;
+            }
+        } else {
+            $cidadeId = $cidadeUsuarioId ? (int) $cidadeUsuarioId : 'todas';
+        }
+
         $filtrosBusca = [
             'mes' => $mes,
         ];
 
+        if ($cidadeId !== 'todas') {
+            $filtrosBusca['cidade_id'] = $cidadeId;
+        }
+
         $retorno = $this->service->index($filtrosBusca);
+        $cidades = Cidade::query()->orderBy('nome')->get(['id', 'nome']);
 
         return Inertia::render('Visita/Index', [
-            'visitas' => $retorno['dados'],
-            'mes'     => $mes,
+            'visitas'         => $retorno['dados'],
+            'mes'             => $mes,
+            'cidades'         => $cidades,
+            'cidadeId'        => $cidadeId,
+            'cidadeUsuarioId' => $cidadeUsuarioId ? (int) $cidadeUsuarioId : null,
         ]);
     }
 

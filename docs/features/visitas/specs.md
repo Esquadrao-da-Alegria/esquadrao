@@ -380,7 +380,7 @@ Grupo `visitas.` (middleware `auth` + `verified`):
 | POST | `/visitas/{visita}/participantes` | `VisitaParticipanteController@store` | `visitas.participantes.store` |
 | DELETE | `/visitas/{visita}/participantes/{participante}` | `VisitaParticipanteController@destroy` | `visitas.participantes.destroy` |
 
-Query string (index): `?mes=YYYY-MM` — filtra visitas pelo mês de `inicio_em`.
+Query string (index): `?mes=YYYY-MM&cidade_id=ID|todas` — filtra visitas pelo mês de `inicio_em` e opcionalmente pela cidade do hospital (padrão: `cidade_base_id` do voluntário logado).
 
 Camadas index: `VisitaController` → `Visita\Service` → `Visita\Queries`
 
