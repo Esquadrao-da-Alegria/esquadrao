@@ -57,17 +57,18 @@ const Show: FC<Props> = ({ eventos, mes, onSelecionarEvento, onAbrirListaComplet
     const hoje = new Date()
 
     return (
-        <div className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
-            <div className="grid grid-cols-7 border-b border-amber-100">
-                {DIAS_SEMANA.map((dia) => (
-                    <div
-                        key={dia}
-                        className="py-2 text-center text-xs font-semibold uppercase tracking-wide text-amber-700/70"
-                    >
-                        {dia}
-                    </div>
-                ))}
-            </div>
+        <div className="overflow-x-auto rounded-2xl border border-amber-100 bg-white shadow-sm">
+            <div className="min-w-[650px]">
+                <div className="grid grid-cols-7 border-b border-amber-100">
+                    {DIAS_SEMANA.map((dia) => (
+                        <div
+                            key={dia}
+                            className="py-2 text-center text-xs font-semibold uppercase tracking-wide text-amber-700/70"
+                        >
+                            {dia}
+                        </div>
+                    ))}
+                </div>
 
             <div className="grid grid-cols-7">
                 {dias.map((dia, idx) => {
@@ -122,7 +123,8 @@ const Show: FC<Props> = ({ eventos, mes, onSelecionarEvento, onAbrirListaComplet
                 })}
             </div>
         </div>
-    )
+    </div>
+)
 }
 
 export default Show

@@ -86,9 +86,9 @@ const Index: FC<Props> = ({ visitas, mes }) => {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-3 w-full sm:w-auto sm:flex-row sm:items-center sm:gap-2">
                         {/* Seletor de mês */}
-                        <div className="flex items-center gap-1 rounded-full border border-amber-200 bg-white p-1">
+                        <div className="flex w-full items-center justify-between sm:w-auto gap-1 rounded-full border border-amber-200 bg-white p-1 shadow-sm">
                             <button
                                 type="button"
                                 onClick={() => navegarMes(mesAnterior(mes))}
@@ -116,7 +116,7 @@ const Index: FC<Props> = ({ visitas, mes }) => {
                         {/* Botão nova visita */}
                         <Link
                             href={create().url}
-                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
+                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-5 py-2.5 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
                         >
                             <Plus
                                 className="size-5"
