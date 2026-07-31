@@ -39,6 +39,7 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
         nome: '',
         email: '',
         mensagem: '',
+        honeypot: '',
     });
 
     const accessKey = '53b7a3e3-b32f-4b85-9be7-d8f176bed235';
@@ -55,13 +56,26 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
             nome: '',
             email: '',
             mensagem: '',
+            honeypot: '',
         });
     };
 
     const handleSubmit = async () => {
+        if (formData.honeypot) {
+            toast.success('Mensagem enviada com sucesso!');
+            resetarFormulario();
+            return;
+        }
+
+        if (!formData.nome || !formData.email || !formData.mensagem) {
+            toast.error('Por favor, preencha todos os campos.');
+            return;
+        }
+
         try {
             const url = 'https://api.staticforms.xyz/submit';
-            const dadosPost = { ...formData, accessKey: accessKey };
+            const { honeypot, ...dadosEnviados } = formData;
+            const dadosPost = { ...dadosEnviados, accessKey: accessKey };
 
             const options = {
                 method: 'POST',
@@ -77,7 +91,6 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
 
             toast.success('Mensagem enviada com sucesso!');
             resetarFormulario();
-            setTimeout(() => location.reload(), 500);
         } catch (error) {
             console.error('Erro:', error);
             toast.error(
@@ -391,6 +404,17 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
                                     </h2>
 
                                     <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+                                        <div className="hidden" aria-hidden="true">
+                                            <input
+                                                type="text"
+                                                name="honeypot"
+                                                tabIndex={-1}
+                                                autoComplete="off"
+                                                value={formData.honeypot}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+
                                         <div>
                                             <label htmlFor="nome" className="mb-2 block text-sm font-medium text-gray-700">Nome</label>
                                             <input type="text" id="nome" name="nome" required placeholder="Digite seu nome" value={formData.nome} onChange={handleChange} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500" />
