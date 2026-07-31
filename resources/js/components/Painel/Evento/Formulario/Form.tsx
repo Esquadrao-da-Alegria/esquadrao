@@ -3,6 +3,15 @@ import { EVENTO_TIPOS, labelTipo } from '@/lib/evento'
 import type { Cidade, EventoTipo, User } from '@/types'
 import { type FC } from 'react'
 
+const OPCOES_HORARIOS = (() => {
+    const lista: string[] = []
+    for (let h = 6; h <= 23; h++) {
+        const hh = String(h).padStart(2, '0')
+        lista.push(`${hh}:00`, `${hh}:15`, `${hh}:30`, `${hh}:45`)
+    }
+    return lista
+})()
+
 export interface EventoFormValues {
     titulo: string
     tipo: EventoTipo | ''
@@ -122,15 +131,22 @@ const Form: FC<Props> = ({ data, errors, responsaveis, cidades, onFieldChange })
                 </div>
                 <div>
                     <label htmlFor="hora_inicio" className={painelLabelClass}>Horário início *</label>
-                    <input
-                        type="time"
+                    <select
                         id="hora_inicio"
                         name="hora_inicio"
                         required
                         value={data.hora_inicio}
                         onChange={(e) => onFieldChange('hora_inicio', e.target.value)}
                         className={painelInputClass}
-                    />
+                    >
+                        <option value="">Selecione...</option>
+                        {data.hora_inicio && !OPCOES_HORARIOS.includes(data.hora_inicio) && (
+                            <option value={data.hora_inicio}>{data.hora_inicio}</option>
+                        )}
+                        {OPCOES_HORARIOS.map((h) => (
+                            <option key={h} value={h}>{h}</option>
+                        ))}
+                    </select>
                     {errors.hora_inicio ? <p className="mt-1 text-sm text-red-600">{errors.hora_inicio}</p> : null}
                 </div>
             </div>
@@ -153,15 +169,22 @@ const Form: FC<Props> = ({ data, errors, responsaveis, cidades, onFieldChange })
                     {!data.sem_hora_fim && (
                         <>
                             <label htmlFor="hora_fim" className={painelLabelClass}>Horário fim *</label>
-                            <input
-                                type="time"
+                            <select
                                 id="hora_fim"
                                 name="hora_fim"
                                 required
                                 value={data.hora_fim}
                                 onChange={(e) => onFieldChange('hora_fim', e.target.value)}
                                 className={painelInputClass}
-                            />
+                            >
+                                <option value="">Selecione...</option>
+                                {data.hora_fim && !OPCOES_HORARIOS.includes(data.hora_fim) && (
+                                    <option value={data.hora_fim}>{data.hora_fim}</option>
+                                )}
+                                {OPCOES_HORARIOS.map((h) => (
+                                    <option key={h} value={h}>{h}</option>
+                                ))}
+                            </select>
                             {errors.hora_fim ? <p className="mt-1 text-sm text-red-600">{errors.hora_fim}</p> : null}
                         </>
                     )}
@@ -195,14 +218,21 @@ const Form: FC<Props> = ({ data, errors, responsaveis, cidades, onFieldChange })
                 </div>
                 <div>
                     <label htmlFor="limite_inscricao_hora" className={painelLabelClass}>Horário limite</label>
-                    <input
-                        type="time"
+                    <select
                         id="limite_inscricao_hora"
                         name="limite_inscricao_hora"
                         value={data.limite_inscricao_hora}
                         onChange={(e) => onFieldChange('limite_inscricao_hora', e.target.value)}
                         className={painelInputClass}
-                    />
+                    >
+                        <option value="">Selecione (padrão 23:59)...</option>
+                        {data.limite_inscricao_hora && !OPCOES_HORARIOS.includes(data.limite_inscricao_hora) && (
+                            <option value={data.limite_inscricao_hora}>{data.limite_inscricao_hora}</option>
+                        )}
+                        {OPCOES_HORARIOS.map((h) => (
+                            <option key={h} value={h}>{h}</option>
+                        ))}
+                    </select>
                     <p className="mt-1 text-xs text-gray-500">Se vazio, será usado 23:59.</p>
                 </div>
             </div>
