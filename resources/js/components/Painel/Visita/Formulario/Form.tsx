@@ -9,6 +9,15 @@ import { labelStatus, labelTipo, VISITA_STATUS, VISITA_TIPOS } from '@/lib/visit
 import type { AlaHospital, Cidade, Hospital, User } from '@/types'
 import type { DadosFormulario, VisitaStatus, VisitaTipo } from '@/types/visita'
 
+const OPCOES_HORARIOS = (() => {
+    const lista: string[] = []
+    for (let h = 6; h <= 23; h++) {
+        const hh = String(h).padStart(2, '0')
+        lista.push(`${hh}:00`, `${hh}:15`, `${hh}:30`, `${hh}:45`)
+    }
+    return lista
+})()
+
 interface Props {
     data: DadosFormulario
     errors: Record<string, string | undefined>
@@ -120,14 +129,42 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, cidades = [], lideres,
                 </div>
                 <div>
                     <label htmlFor="hora_inicio" className={painelLabelClass}>Início *</label>
-                    <input type="time" id="hora_inicio" required value={data.hora_inicio}
-                        onChange={(e) => onCampoChange('hora_inicio', e.target.value)} className={painelInputClass} />
+                    <select
+                        id="hora_inicio"
+                        name="hora_inicio"
+                        required
+                        value={data.hora_inicio}
+                        onChange={(e) => onCampoChange('hora_inicio', e.target.value)}
+                        className={painelInputClass}
+                    >
+                        <option value="">Selecione...</option>
+                        {data.hora_inicio && !OPCOES_HORARIOS.includes(data.hora_inicio) && (
+                            <option value={data.hora_inicio}>{data.hora_inicio}</option>
+                        )}
+                        {OPCOES_HORARIOS.map((h) => (
+                            <option key={h} value={h}>{h}</option>
+                        ))}
+                    </select>
                     {errors.hora_inicio ? <p className="mt-1 text-sm text-red-600">{errors.hora_inicio}</p> : null}
                 </div>
                 <div>
                     <label htmlFor="hora_fim" className={painelLabelClass}>Fim *</label>
-                    <input type="time" id="hora_fim" required value={data.hora_fim}
-                        onChange={(e) => onCampoChange('hora_fim', e.target.value)} className={painelInputClass} />
+                    <select
+                        id="hora_fim"
+                        name="hora_fim"
+                        required
+                        value={data.hora_fim}
+                        onChange={(e) => onCampoChange('hora_fim', e.target.value)}
+                        className={painelInputClass}
+                    >
+                        <option value="">Selecione...</option>
+                        {data.hora_fim && !OPCOES_HORARIOS.includes(data.hora_fim) && (
+                            <option value={data.hora_fim}>{data.hora_fim}</option>
+                        )}
+                        {OPCOES_HORARIOS.map((h) => (
+                            <option key={h} value={h}>{h}</option>
+                        ))}
+                    </select>
                     {errors.hora_fim ? <p className="mt-1 text-sm text-red-600">{errors.hora_fim}</p> : null}
                 </div>
             </div>
