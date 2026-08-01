@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\Visita;
 
+use App\Enums\VisitaStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Visita\StoreRequest;
 use App\Http\Requests\Web\Visita\UpdateRequest;
@@ -106,6 +107,21 @@ class VisitaController extends Controller
         }
 
         return redirect()->route('visitas.index');
+    }
+
+    public function cancelar(Visita $visita): \Illuminate\Http\RedirectResponse
+    {
+        if ($visita->status === VisitaStatus::Cancelada) {
+            return back()->with('mensagem_alerta', 'Esta visita já está cancelada.');
+        }
+
+        $visita->update([
+            'status' => VisitaStatus::Cancelada->value,
+        ]);
+
+        return redirect()
+            ->route('visitas.index')
+            ->with('mensagem_sucesso', 'Visita cancelada com sucesso!');
     }
 
     private function normalizarMes(?string $mes): string
