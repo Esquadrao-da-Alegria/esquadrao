@@ -91,6 +91,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{visita}/edit', [VisitaController::class, 'edit'])->name('edit');
         Route::put('{visita}', [VisitaController::class, 'update'])->name('update');
 
+        Route::post('{visita}/cancelar', [VisitaController::class, 'cancelar'])
+            ->middleware('administrador')
+            ->name('cancelar');
+
         Route::prefix('{visita}/relatorios')->scopeBindings()->name('relatorios.')->group(function () {
             Route::get('/', [VisitaRelatorioController::class, 'index'])->name('index');
             Route::get('create', [VisitaRelatorioController::class, 'create'])->name('create');
