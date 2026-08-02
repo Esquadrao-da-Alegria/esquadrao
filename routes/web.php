@@ -18,10 +18,8 @@ use App\Models\Patrocinador;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// URLs do site estático antigo (index.html, etc.)
 Route::redirect('/index.html', '/', 301);
 
-// HOME PAGE
 Route::get('/', function () {
     return Inertia::render('Home', [
         'patrocinadores' => Patrocinador::where('ativo', true)
@@ -30,20 +28,16 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-// Hospitais
 Route::get('/onde-atuamos', [OndeAtuamosController::class, 'index'])->name('onde_atuamos.index');
 
-// Conheça
 Route::get('/conheça', function () {
     return Inertia::render('Conheca/Index');
 })->name('conheca.index');
 
-// Conheça
 Route::get('/doacoes', function () {
     return Inertia::render('Doacao/Index');
 })->name('doacoes.index');
 
-// Fale Conosco
 Route::get('/fale-conosco', function () {
     return Inertia::render('FaleConosco/Index');
 })->name('fale_conosco.index');
@@ -54,7 +48,6 @@ Route::get('/convites/{token}', [ConviteCadastroController::class, 'show'])
 Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'concluir'])
     ->name('convites.concluir');
 
-// AUTENTICADO
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('Dashboard');
@@ -64,9 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Ajuda/Index');
     })->name('ajuda.index');
 
-    // Listas JSON
     ROUTE::prefix('json')->name('json.')->group(function () {
-
         Route::get('cidades', [CidadeController::class, 'index'])->name('cidades.index');
     });
 
@@ -78,18 +69,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
-    
+
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
     Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
     Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
 
-    // VISITAS
     Route::prefix('visitas')->name('visitas.')->group(function () {
         Route::get('/', [VisitaController::class, 'index'])->name('index');
         Route::get('create', [VisitaController::class, 'create'])->name('create');
         Route::post('/', [VisitaController::class, 'store'])->name('store');
         Route::get('{visita}/edit', [VisitaController::class, 'edit'])->name('edit');
         Route::put('{visita}', [VisitaController::class, 'update'])->name('update');
+        Route::post('{visita}/cancelar', [VisitaController::class, 'cancelar'])->name('cancelar');
 
         Route::prefix('{visita}/relatorios')->scopeBindings()->name('relatorios.')->group(function () {
             Route::get('/', [VisitaRelatorioController::class, 'index'])->name('index');
@@ -108,7 +99,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('participantes.destroy');
     });
 
-    // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
         Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
         Route::get('/eventos/{evento}/edit', [EventoController::class, 'edit'])->name('eventos.edit');
@@ -116,7 +106,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/eventos/{evento}/cancelar', [EventoController::class, 'cancelar'])->name('eventos.cancelar');
         Route::delete('/eventos/{evento}', [EventoController::class, 'destroy'])->name('eventos.destroy');
 
-        // VOLUNTARIOS
         Route::post('/voluntarios/convite', [VoluntarioController::class, 'storeConvite'])
             ->name('voluntarios.convite.store');
 
@@ -130,10 +119,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->parameters(['voluntarios' => 'voluntario'])
             ->except(['show']);
 
-        // Hospitais
         Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
-
-        // patrocinadores
         Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
     });
 

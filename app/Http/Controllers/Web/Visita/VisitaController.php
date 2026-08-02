@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\Visita;
 
+use App\Enums\VisitaStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Visita\StoreRequest;
 use App\Http\Requests\Web\Visita\UpdateRequest;
@@ -40,9 +41,7 @@ class VisitaController extends Controller
             $cidadeId = $cidadeUsuarioId ? (int) $cidadeUsuarioId : 'todas';
         }
 
-        $filtrosBusca = [
-            'mes' => $mes,
-        ];
+        $filtrosBusca = ['mes' => $mes];
 
         if ($cidadeId !== 'todas') {
             $filtrosBusca['cidade_id'] = $cidadeId;
@@ -52,10 +51,10 @@ class VisitaController extends Controller
         $cidades = Cidade::query()->orderBy('nome')->get(['id', 'nome']);
 
         return Inertia::render('Visita/Index', [
-            'visitas'         => $retorno['dados'],
-            'mes'             => $mes,
-            'cidades'         => $cidades,
-            'cidadeId'        => $cidadeId,
+            'visitas' => $retorno['dados'],
+            'mes' => $mes,
+            'cidades' => $cidades,
+            'cidadeId' => $cidadeId,
             'cidadeUsuarioId' => $cidadeUsuarioId ? (int) $cidadeUsuarioId : null,
         ]);
     }
@@ -63,7 +62,6 @@ class VisitaController extends Controller
     public function create(): \Inertia\Response
     {
         $dadosView = $this->formService->buscarDados(null);
-
         return Inertia::render('Visita/Create', $dadosView);
     }
 
@@ -81,21 +79,17 @@ class VisitaController extends Controller
     public function edit(Visita $visita): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
         if (! $this->service->podeEditarVisita(Auth::user(), $visita)) {
-            return redirect()
-                ->route('visitas.index')
+            return redirect()->route('visitas.index')
                 ->with('mensagem_erro', 'Você não tem permissão para editar esta visita.');
         }
 
-        $dadosView = $this->formService->buscarDados($visita);
-
-        return Inertia::render('Visita/Edit', $dadosView);
+        return Inertia::render('Visita/Edit', $this->formService->buscarDados($visita));
     }
 
     public function update(UpdateRequest $request, Visita $visita): \Illuminate\Http\RedirectResponse
     {
         if (! $this->service->podeEditarVisita(Auth::user(), $visita)) {
-            return redirect()
-                ->route('visitas.index')
+            return redirect()->route('visitas.index')
                 ->with('mensagem_erro', 'Você não tem permissão para editar esta visita.');
         }
 
@@ -106,6 +100,28 @@ class VisitaController extends Controller
         }
 
         return redirect()->route('visitas.index');
+    }
+
+    public function cancelar(Visita $visita): \Illuminate\Http\RedirectResponse
+    {
+        $user = Auth::user();
+        $user?->loadMissing('cargos');
+
+        $ehAdministrador = $user?->cargos->contains('slug', 'administrador') ?? false;
+        $ehLider = $user !== null && $visita->lider_id !== null && $user->id === $visita->lider_id;
+
+        if (! $ehAdministrador && ! $ehLider) {
+            return back()->with('mensagem_erro', 'Você não tem permissão para cancelar esta visita.');
+        }
+
+        if ($visita->status === VisitaStatus::Cancelada) {
+            return back()->with('mensagem_alerta', 'Esta visita já está cancelada.');
+        }
+
+        $visita->update(['status' => VisitaStatus::Cancelada->value]);
+
+        return redirect()->route('visitas.index')
+            ->with('mensagem_sucesso', 'Visita cancelada com sucesso!');
     }
 
     private function normalizarMes(?string $mes): string
