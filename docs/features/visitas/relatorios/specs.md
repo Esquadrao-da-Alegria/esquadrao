@@ -29,6 +29,7 @@ Documento de referência do submódulo **relatórios** vinculados a uma visita. 
 10. **Ala do relatório** — Campo opcional `ala_unidade_id` (FK → `alas_hospitais`), independente da ala da visita; exibido na seção do relatório (UI e PDF).
 11. **Sem destroy** — Não há rota nem query `destroy` nesta v1.
 12. **Histórico preservado** — Relatórios impedem exclusão física da visita (`visita_id` com `restrictOnDelete`). Visita com relatório(s) não pode ser removida do banco; o histórico não desaparece em cascata.
+13. **Notificação por e-mail** — Ao cadastrar um novo relatório, uma notificação por e-mail (`RelatorioVisitaNotification`) é enviada automaticamente para todos os integrantes da visita (com status diferente de cancelado).
 
 ---
 
