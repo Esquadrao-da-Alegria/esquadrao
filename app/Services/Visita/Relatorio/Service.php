@@ -2,16 +2,19 @@
 
 namespace App\Services\Visita\Relatorio;
 
+use App\Enums\StatusParticipacao;
 use App\Enums\VisitaStatus;
 use App\Models\User;
 use App\Models\Visita;
 use App\Models\VisitaRelatorio;
+use App\Notifications\RelatorioVisitaNotification;
 use App\Queries\Visita\Relatorio\Queries;
 use App\Services\Visita\Service as VisitaService;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Facades\Pdf;
 use Symfony\Component\HttpFoundation\Response;
@@ -122,6 +125,11 @@ class Service
             }
 
             DB::commit();
+
+            $relatorioModel = $retornoDatabase['dados']['model'] ?? null;
+            if ($relatorioModel instanceof VisitaRelatorio) {
+                $this->notificarIntegrantesDaVisita($visita, $relatorioModel);
+            }
 
             return $retornoDatabase;
         } catch (\Throwable $th) {
@@ -315,5 +323,28 @@ class Service
             'dados'   => $dados,
             'erros'   => [$mensagemErro],
         ]);
+    }
+
+    private function notificarIntegrantesDaVisita(Visita $visita, VisitaRelatorio $relatorio): void
+    {
+        try {
+            $visita->load(['hospital', 'participantes.voluntario']);
+
+            $integrantes = $visita->participantes
+                ->filter(fn ($p) => $p->status_participacao !== StatusParticipacao::Cancelado)
+                ->map(fn ($p) => $p->voluntario)
+                ->filter(fn ($user) => $user !== null && ! empty($user->email))
+                ->unique('id');
+
+            if ($integrantes->isNotEmpty()) {
+                Notification::send($integrantes, new RelatorioVisitaNotification($visita, $relatorio));
+            }
+        } catch (\Throwable $th) {
+            $this->logarErro(
+                $this->payloadLogErro($visita->id, $relatorio->id, Auth::id()),
+                'notificar_integrantes',
+                formatarMensagemErro($th),
+            );
+        }
     }
 }
