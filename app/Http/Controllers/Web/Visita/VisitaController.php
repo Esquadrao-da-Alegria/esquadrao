@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Visita\StoreRequest;
 use App\Http\Requests\Web\Visita\UpdateRequest;
 use App\Models\Cidade;
+use App\Models\Evento;
 use App\Models\Visita;
 use App\Services\Visita\Form\Service as FormService;
 use App\Services\Visita\Service;
@@ -50,11 +51,22 @@ class VisitaController extends Controller
         $retorno = $this->service->index($filtrosBusca);
         $cidades = Cidade::query()->orderBy('nome')->get(['id', 'nome']);
 
+        $inicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
+        $fim = $inicio->copy()->endOfMonth();
+
+        $eventos = Evento::with(['responsavel', 'cidade'])
+            ->withCount('participantesAtivos')
+            ->whereBetween('data_inicio', [$inicio, $fim])
+            ->when($cidadeId !== 'todas', fn ($q) => $q->where('cidade_id', $cidadeId))
+            ->orderBy('data_inicio')
+            ->get();
+
         return Inertia::render('Visita/Index', [
-            'visitas' => $retorno['dados'],
-            'mes' => $mes,
-            'cidades' => $cidades,
-            'cidadeId' => $cidadeId,
+            'visitas'         => $retorno['dados'],
+            'eventos'         => $eventos,
+            'mes'             => $mes,
+            'cidades'         => $cidades,
+            'cidadeId'        => $cidadeId,
             'cidadeUsuarioId' => $cidadeUsuarioId ? (int) $cidadeUsuarioId : null,
         ]);
     }

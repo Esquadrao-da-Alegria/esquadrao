@@ -246,6 +246,52 @@ class VisitaIndexTest extends TestCase
             );
     }
 
+    public function test_retorna_eventos_do_mes_e_cidade_no_calendario_de_visitas(): void
+    {
+        $estado = Estado::query()->create(['nome' => 'RS', 'sigla' => 'RS']);
+        $cidadePOA = Cidade::query()->forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
+        $cidadeSM  = Cidade::query()->forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
+
+        $voluntario = \App\Models\Voluntario::query()->create([
+            'nome_completo'   => 'Voluntario Teste Visita Eventos',
+            'email'           => 'vol_vis_evt@teste.com',
+            'cidade_base_id'  => $cidadePOA->id,
+            'status'          => 'ativo',
+        ]);
+        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+
+        $eventoPOA = \App\Models\Evento::create([
+            'titulo'        => 'Oficina de Palhaço POA',
+            'tipo'          => 'oficina',
+            'descricao'     => 'Oficina',
+            'local'         => 'Sede',
+            'cidade_id'     => $cidadePOA->id,
+            'data_inicio'   => now()->format('Y-m-') . '15 14:00:00',
+            'status'        => 'agendado',
+            'criado_por_id' => $user->id,
+        ]);
+
+        $eventoSM = \App\Models\Evento::create([
+            'titulo'        => 'Oficina de Palhaço SM',
+            'tipo'          => 'oficina',
+            'descricao'     => 'Oficina',
+            'local'         => 'Sede',
+            'cidade_id'     => $cidadeSM->id,
+            'data_inicio'   => now()->format('Y-m-') . '16 14:00:00',
+            'status'        => 'agendado',
+            'criado_por_id' => $user->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Index')
+                ->has('eventos', 1)
+                ->where('eventos.0.id', $eventoPOA->id)
+            );
+    }
+
     private function criarUsuario(): User
     {
         return User::factory()->createOne();

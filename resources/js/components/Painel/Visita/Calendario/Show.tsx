@@ -1,15 +1,23 @@
 import { type FC } from 'react'
+import type { Evento } from '@/types'
 import type { Visita } from '@/types/visita'
 import CardShow from '@/components/Painel/Visita/Card/Show'
+import EventoCardShow from '@/components/Painel/Visita/Card/EventoCardShow'
 
 const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 const MAX_CARDS = 2
 
+export type ItemCalendarioVisita =
+    | { tipo: 'visita'; data: Visita; dataInicio: Date }
+    | { tipo: 'evento'; data: Evento; dataInicio: Date }
+
 interface Props {
     visitas: Visita[]
+    eventos?: Evento[]
     mes: string // YYYY-MM
     onSelecionarVisita: (visita: Visita) => void
-    onAbrirListaCompleta: (dia: Date, visitas: Visita[]) => void
+    onSelecionarEvento?: (evento: Evento) => void
+    onAbrirListaCompleta: (dia: Date, visitas: Visita[], eventos: Evento[]) => void
 }
 
 function gerarDiasDoMes(mes: string): Date[] {
@@ -53,7 +61,14 @@ function mesmodia(d1: Date, d2: Date): boolean {
     )
 }
 
-const Show: FC<Props> = ({ visitas, mes, onSelecionarVisita, onAbrirListaCompleta }) => {
+const Show: FC<Props> = ({
+    visitas,
+    eventos = [],
+    mes,
+    onSelecionarVisita,
+    onSelecionarEvento,
+    onAbrirListaCompleta,
+}) => {
     const dias = gerarDiasDoMes(mes)
     const [ano, mesNum] = mes.split('-').map(Number)
     const hoje = new Date()
@@ -80,8 +95,25 @@ const Show: FC<Props> = ({ visitas, mes, onSelecionarVisita, onAbrirListaComplet
                         const visitasDoDia = visitas.filter((v) =>
                             mesmodia(new Date(v.inicio_em), dia),
                         )
-                        const visitasVisiveis = visitasDoDia.slice(0, MAX_CARDS)
-                        const overflow = visitasDoDia.length - MAX_CARDS
+                        const eventosDoDia = eventos.filter((e) =>
+                            mesmodia(new Date(e.data_inicio), dia),
+                        )
+
+                        const itensDoDia: ItemCalendarioVisita[] = [
+                            ...visitasDoDia.map((v) => ({
+                                tipo: 'visita' as const,
+                                data: v,
+                                dataInicio: new Date(v.inicio_em),
+                            })),
+                            ...eventosDoDia.map((e) => ({
+                                tipo: 'evento' as const,
+                                data: e,
+                                dataInicio: new Date(e.data_inicio),
+                            })),
+                        ].sort((a, b) => a.dataInicio.getTime() - b.dataInicio.getTime())
+
+                        const itensVisiveis = itensDoDia.slice(0, MAX_CARDS)
+                        const overflow = itensDoDia.length - MAX_CARDS
 
                         const ehHoje = mesmodia(dia, hoje)
 
@@ -105,18 +137,28 @@ const Show: FC<Props> = ({ visitas, mes, onSelecionarVisita, onAbrirListaComplet
                                 </span>
 
                                 <div className="space-y-0.5">
-                                    {visitasVisiveis.map((v) => (
-                                        <CardShow
-                                            key={v.id}
-                                            visita={v}
-                                            onClick={() => onSelecionarVisita(v)}
-                                        />
-                                    ))}
+                                    {itensVisiveis.map((item) =>
+                                        item.tipo === 'visita' ? (
+                                            <CardShow
+                                                key={`visita-${item.data.id}`}
+                                                visita={item.data}
+                                                onClick={() => onSelecionarVisita(item.data)}
+                                            />
+                                        ) : (
+                                            <EventoCardShow
+                                                key={`evento-${item.data.id}`}
+                                                evento={item.data}
+                                                onClick={() => onSelecionarEvento?.(item.data)}
+                                            />
+                                        ),
+                                    )}
 
                                     {overflow > 0 && (
                                         <button
                                             type="button"
-                                            onClick={() => onAbrirListaCompleta(dia, visitasDoDia)}
+                                            onClick={() =>
+                                                onAbrirListaCompleta(dia, visitasDoDia, eventosDoDia)
+                                            }
                                             className="w-full rounded px-1 py-0.5 text-left text-xs text-amber-700 hover:bg-amber-50"
                                         >
                                             +{overflow} mais

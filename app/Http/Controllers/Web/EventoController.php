@@ -11,6 +11,7 @@ use App\Models\Evento;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class EventoController extends Controller
@@ -22,13 +23,37 @@ class EventoController extends Controller
         $inicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
         $fim = $inicio->copy()->endOfMonth();
 
+        $user = Auth::user();
+        $user?->loadMissing('voluntario');
+        $cidadeUsuarioId = $user?->voluntario?->cidade_base_id;
+
+        if ($request->has('cidade_id')) {
+            $cidadeFiltro = $request->query('cidade_id');
+            if ($cidadeFiltro === 'todas' || $cidadeFiltro === '' || $cidadeFiltro === null) {
+                $cidadeId = 'todas';
+            } else {
+                $cidadeId = (int) $cidadeFiltro;
+            }
+        } else {
+            $cidadeId = $cidadeUsuarioId ? (int) $cidadeUsuarioId : 'todas';
+        }
+
         $eventos = Evento::with(['responsavel', 'cidade'])->withCount('participantesAtivos')
             ->whereBetween('data_inicio', [$inicio, $fim])
+            ->when($cidadeId !== 'todas', fn ($q) => $q->where('cidade_id', $cidadeId))
             ->when($request->filled('tipo'), fn ($q) => $q->where('tipo', $request->string('tipo')))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
             ->orderBy('data_inicio')->get();
 
-        return Inertia::render('Evento/Index', ['eventos' => $eventos, 'mes' => $mes]);
+        $cidades = Cidade::orderBy('nome')->get(['id', 'nome']);
+
+        return Inertia::render('Evento/Index', [
+            'eventos' => $eventos,
+            'mes' => $mes,
+            'cidades' => $cidades,
+            'cidadeId' => $cidadeId,
+            'cidadeUsuarioId' => $cidadeUsuarioId ? (int) $cidadeUsuarioId : null,
+        ]);
     }
 
     public function create()

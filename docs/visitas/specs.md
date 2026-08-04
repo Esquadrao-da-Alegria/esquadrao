@@ -468,8 +468,9 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 
 | Arquivo | Responsabilidade |
 |---------|------------------|
-| `Pages/Visita/Index.tsx` | Page principal — estado de modais, navegação de mês |
+| `Pages/Visita/Index.tsx` | Page principal — estado de modais, navegação de mês e cidade, exibição conjunta de visitas e eventos |
 | `components/Painel/Visita/Card/Show.tsx` | Card de visita no calendário |
+| `components/Painel/Visita/Card/EventoCardShow.tsx` | Card de evento no calendário de visitas (estilo índigo diferenciado) |
 | `components/Painel/Visita/Calendario/Show.tsx` | Grade mensal |
 | `components/Painel/Visita/Calendario/Detalhes/Modal/Show.tsx` | Modal de detalhes + inscrição em 2 passos |
 | `components/Painel/Visita/Calendario/ListaCompleta/Modal/Show.tsx` | Modal lista completa do dia |
