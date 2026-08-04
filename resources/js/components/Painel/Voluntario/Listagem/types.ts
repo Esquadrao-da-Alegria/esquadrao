@@ -32,10 +32,16 @@ export interface PaginatedVoluntarios {
     last_page: number;
 }
 
+export interface CidadeOption {
+    id: number;
+    nome: string;
+}
+
 export interface VoluntarioFiltros {
     aba?: AbaKey;
     busca?: string;
     status?: StatusFiltro;
+    cidade_id?: number | 'todas';
 }
 
 export type StatusCounters = Partial<Record<StatusKey | AbaKey, number>>;

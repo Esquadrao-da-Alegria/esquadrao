@@ -749,4 +749,58 @@ class EventoTest extends TestCase
 
         $this->assertDatabaseHas('eventos', ['id' => $evento->id, 'status' => 'cancelado']);
     }
+
+    public function test_filtra_eventos_por_cidade_do_voluntario_ou_parametro(): void
+    {
+        $estado = Estado::create(['nome' => 'RS', 'sigla' => 'RS']);
+        $cidadePOA = Cidade::forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
+        $cidadeSM  = Cidade::forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
+
+        $voluntario = \App\Models\Voluntario::create([
+            'nome_completo'  => 'Voluntario Eventos',
+            'email'          => 'vol_evt@teste.com',
+            'cidade_base_id' => $cidadePOA->id,
+            'status'         => 'ativo',
+        ]);
+        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+
+        $eventoPOA = Evento::create([
+            ...$this->dadosEvento(['cidade_id' => $cidadePOA->id, 'titulo' => 'Evento POA']),
+            'criado_por_id' => $user->id,
+        ]);
+
+        $eventoSM = Evento::create([
+            ...$this->dadosEvento(['cidade_id' => $cidadeSM->id, 'titulo' => 'Evento SM']),
+            'criado_por_id' => $user->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('eventos.index'))
+            ->assertOk()
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Evento/Index')
+                ->where('cidadeId', $cidadePOA->id)
+                ->has('eventos', 1)
+                ->where('eventos.0.id', $eventoPOA->id)
+            );
+
+        $this->actingAs($user)
+            ->get(route('eventos.index', ['cidade_id' => $cidadeSM->id]))
+            ->assertOk()
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Evento/Index')
+                ->where('cidadeId', $cidadeSM->id)
+                ->has('eventos', 1)
+                ->where('eventos.0.id', $eventoSM->id)
+            );
+
+        $this->actingAs($user)
+            ->get(route('eventos.index', ['cidade_id' => 'todas']))
+            ->assertOk()
+            ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
+                ->component('Evento/Index')
+                ->where('cidadeId', 'todas')
+                ->has('eventos', 2)
+            );
+    }
 }

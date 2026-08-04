@@ -9,14 +9,15 @@ import PainelLayout from '@/layouts/PainelLayout';
 import { create, index } from '@/routes/visitas';
 
 // TIPOS
+import type { Evento } from '@/types';
 import type { Visita } from '@/types/visita';
 
 // COMPONENTES
+import EventoDetalhesModalShow from '@/components/Painel/Evento/Calendario/Detalhes/Modal/Show';
 import DetalhesModalShow from '@/components/Painel/Visita/Calendario/Detalhes/Modal/Show';
 import ListaCompletaModalShow from '@/components/Painel/Visita/Calendario/ListaCompleta/Modal/Show';
 import CalendarioShow from '@/components/Painel/Visita/Calendario/Show';
 
-// ICONS
 // ICONS
 import { CalendarDays, ChevronLeft, ChevronRight, MapPin, Plus } from 'lucide-react';
 
@@ -27,6 +28,7 @@ interface CidadeOption {
 
 interface Props {
     visitas: Visita[];
+    eventos?: Evento[];
     mes: string; // YYYY-MM
     cidades?: CidadeOption[];
     cidadeId?: number | 'todas';
@@ -53,6 +55,7 @@ function mesSeguinte(mes: string): string {
 
 const Index: FC<Props> = ({
     visitas,
+    eventos = [],
     mes,
     cidades = [],
     cidadeId = 'todas',
@@ -61,8 +64,12 @@ const Index: FC<Props> = ({
     const [visitaSelecionada, setVisitaSelecionada] = useState<Visita | null>(
         null,
     );
+    const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(
+        null,
+    );
     const [diaOverflow, setDiaOverflow] = useState<Date | null>(null);
     const [visitasOverflow, setVisitasOverflow] = useState<Visita[]>([]);
+    const [eventosOverflow, setEventosOverflow] = useState<Evento[]>([]);
 
     const navegar = (novoMes: string, novaCidade: number | 'todas') => {
         const query: Record<string, string | number> = { mes: novoMes };
@@ -77,14 +84,20 @@ const Index: FC<Props> = ({
         });
     };
 
-    const abrirListaCompleta = (dia: Date, visitasDoDia: Visita[]) => {
+    const abrirListaCompleta = (
+        dia: Date,
+        visitasDoDia: Visita[],
+        eventosDoDia: Evento[] = [],
+    ) => {
         setDiaOverflow(dia);
         setVisitasOverflow(visitasDoDia);
+        setEventosOverflow(eventosDoDia);
     };
 
     const fecharListaCompleta = () => {
         setDiaOverflow(null);
         setVisitasOverflow([]);
+        setEventosOverflow([]);
     };
 
     const fecharDetalhes = () => setVisitaSelecionada(null);
@@ -101,9 +114,9 @@ const Index: FC<Props> = ({
                                 {nomeMes(mes)}
                             </h1>
                             <p className="mt-0.5 text-sm text-amber-900/50">
-                                {visitas.length === 0
-                                    ? 'Nenhuma visita neste mês'
-                                    : `${visitas.length} ${visitas.length === 1 ? 'visita' : 'visitas'}`}
+                                {visitas.length === 0 && eventos.length === 0
+                                    ? 'Nenhuma atividade neste mês'
+                                    : `${visitas.length} ${visitas.length === 1 ? 'visita' : 'visitas'} · ${eventos.length} ${eventos.length === 1 ? 'evento' : 'eventos'}`}
                             </p>
                         </div>
                     </div>
@@ -183,26 +196,39 @@ const Index: FC<Props> = ({
                 {/* Calendário */}
                 <CalendarioShow
                     visitas={visitas}
+                    eventos={eventos}
                     mes={mes}
                     onSelecionarVisita={setVisitaSelecionada}
+                    onSelecionarEvento={setEventoSelecionado}
                     onAbrirListaCompleta={abrirListaCompleta}
                 />
             </div>
 
-            {/* Modal detalhes */}
+            {/* Modal detalhes visita */}
             <DetalhesModalShow
                 visita={visitaSelecionada}
                 onFechar={fecharDetalhes}
+            />
+
+            {/* Modal detalhes evento */}
+            <EventoDetalhesModalShow
+                evento={eventoSelecionado}
+                onFechar={() => setEventoSelecionado(null)}
             />
 
             {/* Modal lista completa */}
             <ListaCompletaModalShow
                 dia={diaOverflow}
                 visitas={visitasOverflow}
+                eventos={eventosOverflow}
                 onFechar={fecharListaCompleta}
                 onSelecionarVisita={(v) => {
                     fecharListaCompleta();
                     setVisitaSelecionada(v);
+                }}
+                onSelecionarEvento={(e) => {
+                    fecharListaCompleta();
+                    setEventoSelecionado(e);
                 }}
             />
         </PainelLayout>

@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Web\Voluntario\StoreConviteRequest;
 use App\Http\Requests\Web\Voluntario\StoreRequest;
 use App\Http\Requests\Web\Voluntario\UpdateRequest;
+use App\Models\Cidade;
 use App\Models\Voluntario;
 use App\Services\Voluntario\Form\Service as FormService;
 use App\Services\Voluntario\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class VoluntarioController extends Controller
@@ -23,20 +25,44 @@ class VoluntarioController extends Controller
 
     public function index(Request $request)
     {
+        $user = Auth::user();
+        $user?->loadMissing('voluntario');
+        $cidadeUsuarioId = $user?->voluntario?->cidade_base_id;
+
+        if ($request->has('cidade_id')) {
+            $cidadeFiltro = $request->query('cidade_id');
+            if ($cidadeFiltro === 'todas' || $cidadeFiltro === '' || $cidadeFiltro === null) {
+                $cidadeId = 'todas';
+            } else {
+                $cidadeId = (int) $cidadeFiltro;
+            }
+        } else {
+            $cidadeId = $cidadeUsuarioId ? (int) $cidadeUsuarioId : 'todas';
+        }
+
         $filtrosBusca = [
             ...$request->all(),
             'retornar_lista' => true,
         ];
 
+        if ($cidadeId !== 'todas') {
+            $filtrosBusca['cidade_id'] = $cidadeId;
+        }
+
         $retorno = $this->service->index($filtrosBusca);
+        $cidades = Cidade::query()->orderBy('nome')->get(['id', 'nome']);
 
         $dadosView = [
             'voluntarios' => $retorno['dados'],
             'contadores' => $retorno['contadores'] ?? [],
+            'cidades' => $cidades,
+            'cidadeId' => $cidadeId,
+            'cidadeUsuarioId' => $cidadeUsuarioId ? (int) $cidadeUsuarioId : null,
             'filtros' => [
                 'aba' => $request->string('aba', 'voluntarios')->toString(),
                 'busca' => $request->string('busca')->toString(),
                 'status' => $request->string('status', 'todos')->toString(),
+                'cidade_id' => $cidadeId,
             ],
         ];
 

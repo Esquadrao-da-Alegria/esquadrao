@@ -5,24 +5,32 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { MapPin, Search } from 'lucide-react';
 import { statusOptions } from './status';
-import { AbaKey, StatusFiltro } from './types';
+import { AbaKey, CidadeOption, StatusFiltro } from './types';
 
 interface Props {
     aba: AbaKey;
     busca: string;
     statusFiltro: StatusFiltro;
+    cidades?: CidadeOption[];
+    cidadeId?: number | 'todas';
+    cidadeUsuarioId?: number | null;
     onBuscaChange: (busca: string) => void;
     onStatusChange: (status: StatusFiltro) => void;
+    onCidadeChange?: (cidadeId: number | 'todas') => void;
 }
 
 const Filtros: React.FC<Props> = ({
     aba,
     busca,
     statusFiltro,
+    cidades = [],
+    cidadeId = 'todas',
+    cidadeUsuarioId = null,
     onBuscaChange,
     onStatusChange,
+    onCidadeChange,
 }) => {
     return (
         <section className="mt-6 flex flex-col gap-3 lg:flex-row">
@@ -39,6 +47,34 @@ const Filtros: React.FC<Props> = ({
                     className="h-11 w-full rounded-2xl border border-gray-200 bg-white pr-4 pl-11 text-sm text-gray-700 shadow-sm transition placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none"
                 />
             </div>
+            {cidades.length > 0 ? (
+                <div className="lg:w-60">
+                    <Select
+                        value={String(cidadeId)}
+                        onValueChange={(val) =>
+                            onCidadeChange?.(val === 'todas' ? 'todas' : Number(val))
+                        }
+                    >
+                        <SelectTrigger className="h-11 rounded-2xl border-gray-200 bg-white px-4 shadow-sm focus:ring-amber-100">
+                            <div className="flex items-center gap-2 truncate">
+                                <MapPin className="size-4 shrink-0 text-gray-400" />
+                                <SelectValue placeholder="Todas as cidades" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="todas">Todas as cidades</SelectItem>
+                            {cidades.map((cidade) => (
+                                <SelectItem key={cidade.id} value={String(cidade.id)}>
+                                    {cidade.nome}
+                                    {cidade.id === cidadeUsuarioId
+                                        ? ' (Sua cidade)'
+                                        : ''}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            ) : null}
             {aba === 'convidados' ? (
                 <div className="lg:w-52">
                     <Select value={statusFiltro} onValueChange={onStatusChange}>
