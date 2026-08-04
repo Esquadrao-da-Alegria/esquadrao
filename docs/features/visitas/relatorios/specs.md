@@ -17,7 +17,7 @@ Documento de referência do submódulo **relatórios** vinculados a uma visita. 
 
 ## Regras de negócio
 
-1. **Quem cria** — Qualquer usuário autenticado, mesmo sem inscrição na visita.
+1. **Quem cria** — Apenas voluntários que participaram da visita (ou o líder da visita). Usuários que não participaram não podem criar relatórios.
 2. **Quem vê** — Qualquer usuário autenticado (listagem, detalhe e PDF).
 3. **Quem edita** — Autor do relatório **ou** quem passa em `podeEditarVisita` (mesma regra da visita).
 4. **Visita cancelada** — Pode listar, ver detalhe e baixar PDF. **Não** pode criar nem editar relatório.

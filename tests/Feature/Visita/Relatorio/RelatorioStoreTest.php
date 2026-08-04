@@ -66,6 +66,27 @@ class RelatorioStoreTest extends TestCase
         $this->assertNotNull($relatorio?->enviado_em);
     }
 
+    public function test_rejeita_criacao_de_relatorio_por_usuario_que_nao_participou_da_visita(): void
+    {
+        $lider = $this->criarVoluntario();
+        $visita = $this->criarVisita($lider);
+
+        $naoParticipante = $this->criarVoluntario();
+
+        $this->actingAs($naoParticipante)
+            ->get(route('visitas.relatorios.create', $visita))
+            ->assertRedirect(route('visitas.relatorios.index', $visita))
+            ->assertSessionHas('mensagem_erro');
+
+        $this->actingAs($naoParticipante)
+            ->from(route('visitas.relatorios.create', $visita))
+            ->post(route('visitas.relatorios.store', $visita), $this->payloadRelatorio())
+            ->assertRedirect(route('visitas.relatorios.create', $visita))
+            ->assertSessionHasErrors('geral');
+
+        $this->assertDatabaseCount('visitas_relatorios', 0);
+    }
+
     public function test_dentro_de_48h_fora_do_prazo_false(): void
     {
         $autor  = $this->criarVoluntario();

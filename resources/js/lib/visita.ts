@@ -154,6 +154,20 @@ export function podeEditarRelatorio(user: User, visita: Visita, relatorio: Visit
     return podeEditarVisita(user, visita)
 }
 
+export function usuarioParticipouDaVisita(visita: Visita, usuarioId: number): boolean {
+    if (usuarioEhLiderDaVisita(visita, usuarioId)) {
+        return true
+    }
+    return usuarioJaInscrito(visita, usuarioId)
+}
+
+export function podeCriarRelatorio(user: User, visita: Visita): boolean {
+    if (visita.status === 'cancelada') {
+        return false
+    }
+    return usuarioParticipouDaVisita(visita, user.id)
+}
+
 export function formatarDataHora(iso: string): string {
     return new Date(iso).toLocaleString('pt-BR', {
         day: '2-digit',

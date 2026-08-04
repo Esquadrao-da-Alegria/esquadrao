@@ -35,6 +35,12 @@ class VisitaRelatorioController extends Controller
                 ->with('mensagem_erro', 'Não é possível criar relatório para visita cancelada.');
         }
 
+        if (! $this->service->usuarioParticipouDaVisita(Auth::user(), $visita)) {
+            return redirect()
+                ->route('visitas.relatorios.index', $visita)
+                ->with('mensagem_erro', 'Apenas voluntários que participaram desta visita podem criar relatórios.');
+        }
+
         $visita = $this->carregarContextoVisita($visita);
 
         return Inertia::render('Visita/Relatorio/Create', [
