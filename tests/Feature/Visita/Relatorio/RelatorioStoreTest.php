@@ -152,10 +152,10 @@ class RelatorioStoreTest extends TestCase
         $this->assertDatabaseCount('visitas_relatorios', 0);
     }
 
-    public function test_store_nao_altera_status_da_visita(): void
+    public function test_store_altera_status_da_visita_agendada_para_realizada(): void
     {
         $autor  = $this->criarVoluntario();
-        $visita = $this->criarVisita($autor, status: VisitaStatus::Realizada);
+        $visita = $this->criarVisita($autor, status: VisitaStatus::Agendada);
 
         $this->actingAs($autor)
             ->post(route('visitas.relatorios.store', $visita), $this->payloadRelatorio())

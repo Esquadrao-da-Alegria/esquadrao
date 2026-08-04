@@ -117,6 +117,10 @@ class Service
                 return $retornoDatabase;
             }
 
+            if (in_array($visita->status, [VisitaStatus::Agendada, VisitaStatus::PendenteRelatorio], true)) {
+                $visita->update(['status' => VisitaStatus::Realizada->value]);
+            }
+
             DB::commit();
 
             return $retornoDatabase;

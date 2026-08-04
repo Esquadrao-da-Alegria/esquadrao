@@ -22,7 +22,7 @@ Documento de referência do submódulo **relatórios** vinculados a uma visita. 
 3. **Quem edita** — Autor do relatório **ou** quem passa em `podeEditarVisita` (mesma regra da visita).
 4. **Visita cancelada** — Pode listar, ver detalhe e baixar PDF. **Não** pode criar nem editar relatório.
 5. **Múltiplos relatórios** — Sem limite por visita (mesmo autor, mesmo tipo).
-6. **Status da visita** — Store/update de relatório **não** altera `visitas.status`.
+6. **Status da visita** — A criação de relatório altera automaticamente o status de visitas agendadas para `realizada`.
 7. **Campos imutáveis na edição** — `visita_id`, `autor_id`, `enviado_em`, `fora_do_prazo` removidos do payload no service.
 8. **Campos obrigatórios** — `tipo_relatorio` e `resumo` (validação `max:5000` nos textos).
 9. **Contexto da visita** — Hospital, datas, líder, ala cadastrada na visita e participantes são **read-only** na UI e no PDF (não persistidos no relatório).
