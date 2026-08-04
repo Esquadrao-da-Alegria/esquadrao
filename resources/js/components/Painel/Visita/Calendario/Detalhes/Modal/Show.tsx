@@ -9,6 +9,7 @@ import {
     labelStatus,
     listarParticipantesAtivos,
     participacaoAtivaDoUsuario,
+    podeCriarRelatorio,
     podeEditarVisita,
     usuarioEhLiderDaVisita,
     usuarioJaInscrito,
@@ -38,6 +39,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
     const participacaoAtiva = visita ? participacaoAtivaDoUsuario(visita, auth.user.id) : null
     const ehLider = visita ? usuarioEhLiderDaVisita(visita, auth.user.id) : false
     const visitaAgendada = visita?.status === 'agendada'
+    const dataFimPassou = visita ? new Date(visita.fim_em) < new Date() : false
     const podeCancelarVisita = Boolean(eh_administrador || ehLider)
 
     useEffect(() => {
@@ -97,13 +99,13 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                     {visita.observacoes && <div><dt className="text-xs font-medium uppercase text-gray-400">Observações</dt><dd className="mt-0.5 text-gray-700">{visita.observacoes}</dd></div>}
                 </dl>
 
-                <div className="mt-6 rounded-2xl border border-amber-100 bg-amber-50/40 p-4"><h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-900/70">Relatórios</h3><div className="flex flex-col gap-2"><Link href={relatoriosIndex.url({ visita: visita.id! })} onClick={fecharModal} className="inline-flex items-center justify-center rounded-full border border-amber-200 bg-white px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50">Ver relatórios</Link>{visita.status !== 'cancelada' && <Link href={create.url({ visita: visita.id! })} onClick={fecharModal} className="inline-flex items-center justify-center rounded-full border-2 border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50">Criar relatório</Link>}</div></div>
+                <div className="mt-6 rounded-2xl border border-amber-100 bg-amber-50/40 p-4"><h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-900/70">Relatórios</h3><div className="flex flex-col gap-2"><Link href={relatoriosIndex.url({ visita: visita.id! })} onClick={fecharModal} className="inline-flex items-center justify-center rounded-full border border-amber-200 bg-white px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50">Ver relatórios</Link>{podeCriarRelatorio(auth.user, visita) && <Link href={create.url({ visita: visita.id! })} onClick={fecharModal} className="inline-flex items-center justify-center rounded-full border-2 border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50">Criar relatório</Link>}</div></div>
 
                 {podeEditarVisita(auth.user, visita) && <div className="mt-6"><Link href={edit({ visita: visita.id! }).url} onClick={fecharModal} className="inline-flex w-full items-center justify-center rounded-lg border border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50">Visualizar Detalhes</Link></div>}
 
                 {podeCancelarVisita && visitaAgendada && <div className="mt-3"><Button className="w-full" variant="destructive" onClick={handleCancelarVisita} disabled={cancelandoVisita}>{cancelandoVisita ? 'Cancelando visita...' : 'Cancelar visita'}</Button></div>}
 
-                {visitaAgendada && !ehLider && <div className="mt-6">{jaInscrito ? <Button className="w-full" variant="outline" onClick={handleCancelarInscricao} disabled={cancelando}>{cancelando ? 'Cancelando...' : 'Cancelar inscrição'}</Button> : <Button className="w-full" onClick={handleParticipar}>Participar</Button>}</div>}
+                {visitaAgendada && !ehLider && <div className="mt-6">{jaInscrito ? <Button className="w-full" variant="outline" onClick={handleCancelarInscricao} disabled={cancelando}>{cancelando ? 'Cancelando...' : 'Cancelar inscrição'}</Button> : (!dataFimPassou && <Button className="w-full" onClick={handleParticipar}>Participar</Button>)}</div>}
             </div>}
 
             {visita && passo === 'inscricao' && <div className="p-6"><div className="mb-4 flex items-start justify-between gap-4"><h2 className="text-lg font-semibold text-gray-900">Escolha o tipo de participação</h2><button type="button" onClick={fecharModal} className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700" aria-label="Fechar">✕</button></div><div className="space-y-3"><button type="button" onClick={() => setTipo('palhaco')} className={`w-full rounded-lg border p-4 text-left transition-colors ${tipo === 'palhaco' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}><span className="mr-2">🎪</span>Palhaço</button><button type="button" onClick={() => setTipo('paisana')} className={`w-full rounded-lg border p-4 text-left transition-colors ${tipo === 'paisana' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}><span className="mr-2">👔</span>Paisana</button></div><div className="mt-6 flex gap-3"><Button variant="outline" className="flex-1" onClick={() => setPasso('detalhes')} disabled={enviando}>Voltar</Button><Button className="flex-1" onClick={handleConfirmar} disabled={!tipo || enviando}>{enviando ? 'Enviando...' : 'Confirmar'}</Button></div></div>}

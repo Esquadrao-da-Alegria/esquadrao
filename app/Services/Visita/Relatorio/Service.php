@@ -92,6 +92,15 @@ class Service
                 return $this->erro('Não é possível criar relatório para visita cancelada.');
             }
 
+            /** @var User $usuario */
+            $usuario = Auth::user();
+
+            if (! $this->usuarioParticipouDaVisita($usuario, $visita)) {
+                DB::rollBack();
+
+                return $this->erro('Apenas voluntários que participaram desta visita podem criar relatórios.');
+            }
+
             $payload = $this->formatarDatabase($visita, $dados, 'store');
 
             $retornoDatabase = $this->queries->store($payload);
@@ -190,6 +199,22 @@ class Service
         }
 
         return $this->visitaService->podeEditarVisita($user, $visita);
+    }
+
+    public function usuarioParticipouDaVisita(User $user, Visita $visita): bool
+    {
+        if ($visita->lider_id !== null && (int) $visita->lider_id === (int) $user->id) {
+            return true;
+        }
+
+        return $visita->participantes()
+            ->where('voluntario_id', $user->id)
+            ->whereIn('status_participacao', [
+                \App\Enums\StatusParticipacao::Confirmado->value,
+                \App\Enums\StatusParticipacao::Pendente->value,
+                \App\Enums\StatusParticipacao::Falta->value,
+            ])
+            ->exists();
     }
 
     public function calcularForaDoPrazo(Visita $visita, CarbonInterface $enviadoEm): bool

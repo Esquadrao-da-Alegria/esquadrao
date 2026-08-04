@@ -117,6 +117,55 @@ class ParticipanteStoreTest extends TestCase
         ]);
     }
 
+    public function test_rejeita_inscricao_self_service_em_visita_passada_ou_concluida(): void
+    {
+        $user = $this->criarUsuarioVoluntarioAtivo();
+
+        $hospital = $this->criarHospital();
+        $visitaPassada = Visita::create([
+            'hospital_id'   => $hospital->id,
+            'criado_por_id' => $user->id,
+            'inicio_em'     => now()->subDays(2),
+            'fim_em'        => now()->subDays(2)->addHours(2),
+            'tipo'          => VisitaTipo::Hospital,
+            'status'        => VisitaStatus::Agendada,
+            'origem'        => VisitaOrigem::Sistema,
+        ]);
+
+        $this->participar($user, $visitaPassada)
+            ->assertStatus(422)
+            ->assertJsonPath('erros.0', 'Esta visita não está aberta para inscrições.');
+
+        $visitaRealizada = $this->criarVisita(VisitaStatus::Realizada);
+
+        $this->participar($user, $visitaRealizada)
+            ->assertStatus(422)
+            ->assertJsonPath('erros.0', 'Esta visita não está aberta para inscrições.');
+    }
+
+    public function test_gestor_consegue_adicionar_outro_participante(): void
+    {
+        $admin = $this->criarUsuarioVoluntarioAtivo();
+        $cargoAdmin = \App\Models\Cargo::create(['nome' => 'Administrador', 'slug' => 'administrador']);
+        $admin->cargos()->attach($cargoAdmin);
+
+        $targetUser = $this->criarUsuarioVoluntarioAtivo();
+        $visita = $this->criarVisita();
+
+        $this->actingAs($admin)->postJson(
+            route('visitas.participantes.store', $visita),
+            [
+                'voluntario_id'     => $targetUser->id,
+                'tipo_participacao' => 'palhaco',
+            ],
+        )->assertOk()->assertJson(['sucesso' => true]);
+
+        $this->assertDatabaseHas('visita_participante', [
+            'visita_id'     => $visita->id,
+            'voluntario_id' => $targetUser->id,
+        ]);
+    }
+
     private function participar(User $user, Visita $visita, string $tipo = 'palhaco'): TestResponse
     {
         return $this->actingAs($user)->postJson(
@@ -159,8 +208,9 @@ class ParticipanteStoreTest extends TestCase
 
     private function criarHospital(): Hospital
     {
-        $estado = Estado::create(['nome' => 'RS', 'sigla' => 'RS']);
-        $cidade = Cidade::forceCreate(['nome' => 'POA', 'estado_id' => $estado->id]);
+        $estado = Estado::firstOrCreate(['sigla' => 'RS'], ['nome' => 'RS']);
+        $cidade = Cidade::query()->where('nome', 'POA')->where('estado_id', $estado->id)->first()
+            ?? Cidade::forceCreate(['nome' => 'POA', 'estado_id' => $estado->id]);
 
         return Hospital::create([
             'cidade_id' => $cidade->id,
