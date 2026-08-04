@@ -2,6 +2,7 @@ import PainelLayout from '@/layouts/PainelLayout'
 import {
     formatarDataHora,
     labelTipoRelatorio,
+    podeCriarRelatorio,
     podeEditarRelatorio,
 } from '@/lib/visita'
 import { index as visitasIndex } from '@/routes/visitas'
@@ -28,7 +29,7 @@ function resumoCurto(texto: string, limite = 120): string {
 const Index: FC<Props> = ({ visita, relatorios }) => {
     const { auth } = usePage<SharedData>().props
     const [baixandoId, setBaixandoId] = useState<number | null>(null)
-    const visitaCancelada = visita.status === 'cancelada'
+    const permissaoCriar = podeCriarRelatorio(auth.user, visita)
 
     const handleCriar = () => {
         router.visit(create.url({ visita: visita.id! }))
@@ -70,7 +71,7 @@ const Index: FC<Props> = ({ visita, relatorios }) => {
                                 : `${relatorios.length} ${relatorios.length === 1 ? 'relatório' : 'relatórios'}`}
                         </p>
                     </div>
-                    {!visitaCancelada && (
+                    {permissaoCriar && (
                         <button
                             onClick={handleCriar}
                             type="button"
@@ -88,7 +89,7 @@ const Index: FC<Props> = ({ visita, relatorios }) => {
                         <p className="text-sm text-amber-900/50">
                             Nenhum relatório cadastrado para esta visita.
                         </p>
-                        {!visitaCancelada && (
+                        {permissaoCriar && (
                             <button
                                 type="button"
                                 onClick={handleCriar}

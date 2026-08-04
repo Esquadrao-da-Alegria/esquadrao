@@ -54,8 +54,8 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 7. **Limite de participantes**  
    Máximo 5 inscrições ativas por visita (`papel_na_visita = participante`, `status_participacao ∈ {confirmado, pendente}`).
 
-8. **Inscrição self-service**  
-   Voluntário autenticado e **ativo** com `voluntario_id` preenchido pode se inscrever em visita `agendada` via modal do calendário.
+8. **Inscrição self-service e gestão de participantes**  
+   Voluntário autenticado e **ativo** com `voluntario_id` preenchido pode se inscrever em visita `agendada` via modal do calendário, desde que a visita não esteja concluída nem com horário passado. Na tela de edição (`Edit.tsx`), gestores e líderes com `podeEditarVisita` podem adicionar ou remover participantes.
 
 9. **Líder elegível**  
    Líder da visita: `User` com `status = ativo` e `voluntario_id` NOT NULL. Cargo `voluntario` **não** é requisito.

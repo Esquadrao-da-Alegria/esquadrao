@@ -32,21 +32,33 @@ class Service
                 return $this->erro('Tipo de participação inválido.');
             }
 
-            if ($visita->status !== VisitaStatus::Agendada) {
-                return $this->erro('Esta visita não está aberta para inscrições.');
-            }
-
             /** @var User $usuario */
             $usuario = Auth::user();
 
-            if ($usuario->status !== User::STATUS_ATIVO || $usuario->voluntario_id === null) {
-                return $this->erro('Apenas voluntários ativos podem se inscrever.');
+            $solicitadoVoluntarioId = isset($dados['voluntario_id']) ? (int) $dados['voluntario_id'] : null;
+            $ehGestorEditando = $solicitadoVoluntarioId !== null && $this->visitaService->podeEditarVisita($usuario, $visita);
+
+            if (! $ehGestorEditando) {
+                if ($visita->status !== VisitaStatus::Agendada || ($visita->fim_em && $visita->fim_em->isPast())) {
+                    return $this->erro('Esta visita não está aberta para inscrições.');
+                }
+
+                if ($usuario->status !== User::STATUS_ATIVO || $usuario->voluntario_id === null) {
+                    return $this->erro('Apenas voluntários ativos podem se inscrever.');
+                }
+
+                $voluntarioId = $usuario->id;
+            } else {
+                $targetUser = User::query()->find($solicitadoVoluntarioId);
+                if (! $targetUser || $targetUser->status !== User::STATUS_ATIVO || $targetUser->voluntario_id === null) {
+                    return $this->erro('Voluntário selecionado é inválido ou inativo.');
+                }
+
+                $voluntarioId = $targetUser->id;
             }
 
-            $voluntarioId = $usuario->id;
-
             if ($this->usuarioJaInscrito($visita->id, $voluntarioId)) {
-                return $this->erro('Você já está inscrito nesta visita.');
+                return $this->erro('Voluntário já está inscrito nesta visita.');
             }
 
             $participacaoCancelada = $this->buscarParticipacaoCancelada($visita->id, $voluntarioId);
