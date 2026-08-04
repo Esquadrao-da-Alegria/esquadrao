@@ -15,8 +15,10 @@ use App\Models\User;
 use App\Models\Visita;
 use App\Models\VisitaRelatorio;
 use App\Models\Voluntario;
+use App\Notifications\RelatorioVisitaNotification;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class RelatorioStoreTest extends TestCase
@@ -165,6 +167,45 @@ class RelatorioStoreTest extends TestCase
             'id'     => $visita->id,
             'status' => VisitaStatus::Realizada->value,
         ]);
+    }
+
+    public function test_envia_notificacao_por_email_para_integrantes_da_visita(): void
+    {
+        Notification::fake();
+
+        $autor  = $this->criarVoluntario();
+        $visita = $this->criarVisita($autor);
+
+        \App\Models\VisitaParticipante::query()->create([
+            'visita_id'           => $visita->id,
+            'voluntario_id'       => $autor->id,
+            'tipo_participacao'   => 'palhaco',
+            'papel_na_visita'     => 'participante',
+            'status_participacao' => 'confirmado',
+        ]);
+
+        $outroParticipante = $this->criarVoluntario();
+        \App\Models\VisitaParticipante::query()->create([
+            'visita_id'           => $visita->id,
+            'voluntario_id'       => $outroParticipante->id,
+            'tipo_participacao'   => 'palhaco',
+            'papel_na_visita'     => 'participante',
+            'status_participacao' => 'confirmado',
+        ]);
+
+        $this->actingAs($autor)
+            ->post(route('visitas.relatorios.store', $visita), $this->payloadRelatorio())
+            ->assertRedirect();
+
+        Notification::assertSentTo(
+            $autor,
+            RelatorioVisitaNotification::class,
+        );
+
+        Notification::assertSentTo(
+            $outroParticipante,
+            RelatorioVisitaNotification::class,
+        );
     }
 
     public function test_store_persiste_ala_unidade_id(): void
