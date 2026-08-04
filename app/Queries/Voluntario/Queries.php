@@ -86,6 +86,14 @@ class Queries
 
                     break;
 
+                case 'cidade_id':
+
+                    if ($valor !== 'todas') {
+                        $query->where('cidade_base_id', $valor);
+                    }
+
+                    break;
+
                 case 'id':
 
                     $query->where('id', $valor);
@@ -126,8 +134,13 @@ class Queries
             ->mapWithKeys(function (string $status) use ($filtros) {
                 $query = $this->queryBase();
 
-                if (! empty($filtros['busca'])) {
-                    $this->aplicarFiltros($query, ['busca' => $filtros['busca']]);
+                $filtrosContagem = array_filter([
+                    'busca' => $filtros['busca'] ?? null,
+                    'cidade_id' => $filtros['cidade_id'] ?? null,
+                ]);
+
+                if (! empty($filtrosContagem)) {
+                    $this->aplicarFiltros($query, $filtrosContagem);
                 }
 
                 $this->aplicarFiltroStatus($query, $status);
@@ -147,8 +160,13 @@ class Queries
     {
         $query = $this->queryBase();
 
-        if (! empty($filtros['busca'])) {
-            $this->aplicarFiltros($query, ['busca' => $filtros['busca']]);
+        $filtrosContagem = array_filter([
+            'busca' => $filtros['busca'] ?? null,
+            'cidade_id' => $filtros['cidade_id'] ?? null,
+        ]);
+
+        if (! empty($filtrosContagem)) {
+            $this->aplicarFiltros($query, $filtrosContagem);
         }
 
         $this->aplicarFiltroAba($query, $aba);

@@ -8,6 +8,7 @@ import StatusCards from '@/components/Painel/Voluntario/Listagem/StatusCards';
 import Cards from '@/components/Painel/Voluntario/Listagem/Cards';
 import {
     AbaKey,
+    CidadeOption,
     PaginatedVoluntarios,
     StatusCounters,
     StatusFiltro,
@@ -24,9 +25,19 @@ interface Props {
     voluntarios: PaginatedVoluntarios;
     contadores: StatusCounters;
     filtros: VoluntarioFiltros;
+    cidades?: CidadeOption[];
+    cidadeId?: number | 'todas';
+    cidadeUsuarioId?: number | null;
 }
 
-const Index: React.FC<Props> = ({ voluntarios, contadores, filtros }) => {
+const Index: React.FC<Props> = ({
+    voluntarios,
+    contadores,
+    filtros,
+    cidades = [],
+    cidadeId = 'todas',
+    cidadeUsuarioId = null,
+}) => {
     const { props } = usePage<SharedData>();
     const ehAdministrador = props.eh_administrador === true;
     const [modalAberto, setModalAberto] = useState(false);
@@ -72,12 +83,15 @@ const Index: React.FC<Props> = ({ voluntarios, contadores, filtros }) => {
         busca,
         status,
         aba,
+        cidadeId: novaCidadeId,
     }: {
         busca?: string;
         status?: StatusFiltro;
         aba?: AbaKey;
+        cidadeId?: number | 'todas';
     }) => {
         const abaAtual = aba ?? filtros.aba ?? 'voluntarios';
+        const cidadeAtual = novaCidadeId !== undefined ? novaCidadeId : cidadeId;
 
         router.get(
             index.url(),
@@ -88,6 +102,7 @@ const Index: React.FC<Props> = ({ voluntarios, contadores, filtros }) => {
                     abaAtual === 'convidados' && status && status !== 'todos'
                         ? status
                         : undefined,
+                cidade_id: cidadeAtual !== 'todas' ? cidadeAtual : 'todas',
             },
             {
                 preserveScroll: true,
@@ -103,6 +118,10 @@ const Index: React.FC<Props> = ({ voluntarios, contadores, filtros }) => {
 
     const handleAbaChange = (aba: AbaKey) => {
         atualizarFiltros({ busca, status: 'todos', aba });
+    };
+
+    const handleCidadeChange = (novaCidadeId: number | 'todas') => {
+        atualizarFiltros({ busca, status: statusFiltro, aba, cidadeId: novaCidadeId });
     };
 
     const handleAbrirModal = () => {
@@ -187,8 +206,12 @@ const Index: React.FC<Props> = ({ voluntarios, contadores, filtros }) => {
                     aba={aba}
                     busca={busca}
                     statusFiltro={statusFiltro}
+                    cidades={cidades}
+                    cidadeId={cidadeId}
+                    cidadeUsuarioId={cidadeUsuarioId}
                     onBuscaChange={setBusca}
                     onStatusChange={handleStatusChange}
+                    onCidadeChange={handleCidadeChange}
                 />
                 <Cards
                     aba={aba}
