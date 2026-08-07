@@ -1,5 +1,5 @@
 import { destroy, store } from '@/routes/visitas/participantes'
-import { obterCsrfToken } from '@/utils/form'
+import { obterCsrfHeaders } from '@/utils/form'
 import type { TipoParticipacao } from '@/types/visita'
 
 type RetornoPadrao = {
@@ -23,7 +23,7 @@ export class Queries {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': obterCsrfToken(),
+                    ...obterCsrfHeaders(),
                 },
                 body: JSON.stringify({
                     tipo_participacao: dados.tipo_participacao,
@@ -49,7 +49,7 @@ export class Queries {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': obterCsrfToken(),
+                    ...obterCsrfHeaders(),
                 },
             }
 

@@ -9,7 +9,7 @@ import { painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { extrairData, extrairHora, podeCriarRelatorio } from '@/lib/visita'
 import { ArrowLeft, Check, Trash2, UserPlus } from 'lucide-react'
 import { toast } from 'react-toastify'
-import { obterCsrfToken } from '@/utils/form'
+import { obterCsrfHeaders } from '@/utils/form'
 
 // TIPOS
 import type { Cidade, Hospital, SharedData, User } from '@/types'
@@ -87,13 +87,12 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
 
         setAdicionando(true)
         try {
-            const token = obterCsrfToken()
             const response = await fetch(`/visitas/${visita.id}/participantes`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': token,
+                    ...obterCsrfHeaders(),
                 },
                 body: JSON.stringify({
                     voluntario_id: Number(novoVoluntarioId),
@@ -124,13 +123,12 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
 
         setRemovendoId(participante.id)
         try {
-            const token = obterCsrfToken()
             const response = await fetch(`/visitas/${visita.id}/participantes/${participante.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': token,
+                    ...obterCsrfHeaders(),
                 },
             })
 

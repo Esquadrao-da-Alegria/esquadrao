@@ -477,7 +477,7 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 | `lib/visita.ts` | Helpers: `contarParticipantes`, `contarParticipantesAtivos`, `usuarioJaInscrito`, `participacaoAtivaDoUsuario`, `usuarioEhLiderDaVisita`, `visitaAtingiuLimite`, `classeCardPorStatus`, `labelStatus`, `podeEditarVisita`, `labelTipo`, `extrairData`, `extrairHora` |
 | `Queries/Visita/Participante/Queries.tsx` | `fetch` POST/DELETE para `visitas.participantes.store` / `visitas.participantes.destroy` |
 | `Services/Visita/Participante/Service.tsx` | Orquestra inscrição/cancelamento, toasts e reload Inertia |
-| `utils/form.ts` | Helper `obterCsrfToken` |
+| `utils/form.ts` | Helpers `obterCsrfToken` e `obterCsrfHeaders` (extrai token CSRF de cookie/meta para requisições fetch) |
 
 ### Regras
 
