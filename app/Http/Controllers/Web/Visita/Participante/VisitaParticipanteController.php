@@ -16,7 +16,12 @@ class VisitaParticipanteController extends Controller
     public function store(Request $request, Visita $visita): JsonResponse
     {
         $retorno = $this->service->store($visita, $request->all());
-        $status  = $retorno['sucesso'] ? 200 : 422;
+
+        if ($retorno['sucesso']) {
+            $retorno['dados']['participantes'] = $this->carregarParticipantes($visita);
+        }
+
+        $status = $retorno['sucesso'] ? 200 : 422;
 
         return response()->json($retorno, $status);
     }
@@ -24,8 +29,21 @@ class VisitaParticipanteController extends Controller
     public function destroy(Visita $visita, VisitaParticipante $participante): JsonResponse
     {
         $retorno = $this->service->destroy($visita, $participante);
-        $status  = $retorno['sucesso'] ? 200 : 422;
+
+        if ($retorno['sucesso']) {
+            $retorno['dados']['participantes'] = $this->carregarParticipantes($visita);
+        }
+
+        $status = $retorno['sucesso'] ? 200 : 422;
 
         return response()->json($retorno, $status);
+    }
+
+    private function carregarParticipantes(Visita $visita): array
+    {
+        return $visita->participantes()
+            ->with('voluntario:id,name')
+            ->get()
+            ->toArray();
     }
 }
