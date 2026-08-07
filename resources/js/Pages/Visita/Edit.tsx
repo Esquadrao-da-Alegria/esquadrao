@@ -1,6 +1,6 @@
 // REACT
 import { type FC, useMemo, useState } from 'react'
-import { Link, router, useForm, usePage } from '@inertiajs/react'
+import { Link, useForm, usePage } from '@inertiajs/react'
 
 // UI
 import VisitaForm from '@/components/Painel/Visita/Formulario/Form'
@@ -56,6 +56,7 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
         observacoes: visita.observacoes ?? '',
     })
 
+    const [participacoes, setParticipacoes] = useState<VisitaParticipante[]>(visita.participantes ?? [])
     const [novoVoluntarioId, setNovoVoluntarioId] = useState<string>('')
     const [novoTipo, setNovoTipo] = useState<TipoParticipacao>('palhaco')
     const [adicionando, setAdicionando] = useState(false)
@@ -67,10 +68,10 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
 
     const participantes = useMemo(
         () =>
-            (visita.participantes ?? [])
+            participacoes
                 .filter((p) => p.status_participacao !== 'cancelado')
                 .sort((a, b) => (a.voluntario?.name ?? '').localeCompare(b.voluntario?.name ?? '')),
-        [visita.participantes],
+        [participacoes],
     )
 
     const voluntariosDisponiveis = useMemo(() => {
@@ -102,9 +103,9 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
 
             const res = await response.json()
             if (response.ok && res.sucesso) {
+                setParticipacoes(res.dados?.participantes ?? participacoes)
                 toast.success('Participante adicionado com sucesso!')
                 setNovoVoluntarioId('')
-                router.reload({ only: ['visita'] })
             } else {
                 toast.error(res.erros?.[0] ?? 'Erro ao adicionar participante.')
             }
@@ -135,8 +136,8 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
 
             const res = await response.json()
             if (response.ok && res.sucesso) {
+                setParticipacoes(res.dados?.participantes ?? participacoes)
                 toast.success('Participante removido com sucesso!')
-                router.reload({ only: ['visita'] })
             } else {
                 toast.error(res.erros?.[0] ?? 'Erro ao remover participante.')
             }
@@ -148,6 +149,11 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
     }
 
     const handleSubmit = () => {
+        if (novoVoluntarioId) {
+            toast.warning('Clique em “Adicionar” para incluir o participante selecionado antes de salvar os dados gerais da visita.')
+            return
+        }
+
         if (!data.data || !data.hora_inicio || !data.hora_fim || !data.tipo || !data.lider_id || !data.status) {
             toast.error('Preencha todos os campos obrigatórios.')
             return
@@ -164,37 +170,18 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
                     <div className="w-full max-w-7xl">
                         <div className="overflow-hidden rounded-3xl border bg-white">
                             <div className="p-8 md:p-12">
-                                <h2 className="mb-8 text-3xl font-bold text-amber-800 md:text-4xl">
-                                    Alterar visita
-                                </h2>
+                                <h2 className="mb-8 text-3xl font-bold text-amber-800 md:text-4xl">Alterar visita</h2>
 
                                 {errors && Object.keys(errors).length > 0 && (
                                     <div className="mb-4 rounded-lg border border-amber-200 bg-white p-4 text-amber-800">
                                         <ul>
-                                            {Object.entries(errors).map(([campo, mensagem]) => (
-                                                <li key={campo}>{mensagem}</li>
-                                            ))}
+                                            {Object.entries(errors).map(([campo, mensagem]) => <li key={campo}>{mensagem}</li>)}
                                         </ul>
                                     </div>
                                 )}
 
-                                <form
-                                    id="visita-form"
-                                    onSubmit={(e) => {
-                                        e.preventDefault()
-                                        handleSubmit()
-                                    }}
-                                    className="space-y-6"
-                                >
-                                    <VisitaForm
-                                        data={data}
-                                        errors={errors}
-                                        mode="edit"
-                                        hospitais={hospitais}
-                                        cidades={cidades}
-                                        lideres={lideres}
-                                        onCampoChange={handleCampoChange}
-                                    />
+                                <form id="visita-form" onSubmit={(e) => { e.preventDefault(); handleSubmit() }} className="space-y-6">
+                                    <VisitaForm data={data} errors={errors} mode="edit" hospitais={hospitais} cidades={cidades} lideres={lideres} onCampoChange={handleCampoChange} />
 
                                     <div>
                                         <h3 className={painelLabelClass}>Participantes</h3>
@@ -203,28 +190,13 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
                                         ) : (
                                             <ul className="mb-4 divide-y divide-gray-100 rounded-xl border border-gray-200 shadow-sm">
                                                 {participantes.map((p) => (
-                                                    <li
-                                                        key={p.id ?? p.voluntario_id}
-                                                        className="flex items-center justify-between px-4 py-3 text-sm"
-                                                    >
+                                                    <li key={p.id ?? p.voluntario_id} className="flex items-center justify-between px-4 py-3 text-sm">
                                                         <div>
-                                                            <span className="font-medium text-gray-900">
-                                                                {p.voluntario?.name ?? '—'}
-                                                            </span>
-                                                            <span className="ml-2 text-xs text-gray-500">
-                                                                ({labelTipoParticipacao(p.tipo_participacao)}
-                                                                {' · '}
-                                                                {labelStatusParticipacao(p.status_participacao)})
-                                                            </span>
+                                                            <span className="font-medium text-gray-900">{p.voluntario?.name ?? '—'}</span>
+                                                            <span className="ml-2 text-xs text-gray-500">({labelTipoParticipacao(p.tipo_participacao)}{' · '}{labelStatusParticipacao(p.status_participacao)})</span>
                                                         </div>
                                                         {p.id && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoverParticipante(p)}
-                                                                disabled={removendoId === p.id}
-                                                                className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50"
-                                                                title="Remover participante"
-                                                            >
+                                                            <button type="button" onClick={() => handleRemoverParticipante(p)} disabled={removendoId === p.id} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50" title="Remover participante">
                                                                 <Trash2 className="size-3.5" aria-hidden />
                                                                 {removendoId === p.id ? 'Removendo...' : 'Remover'}
                                                             </button>
@@ -235,63 +207,31 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
                                         )}
 
                                         <div className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4">
-                                            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                                Adicionar participante
-                                            </h4>
+                                            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-700">Adicionar participante</h4>
+                                            <p className="mb-3 text-xs text-gray-500">Selecione a pessoa e clique em <strong>Adicionar</strong>. A inclusão é feita imediatamente e não depende do botão Salvar.</p>
                                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                                <select
-                                                    value={novoVoluntarioId}
-                                                    onChange={(e) => setNovoVoluntarioId(e.target.value)}
-                                                    className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-amber-500 focus:outline-none sm:w-64"
-                                                >
+                                                <select value={novoVoluntarioId} onChange={(e) => setNovoVoluntarioId(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-amber-500 focus:outline-none sm:w-64">
                                                     <option value="">Selecione um voluntário...</option>
-                                                    {voluntariosDisponiveis.map((v) => (
-                                                        <option key={v.id} value={v.id}>
-                                                            {v.name}
-                                                        </option>
-                                                    ))}
+                                                    {voluntariosDisponiveis.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
                                                 </select>
-
-                                                <select
-                                                    value={novoTipo}
-                                                    onChange={(e) => setNovoTipo(e.target.value as TipoParticipacao)}
-                                                    className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-amber-500 focus:outline-none sm:w-36"
-                                                >
+                                                <select value={novoTipo} onChange={(e) => setNovoTipo(e.target.value as TipoParticipacao)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-amber-500 focus:outline-none sm:w-36">
                                                     <option value="palhaco">🎪 Palhaço</option>
                                                     <option value="paisana">👔 Paisana</option>
                                                 </select>
-
-                                                <button
-                                                    type="button"
-                                                    onClick={handleAdicionarParticipante}
-                                                    disabled={adicionando || !novoVoluntarioId}
-                                                    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-amber-600 bg-white px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-50"
-                                                >
+                                                <button type="button" onClick={handleAdicionarParticipante} disabled={adicionando || !novoVoluntarioId} className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-amber-600 bg-white px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-50">
                                                     <UserPlus className="size-4" aria-hidden />
-                                                    {adicionando ? 'Adicionando...' : 'Adicionar'}
+                                                    {adicionando ? 'Adicionando...' : 'Adicionar participante'}
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="rounded-2xl border border-amber-100 bg-amber-50/40 p-5">
-                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-900/70">
-                                            Relatórios
-                                        </h3>
+                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-900/70">Relatórios</h3>
                                         <div className="flex flex-col gap-2 sm:flex-row">
-                                            <Link
-                                                href={relatoriosIndex.url({ visita: visita.id! })}
-                                                className="inline-flex flex-1 items-center justify-center rounded-full border border-amber-200 bg-white px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50"
-                                            >
-                                                Ver relatórios
-                                            </Link>
+                                            <Link href={relatoriosIndex.url({ visita: visita.id! })} className="inline-flex flex-1 items-center justify-center rounded-full border border-amber-200 bg-white px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50">Ver relatórios</Link>
                                             {podeCriarRelatorio(auth.user, visita) && (
-                                                <Link
-                                                    href={create.url({ visita: visita.id! })}
-                                                    className="inline-flex flex-1 items-center justify-center rounded-full border-2 border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
-                                                >
-                                                    Criar relatório
-                                                </Link>
+                                                <Link href={create.url({ visita: visita.id! })} className="inline-flex flex-1 items-center justify-center rounded-full border-2 border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50">Criar relatório</Link>
                                             )}
                                         </div>
                                     </div>
@@ -299,22 +239,12 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
                             </div>
 
                             <div className="flex flex-col gap-3 border-t bg-white px-8 py-6 sm:flex-row sm:items-center sm:justify-between md:px-12">
-                                <Link
-                                    href={index().url}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-                                >
-                                    <ArrowLeft className="size-4" aria-hidden />
-                                    Voltar
+                                <Link href={index().url} className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50">
+                                    <ArrowLeft className="size-4" aria-hidden /> Voltar
                                 </Link>
-
-                                <button
-                                    type="submit"
-                                    form="visita-form"
-                                    disabled={processing}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
-                                >
+                                <button type="submit" form="visita-form" disabled={processing} className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70">
                                     <Check className="size-4" aria-hidden />
-                                    {processing ? 'Salvando...' : 'Salvar'}
+                                    {processing ? 'Salvando...' : 'Salvar dados gerais'}
                                 </button>
                             </div>
                         </div>

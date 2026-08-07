@@ -38,6 +38,28 @@ class VisitaEdicaoRegressaoTest extends TestCase
         $this->assertSame('2026-08-10 21:00:00', $dados['visita']['fim_em']);
     }
 
+    public function test_adicionar_participante_retorna_lista_atualizada_para_tela(): void
+    {
+        $diretor = $this->criarDiretor();
+        $visita = $this->criarVisita($diretor);
+        $participante = $this->criarVoluntario();
+
+        $response = $this->actingAs($diretor)->postJson(
+            route('visitas.participantes.store', $visita),
+            [
+                'voluntario_id' => $participante->id,
+                'tipo_participacao' => TipoParticipacao::Palhaco->value,
+            ],
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('sucesso', true)
+            ->assertJsonPath('dados.participantes.0.voluntario_id', $participante->id)
+            ->assertJsonPath('dados.participantes.0.voluntario.name', $participante->name)
+            ->assertJsonPath('dados.participantes.0.status_participacao', StatusParticipacao::Confirmado->value);
+    }
+
     public function test_remover_participante_retorna_lista_atualizada_para_tela(): void
     {
         $diretor = $this->criarDiretor();
