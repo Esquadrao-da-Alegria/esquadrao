@@ -23,7 +23,7 @@ export class Queries {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': obterCsrfToken(),
+                    'X-CSRF-TOKEN': obterCsrfToken(),
                 },
                 body: JSON.stringify({
                     tipo_participacao: dados.tipo_participacao,
@@ -49,7 +49,7 @@ export class Queries {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': obterCsrfToken(),
+                    'X-CSRF-TOKEN': obterCsrfToken(),
                 },
             }
 
