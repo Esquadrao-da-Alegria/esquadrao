@@ -167,7 +167,7 @@ class Service
 
             DB::commit();
 
-            session()->flash('mensagem_sucesso', 'Visita atualizada com sucesso!');
+            session()->flash('mensagem_sucesso', 'Dados gerais da visita atualizados com sucesso!');
 
             return $retornoDatabase;
         } catch (\Throwable $th) {
