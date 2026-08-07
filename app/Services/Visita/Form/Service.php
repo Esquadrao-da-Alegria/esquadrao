@@ -60,7 +60,10 @@ class Service
         ];
 
         if ($visita) {
-            $retorno['visita'] = $visita;
+            $visitaDados = $visita->toArray();
+            $visitaDados['inicio_em'] = $visita->inicio_em?->format('Y-m-d H:i:s');
+            $visitaDados['fim_em'] = $visita->fim_em?->format('Y-m-d H:i:s');
+            $retorno['visita'] = $visitaDados;
         }
 
         return $retorno;
