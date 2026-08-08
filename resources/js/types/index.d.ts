@@ -28,12 +28,19 @@ export interface SharedData {
     auth: Auth;
     sidebarOpen: boolean;
     eh_administrador?: boolean;
+    permissoes_dashboards: Record<PermissaoDashboard, boolean>;
     mensagem_sucesso?: string | null;
     mensagem_erro?: string | null;
     mensagem_alerta?: string | null;
     link_convite?: string | null;
     [key: string]: unknown;
 }
+
+export type PermissaoDashboard =
+    | 'dashboard.meu'
+    | 'dashboard.visao_geral'
+    | 'dashboard.visitas_por_hospital'
+    | 'dashboard.visitas_por_participante';
 
 export interface User {
     id: number;
@@ -188,4 +195,3 @@ export interface Evento {
     created_at: string;
     updated_at: string;
 }
-
