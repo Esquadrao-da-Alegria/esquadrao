@@ -35,6 +35,7 @@ const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
         hora_inicio: '',
         hora_fim: '',
         tipo: 'hospital',
+        limite_participantes: '',
         lider_id: auth.user.id,
         observacoes: '',
     })
@@ -44,7 +45,8 @@ const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
     }
 
     const handleSubmit = () => {
-        if (!data.hospital_id || !data.data || !data.hora_inicio || !data.hora_fim || !data.tipo || !data.lider_id) {
+        const exigeHospital = data.tipo === 'hospital' || data.tipo === 'residencia'
+        if ((exigeHospital && !data.hospital_id) || !data.data || !data.hora_inicio || !data.hora_fim || !data.tipo || !data.lider_id) {
             toast.error('Preencha todos os campos obrigatórios.')
             return
         }

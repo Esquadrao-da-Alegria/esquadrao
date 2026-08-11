@@ -19,17 +19,19 @@ class StoreRequest extends FormRequest
     {
         return [
             'hospital_id'    => [
-                'required',
+                Rule::requiredIf(fn () => in_array($this->input('tipo'), [VisitaTipo::Hospital->value, VisitaTipo::Residencia->value, 'hospital', 'residencia'], true)),
+                'nullable',
                 'integer',
                 Rule::exists('hospitais', 'id')->where(fn ($q) => $q->where('ativo', true)),
             ],
-            'ala_unidade_id' => ['nullable', 'integer', 'exists:alas_hospitais,id'],
-            'data'           => ['required', 'date'],
-            'hora_inicio'    => ['required', 'date_format:H:i'],
-            'hora_fim'       => ['required', 'date_format:H:i', 'after:hora_inicio'],
-            'tipo'           => ['required', Rule::enum(VisitaTipo::class)],
-            'lider_id'       => ['required', 'integer', 'exists:users,id'],
-            'observacoes'    => ['nullable', 'string'],
+            'ala_unidade_id'       => ['nullable', 'integer', 'exists:alas_hospitais,id'],
+            'data'                 => ['required', 'date'],
+            'hora_inicio'          => ['required', 'date_format:H:i'],
+            'hora_fim'             => ['required', 'date_format:H:i', 'after:hora_inicio'],
+            'tipo'                 => ['required', Rule::enum(VisitaTipo::class)],
+            'limite_participantes' => ['nullable', 'integer', 'min:1'],
+            'lider_id'             => ['required', 'integer', 'exists:users,id'],
+            'observacoes'          => ['nullable', 'string'],
         ];
     }
 
@@ -53,7 +55,9 @@ class StoreRequest extends FormRequest
             $hospitalId = $this->input('hospital_id');
             $alaId      = $this->input('ala_unidade_id');
 
-            if ($alaId && $hospitalId) {
+            if ($alaId && ! $hospitalId) {
+                $validator->errors()->add('ala_unidade_id', 'A ala não pode ser vinculada a uma visita sem hospital.');
+            } elseif ($alaId && $hospitalId) {
                 $pertence = Ala::query()
                     ->whereKey($alaId)
                     ->where('hospital_id', $hospitalId)
