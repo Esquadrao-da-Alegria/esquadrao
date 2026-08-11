@@ -118,8 +118,15 @@ class Queries
                     break;
 
                 case 'cidade_id':
-                    $query->whereHas('hospital', function (Builder $q) use ($valor) {
-                        $q->where('cidade_id', $valor);
+                    $query->where(function (Builder $q) use ($valor) {
+                        $q->whereHas('hospital', function (Builder $h) use ($valor) {
+                            $h->where('cidade_id', $valor);
+                        })->orWhere(function (Builder $h) use ($valor) {
+                            $h->whereNull('hospital_id')
+                                ->whereHas('lider.voluntario', function (Builder $v) use ($valor) {
+                                    $v->where('cidade_base_id', $valor);
+                                });
+                        });
                     });
                     break;
             }
