@@ -1,7 +1,7 @@
 import { type FC } from 'react'
 
 import Modal from '@/components/Modal/Show'
-import { classeCardPorStatus, labelStatus } from '@/lib/visita'
+import { classeCardPorStatus, labelStatus, tituloVisita } from '@/lib/visita'
 import { labelStatus as labelStatusEvento } from '@/lib/evento'
 import type { Evento } from '@/types'
 import type { Visita } from '@/types/visita'
@@ -76,10 +76,10 @@ const Show: FC<Props> = ({
                                         <button
                                             type="button"
                                             onClick={() => onSelecionarVisita(visita)}
-                                            className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition hover:opacity-80 ${classeCardPorStatus(visita.status)}`}
+                                            className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition hover:opacity-80 ${classeCardPorStatus(visita)}`}
                                         >
                                             <span className="block font-medium">
-                                                {hora} · {visita.hospital?.nome ?? '—'}
+                                                {hora} · {tituloVisita(visita)}
                                             </span>
                                             <span className="block text-xs opacity-75">
                                                 {labelStatus(visita.status)}
