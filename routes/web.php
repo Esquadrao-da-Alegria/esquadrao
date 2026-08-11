@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Web\EventoController;
+use App\Http\Controllers\Web\Dashboard\Meu\Controller as MeuDashboardController;
+use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVisitaHospitalController;
+use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
 use App\Http\Controllers\Web\EventoFinalizacaoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
 use App\Http\Controllers\Web\EventoPresencaController;
@@ -15,6 +18,7 @@ use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
 use App\Http\Controllers\Web\VoluntarioController;
 use App\Models\Patrocinador;
+use App\Services\Dashboard\Permissao\Service as DashboardPermissaoService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -52,6 +56,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::prefix('dashboards')->name('dashboards.')->group(function () {
+        Route::get('meu', [MeuDashboardController::class, 'index'])
+            ->middleware('can:'.DashboardPermissaoService::MEU_DASHBOARD)->name('meu');
+
+        Route::get('visao-geral', function () {
+            return Inertia::render('Dashboard/Gerencial', [
+                'titulo' => 'Visão geral',
+                'descricao' => 'Os indicadores gerais serão disponibilizados nesta área.',
+            ]);
+        })->middleware('can:'.DashboardPermissaoService::VISAO_GERAL)->name('visao-geral');
+
+        Route::get('visitas-por-hospital', [DashboardVisitaHospitalController::class, 'index'])
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_HOSPITAL)
+            ->name('visitas-por-hospital');
+
+        Route::get('visitas-por-participante', [DashboardVisitaParticipanteController::class, 'index'])
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
+            ->name('visitas-por-participante');
+        Route::get('visitas-por-participante/{voluntario}', [DashboardVisitaParticipanteController::class, 'show'])
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
+            ->name('visitas-por-participante.show');
+    });
 
     Route::get('ajuda', function () {
         return Inertia::render('Ajuda/Index');
