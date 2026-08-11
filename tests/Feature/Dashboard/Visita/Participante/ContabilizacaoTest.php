@@ -74,6 +74,88 @@ class ContabilizacaoTest extends TestCase
                 ->where('participantes.data.0.relatorios_pendentes', 1));
     }
 
+    public function test_relatorio_de_palhaco_valida_o_grupo_mas_nao_valida_paisanas(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidade);
+        $palhacoAutor = $this->criarUsuario('voluntario', $cidade);
+        $palhacoSemRelatorio = $this->criarUsuario('voluntario', $cidade);
+        $paisanaSemRelatorio = $this->criarUsuario('voluntario', $cidade);
+        $visita = $this->criarVisita($this->criarHospital($cidade), $gestor, '2026-03-15 10:00:00');
+        $this->participar($visita, $palhacoAutor, TipoParticipacao::Palhaco);
+        $this->participar($visita, $palhacoSemRelatorio, TipoParticipacao::Palhaco);
+        $this->participar($visita, $paisanaSemRelatorio, TipoParticipacao::Paisana);
+        $this->relatar($visita, $palhacoAutor, false);
+
+        foreach ([$palhacoAutor, $palhacoSemRelatorio] as $palhaco) {
+            $this->actingAs($gestor)
+                ->get(route('dashboards.visitas-por-participante', [
+                    'periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 3,
+                    'participante_id' => $palhaco->id,
+                ]))
+                ->assertInertia(fn (Assert $page) => $page
+                    ->where('participantes.data.0.visitas_validas', 1));
+        }
+
+        $this->actingAs($gestor)
+            ->get(route('dashboards.visitas-por-participante', [
+                'periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 3,
+                'participante_id' => $paisanaSemRelatorio->id,
+            ]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('participantes.data.0.visitas_validas', 0)
+                ->where('participantes.data.0.relatorios_pendentes', 1));
+    }
+
+    public function test_cada_paisana_precisa_do_proprio_relatorio(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidade);
+        $paisanaAutor = $this->criarUsuario('voluntario', $cidade);
+        $paisanaSemRelatorio = $this->criarUsuario('voluntario', $cidade);
+        $visita = $this->criarVisita($this->criarHospital($cidade), $gestor, '2026-03-15 10:00:00');
+        $this->participar($visita, $paisanaAutor, TipoParticipacao::Paisana);
+        $this->participar($visita, $paisanaSemRelatorio, TipoParticipacao::Paisana);
+        $this->relatar($visita, $paisanaAutor, false);
+
+        foreach ([[$paisanaAutor, 1], [$paisanaSemRelatorio, 0]] as [$paisana, $esperado]) {
+            $this->actingAs($gestor)
+                ->get(route('dashboards.visitas-por-participante', [
+                    'periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 3,
+                    'participante_id' => $paisana->id,
+                ]))
+                ->assertInertia(fn (Assert $page) => $page
+                    ->where('participantes.data.0.visitas_validas', $esperado));
+        }
+    }
+
+    public function test_relatorio_fora_do_prazo_e_visita_nao_realizada_nao_validam_o_grupo(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidade);
+        $autor = $this->criarUsuario('voluntario', $cidade);
+        $palhaco = $this->criarUsuario('voluntario', $cidade);
+        $hospital = $this->criarHospital($cidade);
+        $foraDoPrazo = $this->criarVisita($hospital, $gestor, '2026-03-10 10:00:00');
+        $pendente = $this->criarVisita($hospital, $gestor, '2026-03-15 10:00:00', VisitaStatus::PendenteRelatorio);
+
+        foreach ([$foraDoPrazo, $pendente] as $visita) {
+            $this->participar($visita, $autor);
+            $this->participar($visita, $palhaco);
+        }
+        $this->relatar($foraDoPrazo, $autor, true);
+        $this->relatar($pendente, $autor, false);
+
+        $this->actingAs($gestor)
+            ->get(route('dashboards.visitas-por-participante', [
+                'periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 3,
+                'participante_id' => $palhaco->id,
+            ]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('participantes.data.0.visitas_validas', 0)
+                ->where('participantes.data.0.relatorios_fora_prazo', 1));
+    }
+
     public function test_coordenador_local_nao_abre_historico_de_outra_cidade(): void
     {
         $cidadeA = $this->criarCidade('Porto Alegre');
@@ -146,14 +228,14 @@ class ContabilizacaoTest extends TestCase
         ]);
     }
 
-    private function criarVisita(Hospital $hospital, User $gestor, string $inicio): Visita
+    private function criarVisita(Hospital $hospital, User $gestor, string $inicio, VisitaStatus $status = VisitaStatus::Realizada): Visita
     {
-        return Visita::query()->create(['hospital_id' => $hospital->id, 'criado_por_id' => $gestor->id, 'inicio_em' => $inicio, 'fim_em' => date('Y-m-d H:i:s', strtotime($inicio.' +2 hours')), 'tipo' => VisitaTipo::Hospital, 'status' => VisitaStatus::Realizada, 'origem' => VisitaOrigem::Sistema]);
+        return Visita::query()->create(['hospital_id' => $hospital->id, 'criado_por_id' => $gestor->id, 'inicio_em' => $inicio, 'fim_em' => date('Y-m-d H:i:s', strtotime($inicio.' +2 hours')), 'tipo' => VisitaTipo::Hospital, 'status' => $status, 'origem' => VisitaOrigem::Sistema]);
     }
 
-    private function participar(Visita $visita, User $user): void
+    private function participar(Visita $visita, User $user, TipoParticipacao $tipo = TipoParticipacao::Palhaco): void
     {
-        VisitaParticipante::query()->create(['visita_id' => $visita->id, 'voluntario_id' => $user->id, 'tipo_participacao' => TipoParticipacao::Palhaco, 'papel_na_visita' => PapelNaVisita::Participante, 'status_participacao' => StatusParticipacao::Confirmado]);
+        VisitaParticipante::query()->create(['visita_id' => $visita->id, 'voluntario_id' => $user->id, 'tipo_participacao' => $tipo, 'papel_na_visita' => PapelNaVisita::Participante, 'status_participacao' => StatusParticipacao::Confirmado]);
     }
 
     private function relatar(Visita $visita, User $autor, bool $foraPrazo): void

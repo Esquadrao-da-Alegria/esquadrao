@@ -7,8 +7,7 @@ use App\Models\User;
 class Service
 {
     public const META_VISITAS = 2;
-    public const META_PRESENCA = 70;
-    public const ATENCAO_PRESENCA = 60;
+    public const META_PRESENCA = 50;
     public const INATIVIDADE_DIAS = 60;
 
     public function tipo(User $user): string

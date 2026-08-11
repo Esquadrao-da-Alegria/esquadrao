@@ -27,7 +27,7 @@ class IndicadoresTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_contabiliza_visitas_sem_relatorio_sem_duplicar_multiplos_relatorios(): void
+    public function test_contabiliza_somente_visitas_realizadas_sem_exigir_relatorio(): void
     {
         $cidade = $this->criarCidade('Porto Alegre');
         $hospital = $this->criarHospital($cidade, 'Hospital Central');
@@ -37,12 +37,14 @@ class IndicadoresTest extends TestCase
         $participanteB = User::factory()->create();
 
         $comRelatorios = $this->criarVisita($hospital, $administrador, VisitaStatus::Realizada, $ala->id, '2026-03-10 10:00:00');
-        $semRelatorio = $this->criarVisita($hospital, $administrador, VisitaStatus::PendenteRelatorio, null, '2026-04-10 10:00:00');
+        $semRelatorio = $this->criarVisita($hospital, $administrador, VisitaStatus::Realizada, null, '2026-04-10 10:00:00');
+        $pendente = $this->criarVisita($hospital, $administrador, VisitaStatus::PendenteRelatorio, null, '2026-04-11 10:00:00');
         $cancelada = $this->criarVisita($hospital, $administrador, VisitaStatus::Cancelada, null, '2026-04-12 10:00:00');
 
         $this->criarParticipacao($comRelatorios, $participanteA, StatusParticipacao::Confirmado);
         $this->criarParticipacao($comRelatorios, $participanteB, StatusParticipacao::Pendente);
         $this->criarParticipacao($semRelatorio, $participanteA, StatusParticipacao::Confirmado);
+        $this->criarParticipacao($pendente, $participanteA, StatusParticipacao::Confirmado);
         $this->criarParticipacao($cancelada, $participanteB, StatusParticipacao::Confirmado);
         $this->criarRelatorio($comRelatorios, $administrador, 10);
         $this->criarRelatorio($comRelatorios, $participanteA, 30);

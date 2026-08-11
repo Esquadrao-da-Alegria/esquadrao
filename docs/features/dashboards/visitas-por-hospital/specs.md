@@ -37,12 +37,14 @@ Dashboard gerencial para acompanhar a atuação do Esquadrão por cidade, hospit
 
 ## Contabilização
 
-1. Considerar visitas cujo `inicio_em` esteja no intervalo e `status != cancelada`.
+1. Considerar visitas cujo `inicio_em` esteja no intervalo e `status = realizada`.
 2. Contabilizar a visita uma única vez, independentemente da quantidade de relatórios.
 3. Considerar somente participações com `status_participacao = confirmado`.
 4. A média de participantes é `participações confirmadas / visitas`, incluindo visitas com zero confirmações.
 5. A ala do agrupamento é `visitas.ala_unidade_id`. Em hospitais com alas, valor nulo aparece como **Sem ala informada**.
 6. Hospitais sem alas permanecem somente no nível do hospital; o detalhamento informa que não existem alas cadastradas.
+
+A visita realizada é contabilizada institucionalmente mesmo sem relatório. Visitas agendadas, pendentes de relatório, canceladas ou com outro status não entram. Regra confirmada pela coordenação em 10/08/2026.
 
 ## Impacto estimado
 

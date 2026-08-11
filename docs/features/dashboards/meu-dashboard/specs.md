@@ -28,11 +28,11 @@ Dashboard individual e informativo da participação do voluntário. A página n
 
 O dashboard reutiliza as fontes do dashboard gerencial de participação:
 
-- `Dashboard\Visita\Participante\Meta\Service`: tipo de atuação, meta de duas visitas e meta de 70% de presença;
+- `Dashboard\Visita\Participante\Meta\Service`: tipo de atuação, meta de duas visitas e meta de 50% de presença por tipo de evento;
 - `Dashboard\Visita\Participante\Compensacao\Service`: créditos, débitos e janela de compensação;
 - `Visita\Relatorio\Prazo\Service`: prazo de relatório preenchido em `visitas_relatorios.fora_do_prazo`.
 
-Uma visita é válida quando não está cancelada, a participação está confirmada e existe relatório do próprio participante enviado dentro do prazo. Múltiplos relatórios não duplicam a visita.
+Uma visita é válida quando está `realizada`, a participação está confirmada e a regra de relatório foi atendida no prazo. Para palhaços, um relatório de qualquer palhaço confirmado valida o grupo; para paisanas, o relatório deve ser pessoal. O `tipo_participacao` daquela visita define a regra, independentemente dos cargos permanentes. Múltiplos relatórios não duplicam a visita. Regra confirmada pela coordenação em 10/08/2026.
 
 ## Classificação de atuação
 
@@ -90,8 +90,9 @@ Motivos de visita não contabilizada:
 
 - visita cancelada;
 - participação não confirmada;
-- relatório do participante pendente;
-- relatório do participante fora do prazo.
+- relatório pessoal do paisana pendente ou fora do prazo;
+- relatório do grupo de palhaços pendente ou fora do prazo;
+- visita ainda não marcada como realizada.
 
 Relatório pendente oferece acesso à rota de criação, cuja autorização real permanece no Service de relatórios.
 

@@ -86,6 +86,31 @@ class MeuDashboardTest extends TestCase
                 ->where('indicadores.impacto_estimado', 20));
     }
 
+    public function test_dashboard_pessoal_aplica_relatorio_do_grupo_apenas_para_palhacos(): void
+    {
+        $cidade = $this->criarCidade();
+        $palhacoAutor = $this->criarUsuario($cidade, ['voluntario']);
+        $palhaco = $this->criarUsuario($cidade, ['voluntario']);
+        $paisana = $this->criarUsuario($cidade, ['voluntario']);
+        $visita = $this->criarVisita($this->criarHospital($cidade), $palhacoAutor, '2026-08-05 10:00:00');
+        $this->participar($visita, $palhacoAutor, StatusParticipacao::Confirmado, TipoParticipacao::Palhaco);
+        $this->participar($visita, $palhaco, StatusParticipacao::Confirmado, TipoParticipacao::Palhaco);
+        $this->participar($visita, $paisana, StatusParticipacao::Confirmado, TipoParticipacao::Paisana);
+        $this->relatar($visita, $palhacoAutor, 10);
+
+        $this->actingAs($palhaco)
+            ->get(route('dashboards.meu', ['periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('indicadores.visitas_validas', 1)
+                ->where('historico.data.0.motivo', 'Visita contabilizada por relatório válido do grupo de palhaços'));
+
+        $this->actingAs($paisana)
+            ->get(route('dashboards.meu', ['periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('indicadores.visitas_validas', 0)
+                ->where('indicadores.relatorios_pendentes', 1));
+    }
+
     public function test_cargo_administrativo_prevalece_e_nao_recebe_meta_de_visitas(): void
     {
         $usuario = $this->criarUsuario($this->criarCidade(), ['voluntario', 'administrador']);
@@ -161,9 +186,9 @@ class MeuDashboardTest extends TestCase
         return Visita::query()->create(['hospital_id' => $hospital->id, 'criado_por_id' => $gestor->id, 'inicio_em' => $inicio, 'fim_em' => date('Y-m-d H:i:s', strtotime($inicio.' +2 hours')), 'tipo' => VisitaTipo::Hospital, 'status' => $status, 'origem' => VisitaOrigem::Sistema]);
     }
 
-    private function participar(Visita $visita, User $user, StatusParticipacao $status = StatusParticipacao::Confirmado): void
+    private function participar(Visita $visita, User $user, StatusParticipacao $status = StatusParticipacao::Confirmado, TipoParticipacao $tipo = TipoParticipacao::Palhaco): void
     {
-        VisitaParticipante::query()->create(['visita_id' => $visita->id, 'voluntario_id' => $user->id, 'tipo_participacao' => TipoParticipacao::Palhaco, 'papel_na_visita' => PapelNaVisita::Participante, 'status_participacao' => $status]);
+        VisitaParticipante::query()->create(['visita_id' => $visita->id, 'voluntario_id' => $user->id, 'tipo_participacao' => $tipo, 'papel_na_visita' => PapelNaVisita::Participante, 'status_participacao' => $status]);
     }
 
     private function relatar(Visita $visita, User $autor, int $impacto): void

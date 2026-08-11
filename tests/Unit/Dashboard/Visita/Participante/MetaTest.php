@@ -10,6 +10,11 @@ use PHPUnit\Framework\TestCase;
 
 class MetaTest extends TestCase
 {
+    public function test_meta_de_presenca_e_cinquenta_por_cento(): void
+    {
+        $this->assertSame(50, Service::META_PRESENCA);
+    }
+
     public function test_voluntario_e_artista_recebem_meta_de_visitas(): void
     {
         $this->assertSame('visitas', $this->tipo('voluntario'));

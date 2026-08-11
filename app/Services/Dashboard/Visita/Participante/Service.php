@@ -112,8 +112,12 @@ class Service
             'hospital' => $item->hospital,
             'outra_cidade' => (int) $item->cidade_id !== (int) $participante['cidade_id'],
             'motivo' => ! $item->possui_relatorio
-                ? 'Relatório do participante pendente'
-                : (! $item->possui_relatorio_no_prazo ? 'Relatório enviado fora do prazo' : 'Visita válida'),
+                ? ($item->tipo_participacao === 'palhaco' ? 'Relatório do grupo de palhaços pendente' : 'Relatório pessoal pendente')
+                : (! $item->possui_relatorio_no_prazo
+                    ? 'Relatório aplicável enviado fora do prazo'
+                    : ($item->tipo_participacao === 'palhaco' && ! $item->relatorio_proprio_no_prazo
+                        ? 'Visita válida por relatório do grupo de palhaços'
+                        : 'Visita válida')),
             'valida' => (bool) $item->possui_relatorio_no_prazo,
         ])->values();
 
@@ -199,11 +203,6 @@ class Service
         if ($tipo === 'isento') return 'isento';
         if ($dias === null || $dias >= MetaService::INATIVIDADE_DIAS) return 'requer_analise';
         if (collect($compensacoes)->contains('situacao', 'requer_analise')) return 'requer_analise';
-
-        foreach (['reuniao', 'oficina'] as $atividade) {
-            $percentual = $presencas[$atividade]['percentual'];
-            if ($percentual !== null && $percentual < MetaService::ATENCAO_PRESENCA) return 'requer_analise';
-        }
 
         if (collect($compensacoes)->contains('situacao', 'compensacao_pendente')) return 'compensacao_pendente';
         if (collect($compensacoes)->contains('situacao', 'atencao')) return 'atencao';

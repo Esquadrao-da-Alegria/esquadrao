@@ -111,8 +111,7 @@ class Service
 
     private function realizada(object $visita): bool
     {
-        return $visita->status !== VisitaStatus::Cancelada->value
-            && $visita->status !== VisitaStatus::Agendada->value
+        return $visita->status === VisitaStatus::Realizada->value
             && $visita->status_participacao === StatusParticipacao::Confirmado->value;
     }
 
@@ -189,10 +188,11 @@ class Service
 
     private function motivo(object $visita): string
     {
-        if ($visita->status === VisitaStatus::Cancelada->value) return 'Visita cancelada';
+        if ($visita->status !== VisitaStatus::Realizada->value) return 'A visita ainda não foi marcada como realizada';
         if ($visita->status_participacao !== StatusParticipacao::Confirmado->value) return 'Participação não confirmada';
-        if (! $visita->possui_relatorio) return 'Seu relatório ainda não foi enviado';
-        if (! $visita->possui_relatorio_no_prazo) return 'Seu relatório foi enviado fora do prazo';
+        if (! $visita->possui_relatorio) return $visita->tipo_participacao === 'palhaco' ? 'O grupo de palhaços ainda não enviou um relatório' : 'Seu relatório pessoal ainda não foi enviado';
+        if (! $visita->possui_relatorio_no_prazo) return 'O relatório aplicável foi enviado fora do prazo';
+        if ($visita->tipo_participacao === 'palhaco' && ! $visita->relatorio_proprio_no_prazo) return 'Visita contabilizada por relatório válido do grupo de palhaços';
         return 'Visita válida no período';
     }
 
@@ -219,7 +219,7 @@ class Service
         if ($saldo !== null && $saldo < 0) $mensagens[] = 'Existe um saldo a compensar. Consulte a evolução mensal para entender o cálculo.';
         foreach (['reuniao' => 'reuniões', 'oficina' => 'oficinas'] as $tipoEvento => $rotulo) {
             $percentual = $presencas[$tipoEvento]['percentual'];
-            if ($percentual !== null && $percentual < MetaService::META_PRESENCA) $mensagens[] = "Sua presença em {$rotulo} está abaixo de 70%. Confira as atividades consideradas.";
+            if ($percentual !== null && $percentual < MetaService::META_PRESENCA) $mensagens[] = "Sua presença em {$rotulo} está abaixo de 50%. Confira as atividades consideradas.";
         }
         return $mensagens;
     }

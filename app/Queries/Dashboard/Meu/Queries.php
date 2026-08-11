@@ -109,8 +109,9 @@ class Queries
             ->when($filtros['cidade_id'], fn (Builder $query, int $cidadeId) => $query->where('h.cidade_id', $cidadeId))
             ->select(['v.id', 'v.inicio_em', 'v.fim_em', 'v.status', 'h.nome as local', 'c.id as cidade_id', 'c.nome as cidade', 'a.nome as ala', 'vp.tipo_participacao', 'vp.status_participacao'])
             ->selectRaw('impactos.media as impacto_estimado')
-            ->selectRaw("EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id) as possui_relatorio")
-            ->selectRaw("EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND vr.fora_do_prazo = 0) as possui_relatorio_no_prazo")
+            ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado') ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id) END as possui_relatorio")
+            ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado' AND vr.fora_do_prazo = 0) ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND vr.fora_do_prazo = 0) END as possui_relatorio_no_prazo")
+            ->selectRaw("EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND vr.fora_do_prazo = 0) as relatorio_proprio_no_prazo")
             ->distinct();
     }
 

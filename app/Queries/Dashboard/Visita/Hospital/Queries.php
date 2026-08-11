@@ -99,7 +99,7 @@ class Queries
         return DB::table('visitas as v')
             ->join('hospitais as h', 'h.id', '=', 'v.hospital_id')
             ->whereBetween('v.inicio_em', [$inicio, $fim])
-            ->where('v.status', '!=', VisitaStatus::Cancelada->value)
+            ->where('v.status', VisitaStatus::Realizada->value)
             ->when($filtros['cidade_id'], fn (Builder $query, int $cidadeId) => $query->where('h.cidade_id', $cidadeId))
             ->when($filtros['hospital_id'], fn (Builder $query, int $hospitalId) => $query->where('v.hospital_id', $hospitalId))
             ->when($filtros['ala_id'], fn (Builder $query, int $alaId) => $query->where('v.ala_unidade_id', $alaId));

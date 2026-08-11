@@ -29,12 +29,15 @@ Administrativos possuem meta institucional de oito horas mensais, mas o sistema 
 
 Uma visita conta no máximo uma vez por participante quando:
 
-- não está cancelada;
+- possui `status = realizada`;
 - a participação está `confirmado`;
-- existe relatório da mesma visita cujo `autor_id` é o próprio participante;
-- o relatório possui `fora_do_prazo = false`.
+- a regra de relatório correspondente ao `tipo_participacao` foi atendida no prazo.
 
-Relatório de outro participante não valida a participação. Múltiplos relatórios não duplicam a visita. Pendências e atrasos aparecem no histórico.
+Para `tipo_participacao = palhaco`, um relatório no prazo escrito por qualquer palhaço confirmado da mesma visita valida a participação de todos os palhaços confirmados. O relatório de um paisana não valida o grupo de palhaços.
+
+Para `tipo_participacao = paisana`, o próprio participante precisa escrever um relatório no prazo. O relatório de outro paisana ou de um palhaço não valida sua participação.
+
+O tipo registrado na participação da visita prevalece sobre os cargos permanentes do usuário. Múltiplos relatórios não duplicam a visita. Pendências e atrasos aparecem no histórico. Regra confirmada pela coordenação em 10/08/2026.
 
 O prazo é centralizado em `App\Services\Visita\Relatorio\Prazo\Service`, atualmente 48 horas após `visita.fim_em`. Mudanças futuras devem ocorrer nesse serviço e continuar preenchendo corretamente `fora_do_prazo`.
 
@@ -55,7 +58,8 @@ O cálculo e sua trilha explicável ficam em `Compensacao\Service`. Se o Regimen
 - Numerador: eventos em que `evento_participantes.presenca = presente`.
 - Eventos cancelados não entram.
 - Ausência de eventos ou presenças ainda não registradas produz dados insuficientes.
-- Meta: 70%; faixa de atenção: 60% a 69,99%.
+- Meta: 50% em cada tipo separadamente. Percentual abaixo de 50% gera atenção, sem produzir sozinho **Requer análise**.
+- Reuniões e oficinas não se compensam: em seis reuniões e seis oficinas, são necessárias ao menos três presenças em cada conjunto.
 - Presenças em outras cidades aparecem no detalhe, mas não aumentam o denominador da cidade-base.
 
 Se assembleias forem modeladas, sua inclusão deve ocorrer na seleção central de eventos da Query, não no React.
