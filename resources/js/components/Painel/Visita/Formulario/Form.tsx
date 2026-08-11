@@ -110,7 +110,7 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, cidades = [], lideres,
                     id="hospital_id"
                     name="hospital_id"
                     required={exigeHospital}
-                    disabled={mode === 'edit'}
+                    disabled={mode === 'edit' && exigeHospital}
                     value={data.hospital_id}
                     onChange={(e) => handleHospitalChange(e.target.value ? Number(e.target.value) : '')}
                     className={painelInputClass}

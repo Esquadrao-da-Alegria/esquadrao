@@ -7,6 +7,7 @@ use App\Enums\StatusParticipacao;
 use App\Enums\TipoParticipacao;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
+use App\Enums\VisitaTipo;
 use App\Models\User;
 use App\Models\Visita;
 use App\Models\VisitaParticipante;
