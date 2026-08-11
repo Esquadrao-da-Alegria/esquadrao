@@ -2,6 +2,8 @@
 
 Documento de referência do submódulo **relatórios** vinculados a uma visita. Complementa [`docs/features/visitas/specs.md`](../specs.md).
 
+Um relatório atrasado conserva `fora_do_prazo = true`. Mediante justificativa, um administrador pode aceitá-lo apenas para contabilização pelo fluxo descrito em [`ajustes-contabilizacao/specs.md`](../ajustes-contabilizacao/specs.md).
+
 ---
 
 ## Vocabulário

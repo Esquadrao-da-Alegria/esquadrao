@@ -60,7 +60,7 @@ class Service
                 'hospitais_visitados' => $visitasValidas->pluck('local')->unique()->count(),
                 'ultima_visita_valida' => $ultimaVisita?->inicio_em,
                 'relatorios_pendentes' => $visitasRealizadas->where('possui_relatorio', 0)->count(),
-                'relatorios_fora_prazo' => $visitasRealizadas->where('possui_relatorio', 1)->where('possui_relatorio_no_prazo', 0)->count(),
+                'relatorios_fora_prazo' => $visitasRealizadas->where('possui_relatorio', 1)->where('possui_relatorio_no_prazo', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
             ],
             'evolucao' => $this->evolucao($visitas, $filtros, $tipoAtuacao),
             'compensacoes' => $compensacoes,
@@ -117,7 +117,7 @@ class Service
 
     private function valida(object $visita): bool
     {
-        return $this->realizada($visita) && (bool) $visita->possui_relatorio_no_prazo;
+        return $this->realizada($visita) && ((bool) $visita->possui_relatorio_no_prazo || (bool) $visita->possui_relatorio_por_ajuste);
     }
 
     private function compensacoes(Collection $visitas, array $filtros): array
@@ -191,7 +191,9 @@ class Service
         if ($visita->status !== VisitaStatus::Realizada->value) return 'A visita ainda não foi marcada como realizada';
         if ($visita->status_participacao !== StatusParticipacao::Confirmado->value) return 'Participação não confirmada';
         if (! $visita->possui_relatorio) return $visita->tipo_participacao === 'palhaco' ? 'O grupo de palhaços ainda não enviou um relatório' : 'Seu relatório pessoal ainda não foi enviado';
-        if (! $visita->possui_relatorio_no_prazo) return 'O relatório aplicável foi enviado fora do prazo';
+        if (! $visita->possui_relatorio_no_prazo && ! $visita->possui_relatorio_por_ajuste) return 'O relatório aplicável foi enviado fora do prazo';
+
+        if ($visita->possui_relatorio_por_ajuste) return 'Relatório fora do prazo aceito por ajuste administrativo';
         if ($visita->tipo_participacao === 'palhaco' && ! $visita->relatorio_proprio_no_prazo) return 'Visita contabilizada por relatório válido do grupo de palhaços';
         return 'Visita válida no período';
     }

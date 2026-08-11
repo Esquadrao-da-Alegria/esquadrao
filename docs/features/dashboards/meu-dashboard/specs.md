@@ -2,6 +2,10 @@
 
 Dashboard individual e informativo da participação do voluntário. A página não altera cadastro, aplica advertência ou conclui que alguém está irregular.
 
+O histórico identifica visitas validadas por aceite administrativo auditável de relatório atrasado, mantendo a regra coletiva para palhaços/artistas e individual para paisanas.
+
+Inscrições e presenças de eventos corrigidas administrativamente aparecem nos mesmos indicadores, pois o ajuste atualiza a participação original e conserva sua auditoria separadamente.
+
 ## Acesso e privacidade
 
 - Todo usuário autenticado e verificado acessa a rota `dashboards.meu`.

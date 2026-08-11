@@ -4,8 +4,9 @@ import { type Evento, type EventoParticipante, type SharedData } from '@/types'
 import { Link, router, usePage } from '@inertiajs/react'
 import { ArrowLeft, Settings, Trash2, UserCheck, UserX, Users } from 'lucide-react'
 import { useState } from 'react'
+import AjusteParticipacao from '@/components/Painel/Evento/AjusteParticipacao'
 
-interface Props { evento: Evento; inscrito: boolean; presenca_marcada: boolean; pode_gerenciar: boolean }
+interface Props { evento: Evento; inscrito: boolean; presenca_marcada: boolean; pode_gerenciar: boolean; ajustes_participacao: any[]; voluntarios_ajuste: Array<{ id: number; name: string }> }
 
 const fmt = (v?: string | null) =>
   v ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(v)) : '-'
@@ -125,7 +126,7 @@ function FinalizacaoForm({ evento }: { evento: Evento }) {
   )
 }
 
-export default function Show({ evento, inscrito, presenca_marcada, pode_gerenciar }: Props) {
+export default function Show({ evento, inscrito, presenca_marcada, pode_gerenciar, ajustes_participacao, voluntarios_ajuste }: Props) {
   const { props } = usePage<SharedData>()
   const [motivo, setMotivo] = useState('')
 
@@ -142,6 +143,7 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
   const podeInscrever = evento.status === 'agendado' && !jaComecou && !limitePassou && !lotado
   const podeCancelarInscricao = inscrito && evento.status === 'agendado' && !jaComecou && !presenca_marcada
   const podeExcluir = props.eh_administrador && !temParticipantes
+  const podeAjustar = props.eh_administrador && evento.status !== 'cancelado' && new Date(evento.data_inicio) <= agora
 
   return (
     <PainelLayout>
@@ -284,6 +286,8 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
 
         {/* Registrar presença */}
         {podeRegistrarPresenca && <PresencaForm evento={evento} participantes={participantes} />}
+
+        {podeAjustar && <AjusteParticipacao eventoId={evento.id} voluntarios={voluntarios_ajuste} ajustes={ajustes_participacao} />}
 
         {/* Lista de participantes (somente leitura para usuários comuns) */}
         {!podeRegistrarPresenca && (

@@ -2,6 +2,10 @@
 
 Dashboard gerencial de apoio à decisão. Os indicadores organizam dados objetivos, mas nunca alteram o cadastro, aplicam advertência, afastamento ou desligamento.
 
+Relatórios fora do prazo aceitos por ajuste administrativo auditável validam a visita. Para palhaços/artistas, o aceite beneficia o grupo confirmado; para paisanas, somente o autor. A interface identifica quando a validade decorre do ajuste.
+
+Correções administrativas auditáveis de inscrição e presença em eventos passam a compor os percentuais de reuniões e oficinas imediatamente, sem combinar as metas dos dois tipos.
+
 ## Acesso
 
 - `administrador` e `coordenador_geral`: escopo global.

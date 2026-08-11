@@ -7,6 +7,7 @@ use App\Models\Cidade;
 use App\Models\Estado;
 use App\Models\Evento;
 use App\Models\User;
+use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -802,5 +803,42 @@ class EventoTest extends TestCase
                 ->where('cidadeId', 'todas')
                 ->has('eventos', 2)
             );
+    }
+
+    public function test_admin_corrige_inscricao_com_auditoria_apos_inicio(): void
+    {
+        $admin = $this->usuarioAdmin();
+        $voluntario = $this->usuarioVoluntario();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id, 'data_inicio' => now()->subHour(), 'data_fim' => now()->addHour()]);
+
+        $this->actingAs($admin)->post(route('eventos.ajustes-participacao.store', $evento), [
+            'tipo' => 'correcao_inscricao', 'voluntario_id' => $voluntario->id,
+            'justificativa' => 'Inscrição não foi registrada por falha operacional.',
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('evento_participantes', ['evento_id' => $evento->id, 'user_id' => $voluntario->id, 'status' => 'inscrito']);
+        $this->assertDatabaseHas('eventos_ajustes_participacao', ['evento_id' => $evento->id, 'voluntario_id' => $voluntario->id, 'administrador_id' => $admin->id]);
+    }
+
+    public function test_admin_corrige_presenca_e_usuario_comum_recebe_bloqueio(): void
+    {
+        $admin = $this->usuarioAdmin();
+        $voluntario = $this->usuarioVoluntario();
+        $comum = $this->criarUsuario();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id, 'data_inicio' => now()->subHour(), 'data_fim' => now()->addHour()]);
+        $evento->participantes()->attach($voluntario->id, ['status' => 'inscrito', 'inscrito_em' => now()->subDay()]);
+        $dados = ['tipo' => 'correcao_presenca', 'voluntario_id' => $voluntario->id, 'presenca' => 'presente', 'justificativa' => 'Presença confirmada na lista física do evento.'];
+
+        $this->actingAs($comum)->post(route('eventos.ajustes-participacao.store', $evento), $dados)->assertForbidden();
+        $this->actingAs($admin)->post(route('eventos.ajustes-participacao.store', $evento), $dados)->assertRedirect();
+
+        $this->assertDatabaseHas('evento_participantes', ['evento_id' => $evento->id, 'user_id' => $voluntario->id, 'presenca' => 'presente', 'presenca_registrada_por_id' => $admin->id]);
+    }
+
+    private function usuarioVoluntario(): User
+    {
+        $voluntario = Voluntario::query()->create(['nome_completo' => uniqid('Voluntário '), 'email' => uniqid().'@teste.com', 'status' => 'ativo']);
+
+        return User::factory()->createOne(['voluntario_id' => $voluntario->id]);
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Requests\Web\Visita\UpdateRequest;
 use App\Models\Cidade;
 use App\Models\Evento;
 use App\Models\Visita;
+use App\Services\Visita\Ajuste\Service as AjusteService;
 use App\Services\Visita\Form\Service as FormService;
 use App\Services\Visita\Service;
 use Carbon\Carbon;
@@ -88,14 +89,21 @@ class VisitaController extends Controller
         return redirect()->route('visitas.index');
     }
 
-    public function edit(Visita $visita): \Inertia\Response|\Illuminate\Http\RedirectResponse
+    public function edit(Visita $visita, AjusteService $ajusteService): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
         if (! $this->service->podeEditarVisita(Auth::user(), $visita)) {
             return redirect()->route('visitas.index')
                 ->with('mensagem_erro', 'Você não tem permissão para editar esta visita.');
         }
 
-        return Inertia::render('Visita/Edit', $this->formService->buscarDados($visita));
+        $dados = $this->formService->buscarDados($visita);
+        $user = Auth::user();
+
+        if ($user?->temCargo('administrador') && $visita->status === VisitaStatus::Realizada) {
+            $dados['ajustes_contabilizacao'] = $ajusteService->index($visita);
+        }
+
+        return Inertia::render('Visita/Edit', $dados);
     }
 
     public function update(UpdateRequest $request, Visita $visita): \Illuminate\Http\RedirectResponse

@@ -6,6 +6,7 @@ use App\Enums\PapelNaVisita;
 use App\Enums\StatusParticipacao;
 use App\Enums\TipoParticipacao;
 use App\Enums\TipoRelatorio;
+use App\Enums\TipoAjusteContabilizacao;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
@@ -18,6 +19,7 @@ use App\Models\User;
 use App\Models\Visita;
 use App\Models\VisitaParticipante;
 use App\Models\VisitaRelatorio;
+use App\Models\VisitaAjusteContabilizacao;
 use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -154,6 +156,30 @@ class ContabilizacaoTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->where('participantes.data.0.visitas_validas', 0)
                 ->where('participantes.data.0.relatorios_fora_prazo', 1));
+    }
+
+    public function test_aceite_administrativo_de_relatorio_atrasado_valida_grupo_de_palhacos(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidade);
+        $autor = $this->criarUsuario('voluntario', $cidade);
+        $palhaco = $this->criarUsuario('voluntario', $cidade);
+        $visita = $this->criarVisita($this->criarHospital($cidade), $gestor, '2026-03-10 10:00:00');
+        $this->participar($visita, $autor);
+        $this->participar($visita, $palhaco);
+        $this->relatar($visita, $autor, true);
+        $relatorio = VisitaRelatorio::query()->where('visita_id', $visita->id)->firstOrFail();
+        VisitaAjusteContabilizacao::query()->create([
+            'visita_id' => $visita->id, 'voluntario_id' => $autor->id, 'relatorio_id' => $relatorio->id,
+            'administrador_id' => $gestor->id, 'tipo' => TipoAjusteContabilizacao::AceiteRelatorioForaPrazo,
+            'tipo_participacao' => TipoParticipacao::Palhaco, 'justificativa' => 'Falha operacional confirmada pelo administrador.',
+        ]);
+
+        $this->actingAs($gestor)->get(route('dashboards.visitas-por-participante', [
+            'periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 3, 'participante_id' => $palhaco->id,
+        ]))->assertInertia(fn (Assert $page) => $page
+            ->where('participantes.data.0.visitas_validas', 1)
+            ->where('participantes.data.0.relatorios_fora_prazo', 0));
     }
 
     public function test_coordenador_local_nao_abre_historico_de_outra_cidade(): void

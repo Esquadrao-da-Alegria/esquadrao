@@ -7,10 +7,12 @@ use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as Dashboa
 use App\Http\Controllers\Web\EventoFinalizacaoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
 use App\Http\Controllers\Web\EventoPresencaController;
+use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\MeuEventoController;
 use App\Http\Controllers\Web\ConviteCadastroController;
 use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
+use App\Http\Controllers\Web\Visita\Ajuste\Controller as VisitaAjusteController;
 use App\Http\Controllers\Web\Visita\Relatorio\VisitaRelatorioController;
 use App\Http\Controllers\Web\Visita\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
@@ -93,6 +95,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['administrador'])->group(function () {
         Route::get('/eventos/create', [EventoController::class, 'create'])->name('eventos.create');
         Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
+        Route::post('/eventos/{evento}/ajustes-participacao', [EventoAjusteController::class, 'store'])->name('eventos.ajustes-participacao.store');
     });
 
     Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
@@ -108,6 +111,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{visita}/edit', [VisitaController::class, 'edit'])->name('edit');
         Route::put('{visita}', [VisitaController::class, 'update'])->name('update');
         Route::post('{visita}/cancelar', [VisitaController::class, 'cancelar'])->name('cancelar');
+
+        Route::middleware('administrador')->prefix('{visita}/ajustes-contabilizacao')->name('ajustes-contabilizacao.')->group(function () {
+            Route::post('/', [VisitaAjusteController::class, 'store'])->name('store');
+        });
 
         Route::prefix('{visita}/relatorios')->scopeBindings()->name('relatorios.')->group(function () {
             Route::get('/', [VisitaRelatorioController::class, 'index'])->name('index');
