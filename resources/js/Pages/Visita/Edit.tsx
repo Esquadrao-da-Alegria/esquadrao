@@ -10,7 +10,7 @@ import { painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { extrairData, extrairHora, podeCriarRelatorio } from '@/lib/visita'
 import { ArrowLeft, Check, Trash2, UserPlus } from 'lucide-react'
 import { toast } from 'react-toastify'
-import { obterCsrfToken } from '@/utils/form'
+import { obterCsrfHeaders } from '@/utils/form'
 
 // TIPOS
 import type { Cidade, Hospital, SharedData, User } from '@/types'
@@ -47,12 +47,13 @@ const labelStatusParticipacao = (status: VisitaParticipante['status_participacao
 const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita, ajustes_contabilizacao }) => {
     const { auth, eh_administrador } = usePage<SharedData>().props
     const { data, setData, transform, put, processing, errors } = useForm<DadosFormulario>({
-        hospital_id: visita.hospital_id,
+        hospital_id: visita.hospital_id ?? '',
         ala_unidade_id: visita.ala_unidade_id ?? null,
         data: extrairData(visita.inicio_em),
         hora_inicio: extrairHora(visita.inicio_em),
         hora_fim: extrairHora(visita.fim_em),
         tipo: visita.tipo,
+        limite_participantes: visita.limite_participantes ?? '',
         lider_id: visita.lider_id ?? '',
         status: visita.status,
         observacoes: visita.observacoes ?? '',
@@ -89,13 +90,12 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita, ajustes_con
 
         setAdicionando(true)
         try {
-            const token = obterCsrfToken()
             const response = await fetch(`/visitas/${visita.id}/participantes`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': token,
+                    ...obterCsrfHeaders(),
                 },
                 body: JSON.stringify({
                     voluntario_id: Number(novoVoluntarioId),
@@ -126,13 +126,12 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita, ajustes_con
 
         setRemovendoId(participante.id)
         try {
-            const token = obterCsrfToken()
             const response = await fetch(`/visitas/${visita.id}/participantes/${participante.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-CSRF-TOKEN': token,
+                    ...obterCsrfHeaders(),
                 },
             })
 

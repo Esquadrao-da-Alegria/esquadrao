@@ -14,15 +14,15 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 | **VisitaParticipante** | Linha na pivot enriquecida `visita_participante` — liga visita a um voluntário com tipo, papel e status de participação. |
 | **Voluntário** | No domínio, o voluntário **é** o usuário. A coluna na pivot chama-se `voluntario_id` e aponta para `users.id`. |
 | **Líder** | Usuário responsável pela visita, referenciado em `visitas.lider_id` (nullable). **Não** é um valor de `PapelNaVisita`. |
-| **Hospital** | Toda visita exige `hospital_id` NOT NULL — o local cadastrado onde a visita ocorre ou está vinculada. |
-| **Ala** | Unidade/setor do hospital (`alas_hospitais`), opcional via `visitas.ala_unidade_id`. Model `Ala`. |
+| **Hospital** | Visitas dos tipos `hospital` e `residencia` exigem `hospital_id`. Para `acao_especial` e `outro`, o `hospital_id` é opcional (`nullable`). |
+| **Ala** | Unidade/setor do hospital (`alas_hospitais`), opcional via `visitas.ala_unidade_id` (apenas quando houver hospital vinculado). Model `Ala`. |
 
 ---
 
 ## Regras de negócio
 
-1. **Toda visita exige hospital**  
-   `hospital_id` é NOT NULL. Mesmo visitas de tipo `residencia` ou `acao_especial` ficam vinculadas a um hospital cadastrado.
+1. **Hospital obrigatorio condicional**  
+   Visitas dos tipos `hospital` e `residencia` exigem `hospital_id`. Para `acao_especial` e `outro`, `hospital_id` é `nullable`. Quando não houver hospital, `ala_unidade_id` também deve ser `null`.
 
 2. **Líder só via `visitas.lider_id`**  
    O líder da visita é um `User` nullable em `visitas.lider_id`. Papéis na pivot (`PapelNaVisita`) são apenas `participante` e `relator`.
@@ -52,7 +52,7 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
    Não há constraint `fim_em > inicio_em` no banco. Validar no service/form request quando existir UI de cadastro.
 
 7. **Limite de participantes**  
-   Máximo 5 inscrições ativas por visita (`papel_na_visita = participante`, `status_participacao ∈ {confirmado, pendente}`).
+   Configurável por visita via `visitas.limite_participantes` (padrão 5 para hospital/residência). Se `null`, a visita não possui limite de vagas (ilimitada). O limite considera apenas inscrições ativas (`papel_na_visita = participante`, `status_participacao ∈ {confirmado, pendente}`).
 
 8. **Inscrição self-service e gestão de participantes**  
    Voluntário autenticado e **ativo** com `voluntario_id` preenchido pode se inscrever em visita `agendada` via modal do calendário, desde que a visita não esteja concluída nem com horário passado. Na tela de edição (`Edit.tsx`), gestores e líderes com `podeEditarVisita` podem adicionar ou remover participantes.
@@ -78,18 +78,19 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 
 ### Tabela `visitas`
 
-Migration: `2026_06_15_000000_create_visitas_table.php`
+Migration: `2026_06_15_000000_create_visitas_table.php`, `2026_08_10_000000_make_visitas_hospital_id_nullable_and_add_limite_participantes.php`
 
 | Coluna | Descrição |
 |--------|-----------|
 | `id` | Chave primária. |
-| `hospital_id` | FK → `hospitais.id` (NOT NULL, restrictOnDelete). |
+| `hospital_id` | FK → `hospitais.id` (nullable, restrictOnDelete). Obrigatório para `hospital` e `residencia`. |
 | `ala_unidade_id` | FK → `alas_hospitais.id` (nullable, nullOnDelete). |
 | `criado_por_id` | FK → `users.id` (NOT NULL, restrictOnDelete). |
 | `lider_id` | FK → `users.id` (nullable, nullOnDelete). |
 | `inicio_em` | Timestamp de início. |
 | `fim_em` | Timestamp de fim. |
 | `tipo` | varchar(50) — valores em `VisitaTipo`. |
+| `limite_participantes` | unsignedSmallInteger (nullable). Limite de vagas da visita (null = ilimitado). |
 | `status` | varchar(50) — valores em `VisitaStatus`. |
 | `origem` | varchar(50) — valores em `VisitaOrigem`. |
 | `observacoes` | Texto livre (nullable). |
@@ -477,7 +478,7 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 | `lib/visita.ts` | Helpers: `contarParticipantes`, `contarParticipantesAtivos`, `usuarioJaInscrito`, `participacaoAtivaDoUsuario`, `usuarioEhLiderDaVisita`, `visitaAtingiuLimite`, `classeCardPorStatus`, `labelStatus`, `podeEditarVisita`, `labelTipo`, `extrairData`, `extrairHora` |
 | `Queries/Visita/Participante/Queries.tsx` | `fetch` POST/DELETE para `visitas.participantes.store` / `visitas.participantes.destroy` |
 | `Services/Visita/Participante/Service.tsx` | Orquestra inscrição/cancelamento, toasts e reload Inertia |
-| `utils/form.ts` | Helper `obterCsrfToken` |
+| `utils/form.ts` | Helpers `obterCsrfToken` e `obterCsrfHeaders` (extrai token CSRF de cookie/meta para requisições fetch) |
 
 ### Regras
 

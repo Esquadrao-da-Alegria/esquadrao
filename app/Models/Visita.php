@@ -21,6 +21,7 @@ class Visita extends Model
         'inicio_em',
         'fim_em',
         'tipo',
+        'limite_participantes',
         'status',
         'origem',
         'observacoes',
@@ -32,6 +33,7 @@ class Visita extends Model
             'inicio_em' => 'datetime',
             'fim_em' => 'datetime',
             'tipo' => VisitaTipo::class,
+            'limite_participantes' => 'integer',
             'status' => VisitaStatus::class,
             'origem' => VisitaOrigem::class,
         ];
