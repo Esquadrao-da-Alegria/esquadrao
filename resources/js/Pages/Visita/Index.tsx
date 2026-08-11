@@ -33,6 +33,7 @@ interface Props {
     cidades?: CidadeOption[];
     cidadeId?: number | 'todas';
     cidadeUsuarioId?: number | null;
+    visitaId?: number | null;
 }
 
 function nomeMes(mes: string): string {
@@ -60,9 +61,10 @@ const Index: FC<Props> = ({
     cidades = [],
     cidadeId = 'todas',
     cidadeUsuarioId = null,
+    visitaId = null,
 }) => {
     const [visitaSelecionada, setVisitaSelecionada] = useState<Visita | null>(
-        null,
+        visitas.find((visita) => visita.id === visitaId) ?? null,
     );
     const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(
         null,

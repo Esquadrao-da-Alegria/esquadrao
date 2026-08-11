@@ -1,5 +1,5 @@
 import PainelLayout from '@/layouts/PainelLayout'
-import { create, edit } from '@/routes/patrocinadores'
+import { create } from '@/routes/patrocinadores'
 import { Link, router } from '@inertiajs/react'
 import { Handshake, Pencil, Plus } from 'lucide-react'
 import React from 'react'
@@ -110,7 +110,7 @@ const Index: React.FC<Props> = ({ patrocinadores }) => {
                                         </div>
                                         <div className="flex shrink-0 items-center justify-end border-t border-amber-50 pt-4 sm:w-auto sm:border-t-0 sm:border-l sm:border-amber-50 sm:pl-6 sm:pt-0">
                                             <Link
-                                                href={edit.url(patrocinador.id!)}
+                                                href={`/patrocinadores/${patrocinador.id}/edit`}
                                                 prefetch
                                                 className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                                                 aria-label={`Editar ${patrocinador.nome}`}

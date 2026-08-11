@@ -21,8 +21,7 @@ import { itensDashboards } from '@/lib/dashboard';
 import { toastAviso, toastErro, toastSucesso } from '@/lib/utils/toast';
 
 // ROTAS
-import { home, login, logout } from '@/routes';
-import { meu as meuDashboard } from '@/routes/dashboards';
+import { dashboard, home, login, logout } from '@/routes';
 import { index } from '@/routes/hospitais';
 import { edit } from '@/routes/profile';
 import { index as eventosIndex } from '@/routes/eventos'
@@ -77,7 +76,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const user = props.auth?.user;
     const ehAdministrador = props.eh_administrador === true;
     const dashboardsVisiveis = itensDashboards.filter(
-        (item) => props.permissoes_dashboards?.[item.permissao] === true,
+        (item) => item.permissao === null || props.permissoes_dashboards?.[item.permissao] === true,
     );
 
     useEffect(() => {
@@ -244,7 +243,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             <aside className="hidden shrink-0 flex-col border-r border-primary/15 bg-white shadow-[inset_3px_0_0_0_var(--primary)] sm:flex sm:w-56 lg:w-64">
                 <div className="border-b border-primary/10 px-4 py-4">
                     <Link
-                        href={meuDashboard()}
+                        href={dashboard()}
                         className="flex items-center gap-2"
                     >
                         <img
@@ -291,8 +290,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     const Icone = item.icone;
                                     const ativo =
                                         pathname === item.caminho || pathname.startsWith(`${item.caminho}/`) ||
-                                        (pathname === '/dashboard' &&
-                                            item.permissao === 'dashboard.meu');
+                                        pathname === item.caminho;
 
                                     return (
                                         <Link
@@ -340,7 +338,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                     <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:max-w-none sm:px-6">
                         <div className="flex min-w-0 flex-1 items-center gap-6">
                             <Link
-                                href={meuDashboard()}
+                                href={dashboard()}
                                 className="flex shrink-0 items-center gap-2 sm:hidden"
                                 onClick={closeMobile}
                             >
@@ -392,8 +390,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                                 const Icone = item.icone;
                                                 const ativo =
                                                     pathname === item.caminho || pathname.startsWith(`${item.caminho}/`) ||
-                                                    (pathname === '/dashboard' &&
-                                                        item.permissao === 'dashboard.meu');
+                                                    pathname === item.caminho;
 
                                                 return (
                                                     <Link

@@ -195,3 +195,17 @@ export interface Evento {
     created_at: string;
     updated_at: string;
 }
+
+export interface MeuEvento {
+    id: number;
+    titulo: string;
+    tipo: EventoTipo;
+    data_inicio: string;
+    data_fim: string | null;
+    local: string | null;
+    status: EventoStatus;
+    responsavel?: User | null;
+    inscricao_status: 'inscrito' | 'cancelado';
+    presenca: PresencaStatus | null;
+    presenca_registrada_em: string | null;
+}

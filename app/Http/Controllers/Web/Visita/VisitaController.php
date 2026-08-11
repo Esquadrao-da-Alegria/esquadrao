@@ -69,6 +69,7 @@ class VisitaController extends Controller
             'cidades'         => $cidades,
             'cidadeId'        => $cidadeId,
             'cidadeUsuarioId' => $cidadeUsuarioId ? (int) $cidadeUsuarioId : null,
+            'visitaId'        => $request->integer('visita_id') ?: null,
         ]);
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\EventoController;
+use App\Http\Controllers\Web\Dashboard\Controller as DashboardController;
 use App\Http\Controllers\Web\Dashboard\Meu\Controller as MeuDashboardController;
 use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVisitaHospitalController;
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
@@ -55,9 +56,7 @@ Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'co
     ->name('convites.concluir');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::prefix('dashboards')->name('dashboards.')->group(function () {
         Route::get('meu', [MeuDashboardController::class, 'index'])
