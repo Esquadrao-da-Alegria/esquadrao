@@ -14,15 +14,11 @@ class Service
     {
         $slugs = $user->cargos->pluck('slug');
 
-        if ($slugs->intersect(['apoio', 'psicologia'])->isNotEmpty()) {
+        if ($slugs->contains('apoio')) {
             return 'isento';
         }
 
-        if ($slugs->intersect(['administrador', 'diretor', 'coordenador_geral', 'coordenador_local'])->isNotEmpty()) {
-            return 'administrativo';
-        }
-
-        if ($slugs->intersect(['artista', 'voluntario'])->isNotEmpty()) {
+        if ($slugs->isNotEmpty()) {
             return 'visitas';
         }
 
