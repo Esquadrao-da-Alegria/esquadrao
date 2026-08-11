@@ -26,13 +26,14 @@ export type TipoRelatorio = 'palhaco' | 'paisana' | 'geral'
 
 export interface Visita {
     id?: number
-    hospital_id: number
+    hospital_id?: number | null
     ala_unidade_id?: number | null
     criado_por_id: number
     lider_id?: number | null
     inicio_em: string
     fim_em: string
     tipo: VisitaTipo
+    limite_participantes?: number | null
     status: VisitaStatus
     origem: VisitaOrigem
     observacoes?: string | null
@@ -86,6 +87,7 @@ export type DadosFormulario = {
     hora_inicio: string
     hora_fim: string
     tipo: VisitaTipo | ''
+    limite_participantes?: number | '' | null
     lider_id: number | ''
     status?: VisitaStatus
     observacoes: string

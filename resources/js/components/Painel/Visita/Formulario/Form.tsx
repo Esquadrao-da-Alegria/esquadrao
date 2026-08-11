@@ -62,8 +62,27 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, cidades = [], lideres,
         onCampoChange('ala_unidade_id', null)
     }
 
+    const exigeHospital = data.tipo === 'hospital' || data.tipo === 'residencia'
+
     return (
         <div className="space-y-6">
+            <div>
+                <label htmlFor="tipo" className={painelLabelClass}>Tipo *</label>
+                <select
+                    id="tipo"
+                    required
+                    value={data.tipo}
+                    onChange={(e) => onCampoChange('tipo', e.target.value as VisitaTipo)}
+                    className={painelInputClass}
+                >
+                    <option value="">Selecione...</option>
+                    {VISITA_TIPOS.map((t) => (
+                        <option key={t} value={t}>{labelTipo(t)}</option>
+                    ))}
+                </select>
+                {errors.tipo ? <p className="mt-1 text-sm text-red-600">{errors.tipo}</p> : null}
+            </div>
+
             {cidades.length > 0 && (
                 <div>
                     <label htmlFor="cidade_filtro_id" className={painelLabelClass}>Filtrar por Cidade</label>
@@ -84,18 +103,22 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, cidades = [], lideres,
             )}
 
             <div>
-                <label htmlFor="hospital_id" className={painelLabelClass}>Hospital *</label>
+                <label htmlFor="hospital_id" className={painelLabelClass}>
+                    {exigeHospital ? 'Hospital *' : 'Hospital (Opcional)'}
+                </label>
                 <select
                     id="hospital_id"
                     name="hospital_id"
-                    required
+                    required={exigeHospital}
                     disabled={mode === 'edit'}
                     value={data.hospital_id}
                     onChange={(e) => handleHospitalChange(e.target.value ? Number(e.target.value) : '')}
                     className={painelInputClass}
                 >
                     <option value="">
-                        {cidadeFiltroId
+                        {!exigeHospital
+                            ? 'Nenhum hospital (Opcional)'
+                            : cidadeFiltroId
                             ? 'Selecione um hospital da cidade...'
                             : 'Selecione...'}
                     </option>
@@ -174,15 +197,24 @@ const Form: FC<Props> = ({ data, errors, mode, hospitais, cidades = [], lideres,
             </div>
 
             <div>
-                <label htmlFor="tipo" className={painelLabelClass}>Tipo *</label>
-                <select id="tipo" required value={data.tipo}
-                    onChange={(e) => onCampoChange('tipo', e.target.value as VisitaTipo)} className={painelInputClass}>
-                    <option value="">Selecione...</option>
-                    {VISITA_TIPOS.map((t) => (
-                        <option key={t} value={t}>{labelTipo(t)}</option>
-                    ))}
-                </select>
-                {errors.tipo ? <p className="mt-1 text-sm text-red-600">{errors.tipo}</p> : null}
+                <label htmlFor="limite_participantes" className={painelLabelClass}>Limite de Participantes</label>
+                <input
+                    type="number"
+                    id="limite_participantes"
+                    name="limite_participantes"
+                    min={1}
+                    placeholder="Deixe em branco para ilimitado (padrão: 5)"
+                    value={data.limite_participantes ?? ''}
+                    onChange={(e) =>
+                        onCampoChange(
+                            'limite_participantes',
+                            e.target.value !== '' ? Number(e.target.value) : '',
+                        )
+                    }
+                    className={painelInputClass}
+                />
+                <p className="mt-1 text-xs text-gray-500">Deixe em branco para ilimitado ou informe um número de vagas.</p>
+                {errors.limite_participantes ? <p className="mt-1 text-sm text-red-600">{errors.limite_participantes}</p> : null}
             </div>
 
             <div>

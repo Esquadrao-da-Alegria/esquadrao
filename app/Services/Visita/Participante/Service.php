@@ -16,8 +16,6 @@ use Illuminate\Support\Facades\Log;
 
 class Service
 {
-    public const LIMITE_PARTICIPANTES = 5;
-
     public function __construct(
         private Queries $queries,
         private VisitaService $visitaService,
@@ -70,7 +68,7 @@ class Service
                     return $this->erro('Não foi possível validar as vagas desta visita. Tente novamente.');
                 }
 
-                if ($contagem['total'] >= self::LIMITE_PARTICIPANTES) {
+                if ($visita->limite_participantes !== null && $contagem['total'] >= $visita->limite_participantes) {
                     return $this->erro('Visita atingiu limite de participantes');
                 }
 
@@ -86,7 +84,7 @@ class Service
                 return $this->erro('Não foi possível validar as vagas desta visita. Tente novamente.');
             }
 
-            if ($contagem['total'] >= self::LIMITE_PARTICIPANTES) {
+            if ($visita->limite_participantes !== null && $contagem['total'] >= $visita->limite_participantes) {
                 return $this->erro('Visita atingiu limite de participantes');
             }
 

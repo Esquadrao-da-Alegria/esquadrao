@@ -45,12 +45,13 @@ const labelStatusParticipacao = (status: VisitaParticipante['status_participacao
 const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
     const { auth } = usePage<SharedData>().props
     const { data, setData, transform, put, processing, errors } = useForm<DadosFormulario>({
-        hospital_id: visita.hospital_id,
+        hospital_id: visita.hospital_id ?? '',
         ala_unidade_id: visita.ala_unidade_id ?? null,
         data: extrairData(visita.inicio_em),
         hora_inicio: extrairHora(visita.inicio_em),
         hora_fim: extrairHora(visita.fim_em),
         tipo: visita.tipo,
+        limite_participantes: visita.limite_participantes ?? '',
         lider_id: visita.lider_id ?? '',
         status: visita.status,
         observacoes: visita.observacoes ?? '',
