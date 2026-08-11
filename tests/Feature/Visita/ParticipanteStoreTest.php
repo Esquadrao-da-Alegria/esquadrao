@@ -59,6 +59,80 @@ class ParticipanteStoreTest extends TestCase
             ->assertJsonPath('erros.0', 'Visita atingiu limite de participantes');
     }
 
+    public function test_acao_especial_com_limite_maior_que_5_aceita_sexto_participante(): void
+    {
+        $visita = Visita::create([
+            'hospital_id'          => null,
+            'criado_por_id'        => $this->criarUsuario()->id,
+            'inicio_em'            => now()->addDay(),
+            'fim_em'               => now()->addDay()->addHours(2),
+            'tipo'                 => VisitaTipo::AcaoEspecial,
+            'limite_participantes' => 10,
+            'status'               => VisitaStatus::Agendada,
+            'origem'               => VisitaOrigem::Sistema,
+        ]);
+
+        $this->lotarVisita($visita);
+
+        $sextoUser = $this->criarUsuarioVoluntarioAtivo();
+
+        $this->participar($sextoUser, $visita)
+            ->assertOk()
+            ->assertJson(['sucesso' => true]);
+
+        $this->assertDatabaseHas('visita_participante', [
+            'visita_id'     => $visita->id,
+            'voluntario_id' => $sextoUser->id,
+        ]);
+    }
+
+    public function test_visita_com_limite_null_permite_inscricoes_ilimitadas(): void
+    {
+        $visita = Visita::create([
+            'hospital_id'          => null,
+            'criado_por_id'        => $this->criarUsuario()->id,
+            'inicio_em'            => now()->addDay(),
+            'fim_em'               => now()->addDay()->addHours(2),
+            'tipo'                 => VisitaTipo::AcaoEspecial,
+            'limite_participantes' => null,
+            'status'               => VisitaStatus::Agendada,
+            'origem'               => VisitaOrigem::Sistema,
+        ]);
+
+        $this->lotarVisita($visita);
+
+        $sextoUser = $this->criarUsuarioVoluntarioAtivo();
+
+        $this->participar($sextoUser, $visita)
+            ->assertOk()
+            ->assertJson(['sucesso' => true]);
+    }
+
+    public function test_visita_bloqueia_inscricao_ao_atingir_limite_configurado(): void
+    {
+        $visita = Visita::create([
+            'hospital_id'          => null,
+            'criado_por_id'        => $this->criarUsuario()->id,
+            'inicio_em'            => now()->addDay(),
+            'fim_em'               => now()->addDay()->addHours(2),
+            'tipo'                 => VisitaTipo::AcaoEspecial,
+            'limite_participantes' => 2,
+            'status'               => VisitaStatus::Agendada,
+            'origem'               => VisitaOrigem::Sistema,
+        ]);
+
+        $user1 = $this->criarUsuarioVoluntarioAtivo();
+        $user2 = $this->criarUsuarioVoluntarioAtivo();
+        $user3 = $this->criarUsuarioVoluntarioAtivo();
+
+        $this->participar($user1, $visita)->assertOk();
+        $this->participar($user2, $visita)->assertOk();
+
+        $this->participar($user3, $visita)
+            ->assertStatus(422)
+            ->assertJsonPath('erros.0', 'Visita atingiu limite de participantes');
+    }
+
     public function test_rejeita_usuario_ja_inscrito(): void
     {
         $user   = $this->criarUsuarioVoluntarioAtivo();

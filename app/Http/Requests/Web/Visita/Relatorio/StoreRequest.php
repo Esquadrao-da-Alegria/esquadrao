@@ -45,6 +45,11 @@ class StoreRequest extends FormRequest
                 return;
             }
 
+            if (! $visita->hospital_id) {
+                $validator->errors()->add('ala_unidade_id', 'A ala não pertence ao hospital da visita.');
+                return;
+            }
+
             $pertence = Ala::query()
                 ->whereKey($alaId)
                 ->where('hospital_id', $visita->hospital_id)

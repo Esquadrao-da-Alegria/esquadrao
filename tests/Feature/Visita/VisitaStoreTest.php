@@ -186,6 +186,96 @@ class VisitaStoreTest extends TestCase
         ]);
     }
 
+    public function test_cria_acao_especial_sem_hospital_sucesso(): void
+    {
+        $user  = $this->criarVoluntario();
+        $lider = $this->criarVoluntario();
+
+        $payload = [
+            'hospital_id'          => null,
+            'ala_unidade_id'       => null,
+            'data'                 => '2026-06-20',
+            'hora_inicio'          => '10:00',
+            'hora_fim'             => '12:00',
+            'tipo'                 => VisitaTipo::AcaoEspecial->value,
+            'limite_participantes' => 15,
+            'lider_id'             => $lider->id,
+            'observacoes'          => 'Ação Especial de Teste',
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertRedirect(route('visitas.index'));
+
+        $this->assertDatabaseHas('visitas', [
+            'hospital_id'          => null,
+            'criado_por_id'        => $user->id,
+            'lider_id'             => $lider->id,
+            'tipo'                 => VisitaTipo::AcaoEspecial->value,
+            'limite_participantes' => 15,
+            'status'               => VisitaStatus::Agendada->value,
+        ]);
+    }
+
+    public function test_cria_visita_hospitalar_sem_hospital_falha(): void
+    {
+        $user  = $this->criarVoluntario();
+        $lider = $this->criarVoluntario();
+
+        $payload = [
+            'hospital_id' => null,
+            'data'        => '2026-06-20',
+            'hora_inicio' => '10:00',
+            'hora_fim'    => '12:00',
+            'tipo'        => VisitaTipo::Hospital->value,
+            'lider_id'    => $lider->id,
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertSessionHasErrors('hospital_id');
+    }
+
+    public function test_cria_visita_residencia_sem_hospital_falha(): void
+    {
+        $user  = $this->criarVoluntario();
+        $lider = $this->criarVoluntario();
+
+        $payload = [
+            'hospital_id' => null,
+            'data'        => '2026-06-20',
+            'hora_inicio' => '10:00',
+            'hora_fim'    => '12:00',
+            'tipo'        => VisitaTipo::Residencia->value,
+            'lider_id'    => $lider->id,
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertSessionHasErrors('hospital_id');
+    }
+
+    public function test_cria_visita_com_ala_sem_hospital_falha(): void
+    {
+        $user     = $this->criarVoluntario();
+        $hospital = $this->criarHospital();
+        $ala      = Ala::query()->create(['hospital_id' => $hospital->id, 'nome' => 'Ala Teste']);
+
+        $payload = [
+            'hospital_id'    => null,
+            'ala_unidade_id' => $ala->id,
+            'data'           => '2026-06-20',
+            'hora_inicio'    => '10:00',
+            'hora_fim'       => '12:00',
+            'tipo'           => VisitaTipo::AcaoEspecial->value,
+            'lider_id'       => $user->id,
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertSessionHasErrors('ala_unidade_id');
+    }
+
     private function criarVoluntario(): User
     {
         return $this->criarUsuarioVoluntarioAtivoComCargo('voluntario');

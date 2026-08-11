@@ -217,20 +217,36 @@ class Service
         $inicioEm = $this->montarDatetime($dados['data'], $dados['hora_inicio']);
         $fimEm    = $this->montarDatetime($dados['data'], $dados['hora_fim']);
 
+        $tipo = $dados['tipo'] instanceof VisitaTipo ? $dados['tipo']->value : $dados['tipo'];
+        $exigeHospital = in_array($tipo, [VisitaTipo::Hospital->value, VisitaTipo::Residencia->value, 'hospital', 'residencia'], true);
+
+        $hospitalId = $exigeHospital ? ($dados['hospital_id'] ?? null) : ($dados['hospital_id'] ?? null);
+        $alaId      = $hospitalId ? ($dados['ala_unidade_id'] ?? null) : null;
+
+        $limite = null;
+        if (array_key_exists('limite_participantes', $dados)) {
+            $limite = ($dados['limite_participantes'] !== null && $dados['limite_participantes'] !== '')
+                ? (int) $dados['limite_participantes']
+                : null;
+        } elseif ($acao === 'store' && $exigeHospital) {
+            $limite = 5;
+        }
+
         $payload = [
-            'lider_id'    => $dados['lider_id'],
-            'inicio_em'   => $inicioEm,
-            'fim_em'      => $fimEm,
-            'tipo'        => $dados['tipo'],
-            'observacoes' => $dados['observacoes'] ?? null,
+            'hospital_id'          => $hospitalId,
+            'ala_unidade_id'       => $alaId,
+            'lider_id'             => $dados['lider_id'],
+            'inicio_em'            => $inicioEm,
+            'fim_em'               => $fimEm,
+            'tipo'                 => $tipo,
+            'limite_participantes' => $limite,
+            'observacoes'          => $dados['observacoes'] ?? null,
         ];
 
         if ($acao === 'store') {
-            $payload['hospital_id']    = $dados['hospital_id'];
-            $payload['ala_unidade_id'] = $dados['ala_unidade_id'] ?? null;
-            $payload['criado_por_id']  = Auth::id();
-            $payload['status']         = VisitaStatus::Agendada->value;
-            $payload['origem']         = VisitaOrigem::Sistema->value;
+            $payload['criado_por_id'] = Auth::id();
+            $payload['status']        = VisitaStatus::Agendada->value;
+            $payload['origem']        = VisitaOrigem::Sistema->value;
         }
 
         if ($acao === 'update') {
@@ -265,6 +281,7 @@ class Service
             'criado_por_id',
             'status',
             'tipo',
+            'limite_participantes',
             'origem',
             'inicio_em',
             'fim_em',

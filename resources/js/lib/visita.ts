@@ -24,7 +24,10 @@ export function contarParticipantesAtivos(visita: Visita): number {
 }
 
 export function visitaAtingiuLimite(visita: Visita): boolean {
-    return contarParticipantesAtivos(visita) >= LIMITE_PARTICIPANTES
+    if (visita.limite_participantes === null || visita.limite_participantes === undefined) {
+        return false
+    }
+    return contarParticipantesAtivos(visita) >= visita.limite_participantes
 }
 
 export function usuarioJaInscrito(visita: Visita, usuarioId: number): boolean {
