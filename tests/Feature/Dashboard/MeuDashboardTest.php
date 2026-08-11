@@ -111,16 +111,15 @@ class MeuDashboardTest extends TestCase
                 ->where('indicadores.relatorios_pendentes', 1));
     }
 
-    public function test_cargo_administrativo_prevalece_e_nao_recebe_meta_de_visitas(): void
+    public function test_administrador_voluntario_recebe_meta_de_visitas(): void
     {
         $usuario = $this->criarUsuario($this->criarCidade(), ['voluntario', 'administrador']);
 
         $this->actingAs($usuario)
             ->get(route('dashboards.meu'))
             ->assertInertia(fn (Assert $page) => $page
-                ->where('voluntario.tipo_atuacao', 'administrativo')
-                ->where('indicadores.meta_mensal', null)
-                ->where('indicadores.saldo', null));
+                ->where('voluntario.tipo_atuacao', 'visitas')
+                ->where('indicadores.meta_mensal', 2));
     }
 
     public function test_periodo_personalizado_bloqueia_intervalo_superior_a_vinte_e_quatro_meses(): void

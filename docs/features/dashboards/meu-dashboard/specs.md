@@ -36,16 +36,7 @@ Uma visita é válida quando está `realizada`, a participação está confirmad
 
 ## Classificação de atuação
 
-Precedência provisória:
-
-1. `apoio` ou `psicologia`: isento;
-2. `administrador`, `diretor`, `coordenador_geral` ou `coordenador_local`: administrativo;
-3. `artista` ou `voluntario`: meta de visitas;
-4. demais combinações: dados insuficientes.
-
-Um cargo administrativo prevalece atualmente sobre `artista` e `voluntario`. Essa decisão pode mudar. A alteração futura deve ocorrer somente em `Meta\Service::tipo`, com ajuste dos testes e desta seção.
-
-Administrativos recebem a orientação sobre oito horas mensais, mas não recebem meta de visitas. Até existir uma fonte confiável de horas, o valor é apresentado como indisponível. Isentos não recebem saldo negativo ou sinalização desfavorável.
+Todo usuário com cargo vinculado recebe meta de visitas, inclusive administradores, diretores, coordenadores e psicologia. A única exceção é quem possui a tag/cargo `apoio`, que prevalece em combinações de múltiplos cargos e isenta o voluntário da meta. Usuários sem qualquer cargo permanecem como dados insuficientes.
 
 ## Filtros
 

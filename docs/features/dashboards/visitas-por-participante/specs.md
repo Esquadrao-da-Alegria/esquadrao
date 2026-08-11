@@ -14,16 +14,9 @@ Dashboard gerencial de apoio à decisão. Os indicadores organizam dados objetiv
 
 ## Classificação provisória da atuação
 
-A fonte atual é `App\Services\Dashboard\Visita\Participante\Meta\Service`:
+A fonte atual é `App\Services\Dashboard\Visita\Participante\Meta\Service`. Todo usuário com cargo vinculado recebe meta de visitas, incluindo administradores, diretores, coordenadores e psicologia. Quem não realiza visitas deve possuir a tag/cargo `apoio`, que prevalece em combinações de múltiplos cargos e isenta da meta. Apenas usuários sem cargo permanecem como dados insuficientes.
 
-1. `apoio` ou `psicologia`: isento da meta de visitas;
-2. `administrador`, `diretor`, `coordenador_geral` ou `coordenador_local`: administrativo;
-3. `artista` ou `voluntario`: meta de visitas;
-4. nenhum cargo reconhecido: dados insuficientes.
-
-Um voluntário que não realiza visitas deve possuir a tag/cargo `apoio`. A classificação por cargo é provisória. Quando existir tipo de atuação explícito, ele deverá substituir somente o método `Meta\Service::tipo`, mantendo o restante do dashboard.
-
-Administrativos possuem meta institucional de oito horas mensais, mas o sistema ainda não registra horas. Eles aparecem como **Dados insuficientes**, sem sinalização negativa.
+Quando existir um tipo de atuação explícito, ele deverá substituir somente o método `Meta\Service::tipo`, mantendo o restante do dashboard.
 
 ## Visita válida
 
