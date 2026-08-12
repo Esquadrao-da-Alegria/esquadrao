@@ -106,6 +106,12 @@ class Service
             ->where('status_participacao', StatusParticipacao::Confirmado->value)
             ->first();
 
+        $autorEhAdmin = $autor->cargos()->where('slug', 'administrador')->exists();
+
+        if (! $participacao && ! $autorEhAdmin) {
+            throw ValidationException::withMessages(['relatorio_id' => 'O autor precisa possuir participação confirmada nesta visita.']);
+        }
+
         if (VisitaAjusteContabilizacao::query()->where('relatorio_id', $relatorio->id)->where('tipo', TipoAjusteContabilizacao::AceiteRelatorioForaPrazo->value)->exists()) {
             throw ValidationException::withMessages(['relatorio_id' => 'Este relatório já possui aceite administrativo.']);
         }
