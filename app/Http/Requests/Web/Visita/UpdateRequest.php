@@ -6,6 +6,8 @@ use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
 use App\Models\Ala;
 use App\Models\User;
+use App\Models\Visita;
+use App\Services\Visita\Service;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,9 +20,17 @@ class UpdateRequest extends FormRequest
 
     public function rules(): array
     {
+        /** @var Visita $visita */
+        $visita = $this->route('visita');
+
+        if (! app(Service::class)->podeEditarVisita($this->user(), $visita)) {
+            return [];
+        }
+
         return [
             'hospital_id'    => [
-                Rule::requiredIf(fn () => in_array($this->input('tipo'), [VisitaTipo::Hospital->value, VisitaTipo::Residencia->value, 'hospital', 'residencia'], true)),
+                Rule::excludeIf(fn () => ! in_array($this->input('tipo'), [VisitaTipo::Hospital->value, VisitaTipo::Residencia->value, 'hospital', 'residencia'], true)),
+                Rule::requiredIf(fn () => in_array($this->input('tipo'), [VisitaTipo::Hospital->value, VisitaTipo::Residencia->value, 'hospital', 'residencia'], true) && ! $this->route('visita')->hospital_id),
                 'nullable',
                 'integer',
                 Rule::exists('hospitais', 'id')->where(fn ($q) => $q->where('ativo', true)),
@@ -39,6 +49,13 @@ class UpdateRequest extends FormRequest
 
     public function withValidator($validator): void
     {
+        /** @var Visita $visita */
+        $visita = $this->route('visita');
+
+        if (! app(Service::class)->podeEditarVisita($this->user(), $visita)) {
+            return;
+        }
+
         $validator->after(function ($validator) {
             $liderId = $this->input('lider_id');
 

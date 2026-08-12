@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\TipoRelatorio;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class VisitaRelatorio extends Model
 {
@@ -47,5 +48,10 @@ class VisitaRelatorio extends Model
     public function autor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'autor_id');
+    }
+
+    public function ajustesContabilizacao(): HasMany
+    {
+        return $this->hasMany(VisitaAjusteContabilizacao::class, 'relatorio_id');
     }
 }

@@ -9,6 +9,8 @@ use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
 use App\Models\Cargo;
+use App\Models\Cidade;
+use App\Models\Estado;
 use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
@@ -114,7 +116,16 @@ class VisitaEdicaoRegressaoTest extends TestCase
 
     private function criarVisita(User $criador): Visita
     {
+        $estado = Estado::query()->firstOrCreate(
+            ['sigla' => 'RS'],
+            ['nome' => 'Rio Grande do Sul'],
+        );
+        $cidade = Cidade::query()->forceCreate([
+            'nome' => 'Porto Alegre',
+            'estado_id' => $estado->id,
+        ]);
         $hospital = Hospital::query()->create([
+            'cidade_id' => $cidade->id,
             'nome'     => 'Hospital Teste ' . uniqid(),
             'cnpj'     => (string) random_int(10000000000000, 99999999999999),
             'endereco' => 'Rua 1',

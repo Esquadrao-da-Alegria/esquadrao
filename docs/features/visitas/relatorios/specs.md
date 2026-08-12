@@ -2,6 +2,8 @@
 
 Documento de referência do submódulo **relatórios** vinculados a uma visita. Complementa [`docs/features/visitas/specs.md`](../specs.md).
 
+Um relatório atrasado conserva `fora_do_prazo = true`. Mediante justificativa, um administrador pode aceitá-lo apenas para contabilização pelo fluxo descrito em [`ajustes-contabilizacao/specs.md`](../ajustes-contabilizacao/specs.md).
+
 ---
 
 ## Vocabulário
@@ -85,6 +87,7 @@ Envelope padrão: `['sucesso' => bool, 'dados' => ..., 'erros' => []]`.
 ### Regras no Service
 
 - `calcularForaDoPrazo(visita, enviadoEm)` → `enviadoEm > visita.fim_em + 48h`
+- A regra de 48 horas é centralizada em `App\Services\Visita\Relatorio\Prazo\Service` e reutilizada pelo dashboard de participação.
 - `podeEditarRelatorio(user, visita, relatorio)` → falso se visita cancelada; verdadeiro se autor; senão `podeEditarVisita`
 - `store` → bloqueia visita cancelada; define `autor_id`, `enviado_em`, `fora_do_prazo`
 - `pdf` → valida pertencimento; gera download síncrono via Spatie Laravel PDF

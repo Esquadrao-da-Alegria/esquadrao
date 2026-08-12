@@ -142,6 +142,12 @@ class Service
 
         try {
             $payload     = $this->formatarDatabase($dados, 'update');
+
+            if (! array_key_exists('hospital_id', $dados)) {
+                $payload['hospital_id'] = $visita->hospital_id;
+                $payload['ala_unidade_id'] = $visita->ala_unidade_id;
+            }
+
             $contextoLog = $payload;
 
             if (Carbon::parse($payload['fim_em'])->lte(Carbon::parse($payload['inicio_em']))) {

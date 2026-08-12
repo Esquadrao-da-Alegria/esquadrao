@@ -10,6 +10,7 @@ use App\Models\VisitaRelatorio;
 use App\Notifications\RelatorioVisitaNotification;
 use App\Queries\Visita\Relatorio\Queries;
 use App\Services\Visita\Service as VisitaService;
+use App\Services\Visita\Relatorio\Prazo\Service as PrazoService;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ class Service
     public function __construct(
         private Queries $queries,
         private VisitaService $visitaService,
+        private PrazoService $prazoService,
     ) {}
 
     public function index(Visita $visita): array
@@ -231,7 +233,7 @@ class Service
 
     public function calcularForaDoPrazo(Visita $visita, CarbonInterface $enviadoEm): bool
     {
-        return $enviadoEm->gt($visita->fim_em->copy()->addHours(48));
+        return $this->prazoService->foraDoPrazo($visita, $enviadoEm);
     }
 
     public function pdf(Visita $visita, VisitaRelatorio $relatorio): Response

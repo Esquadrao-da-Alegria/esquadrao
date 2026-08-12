@@ -23,6 +23,8 @@ Documento de referência sobre o modelo de **usuários do sistema** e **cargos**
 2. **Uma conta de usuário pode ter múltiplos cargos**
    Relação **N:N** entre `users` e `cargos` via `voluntario_cargo`. Ex.: a conta vinculada a um voluntário pode ser Artista e Coordenador Local ao mesmo tempo.
 
+   Atualmente, todo cargo vinculado à conta é considerado ativo. A pivot não guarda vigência nem histórico de ativação. Se o sistema passar a exigir histórico de cargos, essa evolução deverá adicionar campos de vigência ou status à atribuição sem alterar o significado dos slugs existentes.
+
 3. **Não repetir o mesmo cargo no mesmo usuário**  
    Existe restrição única em `(voluntario_id, cargo_id)`. Tentar inserir o mesmo par duas vezes falha no banco.
 

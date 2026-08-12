@@ -1,13 +1,19 @@
 <?php
 
 use App\Http\Controllers\Web\EventoController;
+use App\Http\Controllers\Web\Dashboard\Controller as DashboardController;
+use App\Http\Controllers\Web\Dashboard\Meu\Controller as MeuDashboardController;
+use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVisitaHospitalController;
+use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
 use App\Http\Controllers\Web\EventoFinalizacaoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
 use App\Http\Controllers\Web\EventoPresencaController;
+use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\MeuEventoController;
 use App\Http\Controllers\Web\ConviteCadastroController;
 use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
+use App\Http\Controllers\Web\Visita\Ajuste\Controller as VisitaAjusteController;
 use App\Http\Controllers\Web\Visita\Relatorio\VisitaRelatorioController;
 use App\Http\Controllers\Web\Visita\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
@@ -15,6 +21,7 @@ use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
 use App\Http\Controllers\Web\VoluntarioController;
 use App\Models\Patrocinador;
+use App\Services\Dashboard\Permissao\Service as DashboardPermissaoService;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -49,9 +56,30 @@ Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'co
     ->name('convites.concluir');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('dashboards')->name('dashboards.')->group(function () {
+        Route::get('meu', [MeuDashboardController::class, 'index'])
+            ->middleware('can:'.DashboardPermissaoService::MEU_DASHBOARD)->name('meu');
+
+        Route::get('visao-geral', function () {
+            return Inertia::render('Dashboard/Gerencial', [
+                'titulo' => 'Visão geral',
+                'descricao' => 'Os indicadores gerais serão disponibilizados nesta área.',
+            ]);
+        })->middleware('can:'.DashboardPermissaoService::VISAO_GERAL)->name('visao-geral');
+
+        Route::get('visitas-por-hospital', [DashboardVisitaHospitalController::class, 'index'])
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_HOSPITAL)
+            ->name('visitas-por-hospital');
+
+        Route::get('visitas-por-participante', [DashboardVisitaParticipanteController::class, 'index'])
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
+            ->name('visitas-por-participante');
+        Route::get('visitas-por-participante/{voluntario}', [DashboardVisitaParticipanteController::class, 'show'])
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
+            ->name('visitas-por-participante.show');
+    });
 
     Route::get('ajuda', function () {
         return Inertia::render('Ajuda/Index');
@@ -66,6 +94,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['administrador'])->group(function () {
         Route::get('/eventos/create', [EventoController::class, 'create'])->name('eventos.create');
         Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
+        Route::post('/eventos/{evento}/ajustes-participacao', [EventoAjusteController::class, 'store'])->name('eventos.ajustes-participacao.store');
     });
 
     Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
@@ -81,6 +110,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('{visita}/edit', [VisitaController::class, 'edit'])->name('edit');
         Route::put('{visita}', [VisitaController::class, 'update'])->name('update');
         Route::post('{visita}/cancelar', [VisitaController::class, 'cancelar'])->name('cancelar');
+
+        Route::middleware('administrador')->prefix('{visita}/ajustes-contabilizacao')->name('ajustes-contabilizacao.')->group(function () {
+            Route::post('/', [VisitaAjusteController::class, 'store'])->name('store');
+        });
 
         Route::prefix('{visita}/relatorios')->scopeBindings()->name('relatorios.')->group(function () {
             Route::get('/', [VisitaRelatorioController::class, 'index'])->name('index');

@@ -1,8 +1,13 @@
 // REACT/INERTIA
 import { useEffect, useState } from 'react';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router, usePage, type InertiaLinkProps } from '@inertiajs/react';
 
 // UI
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,6 +17,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { itensDashboards } from '@/lib/dashboard';
 import { toastAviso, toastErro, toastSucesso } from '@/lib/utils/toast';
 
 // ROTAS
@@ -29,9 +35,10 @@ import {
     Building2,
     CalendarDays,
     ChevronDown,
+    ChevronRight,
     CircleHelp,
     Handshake,
-    LayoutGrid,
+    LayoutDashboard,
     LogOut,
     User,
     UsersRound,
@@ -52,7 +59,7 @@ const temaPainelAmarelo = cn(
 
 interface ItemNavegacaoPainel {
     titulo: string;
-    href: any;
+    href: NonNullable<InertiaLinkProps['href']>;
     icone: LucideIcon;
     ativo: boolean;
     visivel: boolean;
@@ -62,9 +69,15 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const { props, url } = usePage<SharedData>();
     const pathname = (url.split('?')[0] ?? '').replace(/\/$/, '') || '/';
+    const rotaDashboardAtiva =
+        pathname === '/dashboard' || pathname.startsWith('/dashboards/');
+    const [dashboardsOpen, setDashboardsOpen] = useState(rotaDashboardAtiva);
 
     const user = props.auth?.user;
     const ehAdministrador = props.eh_administrador === true;
+    const dashboardsVisiveis = itensDashboards.filter(
+        (item) => item.permissao === null || props.permissoes_dashboards?.[item.permissao] === true,
+    );
 
     useEffect(() => {
         const mensagemSucesso = props.mensagem_sucesso;
@@ -80,9 +93,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
         props.mensagem_alerta,
     ]);
 
+    useEffect(() => {
+        if (rotaDashboardAtiva) setDashboardsOpen(true);
+    }, [rotaDashboardAtiva]);
+
     const closeMobile = () => setMobileOpen(false);
 
-    const isDashboard = pathname === '/dashboard';
     const isAjuda = pathname === '/ajuda';
     const isHospitaisCreate = pathname === '/hospitais/create';
     const isHospitaisNav =
@@ -116,13 +132,6 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             : '';
 
     const itensNavegacao: ItemNavegacaoPainel[] = [
-        {
-            titulo: 'Início',
-            href: dashboard(),
-            icone: LayoutGrid,
-            ativo: isDashboard,
-            visivel: true,
-        },
         {
             titulo: 'Hospitais',
             href: index(),
@@ -254,6 +263,54 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                     <p className="mb-1 px-3 text-xs font-medium text-gray-400">
                         Menu principal
                     </p>
+                    {dashboardsVisiveis.length > 0 && (
+                        <Collapsible
+                            open={dashboardsOpen}
+                            onOpenChange={setDashboardsOpen}
+                        >
+                            <CollapsibleTrigger
+                                className={`${sidebarLinkClass} ${sidebarLinkActive(
+                                    rotaDashboardAtiva,
+                                )}`}
+                            >
+                                <LayoutDashboard
+                                    className="size-4 shrink-0 opacity-70"
+                                    aria-hidden
+                                />
+                                <span className="flex-1 text-left">Dashboards</span>
+                                <ChevronRight
+                                    className={`size-4 transition-transform ${
+                                        dashboardsOpen ? 'rotate-90' : ''
+                                    }`}
+                                    aria-hidden
+                                />
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="mt-0.5 space-y-0.5 pl-5">
+                                {dashboardsVisiveis.map((item) => {
+                                    const Icone = item.icone;
+                                    const ativo =
+                                        pathname === item.caminho || pathname.startsWith(`${item.caminho}/`) ||
+                                        pathname === item.caminho;
+
+                                    return (
+                                        <Link
+                                            key={item.permissao}
+                                            href={item.href}
+                                            className={`${sidebarLinkClass} ${sidebarLinkActive(
+                                                ativo,
+                                            )}`}
+                                        >
+                                            <Icone
+                                                className="size-4 shrink-0 opacity-70"
+                                                aria-hidden
+                                            />
+                                            {item.titulo}
+                                        </Link>
+                                    );
+                                })}
+                            </CollapsibleContent>
+                        </Collapsible>
+                    )}
                     {itensVisiveis.map((item) => {
                         const Icone = item.icone;
 
@@ -304,6 +361,57 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                         : 'hidden'
                                 } sm:hidden`}
                             >
+                                {dashboardsVisiveis.length > 0 && (
+                                    <Collapsible
+                                        open={dashboardsOpen}
+                                        onOpenChange={setDashboardsOpen}
+                                    >
+                                        <CollapsibleTrigger
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                rotaDashboardAtiva,
+                                            )} flex w-full items-center gap-2`}
+                                        >
+                                            <LayoutDashboard
+                                                className="size-4 shrink-0 opacity-70"
+                                                aria-hidden
+                                            />
+                                            <span className="flex-1 text-left">
+                                                Dashboards
+                                            </span>
+                                            <ChevronRight
+                                                className={`size-4 transition-transform ${
+                                                    dashboardsOpen ? 'rotate-90' : ''
+                                                }`}
+                                                aria-hidden
+                                            />
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent className="space-y-0.5 pl-5">
+                                            {dashboardsVisiveis.map((item) => {
+                                                const Icone = item.icone;
+                                                const ativo =
+                                                    pathname === item.caminho || pathname.startsWith(`${item.caminho}/`) ||
+                                                    pathname === item.caminho;
+
+                                                return (
+                                                    <Link
+                                                        key={item.permissao}
+                                                        href={item.href}
+                                                        className={`${navLinkClass} ${navLinkActive(
+                                                            ativo,
+                                                        )} flex items-center gap-2`}
+                                                        onClick={closeMobile}
+                                                    >
+                                                        <Icone
+                                                            className="size-4 shrink-0 opacity-70"
+                                                            aria-hidden
+                                                        />
+                                                        {item.titulo}
+                                                    </Link>
+                                                );
+                                            })}
+                                        </CollapsibleContent>
+                                    </Collapsible>
+                                )}
                                 {itensVisiveis.map((item) => {
                                     const Icone = item.icone;
 
