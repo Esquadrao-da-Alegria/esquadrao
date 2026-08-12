@@ -78,7 +78,7 @@ Cores sempre acompanham texto. Nunca usar “irregular”, “deve ser afastado�
 
 ## Filtros e interface
 
-A busca por nome ou e-mail é aplicada automaticamente com atraso curto. Período, cidade e filtros avançados são preparados localmente e enviados somente pelo botão **Aplicar filtros**, evitando consultas a cada mudança. O botão **Mais filtros** informa a quantidade ativa; os filtros aplicados aparecem como marcadores removíveis. Limpar filtros avançados preserva busca, período e cidade.
+A busca por nome ou e-mail, o período, a cidade e os filtros avançados são preparados localmente e enviados pelo botão **Aplicar filtros** ou pela tecla Enter no campo de busca, evitando consultas concorrentes a cada mudança. O botão **Mais filtros** informa a quantidade ativa; os filtros aplicados aparecem como marcadores removíveis. Limpar filtros avançados preserva busca, período e cidade.
 
 O histórico completo usa o identificador do voluntário e ignora a página da listagem. Assim, participantes exibidos em qualquer página da paginação continuam acessando seu próprio histórico com os filtros de contexto.
 
