@@ -33,7 +33,7 @@ class IndexRequest extends FormRequest
             'busca' => ['nullable', 'string', 'max:120'],
             'participante_id' => ['nullable', 'integer', 'exists:users,id'],
             'cargo_id' => ['nullable', 'integer', 'exists:cargos,id'],
-            'tipo_atuacao' => ['nullable', Rule::in(['visitas', 'administrativo', 'isento', 'dados_insuficientes'])],
+            'tipo_atuacao' => ['nullable', Rule::in(['visitas', 'isento', 'dados_insuficientes'])],
             'situacao' => ['nullable', Rule::in(['dentro_meta', 'atencao', 'compensacao_pendente', 'requer_analise', 'isento', 'dados_insuficientes'])],
             'atividade' => ['nullable', Rule::in(['visitas', 'reunioes', 'oficinas'])],
             'page' => ['nullable', 'integer', 'min:1'],
