@@ -35,16 +35,21 @@ class ContabilizacaoTest extends TestCase
         $gestor = $this->criarUsuario('administrador', $cidade);
         $encontrado = $this->criarUsuario('voluntario', $cidade);
         $this->criarUsuario('voluntario', $cidade);
-        $encontrado->update(['name' => 'Voluntária Busca Exclusiva']);
+        $encontrado->update([
+            'name' => 'Voluntária Busca Exclusiva',
+            'email' => 'busca.exclusiva@example.com',
+        ]);
 
-        $this->actingAs($gestor)
-            ->get(route('dashboards.visitas-por-participante', [
-                'periodo_tipo' => 'ano', 'ano' => 2026, 'busca' => 'Busca Exclusiva',
-            ]))
-            ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page
-                ->has('participantes.data', 1)
-                ->where('participantes.data.0.id', $encontrado->id));
+        foreach (['Busca Exclusiva', 'busca.exclusiva@example.com'] as $busca) {
+            $this->actingAs($gestor)
+                ->get(route('dashboards.visitas-por-participante', [
+                    'periodo_tipo' => 'ano', 'ano' => 2026, 'busca' => $busca,
+                ]))
+                ->assertOk()
+                ->assertInertia(fn (Assert $page) => $page
+                    ->has('participantes.data', 1)
+                    ->where('participantes.data.0.id', $encontrado->id));
+        }
     }
 
     public function test_visita_exige_relatorio_no_prazo_do_proprio_participante(): void
