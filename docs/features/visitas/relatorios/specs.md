@@ -19,7 +19,7 @@ Um relatório atrasado conserva `fora_do_prazo = true`. Mediante justificativa, 
 
 ## Regras de negócio
 
-1. **Quem cria** — Apenas voluntários que participaram da visita (ou o líder da visita). Usuários que não participaram não podem criar relatórios.
+1. **Quem cria** — Voluntários que participaram da visita (ou o líder da visita) e usuários com permissão `podeEditarVisita` (administradores, diretores e coordenadores autorizados).
 2. **Quem vê** — Qualquer usuário autenticado (listagem, detalhe e PDF).
 3. **Quem edita** — Autor do relatório **ou** quem passa em `podeEditarVisita` (mesma regra da visita).
 4. **Visita cancelada** — Pode listar, ver detalhe e baixar PDF. **Não** pode criar nem editar relatório.
