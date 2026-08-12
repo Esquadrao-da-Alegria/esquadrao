@@ -100,23 +100,17 @@ class Service
         $autor = User::query()->findOrFail($relatorio->autor_id);
         $this->validarConflitoInteresse($administrador, $autor);
 
-        if (! $relatorio->fora_do_prazo) {
-            throw ValidationException::withMessages(['relatorio_id' => 'O relatório selecionado já foi enviado dentro do prazo.']);
-        }
-
         $participacao = VisitaParticipante::query()
             ->where('visita_id', $visita->id)
             ->where('voluntario_id', $autor->id)
             ->where('status_participacao', StatusParticipacao::Confirmado->value)
             ->first();
 
-        if (! $participacao) {
-            throw ValidationException::withMessages(['relatorio_id' => 'O autor precisa possuir participação confirmada nesta visita.']);
-        }
-
         if (VisitaAjusteContabilizacao::query()->where('relatorio_id', $relatorio->id)->where('tipo', TipoAjusteContabilizacao::AceiteRelatorioForaPrazo->value)->exists()) {
             throw ValidationException::withMessages(['relatorio_id' => 'Este relatório já possui aceite administrativo.']);
         }
+
+        $tipoParticipacao = $participacao?->tipo_participacao?->value ?? TipoParticipacao::Palhaco->value;
 
         return VisitaAjusteContabilizacao::query()->create([
             'visita_id' => $visita->id,
@@ -124,7 +118,7 @@ class Service
             'relatorio_id' => $relatorio->id,
             'administrador_id' => $administrador->id,
             'tipo' => TipoAjusteContabilizacao::AceiteRelatorioForaPrazo,
-            'tipo_participacao' => $participacao->tipo_participacao,
+            'tipo_participacao' => $tipoParticipacao,
             'justificativa' => $dados['justificativa'],
             'dados_anteriores' => ['fora_do_prazo' => true, 'aceito_para_contabilizacao' => false],
             'dados_posteriores' => ['fora_do_prazo' => true, 'aceito_para_contabilizacao' => true],
