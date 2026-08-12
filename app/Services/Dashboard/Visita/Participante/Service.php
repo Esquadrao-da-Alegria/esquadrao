@@ -70,7 +70,7 @@ class Service
             ->when($filtros['atividade'] === 'oficinas', fn ($itens) => $itens->filter(fn ($item) => $item['oficinas']['presencas'] > 0))
             ->values();
 
-        $pagina = LengthAwarePaginator::resolveCurrentPage();
+        $pagina = (int) ($filtros['page'] ?? LengthAwarePaginator::resolveCurrentPage());
         $paginacao = new LengthAwarePaginator(
             $linhas->forPage($pagina, 15)->values(),
             $linhas->count(),
@@ -99,6 +99,7 @@ class Service
         }
 
         $filtros['participante_id'] = $voluntario->id;
+        $filtros['page'] = 1;
         $resultado = $this->index($gestor, $filtros);
         $participante = collect($resultado['participantes']->items())->first();
 
@@ -250,7 +251,7 @@ class Service
 
     private function filtrosView(array $filtros): array
     {
-        return collect($filtros)->except(['inicio', 'fim'])->all();
+        return collect($filtros)->except(['inicio', 'fim', 'page'])->all();
     }
 
     private function opcoes(User $gestor, array $filtros): array
