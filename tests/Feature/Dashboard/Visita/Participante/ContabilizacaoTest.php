@@ -35,11 +35,11 @@ class ContabilizacaoTest extends TestCase
         $gestor = $this->criarUsuario('administrador', $cidade);
         $encontrado = $this->criarUsuario('voluntario', $cidade);
         $this->criarUsuario('voluntario', $cidade);
-        $encontrado->update(['name' => 'Maria do Sorriso']);
+        $encontrado->update(['name' => 'Voluntária Busca Exclusiva']);
 
         $this->actingAs($gestor)
             ->get(route('dashboards.visitas-por-participante', [
-                'periodo_tipo' => 'ano', 'ano' => 2026, 'busca' => 'Maria',
+                'periodo_tipo' => 'ano', 'ano' => 2026, 'busca' => 'Busca Exclusiva',
             ]))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
@@ -201,7 +201,17 @@ class ContabilizacaoTest extends TestCase
     {
         $cidade = $this->criarCidade('Porto Alegre');
         $gestor = $this->criarUsuario('administrador', $cidade);
-        $voluntario = $this->criarUsuario('voluntario', $cidade);
+        $gestor->update(['name' => 'A Gestor']);
+        $voluntarios = collect(range(1, 15))->map(fn () => $this->criarUsuario('voluntario', $cidade));
+        $voluntario = $voluntarios->sortBy('name')->last();
+
+        $this->actingAs($gestor)
+            ->get(route('dashboards.visitas-por-participante', [
+                'periodo_tipo' => 'ano', 'ano' => 2026, 'page' => 2,
+            ]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('participantes.current_page', 2)
+                ->where('participantes.data.0.id', $voluntario->id));
 
         $this->actingAs($gestor)
             ->get(route('dashboards.visitas-por-participante.show', [
@@ -215,6 +225,35 @@ class ContabilizacaoTest extends TestCase
                 ->component('Dashboard/Visita/Participante/Show')
                 ->where('participante.id', $voluntario->id)
                 ->missing('filtros.page'));
+    }
+
+    public function test_filtros_avancados_restringem_cargo_atuacao_situacao_e_atividade(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidade);
+        $apoio = $this->criarUsuario('apoio', $cidade);
+        $this->criarUsuario('voluntario', $cidade);
+        $cargoApoio = Cargo::query()->where('slug', 'apoio')->firstOrFail();
+        $reuniao = $this->criarEvento($cidade, $gestor, 'reuniao', '2026-03-10 10:00:00');
+        $reuniao->participantes()->attach($apoio->id, ['status' => 'inscrito', 'presenca' => 'presente']);
+
+        foreach ([['cargo_id' => $cargoApoio->id], ['tipo_atuacao' => 'isento'], ['situacao' => 'isento'], ['atividade' => 'reunioes']] as $filtro) {
+            $this->actingAs($gestor)
+                ->get(route('dashboards.visitas-por-participante', ['periodo_tipo' => 'ano', 'ano' => 2026, ...$filtro]))
+                ->assertInertia(fn (Assert $page) => $page
+                    ->has('participantes.data', 1)
+                    ->where('participantes.data.0.id', $apoio->id));
+        }
+    }
+
+    public function test_tipo_de_atuacao_administrativo_obsoleto_e_rejeitado(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidade);
+
+        $this->actingAs($gestor)
+            ->get(route('dashboards.visitas-por-participante', ['periodo_tipo' => 'ano', 'ano' => 2026, 'tipo_atuacao' => 'administrativo']))
+            ->assertSessionHasErrors('tipo_atuacao');
     }
 
     public function test_percentual_considera_eventos_finalizados_da_cidade_e_somente_presenca(): void
