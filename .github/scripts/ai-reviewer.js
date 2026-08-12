@@ -9,7 +9,7 @@ import path from 'path';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
 const GITHUB_EVENT_PATH = process.env.GITHUB_EVENT_PATH;
 
@@ -181,8 +181,6 @@ function buscarArquivosMarkdownRecursivo(diretorio) {
 }
 
 async function chamarGeminiApi(regrasContexto, contextoPR) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
     const systemInstruction = `Você é o Esquadrão AI Reviewer. Sua função é realizar uma revisão de código 100% informativa em Pull Requests do projeto Esquadrão da Alegria.
 
 SEGURANÇA E PROMPT INJECTION:
@@ -221,7 +219,39 @@ Sua resposta DEVE ser um objeto JSON estrito no seguinte formato:
 
     const promptText = `FONTES DE REGRAS DOCUMENTADAS DO PROJETO:\n${regrasContexto}\n\nCONTEXTO E DIFF DA PULL REQUEST:\n${contextoPR}`;
 
-    const body = {
+    // 1. Tentar pela nova Interactions API (padrão atual do Google Gemini)
+    try {
+        const urlInteractions = `https://generativelanguage.googleapis.com/v1beta/interactions?key=${GEMINI_API_KEY}`;
+        const bodyInteractions = {
+            model: GEMINI_MODEL,
+            input: promptText,
+            system_instruction: systemInstruction,
+            generation_config: {
+                temperature: 0.2,
+                response_mime_type: 'application/json'
+            }
+        };
+
+        const resInteractions = await fetch(urlInteractions, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyInteractions)
+        });
+
+        if (resInteractions.ok) {
+            const data = await resInteractions.json();
+            const rawText = data?.output || data?.outputs?.[0]?.text || data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.text;
+            if (rawText) {
+                return parsearRespostaJson(rawText);
+            }
+        }
+    } catch (e) {
+        console.log('ℹ️ Tentativa via Interactions API falhou, tentando generateContent...');
+    }
+
+    // 2. Fallback para API generateContent legada
+    const urlGenerateContent = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+    const bodyGenerateContent = {
         contents: [
             {
                 role: 'user',
@@ -237,10 +267,10 @@ Sua resposta DEVE ser um objeto JSON estrito no seguinte formato:
         }
     };
 
-    const resposta = await fetch(url, {
+    const resposta = await fetch(urlGenerateContent, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(bodyGenerateContent)
     });
 
     if (!resposta.ok) {
@@ -249,16 +279,19 @@ Sua resposta DEVE ser um objeto JSON estrito no seguinte formato:
     }
 
     const data = await resposta.json();
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.text;
 
     if (!rawText) {
         throw new Error('Retorno vazio da Gemini API.');
     }
 
+    return parsearRespostaJson(rawText);
+}
+
+function parsearRespostaJson(rawText) {
     try {
         return JSON.parse(rawText);
     } catch {
-        // Fallback caso a resposta não seja JSON puro
         return {
             summaryMarkdown: rawText,
             inlineComments: []
