@@ -78,9 +78,13 @@ Cores sempre acompanham texto. Nunca usar “irregular”, “deve ser afastado�
 
 ## Filtros e interface
 
+A busca por nome ou e-mail é aplicada automaticamente com atraso curto. Período, cidade e filtros avançados são preparados localmente e enviados somente pelo botão **Aplicar filtros**, evitando consultas a cada mudança. O botão **Mais filtros** informa a quantidade ativa; os filtros aplicados aparecem como marcadores removíveis. Limpar filtros avançados preserva busca, período e cidade.
+
+O histórico completo usa o identificador do voluntário e ignora a página da listagem. Assim, participantes exibidos em qualquer página da paginação continuam acessando seu próprio histórico com os filtros de contexto.
+
 - Período por mês, semestre ou ano.
 - Busca por nome ou e-mail, cidade, cargo, tipo de atuação, situação e atividade documentada.
-- A busca e os seletores atualizam a consulta sem exigir uma ação adicional. Período e cidade permanecem visíveis; filtros menos frequentes ficam na área expansível **Mais filtros**.
+- Período e cidade permanecem visíveis; filtros menos frequentes ficam na área expansível **Mais filtros**.
 - O resumo possui somente quatro indicadores prioritários: acompanhados, dentro da meta, requer análise e dados insuficientes. Os demais valores continuam disponíveis por participante.
 - A tabela paginada concentra voluntário, total de eventos documentados, situação e ações. **Eventos** agrega visitas válidas e presenças em reuniões e oficinas somente para simplificar a leitura; cada componente permanece separado no cálculo.
 - A ação **Ver detalhes** abre modal com meta, saldo, visitas, reuniões, oficinas, relatórios e inatividade. O histórico completo continua acessível pelo modal e sempre inicia na primeira página do participante, independentemente da página da listagem de acompanhamento.

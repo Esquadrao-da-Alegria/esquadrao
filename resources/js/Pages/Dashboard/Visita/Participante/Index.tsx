@@ -14,7 +14,9 @@ import {
     MapPin,
     Search,
     ShieldQuestion,
+    SlidersHorizontal,
     UsersRound,
+    X,
 } from 'lucide-react';
 import { cloneElement, useEffect, useRef, useState } from 'react';
 
@@ -58,11 +60,24 @@ const estiloSituacao: Record<string, string> = {
 
 export default function Index({ participantes, indicadores, filtros, opcoes, escopo_global }: Props) {
     const [busca, setBusca] = useState(filtros.busca ?? '');
-    const [filtrosAvancados, setFiltrosAvancados] = useState(false);
+    const [rascunho, setRascunho] = useState({
+        periodo_tipo: filtros.periodo_tipo,
+        ano: String(filtros.ano),
+        mes: String(filtros.mes ?? new Date().getMonth() + 1),
+        semestre: String(filtros.semestre ?? 1),
+        cidade: filtros.visao_global ? 'todas' : String(filtros.cidade_id ?? ''),
+        cargo_id: String(filtros.cargo_id ?? ''),
+        tipo_atuacao: filtros.tipo_atuacao ?? '',
+        situacao: filtros.situacao ?? '',
+        atividade: filtros.atividade ?? '',
+    });
+    const quantidadeAvancados = [filtros.cargo_id, filtros.tipo_atuacao, filtros.situacao, filtros.atividade].filter(Boolean).length;
+    const [filtrosAvancados, setFiltrosAvancados] = useState(quantidadeAvancados > 0);
+    const [consultando, setConsultando] = useState(false);
     const [participanteSelecionado, setParticipanteSelecionado] = useState<AcompanhamentoParticipante | null>(null);
     const primeiraBusca = useRef(true);
 
-    const consultar = (alteracoes: Record<string, string | number | undefined | null>) => {
+    const consultar = (alteracoes: Record<string, string | number | undefined | null>, preservarEstado = true) => {
         const query = {
             ...filtros,
             ...alteracoes,
@@ -72,8 +87,26 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
         router.get(
             visitasPorParticipante().url,
             Object.fromEntries(Object.entries(query).filter(([, valor]) => valor !== '' && valor !== null && valor !== undefined)),
-            { preserveScroll: true, preserveState: true, replace: true },
+            { preserveScroll: true, preserveState: preservarEstado, replace: true, onStart: () => setConsultando(true), onFinish: () => setConsultando(false) },
         );
+    };
+
+    const aplicarFiltros = () => consultar({
+        periodo_tipo: rascunho.periodo_tipo,
+        ano: rascunho.ano,
+        mes: rascunho.periodo_tipo === 'mes' ? rascunho.mes : undefined,
+        semestre: rascunho.periodo_tipo === 'semestre' ? rascunho.semestre : undefined,
+        cidade_id: rascunho.cidade === 'todas' ? undefined : rascunho.cidade,
+        visao_global: rascunho.cidade === 'todas' ? 1 : undefined,
+        cargo_id: rascunho.cargo_id || undefined,
+        tipo_atuacao: rascunho.tipo_atuacao || undefined,
+        situacao: rascunho.situacao || undefined,
+        atividade: rascunho.atividade || undefined,
+    });
+
+    const limparAvancados = () => {
+        setRascunho((atual) => ({ ...atual, cargo_id: '', tipo_atuacao: '', situacao: '', atividade: '' }));
+        consultar({ cargo_id: undefined, tipo_atuacao: undefined, situacao: undefined, atividade: undefined });
     };
 
     useEffect(() => {
@@ -85,6 +118,20 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
         const tempo = window.setTimeout(() => consultar({ busca }), 350);
         return () => window.clearTimeout(tempo);
     }, [busca]);
+
+    useEffect(() => {
+        setRascunho({
+            periodo_tipo: filtros.periodo_tipo,
+            ano: String(filtros.ano),
+            mes: String(filtros.mes ?? new Date().getMonth() + 1),
+            semestre: String(filtros.semestre ?? 1),
+            cidade: filtros.visao_global ? 'todas' : String(filtros.cidade_id ?? ''),
+            cargo_id: String(filtros.cargo_id ?? ''),
+            tipo_atuacao: filtros.tipo_atuacao ?? '',
+            situacao: filtros.situacao ?? '',
+            atividade: filtros.atividade ?? '',
+        });
+    }, [filtros]);
 
     return (
         <PainelLayout>
@@ -102,30 +149,33 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
                             <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-gray-400" aria-hidden />
                             <input type="search" value={busca} onChange={(event) => setBusca(event.target.value)} placeholder="Buscar por nome ou e-mail..." className="h-11 w-full rounded-2xl border border-gray-200 bg-white pr-4 pl-11 text-sm text-gray-700 shadow-sm transition placeholder:text-gray-400 focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none" />
                         </div>
-                        <select value={filtros.periodo_tipo} onChange={(event) => consultar({ periodo_tipo: event.target.value, mes: event.target.value === 'mes' ? filtros.mes ?? new Date().getMonth() + 1 : undefined, semestre: event.target.value === 'semestre' ? filtros.semestre ?? 1 : undefined })} className="h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm shadow-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none lg:w-44">
+                        <select value={rascunho.periodo_tipo} onChange={(event) => setRascunho((atual) => ({ ...atual, periodo_tipo: event.target.value as FiltrosParticipante['periodo_tipo'] }))} className="h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm shadow-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none lg:w-44">
                             <option value="mes">Por mês</option><option value="semestre">Por semestre</option><option value="ano">Por ano</option>
                         </select>
-                        <select value={filtros.visao_global ? 'todas' : filtros.cidade_id ?? ''} disabled={!escopo_global} onChange={(event) => consultar({ cidade_id: event.target.value === 'todas' ? undefined : event.target.value, visao_global: event.target.value === 'todas' ? 1 : undefined })} className="h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm shadow-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none disabled:bg-amber-50 lg:w-60">
+                        <select value={rascunho.cidade} disabled={!escopo_global} onChange={(event) => setRascunho((atual) => ({ ...atual, cidade: event.target.value }))} className="h-11 rounded-2xl border border-gray-200 bg-white px-4 text-sm shadow-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none disabled:bg-amber-50 lg:w-60">
                             {escopo_global && <option value="todas">Todas as cidades</option>}
                             {opcoes.cidades.map((cidade) => <option key={cidade.id} value={cidade.id}>{cidade.nome}</option>)}
                         </select>
                         <button type="button" onClick={() => setFiltrosAvancados((aberto) => !aberto)} aria-expanded={filtrosAvancados} className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 text-sm font-medium text-amber-900 shadow-sm transition hover:border-amber-300 hover:bg-amber-50">
-                            Mais filtros <ChevronDown className={`size-4 transition ${filtrosAvancados ? 'rotate-180' : ''}`} />
+                            <SlidersHorizontal className="size-4" /> Mais filtros{quantidadeAvancados > 0 && ` (${quantidadeAvancados})`} <ChevronDown className={`size-4 transition ${filtrosAvancados ? 'rotate-180' : ''}`} />
                         </button>
+                        <button type="button" onClick={aplicarFiltros} disabled={consultando} className="inline-flex h-11 items-center justify-center rounded-2xl border-2 border-amber-600 bg-white px-5 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 disabled:cursor-wait disabled:opacity-60">{consultando ? 'Aplicando...' : 'Aplicar filtros'}</button>
                     </div>
 
                     {filtrosAvancados && (
                         <div className="grid gap-3 rounded-2xl border border-amber-100 bg-amber-50/40 p-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <Campo label="Ano"><input type="number" min="2020" max="2100" value={filtros.ano} onChange={(event) => consultar({ ano: event.target.value })} /></Campo>
-                            {filtros.periodo_tipo === 'mes' && <Campo label="Mês"><select value={filtros.mes ?? ''} onChange={(event) => consultar({ mes: event.target.value })}>{Array.from({ length: 12 }, (_, indice) => <option key={indice + 1} value={indice + 1}>{new Date(2026, indice).toLocaleDateString('pt-BR', { month: 'long' })}</option>)}</select></Campo>}
-                            {filtros.periodo_tipo === 'semestre' && <Campo label="Semestre"><select value={filtros.semestre ?? ''} onChange={(event) => consultar({ semestre: event.target.value })}><option value="1">1º semestre</option><option value="2">2º semestre</option></select></Campo>}
-                            <Campo label="Cargo"><select value={filtros.cargo_id ?? ''} onChange={(event) => consultar({ cargo_id: event.target.value || undefined })}><option value="">Todos</option>{opcoes.cargos.map((cargo) => <option key={cargo.id} value={cargo.id}>{cargo.nome}</option>)}</select></Campo>
-                            <Campo label="Tipo de atuação"><select value={filtros.tipo_atuacao ?? ''} onChange={(event) => consultar({ tipo_atuacao: event.target.value || undefined })}><option value="">Todos</option><option value="visitas">Visitas</option><option value="administrativo">Administrativo</option><option value="isento">Apoio / isento</option><option value="dados_insuficientes">Não definido</option></select></Campo>
-                            <Campo label="Situação"><select value={filtros.situacao ?? ''} onChange={(event) => consultar({ situacao: event.target.value || undefined })}><option value="">Todas</option>{Object.entries(textos).map(([valor, texto]) => <option key={valor} value={valor}>{texto}</option>)}</select></Campo>
-                            <Campo label="Participou em"><select value={filtros.atividade ?? ''} onChange={(event) => consultar({ atividade: event.target.value || undefined })}><option value="">Todos os eventos</option><option value="visitas">Visitas válidas</option><option value="reunioes">Reuniões</option><option value="oficinas">Oficinas</option></select></Campo>
-                            <button type="button" onClick={() => router.get(visitasPorParticipante().url)} className="self-end rounded-full px-4 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-100">Limpar filtros</button>
+                            <Campo label="Ano"><input type="number" min="2020" max="2100" value={rascunho.ano} onChange={(event) => setRascunho((atual) => ({ ...atual, ano: event.target.value }))} /></Campo>
+                            {rascunho.periodo_tipo === 'mes' && <Campo label="Mês"><select value={rascunho.mes} onChange={(event) => setRascunho((atual) => ({ ...atual, mes: event.target.value }))}>{Array.from({ length: 12 }, (_, indice) => <option key={indice + 1} value={indice + 1}>{new Date(2026, indice).toLocaleDateString('pt-BR', { month: 'long' })}</option>)}</select></Campo>}
+                            {rascunho.periodo_tipo === 'semestre' && <Campo label="Semestre"><select value={rascunho.semestre} onChange={(event) => setRascunho((atual) => ({ ...atual, semestre: event.target.value }))}><option value="1">1º semestre</option><option value="2">2º semestre</option></select></Campo>}
+                            <Campo label="Cargo"><select value={rascunho.cargo_id} onChange={(event) => setRascunho((atual) => ({ ...atual, cargo_id: event.target.value }))}><option value="">Todos</option>{opcoes.cargos.map((cargo) => <option key={cargo.id} value={cargo.id}>{cargo.nome}</option>)}</select></Campo>
+                            <Campo label="Tipo de atuação"><select value={rascunho.tipo_atuacao} onChange={(event) => setRascunho((atual) => ({ ...atual, tipo_atuacao: event.target.value }))}><option value="">Todos</option><option value="visitas">Visitas</option><option value="isento">Apoio / isento</option><option value="dados_insuficientes">Não definido</option></select></Campo>
+                            <Campo label="Situação"><select value={rascunho.situacao} onChange={(event) => setRascunho((atual) => ({ ...atual, situacao: event.target.value }))}><option value="">Todas</option>{Object.entries(textos).map(([valor, texto]) => <option key={valor} value={valor}>{texto}</option>)}</select></Campo>
+                            <Campo label="Participou em"><select value={rascunho.atividade} onChange={(event) => setRascunho((atual) => ({ ...atual, atividade: event.target.value }))}><option value="">Todos os eventos</option><option value="visitas">Visitas válidas</option><option value="reunioes">Reuniões</option><option value="oficinas">Oficinas</option></select></Campo>
+                            <button type="button" onClick={limparAvancados} className="self-end rounded-full px-4 py-2 text-sm font-medium text-amber-800 transition hover:bg-amber-100">Limpar filtros avançados</button>
                         </div>
                     )}
+
+                    {quantidadeAvancados > 0 && <div className="flex flex-wrap items-center gap-2 text-xs text-amber-900/70"><span>Filtros ativos:</span>{filtros.cargo_id && <FiltroAtivo texto={`Cargo: ${opcoes.cargos.find((cargo) => cargo.id === Number(filtros.cargo_id))?.nome ?? filtros.cargo_id}`} onRemove={() => consultar({ cargo_id: undefined })} />}{filtros.tipo_atuacao && <FiltroAtivo texto={`Atuação: ${filtros.tipo_atuacao === 'isento' ? 'Apoio / isento' : filtros.tipo_atuacao === 'visitas' ? 'Visitas' : 'Não definido'}`} onRemove={() => consultar({ tipo_atuacao: undefined })} />}{filtros.situacao && <FiltroAtivo texto={`Situação: ${textos[filtros.situacao]}`} onRemove={() => consultar({ situacao: undefined })} />}{filtros.atividade && <FiltroAtivo texto={`Atividade: ${filtros.atividade}`} onRemove={() => consultar({ atividade: undefined })} />}</div>}
                 </section>
 
                 <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -157,6 +207,10 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
 
 function Campo({ label, children }: { label: string; children: React.ReactElement<{ className?: string }> }) {
     return <label className="space-y-1.5 text-sm font-medium text-amber-950"><span>{label}</span>{cloneElement(children, { className: 'h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none' })}</label>;
+}
+
+function FiltroAtivo({ texto, onRemove }: { texto: string; onRemove: () => void }) {
+    return <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white px-2.5 py-1 font-medium text-amber-800">{texto}<button type="button" onClick={onRemove} aria-label={`Remover ${texto}`} className="rounded-full p-0.5 hover:bg-amber-100"><X className="size-3" /></button></span>;
 }
 
 function Card({ icon: Icone, titulo, valor, tom }: { icon: typeof UsersRound; titulo: string; valor: number; tom?: string }) {
