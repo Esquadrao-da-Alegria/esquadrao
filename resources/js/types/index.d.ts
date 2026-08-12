@@ -84,6 +84,26 @@ export interface Cargo {
 
 // RECURSOS
 
+export interface Voluntario {
+    id: number;
+    nome_completo: string;
+    nome_doutor: string | null;
+    email: string;
+    telefone: string | null;
+    data_nascimento: string | null;
+    cpf: string | null;
+    cidade_base_id: number | null;
+    cidade_base?: Cidade | null;
+    data_entrada_ong: string | null;
+    status: string;
+    observacoes: string | null;
+    foto_perfil: string | null;
+    url_foto: string | null;
+    cargos?: Cargo[];
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Estado {
     id: number;
     nome: string;

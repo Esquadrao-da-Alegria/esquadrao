@@ -193,6 +193,17 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                     Conta
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {user?.voluntario && (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            href="/meu-perfil"
+                            className="flex cursor-pointer items-center gap-2"
+                        >
+                            <User className="size-4 shrink-0" />
+                            Meu perfil
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                     <Link
                         href={edit()}
