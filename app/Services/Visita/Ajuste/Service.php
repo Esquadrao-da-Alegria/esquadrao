@@ -139,8 +139,6 @@ class Service
 
     private function validarConflitoInteresse(User $administrador, User $voluntario): void
     {
-        if ($administrador->is($voluntario)) {
-            throw ValidationException::withMessages(['voluntario_id' => 'O administrador não pode registrar um ajuste para si mesmo.']);
-        }
+        // Permite que administradores registrem ajustes para qualquer voluntário/relatório, incluindo si mesmos.
     }
 }
