@@ -100,6 +100,10 @@ class Service
         $autor = User::query()->findOrFail($relatorio->autor_id);
         $this->validarConflitoInteresse($administrador, $autor);
 
+        if (! $relatorio->fora_do_prazo) {
+            throw ValidationException::withMessages(['relatorio_id' => 'O relatório selecionado já foi enviado dentro do prazo.']);
+        }
+
         $participacao = VisitaParticipante::query()
             ->where('visita_id', $visita->id)
             ->where('voluntario_id', $autor->id)
