@@ -100,18 +100,20 @@ class Queries
 
         return DB::table('visita_participante as vp')
             ->join('visitas as v', 'v.id', '=', 'vp.visita_id')
-            ->join('hospitais as h', 'h.id', '=', 'v.hospital_id')
-            ->join('cidades as c', 'c.id', '=', 'h.cidade_id')
+            ->leftJoin('hospitais as h', 'h.id', '=', 'v.hospital_id')
+            ->leftJoin('cidades as c', 'c.id', '=', 'h.cidade_id')
             ->leftJoin('alas_hospitais as a', 'a.id', '=', 'v.ala_unidade_id')
             ->leftJoinSub($impactos, 'impactos', 'impactos.visita_id', '=', 'v.id')
             ->where('vp.voluntario_id', $userId)
             ->whereBetween('v.inicio_em', [$filtros['inicio'], $filtros['fim']])
             ->when($filtros['cidade_id'], fn (Builder $query, int $cidadeId) => $query->where('h.cidade_id', $cidadeId))
-            ->select(['v.id', 'v.inicio_em', 'v.fim_em', 'v.status', 'h.nome as local', 'c.id as cidade_id', 'c.nome as cidade', 'a.nome as ala', 'vp.tipo_participacao', 'vp.status_participacao'])
+            ->select(['v.id', 'v.inicio_em', 'v.fim_em', 'v.status', 'c.id as cidade_id', 'c.nome as cidade', 'a.nome as ala', 'vp.tipo_participacao', 'vp.status_participacao'])
+            ->selectRaw("COALESCE(h.nome, 'Sem hospital') as local")
             ->selectRaw('impactos.media as impacto_estimado')
             ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado') ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id) END as possui_relatorio")
             ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado' AND vr.fora_do_prazo = 0) ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND vr.fora_do_prazo = 0) END as possui_relatorio_no_prazo")
             ->selectRaw("EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND vr.fora_do_prazo = 0) as relatorio_proprio_no_prazo")
+            ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id JOIN visitas_ajustes_contabilizacao vac ON vac.relatorio_id = vr.id AND vac.tipo = 'aceite_relatorio_fora_prazo' WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado') ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visitas_ajustes_contabilizacao vac ON vac.relatorio_id = vr.id AND vac.tipo = 'aceite_relatorio_fora_prazo' WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id) END as possui_relatorio_por_ajuste")
             ->distinct();
     }
 

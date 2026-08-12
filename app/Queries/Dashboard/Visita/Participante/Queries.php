@@ -39,7 +39,7 @@ class Queries
 
         $visitasValidas = DB::table('visita_participante as vp')
             ->join('visitas as v', 'v.id', '=', 'vp.visita_id')
-            ->join('hospitais as h', 'h.id', '=', 'v.hospital_id')
+            ->leftJoin('hospitais as h', 'h.id', '=', 'v.hospital_id')
             ->whereIn('vp.voluntario_id', $ids)
             ->where('vp.status_participacao', StatusParticipacao::Confirmado->value)
             ->where('v.status', VisitaStatus::Realizada->value)
@@ -52,7 +52,10 @@ class Queries
                                 ->from('visitas_relatorios as vr')
                                 ->whereColumn('vr.visita_id', 'v.id')
                                 ->whereColumn('vr.autor_id', 'vp.voluntario_id')
-                                ->where('vr.fora_do_prazo', false);
+                                ->where(function ($aceite) {
+                                    $aceite->where('vr.fora_do_prazo', false)
+                                        ->orWhereExists(fn ($ajuste) => $ajuste->selectRaw('1')->from('visitas_ajustes_contabilizacao as vac')->whereColumn('vac.relatorio_id', 'vr.id')->where('vac.tipo', 'aceite_relatorio_fora_prazo'));
+                                });
                         });
                 })->orWhere(function ($palhaco) {
                     $palhaco->where('vp.tipo_participacao', 'palhaco')
@@ -66,25 +69,31 @@ class Queries
                                 ->whereColumn('vr.visita_id', 'v.id')
                                 ->where('autor_vp.tipo_participacao', 'palhaco')
                                 ->where('autor_vp.status_participacao', StatusParticipacao::Confirmado->value)
-                                ->where('vr.fora_do_prazo', false);
+                                ->where(function ($aceite) {
+                                    $aceite->where('vr.fora_do_prazo', false)
+                                        ->orWhereExists(fn ($ajuste) => $ajuste->selectRaw('1')->from('visitas_ajustes_contabilizacao as vac')->whereColumn('vac.relatorio_id', 'vr.id')->where('vac.tipo', 'aceite_relatorio_fora_prazo'));
+                                });
                         });
                 });
             })
-            ->select(['vp.voluntario_id', 'v.id as visita_id', 'v.inicio_em', 'v.fim_em', 'v.status', 'h.nome as hospital', 'h.cidade_id'])
+            ->select(['vp.voluntario_id', 'v.id as visita_id', 'v.inicio_em', 'v.fim_em', 'v.status', 'h.cidade_id'])
+            ->selectRaw("COALESCE(h.nome, 'Sem hospital') as hospital")
             ->distinct()
             ->get();
 
         $participacoes = DB::table('visita_participante as vp')
             ->join('visitas as v', 'v.id', '=', 'vp.visita_id')
-            ->join('hospitais as h', 'h.id', '=', 'v.hospital_id')
+            ->leftJoin('hospitais as h', 'h.id', '=', 'v.hospital_id')
             ->whereIn('vp.voluntario_id', $ids)
             ->where('vp.status_participacao', StatusParticipacao::Confirmado->value)
             ->where('v.status', VisitaStatus::Realizada->value)
             ->whereBetween('v.inicio_em', [$inicio, $fim])
-            ->select(['vp.voluntario_id', 'vp.tipo_participacao', 'v.id as visita_id', 'v.inicio_em', 'h.nome as hospital', 'h.cidade_id'])
+            ->select(['vp.voluntario_id', 'vp.tipo_participacao', 'v.id as visita_id', 'v.inicio_em', 'h.cidade_id'])
+            ->selectRaw("COALESCE(h.nome, 'Sem hospital') as hospital")
             ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado') ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id) END as possui_relatorio")
             ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado' AND vr.fora_do_prazo = 0) ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND vr.fora_do_prazo = 0) END as possui_relatorio_no_prazo")
             ->selectRaw("EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND vr.fora_do_prazo = 0) as relatorio_proprio_no_prazo")
+            ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id JOIN visitas_ajustes_contabilizacao vac ON vac.relatorio_id = vr.id AND vac.tipo = 'aceite_relatorio_fora_prazo' WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado') ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visitas_ajustes_contabilizacao vac ON vac.relatorio_id = vr.id AND vac.tipo = 'aceite_relatorio_fora_prazo' WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id) END as possui_relatorio_por_ajuste")
             ->distinct()
             ->get();
 

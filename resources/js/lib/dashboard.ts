@@ -1,27 +1,23 @@
-import {
-    meu,
-    visaoGeral,
-    visitasPorHospital,
-    visitasPorParticipante,
-} from '@/routes/dashboards';
-import { ChartNoAxesCombined, Hospital, UserRound } from 'lucide-react';
+import { dashboard } from '@/routes';
+import { meu, visitasPorHospital, visitasPorParticipante } from '@/routes/dashboards';
+import { ChartNoAxesCombined, Hospital, LayoutDashboard, UserRound } from 'lucide-react';
 
 import type { PermissaoDashboard } from '@/types';
 
 export const itensDashboards = [
     {
-        titulo: 'Meu dashboard',
+        titulo: 'Visão Geral',
+        href: dashboard(),
+        caminho: '/dashboard',
+        icone: LayoutDashboard,
+        permissao: null,
+    },
+    {
+        titulo: 'Meu Dashboard',
         href: meu(),
         caminho: '/dashboards/meu',
         icone: UserRound,
         permissao: 'dashboard.meu',
-    },
-    {
-        titulo: 'Visão geral',
-        href: visaoGeral(),
-        caminho: '/dashboards/visao-geral',
-        icone: ChartNoAxesCombined,
-        permissao: 'dashboard.visao_geral',
     },
     {
         titulo: 'Visitas por hospital',
@@ -42,5 +38,5 @@ export const itensDashboards = [
     href: ReturnType<typeof meu>;
     caminho: string;
     icone: typeof UserRound;
-    permissao: PermissaoDashboard;
+    permissao: PermissaoDashboard | null;
 }>;

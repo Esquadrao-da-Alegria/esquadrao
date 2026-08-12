@@ -95,6 +95,8 @@ class EventoController extends Controller
             'inscrito' => $inscrito,
             'presenca_marcada' => $presencaMarcada,
             'pode_gerenciar' => $podeGerenciar,
+            'ajustes_participacao' => $user->temCargo('administrador') ? $evento->ajustesParticipacao()->with(['voluntario:id,name', 'administrador:id,name'])->latest()->get() : [],
+            'voluntarios_ajuste' => $user->temCargo('administrador') ? User::query()->whereNotNull('voluntario_id')->whereHas('voluntario', fn ($query) => $query->where('status', 'ativo'))->orderBy('name')->get(['id', 'name']) : [],
         ]);
     }
 

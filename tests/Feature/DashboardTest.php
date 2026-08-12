@@ -26,12 +26,15 @@ class DashboardTest extends TestCase
         $this->get(route('dashboards.meu'))->assertRedirect(route('login'));
     }
 
-    public function test_dashboard_legado_mantem_acesso_ao_dashboard_individual(): void
+    public function test_dashboard_e_a_porta_de_entrada_da_visao_geral(): void
     {
         $this->actingAs(User::factory()->create())
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page->component('Dashboard'));
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Dashboard')
+                ->where('contexto.possui_vinculo', false)
+                ->has('proximas_atividades', 0));
     }
 
     public function test_voluntario_autenticado_acessa_dashboard_individual(): void
