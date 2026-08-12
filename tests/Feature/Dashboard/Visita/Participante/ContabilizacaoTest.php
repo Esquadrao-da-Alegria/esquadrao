@@ -197,6 +197,26 @@ class ContabilizacaoTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_historico_individual_nao_herda_pagina_da_listagem(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidade);
+        $voluntario = $this->criarUsuario('voluntario', $cidade);
+
+        $this->actingAs($gestor)
+            ->get(route('dashboards.visitas-por-participante.show', [
+                'voluntario' => $voluntario,
+                'periodo_tipo' => 'ano',
+                'ano' => 2026,
+                'page' => 2,
+            ]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Dashboard/Visita/Participante/Show')
+                ->where('participante.id', $voluntario->id)
+                ->missing('filtros.page'));
+    }
+
     public function test_percentual_considera_eventos_finalizados_da_cidade_e_somente_presenca(): void
     {
         $cidade = $this->criarCidade('Porto Alegre');
