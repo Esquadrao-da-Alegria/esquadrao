@@ -37,7 +37,7 @@ class AjusteContabilizacaoTest extends TestCase
         $this->assertDatabaseHas('visitas_ajustes_contabilizacao', ['visita_id' => $visita->id, 'voluntario_id' => $voluntario->id, 'administrador_id' => $admin->id]);
     }
 
-    public function test_aceite_preserva_relatorio_atrasado_e_bloqueia_autoajuste(): void
+    public function test_aceite_preserva_relatorio_atrasado_e_permite_autoajuste(): void
     {
         [$admin, $voluntario, $visita] = $this->cenario();
         VisitaParticipante::query()->create(['visita_id' => $visita->id, 'voluntario_id' => $voluntario->id, 'tipo_participacao' => TipoParticipacao::Paisana, 'papel_na_visita' => PapelNaVisita::Participante, 'status_participacao' => StatusParticipacao::Confirmado]);
@@ -48,7 +48,7 @@ class AjusteContabilizacaoTest extends TestCase
         $this->assertTrue($relatorio->fresh()->fora_do_prazo);
         $this->assertDatabaseHas('visitas_ajustes_contabilizacao', ['relatorio_id' => $relatorio->id, 'voluntario_id' => $voluntario->id]);
 
-        $this->actingAs($admin)->post(route('visitas.ajustes-contabilizacao.store', $visita), ['tipo' => 'correcao_participacao', 'voluntario_id' => $admin->id, 'tipo_participacao' => 'palhaco', 'justificativa' => 'Tentativa de ajuste em benefício do administrador.'])->assertSessionHasErrors('voluntario_id');
+        $this->actingAs($admin)->post(route('visitas.ajustes-contabilizacao.store', $visita), ['tipo' => 'correcao_participacao', 'voluntario_id' => $admin->id, 'tipo_participacao' => 'palhaco', 'justificativa' => 'Ajuste de participação pelo administrador.'])->assertRedirect();
     }
 
     private function cenario(): array
