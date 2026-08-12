@@ -195,6 +195,9 @@ export function podeCriarRelatorio(user: User, visita: Visita): boolean {
     if (visita.status === 'cancelada') {
         return false
     }
+    if (podeEditarVisita(user, visita)) {
+        return true
+    }
     return usuarioParticipouDaVisita(visita, user.id)
 }
 

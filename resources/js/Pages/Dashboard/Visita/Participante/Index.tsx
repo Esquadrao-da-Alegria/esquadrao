@@ -18,7 +18,7 @@ import {
     UsersRound,
     X,
 } from 'lucide-react';
-import { cloneElement, useEffect, useRef, useState } from 'react';
+import { cloneElement, useEffect, useState } from 'react';
 
 interface Opcao {
     id: number;
@@ -75,7 +75,6 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
     const [filtrosAvancados, setFiltrosAvancados] = useState(quantidadeAvancados > 0);
     const [consultando, setConsultando] = useState(false);
     const [participanteSelecionado, setParticipanteSelecionado] = useState<AcompanhamentoParticipante | null>(null);
-    const primeiraBusca = useRef(true);
 
     const consultar = (alteracoes: Record<string, string | number | undefined | null>, preservarEstado = true) => {
         const query = {
@@ -92,6 +91,7 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
     };
 
     const aplicarFiltros = () => consultar({
+        busca: busca || undefined,
         periodo_tipo: rascunho.periodo_tipo,
         ano: rascunho.ano,
         mes: rascunho.periodo_tipo === 'mes' ? rascunho.mes : undefined,
@@ -108,16 +108,6 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
         setRascunho((atual) => ({ ...atual, cargo_id: '', tipo_atuacao: '', situacao: '', atividade: '' }));
         consultar({ cargo_id: undefined, tipo_atuacao: undefined, situacao: undefined, atividade: undefined });
     };
-
-    useEffect(() => {
-        if (primeiraBusca.current) {
-            primeiraBusca.current = false;
-            return;
-        }
-
-        const tempo = window.setTimeout(() => consultar({ busca }), 350);
-        return () => window.clearTimeout(tempo);
-    }, [busca]);
 
     useEffect(() => {
         setRascunho({
@@ -143,7 +133,7 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
                     <p className="mt-2 max-w-3xl text-sm leading-relaxed text-amber-900/60">Indicadores organizam os dados para análise humana. Nenhuma sinalização aplica advertência, afastamento ou altera o cadastro.</p>
                 </header>
 
-                <section className="space-y-3">
+                <form onSubmit={(event) => { event.preventDefault(); aplicarFiltros(); }} className="space-y-3">
                     <div className="flex flex-col gap-3 lg:flex-row">
                         <div className="relative flex-1">
                             <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-gray-400" aria-hidden />
@@ -159,7 +149,7 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
                         <button type="button" onClick={() => setFiltrosAvancados((aberto) => !aberto)} aria-expanded={filtrosAvancados} className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 text-sm font-medium text-amber-900 shadow-sm transition hover:border-amber-300 hover:bg-amber-50">
                             <SlidersHorizontal className="size-4" /> Mais filtros{quantidadeAvancados > 0 && ` (${quantidadeAvancados})`} <ChevronDown className={`size-4 transition ${filtrosAvancados ? 'rotate-180' : ''}`} />
                         </button>
-                        <button type="button" onClick={aplicarFiltros} disabled={consultando} className="inline-flex h-11 items-center justify-center rounded-2xl border-2 border-amber-600 bg-white px-5 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 disabled:cursor-wait disabled:opacity-60">{consultando ? 'Aplicando...' : 'Aplicar filtros'}</button>
+                        <button type="submit" disabled={consultando} className="inline-flex h-11 items-center justify-center rounded-2xl border-2 border-amber-600 bg-white px-5 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 disabled:cursor-wait disabled:opacity-60">{consultando ? 'Aplicando...' : 'Aplicar filtros'}</button>
                     </div>
 
                     {filtrosAvancados && (
@@ -176,7 +166,7 @@ export default function Index({ participantes, indicadores, filtros, opcoes, esc
                     )}
 
                     {quantidadeAvancados > 0 && <div className="flex flex-wrap items-center gap-2 text-xs text-amber-900/70"><span>Filtros ativos:</span>{filtros.cargo_id && <FiltroAtivo texto={`Cargo: ${opcoes.cargos.find((cargo) => cargo.id === Number(filtros.cargo_id))?.nome ?? filtros.cargo_id}`} onRemove={() => consultar({ cargo_id: undefined })} />}{filtros.tipo_atuacao && <FiltroAtivo texto={`Atuação: ${filtros.tipo_atuacao === 'isento' ? 'Apoio / isento' : filtros.tipo_atuacao === 'visitas' ? 'Visitas' : 'Não definido'}`} onRemove={() => consultar({ tipo_atuacao: undefined })} />}{filtros.situacao && <FiltroAtivo texto={`Situação: ${textos[filtros.situacao]}`} onRemove={() => consultar({ situacao: undefined })} />}{filtros.atividade && <FiltroAtivo texto={`Atividade: ${filtros.atividade}`} onRemove={() => consultar({ atividade: undefined })} />}</div>}
-                </section>
+                </form>
 
                 <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     <Card icon={UsersRound} titulo="Acompanhados" valor={indicadores.total} />

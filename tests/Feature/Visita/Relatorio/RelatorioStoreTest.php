@@ -89,6 +89,27 @@ class RelatorioStoreTest extends TestCase
         $this->assertDatabaseCount('visitas_relatorios', 0);
     }
 
+    public function test_administrador_que_nao_participou_da_visita_pode_criar_relatorio(): void
+    {
+        $lider = $this->criarVoluntario();
+        $visita = $this->criarVisita($lider);
+
+        $administrador = $this->criarAdministrador();
+
+        $this->actingAs($administrador)
+            ->get(route('visitas.relatorios.create', $visita))
+            ->assertOk();
+
+        $this->actingAs($administrador)
+            ->post(route('visitas.relatorios.store', $visita), $this->payloadRelatorio())
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('visitas_relatorios', [
+            'visita_id' => $visita->id,
+            'autor_id'  => $administrador->id,
+        ]);
+    }
+
     public function test_dentro_de_48h_fora_do_prazo_false(): void
     {
         $autor  = $this->criarVoluntario();
@@ -283,6 +304,28 @@ class RelatorioStoreTest extends TestCase
         $voluntario = Voluntario::query()->create([
             'nome_completo' => 'Voluntário ' . uniqid(),
             'email'         => uniqid('vol_') . '@test.com',
+            'status'        => User::STATUS_ATIVO,
+        ]);
+
+        $user = User::factory()->create([
+            'voluntario_id' => $voluntario->id,
+            'status'        => User::STATUS_ATIVO,
+        ]);
+        $user->cargos()->syncWithoutDetaching([$cargo->id]);
+
+        return $user->fresh('cargos');
+    }
+
+    private function criarAdministrador(): User
+    {
+        $cargo = Cargo::query()->firstOrCreate(
+            ['slug' => 'administrador'],
+            ['nome' => 'Administrador'],
+        );
+
+        $voluntario = Voluntario::query()->create([
+            'nome_completo' => 'Admin ' . uniqid(),
+            'email'         => uniqid('adm_') . '@test.com',
             'status'        => User::STATUS_ATIVO,
         ]);
 
