@@ -9,6 +9,7 @@ import path from 'path';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
 const GITHUB_EVENT_PATH = process.env.GITHUB_EVENT_PATH;
 
@@ -180,7 +181,7 @@ function buscarArquivosMarkdownRecursivo(diretorio) {
 }
 
 async function chamarGeminiApi(regrasContexto, contextoPR) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
     const systemInstruction = `Você é o Esquadrão AI Reviewer. Sua função é realizar uma revisão de código 100% informativa em Pull Requests do projeto Esquadrão da Alegria.
 
