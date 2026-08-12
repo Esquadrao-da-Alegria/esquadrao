@@ -83,7 +83,7 @@ Cores sempre acompanham texto. Nunca usar “irregular”, “deve ser afastado�
 - A busca e os seletores atualizam a consulta sem exigir uma ação adicional. Período e cidade permanecem visíveis; filtros menos frequentes ficam na área expansível **Mais filtros**.
 - O resumo possui somente quatro indicadores prioritários: acompanhados, dentro da meta, requer análise e dados insuficientes. Os demais valores continuam disponíveis por participante.
 - A tabela paginada concentra voluntário, total de eventos documentados, situação e ações. **Eventos** agrega visitas válidas e presenças em reuniões e oficinas somente para simplificar a leitura; cada componente permanece separado no cálculo.
-- A ação **Ver detalhes** abre modal com meta, saldo, visitas, reuniões, oficinas, relatórios e inatividade. O histórico completo continua acessível pelo modal.
+- A ação **Ver detalhes** abre modal com meta, saldo, visitas, reuniões, oficinas, relatórios e inatividade. O histórico completo continua acessível pelo modal e sempre inicia na primeira página do participante, independentemente da página da listagem de acompanhamento.
 - Identidade visual âmbar do painel, responsiva e sem biblioteca adicional.
 - O detalhe apresenta meses, saldos, exclusões, relatórios e presenças.
 
