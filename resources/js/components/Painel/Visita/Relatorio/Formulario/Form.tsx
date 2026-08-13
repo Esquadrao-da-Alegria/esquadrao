@@ -73,6 +73,20 @@ const Form: FC<Props> = ({ visita, data, errors, foraDoPrazoAviso, onFieldChange
             </div>
 
             <div>
+                <label htmlFor="unidades_visitadas" className={painelLabelClass}>Unidades / Alas visitadas (opcional)</label>
+                <input
+                    id="unidades_visitadas"
+                    name="unidades_visitadas"
+                    type="text"
+                    placeholder="Ex: Pediatria, UTI, 3º andar"
+                    value={data.unidades_visitadas}
+                    onChange={(e) => onFieldChange('unidades_visitadas', e.target.value)}
+                    className={painelInputClass}
+                />
+                {errors.unidades_visitadas ? <p className="mt-1 text-sm text-red-600">{errors.unidades_visitadas}</p> : null}
+            </div>
+
+            <div>
                 <label htmlFor="resumo" className={painelLabelClass}>Resumo *</label>
                 <textarea
                     id="resumo"

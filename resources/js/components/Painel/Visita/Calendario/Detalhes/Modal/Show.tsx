@@ -89,7 +89,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
             {visita && passo === 'detalhes' && <div className="p-6">
                 <div className="mb-4 flex items-start justify-between gap-4"><h2 className="text-lg font-semibold text-gray-900">Detalhes da visita</h2><button type="button" onClick={fecharModal} className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700" aria-label="Fechar">✕</button></div>
                 <dl className="space-y-3 text-sm">
-                    <div><dt className="text-xs font-medium uppercase text-gray-400">Hospital</dt><dd className="mt-0.5 font-medium text-gray-900">{visita.hospital?.nome ?? '—'}</dd></div>
+                    <div><dt className="text-xs font-medium uppercase text-gray-400">{visita.tipo === 'acao_especial' ? 'Tipo / Local' : 'Hospital'}</dt><dd className="mt-0.5 font-medium text-gray-900">{visita.tipo === 'acao_especial' ? (visita.hospital?.nome ? `Ação Especial — ${visita.hospital.nome}` : 'Ação Especial') : (visita.hospital?.nome ?? '—')}</dd></div>
                     {visita.alaUnidade && <div><dt className="text-xs font-medium uppercase text-gray-400">Ala / Unidade</dt><dd className="mt-0.5 text-gray-700">{visita.alaUnidade.nome}</dd></div>}
                     <div><dt className="text-xs font-medium uppercase text-gray-400">Data</dt><dd className="mt-0.5 text-gray-700 capitalize">{formatarData(new Date(visita.inicio_em))}</dd></div>
                     <div><dt className="text-xs font-medium uppercase text-gray-400">Horário</dt><dd className="mt-0.5 text-gray-700">{formatarHora(new Date(visita.inicio_em))} – {formatarHora(new Date(visita.fim_em))}</dd></div>

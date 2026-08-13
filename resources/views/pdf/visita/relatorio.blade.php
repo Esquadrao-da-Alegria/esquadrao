@@ -159,6 +159,13 @@
         </div>
     </dl>
 
+    @if ($relatorio->unidades_visitadas)
+        <div class="campo">
+            <div class="campo-label">Unidades / Alas visitadas</div>
+            <div class="campo-valor">{{ $relatorio->unidades_visitadas }}</div>
+        </div>
+    @endif
+
     <div class="campo">
         <div class="campo-label">Resumo</div>
         <div class="campo-valor">{{ $relatorio->resumo }}</div>

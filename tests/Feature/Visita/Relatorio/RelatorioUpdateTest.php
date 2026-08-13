@@ -40,6 +40,24 @@ class RelatorioUpdateTest extends TestCase
         ]);
     }
 
+    public function test_autor_atualiza_unidades_visitadas(): void
+    {
+        $autor     = $this->criarVoluntario();
+        $visita    = $this->criarVisita($autor);
+        $relatorio = $this->criarRelatorio($visita, $autor);
+
+        $this->actingAs($autor)
+            ->put(route('visitas.relatorios.update', [$visita, $relatorio]), $this->payloadRelatorio([
+                'unidades_visitadas' => 'Pediatria e Oncologia',
+            ]))
+            ->assertRedirect(route('visitas.relatorios.show', [$visita, $relatorio]));
+
+        $this->assertDatabaseHas('visitas_relatorios', [
+            'id'                 => $relatorio->id,
+            'unidades_visitadas' => 'Pediatria e Oncologia',
+        ]);
+    }
+
     public function test_usuario_comum_nao_atualiza_relatorio_de_outro(): void
     {
         $autor     = $this->criarVoluntario();

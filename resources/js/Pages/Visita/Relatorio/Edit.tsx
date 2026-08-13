@@ -28,6 +28,7 @@ const Edit: FC<Props> = ({ visita, relatorio, foraDoPrazoAviso }) => {
     const { data, setData, transform, put, processing, errors } = useForm<DadosFormulario>({
         tipo_relatorio: relatorio.tipo_relatorio,
         ala_unidade_id: relatorio.ala_unidade_id ?? null,
+        unidades_visitadas: relatorio.unidades_visitadas ?? '',
         resumo: relatorio.resumo,
         feedback: relatorio.feedback ?? '',
         quartos_visitados: relatorio.quartos_visitados ?? '',

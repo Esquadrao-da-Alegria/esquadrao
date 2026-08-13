@@ -51,7 +51,34 @@ export function contarParticipantes(visita: Visita) {
     }
 }
 
-export function classeCardPorStatus(status: VisitaStatus): string {
+export function tituloVisita(visita: Visita): string {
+    if (visita.tipo === 'acao_especial') {
+        return visita.hospital?.nome ? `Ação Especial - ${visita.hospital.nome}` : 'Ação Especial'
+    }
+    return visita.hospital?.nome ?? 'Visita'
+}
+
+export function classeCardPorStatus(visita: Visita | VisitaStatus): string {
+    const status = typeof visita === 'object' ? visita.status : visita
+    const tipo = typeof visita === 'object' ? visita.tipo : null
+
+    if (tipo === 'acao_especial') {
+        switch (status) {
+            case 'agendada':
+                return 'bg-purple-600 text-white border-purple-700'
+            case 'realizada':
+            case 'contabilizada':
+                return 'bg-purple-100 text-purple-800 border-purple-200'
+            case 'pendente_relatorio':
+            case 'nao_contabilizada':
+                return 'bg-purple-100 text-purple-900 border-purple-300'
+            case 'cancelada':
+                return 'bg-gray-100 text-gray-500 border-gray-200'
+            default:
+                return 'bg-purple-600 text-white border-purple-700'
+        }
+    }
+
     switch (status) {
         case 'agendada':
             return 'bg-amber-500 text-white border-amber-600'

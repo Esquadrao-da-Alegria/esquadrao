@@ -8,7 +8,7 @@ Permitir que um administrador corrija uma participação registrada incorretamen
 
 - Somente administradores podem consultar e criar ajustes, inclusive administradores de suporte sem cidade base.
 - Apenas visitas com status `realizada` podem ser ajustadas.
-- O administrador não pode criar ajuste em benefício próprio.
+- O administrador pode aplicar ajustes de contabilização para qualquer visita, relatório ou integrante (incluindo cadastros operados por ele).
 - A correção de participação inclui ou confirma o voluntário e registra seu tipo como palhaço/artista ou paisana.
 - O aceite exige um relatório existente, atrasado e de autor com participação confirmada. O campo `fora_do_prazo` permanece verdadeiro.
 - Um relatório atrasado aceito de palhaço/artista valida os palhaços/artistas confirmados da visita. Para paisanas, valida somente seu autor.

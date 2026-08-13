@@ -266,6 +266,24 @@ class RelatorioStoreTest extends TestCase
         $this->assertDatabaseCount('visitas_relatorios', 0);
     }
 
+    public function test_store_persiste_unidades_visitadas(): void
+    {
+        $autor  = $this->criarVoluntario();
+        $visita = $this->criarVisita($autor);
+
+        $this->actingAs($autor)
+            ->post(route('visitas.relatorios.store', $visita), $this->payloadRelatorio([
+                'unidades_visitadas' => 'Pediatria e UTI Infantil',
+            ]))
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('visitas_relatorios', [
+            'visita_id'          => $visita->id,
+            'unidades_visitadas' => 'Pediatria e UTI Infantil',
+        ]);
+    }
+
     private function criarAla(int $hospitalId, string $nome): Ala
     {
         return Ala::query()->create([
