@@ -5,6 +5,7 @@ export class Service {
         return {
             ...data,
             ala_unidade_id: data.ala_unidade_id || null,
+            unidades_visitadas: data.unidades_visitadas || null,
             quartos_visitados: data.quartos_visitados === '' ? null : data.quartos_visitados,
             pessoas_impactadas: data.pessoas_impactadas === '' ? null : data.pessoas_impactadas,
             feedback: data.feedback || null,

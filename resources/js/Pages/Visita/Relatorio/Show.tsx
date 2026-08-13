@@ -105,6 +105,7 @@ const Show: FC<Props> = ({ visita, relatorio, podeEditar }) => {
                                     <dd className="mt-1 text-sm text-amber-950">{relatorio.alaUnidade.nome}</dd>
                                 </div>
                             ) : null}
+                            <Campo label="Unidades / Alas visitadas" valor={relatorio.unidades_visitadas} />
                             <Campo label="Resumo" valor={relatorio.resumo} />
                             <Campo label="Feedback" valor={relatorio.feedback} />
                             {relatorio.quartos_visitados != null && (

@@ -278,6 +278,7 @@ class Service
         $payload = [
             'tipo_relatorio'                 => $dados['tipo_relatorio'],
             'ala_unidade_id'                 => $dados['ala_unidade_id'] ?? null,
+            'unidades_visitadas'             => $dados['unidades_visitadas'] ?? null,
             'resumo'                         => $dados['resumo'],
             'feedback'                       => $dados['feedback'] ?? null,
             'quartos_visitados'              => $dados['quartos_visitados'] ?? null,

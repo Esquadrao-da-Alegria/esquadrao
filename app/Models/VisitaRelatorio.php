@@ -16,6 +16,7 @@ class VisitaRelatorio extends Model
         'autor_id',
         'tipo_relatorio',
         'ala_unidade_id',
+        'unidades_visitadas',
         'resumo',
         'feedback',
         'quartos_visitados',

@@ -65,6 +65,7 @@ export interface VisitaRelatorio {
     autor_id: number
     tipo_relatorio: TipoRelatorio
     ala_unidade_id?: number | null
+    unidades_visitadas?: string | null
     resumo: string
     feedback?: string | null
     quartos_visitados?: number | null

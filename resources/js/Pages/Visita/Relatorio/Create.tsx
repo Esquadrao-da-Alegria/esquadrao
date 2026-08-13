@@ -27,6 +27,7 @@ const Create: FC<Props> = ({ visita, foraDoPrazoAviso }) => {
     const { data, setData, transform, post, processing, errors } = useForm<DadosFormulario>({
         tipo_relatorio: '',
         ala_unidade_id: null,
+        unidades_visitadas: '',
         resumo: '',
         feedback: '',
         quartos_visitados: '',
