@@ -205,10 +205,12 @@ class Service
         if (in_array($tipo, ['administrativo', 'dados_insuficientes'], true)) return 'dados_insuficientes';
         if ($tipo === 'isento') return 'isento';
         if ($dias === null || $dias >= MetaService::INATIVIDADE_DIAS) return 'requer_analise';
-        if (collect($compensacoes)->contains('situacao', 'requer_analise')) return 'requer_analise';
 
-        if (collect($compensacoes)->contains('situacao', 'compensacao_pendente')) return 'compensacao_pendente';
-        if (collect($compensacoes)->contains('situacao', 'atencao')) return 'atencao';
+        $compensacaoAtual = $compensacoes ? $compensacoes[array_key_last($compensacoes)]['situacao'] : null;
+
+        if ($compensacaoAtual === 'requer_analise') return 'requer_analise';
+        if ($compensacaoAtual === 'compensacao_pendente') return 'compensacao_pendente';
+        if ($compensacaoAtual === 'atencao') return 'atencao';
         if (collect($presencas)->contains(fn ($item) => $item['percentual'] !== null && $item['percentual'] < MetaService::META_PRESENCA)) return 'atencao';
 
         return 'dentro_meta';
