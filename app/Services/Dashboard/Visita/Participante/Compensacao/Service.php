@@ -26,14 +26,16 @@ class Service
             $creditoUtilizado = min($creditoAnterior, $faltaAtual);
             $debitoTransferido = max(0, $faltaAtual - $creditoUtilizado);
             $creditoTransferido = min(MetaService::META_VISITAS, $excedente);
-            $debitoExpirado = max(0, $debitoAnterior - $debitoCompensado);
+            $mesAtualFormatado = now()->format('Y-m');
+            $ehMesFuturo = $mes > $mesAtualFormatado;
+            $debitoExpirado = $ehMesFuturo ? 0 : max(0, $debitoAnterior - $debitoCompensado);
 
             $situacao = 'dentro_meta';
 
             if ($debitoExpirado > 0) {
                 $situacao = 'requer_analise';
             } elseif ($debitoTransferido > 0) {
-                $situacao = $indice === array_key_last($meses) ? 'compensacao_pendente' : 'atencao';
+                $situacao = ($indice === array_key_last($meses) || $ehMesFuturo) ? 'compensacao_pendente' : 'atencao';
             } elseif ($creditoUtilizado > 0 || $debitoCompensado > 0) {
                 $situacao = 'compensado';
             }

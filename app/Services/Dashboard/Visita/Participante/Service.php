@@ -206,7 +206,11 @@ class Service
         if ($tipo === 'isento') return 'isento';
         if ($dias === null || $dias >= MetaService::INATIVIDADE_DIAS) return 'requer_analise';
 
-        $compensacaoAtual = $compensacoes ? $compensacoes[array_key_last($compensacoes)]['situacao'] : null;
+        $mesAtualFormatado = now()->format('Y-m');
+        $compMesAtual = collect($compensacoes)->firstWhere('mes', $mesAtualFormatado)
+            ?? ($compensacoes ? $compensacoes[array_key_last($compensacoes)] : null);
+
+        $compensacaoAtual = $compMesAtual ? $compMesAtual['situacao'] : null;
 
         if ($compensacaoAtual === 'requer_analise') return 'requer_analise';
         if ($compensacaoAtual === 'compensacao_pendente') return 'compensacao_pendente';
