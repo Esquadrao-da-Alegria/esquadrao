@@ -36,7 +36,7 @@ Para `tipo_participacao = paisana`, o próprio participante precisa escrever um 
 
 O tipo registrado na participação da visita prevalece sobre os cargos permanentes do usuário. Múltiplos relatórios não duplicam a visita. Pendências e atrasos aparecem no histórico. Regra confirmada pela coordenação em 10/08/2026.
 
-O prazo é centralizado em `App\Services\Visita\Relatorio\Prazo\Service`, atualmente 48 horas após `visita.fim_em`. Mudanças futuras devem ocorrer nesse serviço e continuar preenchendo corretamente `fora_do_prazo`.
+O prazo é centralizado em `App\Services\Visita\Relatorio\Prazo\Service`, atualmente 48 horas após `max(visita.fim_em, visita.created_at)`. Em visitas cadastradas no sistema após sua realização (`created_at > fim_em`), a janela de 48 horas conta a partir da criação no banco de dados.
 
 ## Meta e compensação
 

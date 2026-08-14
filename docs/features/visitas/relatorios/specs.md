@@ -13,7 +13,7 @@ Um relatório atrasado conserva `fora_do_prazo = true`. Mediante justificativa, 
 | **VisitaRelatorio** | Registro na tabela `visitas_relatorios` — relato enviado por um usuário sobre uma visita. |
 | **Autor** | Usuário que criou o relatório (`autor_id` → `users.id`). |
 | **Prazo 48h** | Recomendação de envio até 48h após `visita.fim_em`. Aviso visual; **não bloqueia** o envio. |
-| **Fora do prazo** | `fora_do_prazo = true` quando `enviado_em > visita.fim_em + 48 horas`. Calculado na criação; imutável na edição. |
+| **Fora do prazo** | `fora_do_prazo = true` quando `enviado_em > max(visita.fim_em, visita.created_at) + 48 horas`. Para visitas cadastradas retroativamente (`created_at > fim_em`), a janela de 48h conta a partir da criação no sistema. Calculado na criação; imutável na edição. |
 
 ---
 
