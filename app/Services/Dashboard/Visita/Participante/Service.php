@@ -191,7 +191,14 @@ class Service
 
     private function presencas(User $user, array $dados, array $filtros): array
     {
-        $eventosCidade = $dados['eventos']->where('cidade_id', $user->voluntario->cidade_base_id);
+        $mesInicio = $user->voluntario?->data_entrada_ong
+            ? Carbon::parse($user->voluntario->data_entrada_ong)->startOfMonth()
+            : ($user->created_at ? $user->created_at->copy()->startOfMonth() : null);
+
+        $eventosCidade = $dados['eventos']
+            ->where('cidade_id', $user->voluntario->cidade_base_id)
+            ->when($mesInicio, fn ($coll) => $coll->filter(fn ($e) => Carbon::parse($e->data_inicio)->gte($mesInicio)));
+
         $presentes = $dados['presencas']->where('user_id', $user->id);
         $resultado = [];
 
