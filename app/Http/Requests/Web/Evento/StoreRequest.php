@@ -17,7 +17,7 @@ class StoreRequest extends FormRequest
             'descricao' => ['nullable', 'string'],
             'local' => ['nullable', 'string', 'max:255'],
             'cidade_id' => ['required', 'exists:cidades,id'],
-            'data_inicio' => ['required', 'date', 'after_or_equal:now'],
+            'data_inicio' => ['required', 'date'],
             'data_fim' => ['required', 'date', 'after:data_inicio'],
             'limite_inscricao' => ['nullable', 'date', 'before_or_equal:data_inicio'],
             'limite_participantes' => ['nullable', 'integer', 'min:1'],
