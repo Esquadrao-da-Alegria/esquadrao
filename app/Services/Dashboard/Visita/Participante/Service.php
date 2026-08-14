@@ -31,10 +31,21 @@ class Service
             $tipo = $this->metaService->tipo($user);
             $validas = $dados['visitasValidas']->where('voluntario_id', $user->id);
             $porMes = $validas->groupBy(fn ($visita) => substr($visita->inicio_em, 0, 7))->map->count()->all();
+
+            $mesInicio = $user->voluntario?->data_entrada_ong
+                ? Carbon::parse($user->voluntario->data_entrada_ong)->format('Y-m')
+                : ($user->created_at ? $user->created_at->format('Y-m') : null);
+
+            $mesesCalculoUsuario = $mesInicio
+                ? array_values(array_filter($mesesCalculo, fn ($m) => $m >= $mesInicio))
+                : $mesesCalculo;
+
+            $mesesExibidosUsuario = array_values(array_filter($mesesExibidos, fn ($m) => ! $mesInicio || $m >= $mesInicio));
+
             $compensacoes = $tipo === 'visitas'
                 ? array_values(array_filter(
-                    $this->compensacaoService->calcular($porMes, $mesesCalculo),
-                    fn (array $mes) => in_array($mes['mes'], $mesesExibidos, true)
+                    $this->compensacaoService->calcular($porMes, $mesesCalculoUsuario),
+                    fn (array $mes) => in_array($mes['mes'], $mesesExibidosUsuario, true)
                 ))
                 : [];
             $presencas = $this->presencas($user, $dados, $filtros);
