@@ -59,7 +59,7 @@ class Service
                 'oficinas' => $presencas['oficina'],
                 'ultima_atividade' => $ultimaAtividade?->toIso8601String(),
                 'dias_sem_atividade' => $diasSemAtividade,
-                'relatorios_pendentes' => $participacoes->where('possui_relatorio', 0)->count(),
+                'relatorios_pendentes' => $participacoes->where('possui_relatorio', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
                 'relatorios_fora_prazo' => $participacoes->where('possui_relatorio', 1)->where('possui_relatorio_no_prazo', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
                 'situacao' => $situacao,
             ];
