@@ -18,6 +18,12 @@ class Service
         $debitoAnterior = 0;
 
         foreach ($meses as $indice => $mes) {
+            $mesNum = (int) substr($mes, 5, 2);
+            if ($mesNum === 7) {
+                $creditoAnterior = 0;
+                $debitoAnterior = 0;
+            }
+
             $visitas = $visitasPorMes[$mes] ?? 0;
             $excedente = max(0, $visitas - MetaService::META_VISITAS);
             $debitoCompensado = min($debitoAnterior, $excedente);
