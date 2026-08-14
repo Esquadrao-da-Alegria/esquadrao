@@ -60,6 +60,7 @@ class Queries
             ->where('vp.status_participacao', 'confirmado')
             ->whereIn('v.status', ['realizada', 'pendente_relatorio'])
             ->where('v.fim_em', '<=', now())
+            ->whereRaw("NOT EXISTS(SELECT 1 FROM visitas_ajustes_contabilizacao vac WHERE vac.visita_id = v.id AND (vac.voluntario_id = vp.voluntario_id OR vac.relatorio_id IS NOT NULL))")
             ->whereRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN NOT EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado') ELSE NOT EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id) END")
             ->select(['v.id', 'v.inicio_em', 'v.fim_em', 'h.nome as local', 'c.nome as cidade'])
             ->orderBy('v.fim_em')
