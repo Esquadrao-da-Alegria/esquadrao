@@ -68,4 +68,9 @@ class Visita extends Model
     {
         return $this->hasMany(VisitaRelatorio::class, 'visita_id');
     }
+
+    public function ajustesContabilizacao(): HasMany
+    {
+        return $this->hasMany(VisitaAjusteContabilizacao::class, 'visita_id');
+    }
 }

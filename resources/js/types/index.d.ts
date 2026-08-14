@@ -28,12 +28,19 @@ export interface SharedData {
     auth: Auth;
     sidebarOpen: boolean;
     eh_administrador?: boolean;
+    permissoes_dashboards: Record<PermissaoDashboard, boolean>;
     mensagem_sucesso?: string | null;
     mensagem_erro?: string | null;
     mensagem_alerta?: string | null;
     link_convite?: string | null;
     [key: string]: unknown;
 }
+
+export type PermissaoDashboard =
+    | 'dashboard.meu'
+    | 'dashboard.visao_geral'
+    | 'dashboard.visitas_por_hospital'
+    | 'dashboard.visitas_por_participante';
 
 export interface User {
     id: number;
@@ -62,6 +69,9 @@ export interface User {
     voluntario?: {
         id: number;
         cidade_base_id?: number | null;
+        nome_completo?: string;
+        foto_perfil?: string | null;
+        url_foto?: string | null;
     };
     [key: string]: unknown; // This allows for additional properties...
 }
@@ -209,3 +219,16 @@ export interface Evento {
     updated_at: string;
 }
 
+export interface MeuEvento {
+    id: number;
+    titulo: string;
+    tipo: EventoTipo;
+    data_inicio: string;
+    data_fim: string | null;
+    local: string | null;
+    status: EventoStatus;
+    responsavel?: User | null;
+    inscricao_status: 'inscrito' | 'cancelado';
+    presenca: PresencaStatus | null;
+    presenca_registrada_em: string | null;
+}

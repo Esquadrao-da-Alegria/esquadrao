@@ -4,6 +4,7 @@ import { Link, useForm, usePage } from '@inertiajs/react'
 
 // UI
 import VisitaForm from '@/components/Painel/Visita/Formulario/Form'
+import AjusteContabilizacao from '@/components/Painel/Visita/AjusteContabilizacao'
 import PainelLayout from '@/layouts/PainelLayout'
 import { painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { extrairData, extrairHora, podeCriarRelatorio } from '@/lib/visita'
@@ -27,6 +28,7 @@ interface Props {
     cidades?: Cidade[]
     lideres: User[]
     visita: Visita
+    ajustes_contabilizacao?: { ajustes: any[]; voluntarios: Array<{ id: number; name: string }>; relatorios_atrasados: any[] }
 }
 
 const labelTipoParticipacao = (tipo: VisitaParticipante['tipo_participacao']) =>
@@ -42,8 +44,8 @@ const labelStatusParticipacao = (status: VisitaParticipante['status_participacao
     return labels[status] ?? status
 }
 
-const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
-    const { auth } = usePage<SharedData>().props
+const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita, ajustes_contabilizacao }) => {
+    const { auth, eh_administrador } = usePage<SharedData>().props
     const { data, setData, transform, put, processing, errors } = useForm<DadosFormulario>({
         hospital_id: visita.hospital_id ?? '',
         ala_unidade_id: visita.ala_unidade_id ?? null,
@@ -234,7 +236,12 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita }) => {
                                             )}
                                         </div>
                                     </div>
+
                                 </form>
+
+                                {eh_administrador && ajustes_contabilizacao && (
+                                    <div className="mt-6"><AjusteContabilizacao visitaId={visita.id!} voluntarios={ajustes_contabilizacao.voluntarios} relatorios={ajustes_contabilizacao.relatorios_atrasados} ajustes={ajustes_contabilizacao.ajustes} /></div>
+                                )}
                             </div>
 
                             <div className="flex flex-col gap-3 border-t bg-white px-8 py-6 sm:flex-row sm:items-center sm:justify-between md:px-12">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Dashboard\Permissao\Service as DashboardPermissaoService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -41,7 +42,7 @@ class HandleInertiaRequests extends Middleware
         $user = $request->user();
 
         if ($user) {
-            $user->loadMissing(['cargos', 'voluntario:id,cidade_base_id,nome_completo']);
+            $user->loadMissing(['cargos', 'voluntario:id,cidade_base_id,nome_completo,foto_perfil']);
         }
 
         return [
@@ -54,6 +55,9 @@ class HandleInertiaRequests extends Middleware
             'eh_administrador' => $user
                 ? $user->cargos->contains(fn ($cargo) => $cargo->slug === 'administrador')
                 : false,
+            'permissoes_dashboards' => $user
+                ? app(DashboardPermissaoService::class)->permissoes($user)
+                : [],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'mensagem_sucesso' => session('mensagem_sucesso'),
             'mensagem_erro' => session('mensagem_erro'),

@@ -7,6 +7,9 @@ use App\Models\Voluntario;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Encoders\JpegEncoder;
+use Intervention\Image\Laravel\Facades\Image;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -61,7 +64,13 @@ class MeuPerfilController extends Controller
             Storage::disk('public')->delete($voluntario->foto_perfil);
         }
 
-        $caminho = $request->file('foto')->store("voluntarios/{$voluntario->id}", 'public');
+        $caminho = "voluntarios/{$voluntario->id}/" . Str::uuid() . '.jpg';
+
+        $encoded = Image::decode($request->file('foto'))
+            ->scaleDown(width: 800, height: 800)
+            ->encode(new JpegEncoder(quality: 85));
+
+        Storage::disk('public')->put($caminho, $encoded);
         $voluntario->update(['foto_perfil' => $caminho]);
 
         return back()->with('mensagem_sucesso', 'Foto atualizada com sucesso.');
