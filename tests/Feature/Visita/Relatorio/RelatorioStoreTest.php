@@ -145,6 +145,26 @@ class RelatorioStoreTest extends TestCase
         ]);
     }
 
+    public function test_visita_retroativa_dentro_de_48h_do_cadastro_fora_do_prazo_false(): void
+    {
+        $autor  = $this->criarVoluntario();
+
+        $this->travelTo(Carbon::parse('2026-08-14 10:00:00'));
+        $visita = $this->criarVisita($autor, inicioEm: '2026-07-15 10:00:00', fimEm: '2026-07-15 12:00:00');
+
+        $this->travelTo(Carbon::parse('2026-08-15 10:00:00'));
+
+        $this->actingAs($autor)
+            ->post(route('visitas.relatorios.store', $visita), $this->payloadRelatorio())
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('visitas_relatorios', [
+            'visita_id'     => $visita->id,
+            'fora_do_prazo' => false,
+        ]);
+    }
+
     public function test_duas_creates_na_mesma_visita_geram_duas_linhas(): void
     {
         $autor  = $this->criarVoluntario();
