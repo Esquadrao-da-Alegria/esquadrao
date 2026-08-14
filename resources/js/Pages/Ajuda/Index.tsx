@@ -288,7 +288,7 @@ const tutoriais: ManualItem[] = [
         id: 'adm-dashboard-status',
         titulo: 'Como interpretar os Status do Dashboard de Participantes',
         subtitulo: 'Entendendo as situações: Dentro da Meta, Atenção, Requer Análise e Isento',
-        categoria: 'coordenador',
+        categoria: 'administrador',
         tags: ['dashboard', 'status', 'situação', 'requer análise', 'atenção', 'dentro da meta', 'isento'],
         linkAcao: { label: 'Ver Dashboard', href: '/dashboards/visitas-por-participante' },
         passos: [

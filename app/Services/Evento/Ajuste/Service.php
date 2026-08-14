@@ -13,13 +13,16 @@ class Service
 {
     public function store(Evento $evento, User $administrador, array $dados): EventoAjusteParticipacao
     {
-        abort_unless($administrador->temCargo('administrador'), 403);
+        $podeGerenciar = $administrador->temCargo('administrador')
+            || $evento->responsavel_id === $administrador->id
+            || $evento->criado_por_id === $administrador->id;
+
+        abort_unless($podeGerenciar, 403);
 
         if ($evento->estaCancelado()) throw ValidationException::withMessages(['evento' => 'Evento cancelado não pode receber ajustes.']);
         if ($evento->data_inicio->isFuture()) throw ValidationException::withMessages(['evento' => 'O ajuste fica disponível somente após o início do evento.']);
 
         $voluntario = User::query()->whereNotNull('voluntario_id')->findOrFail($dados['voluntario_id']);
-        if ($administrador->is($voluntario)) throw ValidationException::withMessages(['voluntario_id' => 'O administrador não pode registrar um ajuste para si mesmo.']);
 
         return DB::transaction(function () use ($evento, $administrador, $voluntario, $dados) {
             $participacao = DB::table('evento_participantes')->where('evento_id', $evento->id)->where('user_id', $voluntario->id)->first();
