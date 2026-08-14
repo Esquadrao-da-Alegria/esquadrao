@@ -45,7 +45,17 @@ class DashboardTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page->component('Dashboard/Meu'));
     }
 
-    public function test_voluntario_comum_nao_acessa_dashboards_gerenciais(): void
+    public function test_voluntario_com_cidade_acessa_dashboard_visitas_por_hospital(): void
+    {
+        $cidade = $this->criarCidade();
+        $user = $this->criarUsuarioComCargo('voluntario', $cidade->id);
+
+        $this->actingAs($user)->get(route('dashboards.visitas-por-hospital'))->assertOk();
+        $this->actingAs($user)->get(route('dashboards.visao-geral'))->assertForbidden();
+        $this->actingAs($user)->get(route('dashboards.visitas-por-participante'))->assertForbidden();
+    }
+
+    public function test_voluntario_sem_cidade_nao_acessa_dashboards_gerenciais(): void
     {
         $user = $this->criarUsuarioComCargo('voluntario');
 
@@ -133,9 +143,22 @@ class DashboardTest extends TestCase
 
     public function test_inertia_compartilha_somente_as_permissoes_esperadas(): void
     {
-        $user = $this->criarUsuarioComCargo('voluntario');
+        $cidade = $this->criarCidade();
+        $userComCidade = $this->criarUsuarioComCargo('voluntario', $cidade->id);
 
-        $this->actingAs($user)
+        $this->actingAs($userComCidade)
+            ->get(route('dashboards.meu'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('permissoes_dashboards', [
+                    'dashboard.meu' => true,
+                    'dashboard.visao_geral' => false,
+                    'dashboard.visitas_por_hospital' => true,
+                    'dashboard.visitas_por_participante' => false,
+                ]));
+
+        $userSemCidade = $this->criarUsuarioComCargo('voluntario');
+
+        $this->actingAs($userSemCidade)
             ->get(route('dashboards.meu'))
             ->assertInertia(fn (Assert $page) => $page
                 ->where('permissoes_dashboards', [
