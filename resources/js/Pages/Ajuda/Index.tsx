@@ -125,6 +125,32 @@ const tutoriais: ManualItem[] = [
         ],
     },
 
+    {
+        id: 'vol-metas-regras',
+        titulo: 'Como funciona o cálculo de Metas, Saldos e Compensações',
+        subtitulo: 'Regras de 2 visitas/mês, compensação dentro do semestre e saldo de créditos',
+        categoria: 'voluntario',
+        tags: ['meta', 'compensacao', 'semestre', 'saldo', 'credito', 'regra'],
+        passos: [
+            {
+                passo: 1,
+                titulo: 'Meta Sugerida de 2 Visitas por Mês',
+                descricao: 'Cada voluntário ativo tem como meta sugerida realizar 2 visitas hospitalares válidas a cada mês.',
+            },
+            {
+                passo: 2,
+                titulo: 'Compensação Flexível dentro do Semestre',
+                descricao: 'As visitas podem ser compensadas dentro do mesmo semestre (1º Semestre: Jan–Jun | 2º Semestre: Jul–Dez). Por exemplo: realizar 4 visitas em Julho cumpre a meta de Julho e transfere 2 créditos para Agosto, cobrindo a meta de Agosto!',
+                dica: 'Meses com mais visitas compensam meses sem visitas, garantindo flexibilidade na rotina.',
+            },
+            {
+                passo: 3,
+                titulo: 'Cálculo a partir da Data de Ingresso',
+                descricao: 'Para novos voluntários ou ao ativar novos grupos (ex: Porto Alegre, Pelotas), o cálculo de metas e compensações inicia exatamente no mês em que o voluntário entrou na ONG (data_entrada_ong), sem cobranças retroativas de meses anteriores.',
+            },
+        ],
+    },
+
     // --- MANUAL DO COORDENADOR / ADMINISTRADOR ---
     {
         id: 'adm-convites',
@@ -230,6 +256,66 @@ const tutoriais: ManualItem[] = [
                 titulo: 'Gerar e Baixar PDF',
                 descricao: 'Após salvar o relatório, clique em "Baixar PDF" para gerar o documento formatado oficial da ONG.',
                 dica: 'Os relatórios em PDF podem ser arquivados e enviados para a coordenação geral ou hospitais parceiros.',
+            },
+        ],
+    },
+    {
+        id: 'adm-retroativos-eventos',
+        titulo: 'Como cadastrar Visitas, Reuniões e Oficinas retroativas e lançar presenças',
+        subtitulo: 'Regularizando atividades realizadas em meses passados para fechar o semestre',
+        categoria: 'coordenador',
+        tags: ['retroativo', 'reunião', 'oficina', 'visita atrasada', 'presença', 'ajuste'],
+        passos: [
+            {
+                passo: 1,
+                titulo: 'Cadastrar Atividade Retroativa',
+                descricao: 'Ao criar uma Visita, Reunião ou Oficina realizada em um mês passado (ex: Julho), selecione a data real da atividade. O sistema permite cadastros retroativos.',
+            },
+            {
+                passo: 2,
+                titulo: 'Prazo de Relatórios em Visitas Retroativas',
+                descricao: 'Em visitas cadastradas após a sua realização, o prazo de 48h para envio do relatório conta a partir da data e hora do cadastro da visita no sistema.',
+                dica: 'Se um relatório atrasado for aceito por um Administrador via Ajuste Administrativo, a pendência é 100% zerada e a visita é validada.',
+            },
+            {
+                passo: 3,
+                titulo: 'Lançar Inscrição e Presença via Ajustes',
+                descricao: 'Em reuniões e oficinas retroativas (sem inscrição prévia online), acesse o evento > "Ajustes de Participação", selecione o voluntário e efetue a "Correção de Inscrição" e a "Correção de Presença" como Presente.',
+            },
+        ],
+    },
+    {
+        id: 'adm-dashboard-status',
+        titulo: 'Como interpretar os Status do Dashboard de Participantes',
+        subtitulo: 'Entendendo as situações: Dentro da Meta, Atenção, Requer Análise e Isento',
+        categoria: 'coordenador',
+        tags: ['dashboard', 'status', 'situação', 'requer análise', 'atenção', 'dentro da meta', 'isento'],
+        linkAcao: { label: 'Ver Dashboard', href: '/dashboards/visitas-por-participante' },
+        passos: [
+            {
+                passo: 1,
+                titulo: '🟢 Dentro da Meta',
+                descricao: 'Voluntário em dia com as metas de visitas hospitalares do semestre e com pelo menos 50% de presença em Reuniões e Oficinas.',
+            },
+            {
+                passo: 2,
+                titulo: '🟡 Atenção',
+                descricao: 'Voluntário em dia com as visitas, mas aguardando a conclusão das visitas do mês em andamento, ou com presença em Reuniões/Oficinas do semestre abaixo de 50%.',
+            },
+            {
+                passo: 3,
+                titulo: '🔵 Compensação Pendente',
+                descricao: 'Voluntário com saldo de visitas pendente a compensar dentro do mesmo semestre.',
+            },
+            {
+                passo: 4,
+                titulo: '🔴 Requer Análise',
+                descricao: 'Voluntário com inatividade superior a 60 dias sem atividades documentadas ou com débito de visitas expirado e não compensado no mês subsequente do mesmo semestre.',
+            },
+            {
+                passo: 5,
+                titulo: '⚪ Isento',
+                descricao: 'Integrantes com tag ou cargo de Apoio, isentos da obrigação de cumprir metas de visitas hospitalares.',
             },
         ],
     },
