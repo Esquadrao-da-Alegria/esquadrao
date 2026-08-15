@@ -42,6 +42,28 @@ export type PermissaoDashboard =
     | 'dashboard.visitas_por_hospital'
     | 'dashboard.visitas_por_participante';
 
+export type MotivoAfastamento =
+    | 'atestado_medico'
+    | 'licenca_pessoal'
+    | 'estudos'
+    | 'outro';
+
+export type StatusAfastamento = 'ativo' | 'encerrado' | 'prorrogado' | 'cancelado';
+
+export interface VoluntarioAfastamento {
+    id: number;
+    voluntario_id: number;
+    registrado_por_id: number | null;
+    registrado_por?: { id: number; name: string } | null;
+    data_inicio: string;
+    data_fim: string;
+    motivo: MotivoAfastamento;
+    observacoes: string | null;
+    status: StatusAfastamento;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -70,6 +92,9 @@ export interface User {
         id: number;
         cidade_base_id?: number | null;
     };
+    esta_afastado?: boolean;
+    afastamento_atual?: VoluntarioAfastamento | null;
+    afastamentos?: VoluntarioAfastamento[];
     [key: string]: unknown; // This allows for additional properties...
 }
 

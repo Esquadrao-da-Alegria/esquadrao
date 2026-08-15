@@ -179,6 +179,42 @@ const tutoriais: ManualItem[] = [
         ],
     },
     {
+        id: 'adm-afastamentos',
+        titulo: 'Como gerenciar Afastamentos e Atestados Médicos de Voluntários',
+        subtitulo: 'Cadastrando licenças temporárias, prorrogações e cancelamento automático de visitas',
+        categoria: 'coordenador',
+        tags: ['afastamento', 'atestado', 'licença', 'médico', 'prorrogação', 'bloqueio', 'visita', 'cancelamento'],
+        linkAcao: { label: 'Gerenciar Voluntários', href: '/voluntarios' },
+        passos: [
+            {
+                passo: 1,
+                titulo: 'Acessar o menu de Ações do Voluntário',
+                descricao: 'No menu "Voluntários", localize o integrante desejado, clique no menu de ações (três pontinhos) no card do voluntário e selecione "Gerenciar afastamento".',
+            },
+            {
+                passo: 2,
+                titulo: 'Cadastrar Novo Afastamento ou Atestado',
+                descricao: 'Informe a Data de Início, a Data de Fim (ou use os atalhos rápidos de +15, +30 ou +60 dias), o Motivo (Atestado Médico, Licença Pessoal, Estudos ou Outro) e observações relevantes.',
+                dica: 'Aviso importante: ao salvar o afastamento, todas as inscrições agendadas do voluntário em visitas hospitalares dentro do período são canceladas automaticamente para liberar vagas.',
+            },
+            {
+                passo: 3,
+                titulo: 'Visualização e Filtros de Afastamento',
+                descricao: 'Voluntários com licença ativa exibem um badge visual destacado ("Afastado - Atestado até DD/MM/AAAA"). Você pode filtrar a listagem selecionando "Apenas Afastados" no filtro de status.',
+            },
+            {
+                passo: 4,
+                titulo: 'Prorrogar Prazo de Afastamento',
+                descricao: 'Caso o voluntário apresente um novo atestado ou necessite de mais tempo, abra o modal de afastamento, acerte a "Nova Data Final" na aba Prorrogar e confirme. O histórico com as datas anteriores é preservado.',
+            },
+            {
+                passo: 5,
+                titulo: 'Encerramento Antecipado',
+                descricao: 'Se o voluntário receber alta médica antes do prazo previsto, selecione a aba "Encerrar Antecipadamente" e confirme. A data de término será ajustada para a data atual e o voluntário poderá voltar a se inscrever em visitas normalmente.',
+            },
+        ],
+    },
+    {
         id: 'adm-eventos',
         titulo: 'Como criar Oficinas e Reuniões e registrar presenças',
         subtitulo: 'Gerenciando eventos, lista de chamada e finalização',
@@ -288,7 +324,7 @@ const tutoriais: ManualItem[] = [
         id: 'adm-dashboard-status',
         titulo: 'Como interpretar os Status do Dashboard de Participantes',
         subtitulo: 'Entendendo as situações: Dentro da Meta, Atenção, Requer Análise e Isento',
-        categoria: 'administrador',
+        categoria: 'coordenador',
         tags: ['dashboard', 'status', 'situação', 'requer análise', 'atenção', 'dentro da meta', 'isento'],
         linkAcao: { label: 'Ver Dashboard', href: '/dashboards/visitas-por-participante' },
         passos: [

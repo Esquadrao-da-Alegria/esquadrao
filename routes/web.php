@@ -19,6 +19,7 @@ use App\Http\Controllers\Web\Visita\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
+use App\Http\Controllers\Web\Voluntario\Afastamento\Controller as VoluntarioAfastamentoController;
 use App\Http\Controllers\Web\VoluntarioController;
 use App\Models\Patrocinador;
 use App\Services\Dashboard\Permissao\Service as DashboardPermissaoService;
@@ -147,6 +148,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::delete('/voluntarios/{voluntario}/convite', [VoluntarioController::class, 'cancelarConvite'])
             ->name('voluntarios.convite.cancelar');
+
+        Route::prefix('voluntarios/{voluntario}/afastamentos')->name('voluntarios.afastamentos.')->group(function () {
+            Route::post('/', [VoluntarioAfastamentoController::class, 'store'])->name('store');
+            Route::post('{afastamento}/prorrogar', [VoluntarioAfastamentoController::class, 'prorrogar'])->name('prorrogar');
+            Route::post('{afastamento}/encerrar', [VoluntarioAfastamentoController::class, 'encerrar'])->name('encerrar');
+        });
 
         Route::resource('/voluntarios', VoluntarioController::class)
             ->parameters(['voluntarios' => 'voluntario'])
