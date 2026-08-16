@@ -52,7 +52,7 @@ class Queries
     private function queryBase(): Builder
     {
         return Voluntario::query()
-            ->with(['user.cargos', 'conviteCadastroAtual', 'cidadeBase']);
+            ->with(['user.cargos', 'conviteCadastroAtual', 'cidadeBase', 'afastamentos.registradoPor']);
     }
 
     private function aplicarFiltros(Builder $query, array $filtros): Builder
@@ -80,7 +80,21 @@ class Queries
 
                 case 'status':
 
-                    if ($valor !== 'todos' && ($filtros['aba'] ?? 'voluntarios') === 'convidados') {
+                    if (($filtros['aba'] ?? 'voluntarios') === 'voluntarios') {
+                        if ($valor === 'afastados' || $valor === 'afastado') {
+                            $query->whereHas('afastamentos', function (Builder $query) {
+                                $query->where('status', \App\Enums\StatusAfastamento::Ativo->value)
+                                    ->where('data_inicio', '<=', now()->toDateString())
+                                    ->where('data_fim', '>=', now()->toDateString());
+                            });
+                        } elseif ($valor === 'ativos' || $valor === 'ativo') {
+                            $query->whereDoesntHave('afastamentos', function (Builder $query) {
+                                $query->where('status', \App\Enums\StatusAfastamento::Ativo->value)
+                                    ->where('data_inicio', '<=', now()->toDateString())
+                                    ->where('data_fim', '>=', now()->toDateString());
+                            });
+                        }
+                    } elseif ($valor !== 'todos' && ($filtros['aba'] ?? 'voluntarios') === 'convidados') {
                         $this->aplicarFiltroStatus($query, (string) $valor);
                     }
 

@@ -36,6 +36,15 @@ class Service
 
         $user->loadMissing(['cargos', 'voluntario']);
 
+        if ($permissao === self::VISITAS_POR_PARTICIPANTE) {
+            return $user->cargos->contains(fn ($cargo) => $cargo->slug === 'administrador');
+        }
+
+        if ($permissao === self::VISITAS_POR_HOSPITAL) {
+            return $user->voluntario?->cidade_base_id !== null
+                || $user->cargos->contains(fn ($cargo) => in_array($cargo->slug, ['administrador', 'coordenador_geral'], true));
+        }
+
         if ($user->cargos->contains(fn ($cargo) => in_array($cargo->slug, ['administrador', 'coordenador_geral'], true))) {
             return true;
         }

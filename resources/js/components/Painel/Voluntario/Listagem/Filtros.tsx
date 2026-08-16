@@ -75,6 +75,20 @@ const Filtros: React.FC<Props> = ({
                     </Select>
                 </div>
             ) : null}
+            {aba === 'voluntarios' ? (
+                <div className="lg:w-56">
+                    <Select value={statusFiltro} onValueChange={onStatusChange}>
+                        <SelectTrigger className="h-11 rounded-2xl border-gray-200 bg-white px-4 shadow-sm focus:ring-amber-100">
+                            <SelectValue placeholder="Todos os voluntários" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="todos">Todos os voluntários</SelectItem>
+                            <SelectItem value="afastados">Apenas Afastados</SelectItem>
+                            <SelectItem value="ativos">Apenas Ativos (Sem Afastamento)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            ) : null}
             {aba === 'convidados' ? (
                 <div className="lg:w-52">
                     <Select value={statusFiltro} onValueChange={onStatusChange}>

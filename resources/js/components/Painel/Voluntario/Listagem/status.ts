@@ -117,3 +117,33 @@ export const getStatusVoluntario = (voluntario: User) => {
             : 'bg-emerald-50 text-emerald-700',
     };
 };
+
+export const getMotivoLabel = (motivo?: string | null): string => {
+    switch (motivo) {
+        case 'atestado_medico':
+            return 'Atestado Médico';
+        case 'licenca_pessoal':
+            return 'Licença Pessoal';
+        case 'estudos':
+            return 'Estudos';
+        case 'outro':
+            return 'Outro';
+        default:
+            return 'Atestado / Licença';
+    }
+};
+
+export const getAfastamentoBadge = (voluntario: User) => {
+    if (!voluntario.esta_afastado && !voluntario.afastamento_atual) {
+        return null;
+    }
+
+    const dataFim = voluntario.afastamento_atual?.data_fim;
+    const dataFormatada = formatarData(dataFim);
+
+    return {
+        label: `Afastado (Atestado até ${dataFormatada})`,
+        className: 'bg-rose-50 text-rose-700 border-rose-200',
+    };
+};
+

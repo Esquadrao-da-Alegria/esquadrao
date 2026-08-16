@@ -10,7 +10,12 @@ class StoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->temCargo('administrador') ?? false;
+        $user = $this->user();
+        if (! $user) return false;
+        if ($user->temCargo('administrador')) return true;
+
+        $evento = $this->route('evento');
+        return $evento && ($evento->responsavel_id === $user->id || $evento->criado_por_id === $user->id);
     }
 
     public function rules(): array

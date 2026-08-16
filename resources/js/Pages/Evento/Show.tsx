@@ -143,7 +143,7 @@ export default function Show({ evento, inscrito, presenca_marcada, pode_gerencia
   const podeInscrever = evento.status === 'agendado' && !jaComecou && !limitePassou && !lotado
   const podeCancelarInscricao = inscrito && evento.status === 'agendado' && !jaComecou && !presenca_marcada
   const podeExcluir = props.eh_administrador && !temParticipantes
-  const podeAjustar = props.eh_administrador && evento.status !== 'cancelado' && new Date(evento.data_inicio) <= agora
+  const podeAjustar = pode_gerenciar && evento.status !== 'cancelado' && new Date(evento.data_inicio) <= agora
 
   return (
     <PainelLayout>

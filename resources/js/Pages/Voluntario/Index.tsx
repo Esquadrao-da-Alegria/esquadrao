@@ -1,4 +1,5 @@
 import Abas from '@/components/Painel/Voluntario/Listagem/Abas';
+import AfastamentoModal from '@/components/Painel/Voluntario/Listagem/AfastamentoModal';
 import ConviteModal from '@/components/Painel/Voluntario/Listagem/ConviteModal';
 import Filtros from '@/components/Painel/Voluntario/Listagem/Filtros';
 import Header from '@/components/Painel/Voluntario/Listagem/Header';
@@ -41,6 +42,9 @@ const Index: React.FC<Props> = ({
     const { props } = usePage<SharedData>();
     const ehAdministrador = props.eh_administrador === true;
     const [modalAberto, setModalAberto] = useState(false);
+    const [afastamentoModalAberto, setAfastamentoModalAberto] = useState(false);
+    const [voluntarioSelecionadoAfastamento, setVoluntarioSelecionadoAfastamento] =
+        useState<VoluntarioListagem | null>(null);
     const [busca, setBusca] = useState(filtros.busca ?? '');
     const aba = filtros.aba ?? 'voluntarios';
     const statusFiltro = filtros.status ?? 'todos';
@@ -98,10 +102,7 @@ const Index: React.FC<Props> = ({
             {
                 aba: abaAtual === 'convidados' ? abaAtual : undefined,
                 busca: busca || undefined,
-                status:
-                    abaAtual === 'convidados' && status && status !== 'todos'
-                        ? status
-                        : undefined,
+                status: status && status !== 'todos' ? status : undefined,
                 cidade_id: cidadeAtual !== 'todas' ? cidadeAtual : 'todas',
             },
             {
@@ -170,6 +171,11 @@ const Index: React.FC<Props> = ({
         });
     };
 
+    const handleGerenciarAfastamento = (voluntario: VoluntarioListagem) => {
+        setVoluntarioSelecionadoAfastamento(voluntario);
+        setAfastamentoModalAberto(true);
+    };
+
     return (
         <PainelLayout>
             <div className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
@@ -220,6 +226,7 @@ const Index: React.FC<Props> = ({
                     onInativar={handleInativar}
                     onReenviarConvite={handleReenviarConvite}
                     onCancelarConvite={handleCancelarConvite}
+                    onGerenciarAfastamento={handleGerenciarAfastamento}
                 />
                 <Paginacao paginacao={voluntarios} />
             </div>
@@ -229,6 +236,12 @@ const Index: React.FC<Props> = ({
                 form={conviteForm}
                 onOpenChange={setModalAberto}
                 onSubmit={handleEnviarConvite}
+            />
+
+            <AfastamentoModal
+                aberto={afastamentoModalAberto}
+                voluntario={voluntarioSelecionadoAfastamento}
+                onOpenChange={setAfastamentoModalAberto}
             />
         </PainelLayout>
     );

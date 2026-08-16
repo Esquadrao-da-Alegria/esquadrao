@@ -88,15 +88,15 @@ class EventoController extends Controller
         $participacao = $evento->participantes()->where('users.id', $user->id)->first();
         $inscrito = $participacao?->pivot->status === 'inscrito';
         $presencaMarcada = $participacao?->pivot->presenca !== null;
-        $podeGerenciar = $user->temCargo('administrador') || $evento->responsavel_id === $user->id;
+        $podeGerenciar = $user->temCargo('administrador') || $evento->responsavel_id === $user->id || $evento->criado_por_id === $user->id;
 
         return Inertia::render('Evento/Show', [
             'evento' => $evento,
             'inscrito' => $inscrito,
             'presenca_marcada' => $presencaMarcada,
             'pode_gerenciar' => $podeGerenciar,
-            'ajustes_participacao' => $user->temCargo('administrador') ? $evento->ajustesParticipacao()->with(['voluntario:id,name', 'administrador:id,name'])->latest()->get() : [],
-            'voluntarios_ajuste' => $user->temCargo('administrador') ? User::query()->whereNotNull('voluntario_id')->whereHas('voluntario', fn ($query) => $query->where('status', 'ativo'))->orderBy('name')->get(['id', 'name']) : [],
+            'ajustes_participacao' => $podeGerenciar ? $evento->ajustesParticipacao()->with(['voluntario:id,name', 'administrador:id,name'])->latest()->get() : [],
+            'voluntarios_ajuste' => $podeGerenciar ? User::query()->whereNotNull('voluntario_id')->whereHas('voluntario', fn ($query) => $query->where('status', 'ativo'))->orderBy('name')->get(['id', 'name']) : [],
         ]);
     }
 

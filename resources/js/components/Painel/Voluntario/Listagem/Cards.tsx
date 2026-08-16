@@ -7,9 +7,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { edit } from '@/routes/voluntarios'
 import { Link } from '@inertiajs/react'
-import { Ban, Calendar, Mail, MailPlus, MapPin, MoreHorizontal, Pencil } from 'lucide-react'
+import { Ban, Calendar, Clock, Mail, MailPlus, MapPin, MoreHorizontal, Pencil } from 'lucide-react'
 import {
     formatarData,
+    getAfastamentoBadge,
     getCidade,
     getIniciais,
     getStatusVoluntario,
@@ -26,6 +27,7 @@ interface Props {
     onInativar: (voluntario: VoluntarioListagem) => void
     onReenviarConvite: (voluntario: VoluntarioListagem) => void
     onCancelarConvite: (voluntario: VoluntarioListagem) => void
+    onGerenciarAfastamento?: (voluntario: VoluntarioListagem) => void
 }
 
 const Cards: React.FC<Props> = ({
@@ -35,6 +37,7 @@ const Cards: React.FC<Props> = ({
     onInativar,
     onReenviarConvite,
     onCancelarConvite,
+    onGerenciarAfastamento,
 }) => {
     const convidados = aba === 'convidados'
 
@@ -129,6 +132,13 @@ const Cards: React.FC<Props> = ({
                                                 >
                                                     {statusVoluntario.label}
                                                 </span>
+                                                {getAfastamentoBadge(voluntario) && (
+                                                    <span
+                                                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${getAfastamentoBadge(voluntario)?.className}`}
+                                                    >
+                                                        {getAfastamentoBadge(voluntario)?.label}
+                                                    </span>
+                                                )}
                                                 <span className="inline-flex items-center rounded-full border border-amber-200/80 bg-amber-50/80 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-amber-900">
                                                     Cadastro {formatarData(voluntario.created_at)}
                                                 </span>
@@ -194,6 +204,17 @@ const Cards: React.FC<Props> = ({
                                                                     Editar
                                                                 </Link>
                                                             </DropdownMenuItem>
+                                                            {onGerenciarAfastamento && (
+                                                                <DropdownMenuItem
+                                                                    onSelect={() =>
+                                                                        onGerenciarAfastamento(voluntario)
+                                                                    }
+                                                                    className="flex cursor-pointer items-center gap-2 text-amber-900 focus:text-amber-950"
+                                                                >
+                                                                    <Clock className="size-4 text-amber-700" />
+                                                                    Gerenciar afastamento
+                                                                </DropdownMenuItem>
+                                                            )}
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem
                                                                 onSelect={() =>

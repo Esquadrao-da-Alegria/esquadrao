@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StatusAfastamento;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,6 +34,8 @@ class Voluntario extends Model
         'convite_utilizado_em',
         'inativado_em',
         'cargos',
+        'esta_afastado',
+        'afastamento_atual',
     ];
 
     protected function casts(): array
@@ -61,6 +64,86 @@ class Voluntario extends Model
     public function cidadeBase(): BelongsTo
     {
         return $this->belongsTo(Cidade::class, 'cidade_base_id');
+    }
+
+    public function afastamentos(): HasMany
+    {
+        return $this->hasMany(VoluntarioAfastamento::class, 'voluntario_id');
+    }
+
+    public function afastamentoAtivo(): HasOne
+    {
+        return $this->hasOne(VoluntarioAfastamento::class, 'voluntario_id')
+            ->where('status', StatusAfastamento::Ativo->value)
+            ->where('data_inicio', '<=', now()->toDateString())
+            ->where('data_fim', '>=', now()->toDateString())
+            ->latestOfMany();
+    }
+
+    public function estaAfastado(?\DateTimeInterface $data = null): bool
+    {
+        $dataRef = $data ? $data->format('Y-m-d') : now()->toDateString();
+
+        if ($this->relationLoaded('afastamentos')) {
+            return $this->afastamentos->contains(function ($afastamento) use ($dataRef) {
+                $status = $afastamento->status instanceof StatusAfastamento
+                    ? $afastamento->status->value
+                    : (string) $afastamento->status;
+
+                $inicio = $afastamento->data_inicio instanceof \DateTimeInterface
+                    ? $afastamento->data_inicio->format('Y-m-d')
+                    : (string) $afastamento->data_inicio;
+
+                $fim = $afastamento->data_fim instanceof \DateTimeInterface
+                    ? $afastamento->data_fim->format('Y-m-d')
+                    : (string) $afastamento->data_fim;
+
+                return $status === StatusAfastamento::Ativo->value
+                    && $inicio <= $dataRef
+                    && $fim >= $dataRef;
+            });
+        }
+
+        return $this->afastamentos()
+            ->whereIn('status', [StatusAfastamento::Ativo, StatusAfastamento::Ativo->value])
+            ->whereDate('data_inicio', '<=', $dataRef)
+            ->whereDate('data_fim', '>=', $dataRef)
+            ->exists();
+    }
+
+    public function getEstaAfastadoAttribute(): bool
+    {
+        return $this->estaAfastado();
+    }
+
+    public function getAfastamentoAtualAttribute(): ?VoluntarioAfastamento
+    {
+        if ($this->relationLoaded('afastamentos')) {
+            return $this->afastamentos
+                ->filter(function ($afastamento) {
+                    $status = $afastamento->status instanceof StatusAfastamento
+                        ? $afastamento->status->value
+                        : $afastamento->status;
+
+                    $inicio = $afastamento->data_inicio instanceof \DateTimeInterface
+                        ? $afastamento->data_inicio->format('Y-m-d')
+                        : (string) $afastamento->data_inicio;
+
+                    $fim = $afastamento->data_fim instanceof \DateTimeInterface
+                        ? $afastamento->data_fim->format('Y-m-d')
+                        : (string) $afastamento->data_fim;
+
+                    $hoje = now()->toDateString();
+
+                    return $status === StatusAfastamento::Ativo->value
+                        && $inicio <= $hoje
+                        && $fim >= $hoje;
+                })
+                ->sortByDesc('data_fim')
+                ->first();
+        }
+
+        return $this->afastamentoAtivo;
     }
 
     public function getNameAttribute(): string

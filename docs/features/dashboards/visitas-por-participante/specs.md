@@ -8,11 +8,10 @@ Correções administrativas auditáveis de inscrição e presença em eventos pa
 
 ## Acesso
 
-- `administrador` e `coordenador_geral`: escopo global.
-- Perfis globais com cidade-base abrem inicialmente no recorte dessa cidade, podendo selecionar outra cidade ou **Todas as cidades**.
+- `administrador`: acesso restrito exclusivamente a administradores (demais cargos recebem HTTP 403).
+- Perfis de administrador com cidade-base abrem inicialmente no recorte dessa cidade, podendo selecionar outra cidade ou **Todas as cidades**.
 - Contas administrativas de suporte sem cidade-base permanecem na visão global.
-- `coordenador_local`: voluntários cuja cidade-base seja a sua; coordenador sem cidade recebe HTTP 403.
-- `diretor` e demais cargos: sem acesso ao dashboard.
+- `coordenador_geral`, `coordenador_local`, `diretor` e demais cargos: sem acesso ao dashboard (HTTP 403).
 - Atividades em outras cidades permanecem no histórico do voluntário autorizado.
 - Rota: `dashboards.visitas-por-participante`; detalhe: `dashboards.visitas-por-participante.show`.
 
