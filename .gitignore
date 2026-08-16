@@ -28,6 +28,11 @@ yarn-error.log
 /.zed
 .pnpm-store/*
 
+# BACKUPS DB
+backup_*.sql
+*.sql.gz
+scripts/import-db-prod.local.env
+
 # DOCS
 docs/superpowers
 docs/plans
