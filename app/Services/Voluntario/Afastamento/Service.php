@@ -37,6 +37,26 @@ class Service
                 ];
             }
 
+            $sobreposicao = VoluntarioAfastamento::query()
+                ->where('voluntario_id', $voluntario->id)
+                ->whereIn('status', [StatusAfastamento::Ativo->value, StatusAfastamento::Prorrogado->value])
+                ->where(function ($query) use ($dataInicio, $dataFim) {
+                    $query->where('data_inicio', '<=', $dataFim)
+                        ->where('data_fim', '>=', $dataInicio);
+                })
+                ->exists();
+
+            if ($sobreposicao) {
+                DB::rollBack();
+                session()->flash('mensagem_erro', 'O voluntário já possui um afastamento ativo no período informado.');
+
+                return [
+                    'sucesso' => false,
+                    'dados' => [],
+                    'erros' => ['O voluntário já possui um afastamento ativo no período informado. Utilize a opção de prorrogação se necessário.'],
+                ];
+            }
+
             $motivo = $dados['motivo'] instanceof MotivoAfastamento
                 ? $dados['motivo']->value
                 : (string) $dados['motivo'];
@@ -94,6 +114,21 @@ class Service
     {
         try {
             DB::beginTransaction();
+
+            $statusAtual = $afastamento->status instanceof StatusAfastamento
+                ? $afastamento->status
+                : StatusAfastamento::tryFrom((string) $afastamento->status);
+
+            if (! in_array($statusAtual, [StatusAfastamento::Ativo, StatusAfastamento::Prorrogado], true)) {
+                DB::rollBack();
+                session()->flash('mensagem_erro', 'Apenas afastamentos ativos podem ser prorrogados.');
+
+                return [
+                    'sucesso' => false,
+                    'dados' => [],
+                    'erros' => ['Apenas afastamentos ativos podem ser prorrogados.'],
+                ];
+            }
 
             $novaDataFim = null;
             if (! empty($dados['dias'])) {
@@ -173,6 +208,21 @@ class Service
     {
         try {
             DB::beginTransaction();
+
+            $statusAtual = $afastamento->status instanceof StatusAfastamento
+                ? $afastamento->status
+                : StatusAfastamento::tryFrom((string) $afastamento->status);
+
+            if (! in_array($statusAtual, [StatusAfastamento::Ativo, StatusAfastamento::Prorrogado], true)) {
+                DB::rollBack();
+                session()->flash('mensagem_erro', 'Apenas afastamentos ativos podem ser encerrados.');
+
+                return [
+                    'sucesso' => false,
+                    'dados' => [],
+                    'erros' => ['Apenas afastamentos ativos podem ser encerrados.'],
+                ];
+            }
 
             $hoje = now()->toDateString();
             $dataFimOriginal = Carbon::parse($afastamento->data_fim)->toDateString();

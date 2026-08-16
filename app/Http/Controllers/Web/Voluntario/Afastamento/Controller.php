@@ -26,6 +26,8 @@ class Controller extends BaseController
         VoluntarioAfastamento $afastamento,
         Service $service
     ): RedirectResponse {
+        abort_if((int) $afastamento->voluntario_id !== (int) $voluntario->id, 404);
+
         $service->prorrogar($afastamento, $request->validated(), $request->user());
 
         return back();
@@ -37,6 +39,8 @@ class Controller extends BaseController
         VoluntarioAfastamento $afastamento,
         Service $service
     ): RedirectResponse {
+        abort_if((int) $afastamento->voluntario_id !== (int) $voluntario->id, 404);
+
         $service->encerrar($afastamento, $request->validated());
 
         return back();

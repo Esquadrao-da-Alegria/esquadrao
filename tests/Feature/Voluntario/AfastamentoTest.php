@@ -274,4 +274,109 @@ class AfastamentoTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function test_nao_permite_cadastrar_novo_afastamento_com_periodo_sobreposto_a_um_ativo(): void
+    {
+        $admin = $this->criarAdmin();
+        [$voluntario] = $this->criarVoluntario();
+
+        VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntario->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->toDateString(),
+            'data_fim' => now()->addDays(30)->toDateString(),
+            'motivo' => MotivoAfastamento::AtestadoMedico,
+            'status' => StatusAfastamento::Ativo,
+        ]);
+
+        // Tentativa de cadastrar outro no meio do período
+        $response = $this->actingAs($admin)->post(route('voluntarios.afastamentos.store', $voluntario), [
+            'data_inicio' => now()->addDays(10)->toDateString(),
+            'data_fim' => now()->addDays(40)->toDateString(),
+            'motivo' => MotivoAfastamento::LicencaPessoal->value,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('mensagem_erro');
+
+        $this->assertDatabaseCount('voluntario_afastamentos', 1);
+    }
+
+    public function test_nao_permite_prorrogar_afastamento_ja_encerrado_ou_cancelado(): void
+    {
+        $admin = $this->criarAdmin();
+        [$voluntario] = $this->criarVoluntario();
+
+        $afastamentoEncerrado = VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntario->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->subDays(20)->toDateString(),
+            'data_fim' => now()->subDays(5)->toDateString(),
+            'motivo' => MotivoAfastamento::AtestadoMedico,
+            'status' => StatusAfastamento::Encerrado,
+        ]);
+
+        $response = $this->actingAs($admin)->post(
+            route('voluntarios.afastamentos.prorrogar', [$voluntario, $afastamentoEncerrado]),
+            ['nova_data_fim' => now()->addDays(10)->toDateString()]
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('mensagem_erro');
+
+        $this->assertEquals(StatusAfastamento::Encerrado, $afastamentoEncerrado->fresh()->status);
+    }
+
+    public function test_nao_permite_encerrar_afastamento_ja_encerrado(): void
+    {
+        $admin = $this->criarAdmin();
+        [$voluntario] = $this->criarVoluntario();
+
+        $afastamentoEncerrado = VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntario->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->subDays(20)->toDateString(),
+            'data_fim' => now()->subDays(5)->toDateString(),
+            'motivo' => MotivoAfastamento::AtestadoMedico,
+            'status' => StatusAfastamento::Encerrado,
+        ]);
+
+        $response = $this->actingAs($admin)->post(
+            route('voluntarios.afastamentos.encerrar', [$voluntario, $afastamentoEncerrado]),
+            ['observacoes' => 'Tentativa duplicada']
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('mensagem_erro');
+    }
+
+    public function test_retorna_404_ao_tentar_alterar_afastamento_pertencente_a_outro_voluntario(): void
+    {
+        $admin = $this->criarAdmin();
+        [$voluntarioA] = $this->criarVoluntario('Voluntário A');
+        [$voluntarioB] = $this->criarVoluntario('Voluntário B');
+
+        $afastamentoB = VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntarioB->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->toDateString(),
+            'data_fim' => now()->addDays(15)->toDateString(),
+            'motivo' => MotivoAfastamento::AtestadoMedico,
+            'status' => StatusAfastamento::Ativo,
+        ]);
+
+        // Tentativa cruzada de prorrogar afastamento do Voluntário B passando a rota do Voluntário A
+        $responseProrrogar = $this->actingAs($admin)->post(
+            route('voluntarios.afastamentos.prorrogar', [$voluntarioA, $afastamentoB]),
+            ['nova_data_fim' => now()->addDays(30)->toDateString()]
+        );
+        $responseProrrogar->assertNotFound();
+
+        // Tentativa cruzada de encerrar
+        $responseEncerrar = $this->actingAs($admin)->post(
+            route('voluntarios.afastamentos.encerrar', [$voluntarioA, $afastamentoB]),
+            ['observacoes' => 'Teste']
+        );
+        $responseEncerrar->assertNotFound();
+    }
 }

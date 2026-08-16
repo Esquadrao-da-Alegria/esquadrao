@@ -149,7 +149,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/voluntarios/{voluntario}/convite', [VoluntarioController::class, 'cancelarConvite'])
             ->name('voluntarios.convite.cancelar');
 
-        Route::prefix('voluntarios/{voluntario}/afastamentos')->name('voluntarios.afastamentos.')->group(function () {
+        Route::prefix('voluntarios/{voluntario}/afastamentos')->scopeBindings()->name('voluntarios.afastamentos.')->group(function () {
             Route::post('/', [VoluntarioAfastamentoController::class, 'store'])->name('store');
             Route::post('{afastamento}/prorrogar', [VoluntarioAfastamentoController::class, 'prorrogar'])->name('prorrogar');
             Route::post('{afastamento}/encerrar', [VoluntarioAfastamentoController::class, 'encerrar'])->name('encerrar');
