@@ -66,12 +66,28 @@ class VisitaIndexTest extends TestCase
             );
     }
 
-    public function test_visita_cancelada_aparece_no_resultado(): void
+    public function test_visita_cancelada_nao_aparece_no_calendario(): void
     {
         $user     = $this->criarUsuario();
         $hospital = $this->criarHospital();
 
-        $visitaCancelada = $this->criarVisita($hospital, $user, '2026-06-20 10:00:00', VisitaStatus::Cancelada);
+        $this->criarVisita($hospital, $user, '2026-06-20 10:00:00', VisitaStatus::Cancelada);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['mes' => '2026-06']))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Index')
+                ->has('visitas', 0)
+            );
+    }
+
+    public function test_visita_ativa_aparece_no_calendario(): void
+    {
+        $user     = $this->criarUsuario();
+        $hospital = $this->criarHospital();
+
+        $visita = $this->criarVisita($hospital, $user, '2026-06-20 10:00:00', VisitaStatus::Agendada);
 
         $this->actingAs($user)
             ->get(route('visitas.index', ['mes' => '2026-06']))
@@ -79,7 +95,94 @@ class VisitaIndexTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Visita/Index')
                 ->has('visitas', 1)
-                ->where('visitas.0.id', $visitaCancelada->id)
+                ->where('visitas.0.id', $visita->id)
+            );
+    }
+
+    public function test_evento_cancelado_nao_aparece_no_calendario(): void
+    {
+        $user = $this->criarUsuario();
+
+        \App\Models\Evento::create([
+            'titulo'        => 'Oficina Cancelada',
+            'tipo'          => 'oficina',
+            'descricao'     => 'Cancelada',
+            'local'         => 'Sede',
+            'data_inicio'   => now()->format('Y-m-') . '10 10:00:00',
+            'status'        => 'cancelado',
+            'criado_por_id' => $user->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['cidade_id' => 'todas']))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Index')
+                ->has('eventos', 0)
+            );
+    }
+
+    public function test_evento_ativo_aparece_no_calendario(): void
+    {
+        $user = $this->criarUsuario();
+
+        $evento = \App\Models\Evento::create([
+            'titulo'        => 'Oficina Ativa',
+            'tipo'          => 'oficina',
+            'descricao'     => 'Ativa',
+            'local'         => 'Sede',
+            'data_inicio'   => now()->format('Y-m-') . '12 10:00:00',
+            'status'        => 'agendado',
+            'criado_por_id' => $user->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['cidade_id' => 'todas']))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Index')
+                ->has('eventos', 1)
+                ->where('eventos.0.id', $evento->id)
+            );
+    }
+
+    public function test_mistura_visitas_e_eventos_exclui_cancelados(): void
+    {
+        $user     = $this->criarUsuario();
+        $hospital = $this->criarHospital();
+
+        $visitaAtiva      = $this->criarVisita($hospital, $user, now()->format('Y-m-') . '05 10:00:00', VisitaStatus::Agendada);
+        $this->criarVisita($hospital, $user, now()->format('Y-m-') . '06 10:00:00', VisitaStatus::Cancelada);
+
+        $eventoAtivo = \App\Models\Evento::create([
+            'titulo'        => 'Evento Ativo',
+            'tipo'          => 'reuniao',
+            'descricao'     => 'Reunião',
+            'local'         => 'Sede',
+            'data_inicio'   => now()->format('Y-m-') . '10 10:00:00',
+            'status'        => 'agendado',
+            'criado_por_id' => $user->id,
+        ]);
+
+        \App\Models\Evento::create([
+            'titulo'        => 'Evento Cancelado',
+            'tipo'          => 'reuniao',
+            'descricao'     => 'Reunião cancelada',
+            'local'         => 'Sede',
+            'data_inicio'   => now()->format('Y-m-') . '11 10:00:00',
+            'status'        => 'cancelado',
+            'criado_por_id' => $user->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['cidade_id' => 'todas']))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Index')
+                ->has('visitas', 1)
+                ->where('visitas.0.id', $visitaAtiva->id)
+                ->has('eventos', 1)
+                ->where('eventos.0.id', $eventoAtivo->id)
             );
     }
 

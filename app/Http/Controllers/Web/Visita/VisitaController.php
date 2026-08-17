@@ -58,6 +58,7 @@ class VisitaController extends Controller
         $eventos = Evento::with(['responsavel', 'cidade'])
             ->withCount('participantesAtivos')
             ->whereBetween('data_inicio', [$inicio, $fim])
+            ->where('status', '!=', 'cancelado')
             ->when($cidadeId !== 'todas', fn ($q) => $q->where('cidade_id', $cidadeId))
             ->orderBy('data_inicio')
             ->get();
