@@ -8,11 +8,10 @@ Correções administrativas auditáveis de inscrição e presença em eventos pa
 
 ## Acesso
 
-- `administrador` e `coordenador_geral`: escopo global.
-- Perfis globais com cidade-base abrem inicialmente no recorte dessa cidade, podendo selecionar outra cidade ou **Todas as cidades**.
+- `administrador`: acesso restrito exclusivamente a administradores (demais cargos recebem HTTP 403).
+- Perfis de administrador com cidade-base abrem inicialmente no recorte dessa cidade, podendo selecionar outra cidade ou **Todas as cidades**.
 - Contas administrativas de suporte sem cidade-base permanecem na visão global.
-- `coordenador_local`: voluntários cuja cidade-base seja a sua; coordenador sem cidade recebe HTTP 403.
-- `diretor` e demais cargos: sem acesso ao dashboard.
+- `coordenador_geral`, `coordenador_local`, `diretor` e demais cargos: sem acesso ao dashboard (HTTP 403).
 - Atividades em outras cidades permanecem no histórico do voluntário autorizado.
 - Rota: `dashboards.visitas-por-participante`; detalhe: `dashboards.visitas-por-participante.show`.
 
@@ -36,7 +35,7 @@ Para `tipo_participacao = paisana`, o próprio participante precisa escrever um 
 
 O tipo registrado na participação da visita prevalece sobre os cargos permanentes do usuário. Múltiplos relatórios não duplicam a visita. Pendências e atrasos aparecem no histórico. Regra confirmada pela coordenação em 10/08/2026.
 
-O prazo é centralizado em `App\Services\Visita\Relatorio\Prazo\Service`, atualmente 48 horas após `visita.fim_em`. Mudanças futuras devem ocorrer nesse serviço e continuar preenchendo corretamente `fora_do_prazo`.
+O prazo é centralizado em `App\Services\Visita\Relatorio\Prazo\Service`, atualmente 48 horas após `max(visita.fim_em, visita.created_at)`. Em visitas cadastradas no sistema após sua realização (`created_at > fim_em`), a janela de 48 horas conta a partir da criação no banco de dados.
 
 ## Meta e compensação
 
@@ -78,7 +77,7 @@ Cores sempre acompanham texto. Nunca usar “irregular”, “deve ser afastado�
 
 ## Filtros e interface
 
-A busca por nome ou e-mail é aplicada automaticamente com atraso curto. Período, cidade e filtros avançados são preparados localmente e enviados somente pelo botão **Aplicar filtros**, evitando consultas a cada mudança. O botão **Mais filtros** informa a quantidade ativa; os filtros aplicados aparecem como marcadores removíveis. Limpar filtros avançados preserva busca, período e cidade.
+A busca por nome ou e-mail, o período, a cidade e os filtros avançados são preparados localmente e enviados pelo botão **Aplicar filtros** ou pela tecla Enter no campo de busca, evitando consultas concorrentes a cada mudança. O botão **Mais filtros** informa a quantidade ativa; os filtros aplicados aparecem como marcadores removíveis. Limpar filtros avançados preserva busca, período e cidade.
 
 O histórico completo usa o identificador do voluntário e ignora a página da listagem. Assim, participantes exibidos em qualquer página da paginação continuam acessando seu próprio histórico com os filtros de contexto.
 

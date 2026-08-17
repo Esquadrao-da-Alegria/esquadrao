@@ -45,11 +45,21 @@ class Service
                     return $this->erro('Apenas voluntários ativos podem se inscrever.');
                 }
 
+                $voluntarioModel = $usuario->voluntario;
+                if ($voluntarioModel && $voluntarioModel->estaAfastado($visita->inicio_em)) {
+                    return $this->erro('Voluntário está afastado temporariamente no período desta visita.');
+                }
+
                 $voluntarioId = $usuario->id;
             } else {
                 $targetUser = User::query()->find($solicitadoVoluntarioId);
                 if (! $targetUser || $targetUser->status !== User::STATUS_ATIVO || $targetUser->voluntario_id === null) {
                     return $this->erro('Voluntário selecionado é inválido ou inativo.');
+                }
+
+                $voluntarioModel = $targetUser->voluntario;
+                if ($voluntarioModel && $voluntarioModel->estaAfastado($visita->inicio_em)) {
+                    return $this->erro('Voluntário está afastado temporariamente no período desta visita.');
                 }
 
                 $voluntarioId = $targetUser->id;

@@ -19,7 +19,13 @@ import ListaCompletaModalShow from '@/components/Painel/Visita/Calendario/ListaC
 import CalendarioShow from '@/components/Painel/Visita/Calendario/Show';
 
 // ICONS
-import { CalendarDays, ChevronLeft, ChevronRight, MapPin, Plus } from 'lucide-react';
+import {
+    CalendarDays,
+    ChevronLeft,
+    ChevronRight,
+    MapPin,
+    Plus,
+} from 'lucide-react';
 
 interface CidadeOption {
     id: number;
@@ -123,7 +129,7 @@ const Index: FC<Props> = ({
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-3 w-full sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+                    <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
                         {/* Seletor de cidade */}
                         {cidades.length > 0 && (
                             <div className="flex w-full items-center gap-2 rounded-full border border-amber-200 bg-white px-3.5 py-1.5 shadow-sm sm:w-auto">
@@ -138,12 +144,17 @@ const Index: FC<Props> = ({
                                                 : Number(e.target.value),
                                         )
                                     }
-                                    className="w-full bg-transparent text-sm font-medium text-amber-900 focus:outline-none cursor-pointer pr-1 sm:w-auto"
+                                    className="w-full cursor-pointer bg-transparent pr-1 text-sm font-medium text-amber-900 focus:outline-none sm:w-auto"
                                     aria-label="Filtrar por cidade"
                                 >
-                                    <option value="todas">Todas as cidades</option>
+                                    <option value="todas">
+                                        Todas as cidades
+                                    </option>
                                     {cidades.map((cidade) => (
-                                        <option key={cidade.id} value={cidade.id}>
+                                        <option
+                                            key={cidade.id}
+                                            value={cidade.id}
+                                        >
                                             {cidade.nome}
                                             {cidade.id === cidadeUsuarioId
                                                 ? ' (Sua cidade)'
@@ -155,10 +166,12 @@ const Index: FC<Props> = ({
                         )}
 
                         {/* Seletor de mês */}
-                        <div className="flex w-full items-center justify-between sm:w-auto gap-1 rounded-full border border-amber-200 bg-white p-1 shadow-sm">
+                        <div className="flex w-full items-center justify-between gap-1 rounded-full border border-amber-200 bg-white p-1 shadow-sm sm:w-auto">
                             <button
                                 type="button"
-                                onClick={() => navegar(mesAnterior(mes), cidadeId)}
+                                onClick={() =>
+                                    navegar(mesAnterior(mes), cidadeId)
+                                }
                                 className="flex size-8 items-center justify-center rounded-full text-amber-700 transition hover:bg-amber-50"
                                 aria-label="Mês anterior"
                             >
@@ -167,12 +180,16 @@ const Index: FC<Props> = ({
                             <input
                                 type="month"
                                 value={mes}
-                                onChange={(e) => navegar(e.target.value, cidadeId)}
+                                onChange={(e) =>
+                                    navegar(e.target.value, cidadeId)
+                                }
                                 className="rounded px-2 py-1 text-sm font-medium text-amber-900 focus:outline-none"
                             />
                             <button
                                 type="button"
-                                onClick={() => navegar(mesSeguinte(mes), cidadeId)}
+                                onClick={() =>
+                                    navegar(mesSeguinte(mes), cidadeId)
+                                }
                                 className="flex size-8 items-center justify-center rounded-full text-amber-700 transition hover:bg-amber-50"
                                 aria-label="Próximo mês"
                             >

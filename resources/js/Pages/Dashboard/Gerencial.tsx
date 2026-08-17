@@ -18,7 +18,10 @@ export default function Gerencial({ titulo, descricao }: Props) {
                     <PlaceholderPattern className="pointer-events-none absolute inset-0 size-full stroke-neutral-900/[0.05] dark:stroke-neutral-100/[0.05]" />
                     <div className="relative max-w-2xl">
                         <span className="inline-flex rounded-xl bg-amber-100 p-3 text-amber-800">
-                            <ChartNoAxesCombined className="size-6" aria-hidden />
+                            <ChartNoAxesCombined
+                                className="size-6"
+                                aria-hidden
+                            />
                         </span>
                         <h1 className="mt-5 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
                             {titulo}

@@ -13,13 +13,13 @@ Um relatório atrasado conserva `fora_do_prazo = true`. Mediante justificativa, 
 | **VisitaRelatorio** | Registro na tabela `visitas_relatorios` — relato enviado por um usuário sobre uma visita. |
 | **Autor** | Usuário que criou o relatório (`autor_id` → `users.id`). |
 | **Prazo 48h** | Recomendação de envio até 48h após `visita.fim_em`. Aviso visual; **não bloqueia** o envio. |
-| **Fora do prazo** | `fora_do_prazo = true` quando `enviado_em > visita.fim_em + 48 horas`. Calculado na criação; imutável na edição. |
+| **Fora do prazo** | `fora_do_prazo = true` quando `enviado_em > max(visita.fim_em, visita.created_at) + 48 horas`. Para visitas cadastradas retroativamente (`created_at > fim_em`), a janela de 48h conta a partir da criação no sistema. Calculado na criação; imutável na edição. |
 
 ---
 
 ## Regras de negócio
 
-1. **Quem cria** — Apenas voluntários que participaram da visita (ou o líder da visita). Usuários que não participaram não podem criar relatórios.
+1. **Quem cria** — Voluntários que participaram da visita (ou o líder da visita) e usuários com permissão `podeEditarVisita` (administradores, diretores e coordenadores autorizados).
 2. **Quem vê** — Qualquer usuário autenticado (listagem, detalhe e PDF).
 3. **Quem edita** — Autor do relatório **ou** quem passa em `podeEditarVisita` (mesma regra da visita).
 4. **Visita cancelada** — Pode listar, ver detalhe e baixar PDF. **Não** pode criar nem editar relatório.
@@ -28,7 +28,7 @@ Um relatório atrasado conserva `fora_do_prazo = true`. Mediante justificativa, 
 7. **Campos imutáveis na edição** — `visita_id`, `autor_id`, `enviado_em`, `fora_do_prazo` removidos do payload no service.
 8. **Campos obrigatórios** — `tipo_relatorio` e `resumo` (validação `max:5000` nos textos).
 9. **Contexto da visita** — Hospital, datas, líder, ala cadastrada na visita e participantes são **read-only** na UI e no PDF (não persistidos no relatório).
-10. **Ala do relatório** — Campo opcional `ala_unidade_id` (FK → `alas_hospitais`), independente da ala da visita; exibido na seção do relatório (UI e PDF).
+10. **Ala e unidades do relatório** — Campo opcional `ala_unidade_id` (FK → `alas_hospitais`) e campo textual livre opcional `unidades_visitadas` (`text`, nullable) para descrever as unidades/setores visitados sem exigência de pré-cadastro no hospital; exibidos na seção do relatório (UI e PDF).
 11. **Sem destroy** — Não há rota nem query `destroy` nesta v1.
 12. **Histórico preservado** — Relatórios impedem exclusão física da visita (`visita_id` com `restrictOnDelete`). Visita com relatório(s) não pode ser removida do banco; o histórico não desaparece em cascata.
 13. **Notificação por e-mail** — Ao cadastrar um novo relatório, uma notificação por e-mail (`RelatorioVisitaNotification`) é enviada automaticamente para todos os integrantes da visita (com status diferente de cancelado).
@@ -39,7 +39,7 @@ Um relatório atrasado conserva `fora_do_prazo = true`. Mediante justificativa, 
 
 ### Tabela `visitas_relatorios`
 
-Migration: `2026_07_19_135423_create_visitas_relatorios_table.php`
+Migration: `2026_07_19_135423_create_visitas_relatorios_table.php`, `2026_08_13_000000_add_unidades_visitadas_to_visitas_relatorios_table.php`
 
 | Coluna | Descrição |
 |--------|-----------|
@@ -48,6 +48,7 @@ Migration: `2026_07_19_135423_create_visitas_relatorios_table.php`
 | `autor_id` | FK → `users` (restrictOnDelete) |
 | `tipo_relatorio` | `palhaco` \| `paisana` \| `geral` |
 | `ala_unidade_id` | FK → `alas_hospitais.id` (nullable, nullOnDelete) |
+| `unidades_visitadas` | text nullable — descrição livre das unidades/alas visitadas |
 | `resumo` | text, obrigatório |
 | `feedback` | text nullable |
 | `quartos_visitados` | unsigned int nullable |

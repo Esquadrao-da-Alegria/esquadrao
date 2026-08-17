@@ -1,11 +1,12 @@
 import Abas from '@/components/Painel/Voluntario/Listagem/Abas';
+import AfastamentoModal from '@/components/Painel/Voluntario/Listagem/AfastamentoModal';
+import Cards from '@/components/Painel/Voluntario/Listagem/Cards';
 import ConviteModal from '@/components/Painel/Voluntario/Listagem/ConviteModal';
 import Filtros from '@/components/Painel/Voluntario/Listagem/Filtros';
 import Header from '@/components/Painel/Voluntario/Listagem/Header';
 import Paginacao from '@/components/Painel/Voluntario/Listagem/Paginacao';
 import { mapVoluntariosStatus } from '@/components/Painel/Voluntario/Listagem/status';
 import StatusCards from '@/components/Painel/Voluntario/Listagem/StatusCards';
-import Cards from '@/components/Painel/Voluntario/Listagem/Cards';
 import {
     AbaKey,
     CidadeOption,
@@ -41,6 +42,11 @@ const Index: React.FC<Props> = ({
     const { props } = usePage<SharedData>();
     const ehAdministrador = props.eh_administrador === true;
     const [modalAberto, setModalAberto] = useState(false);
+    const [afastamentoModalAberto, setAfastamentoModalAberto] = useState(false);
+    const [
+        voluntarioSelecionadoAfastamento,
+        setVoluntarioSelecionadoAfastamento,
+    ] = useState<VoluntarioListagem | null>(null);
     const [busca, setBusca] = useState(filtros.busca ?? '');
     const aba = filtros.aba ?? 'voluntarios';
     const statusFiltro = filtros.status ?? 'todos';
@@ -51,8 +57,7 @@ const Index: React.FC<Props> = ({
     });
 
     const listaVoluntarios = useMemo(
-        () =>
-            Array.isArray(voluntarios?.data) ? voluntarios.data : [],
+        () => (Array.isArray(voluntarios?.data) ? voluntarios.data : []),
         [voluntarios],
     );
 
@@ -91,17 +96,15 @@ const Index: React.FC<Props> = ({
         cidadeId?: number | 'todas';
     }) => {
         const abaAtual = aba ?? filtros.aba ?? 'voluntarios';
-        const cidadeAtual = novaCidadeId !== undefined ? novaCidadeId : cidadeId;
+        const cidadeAtual =
+            novaCidadeId !== undefined ? novaCidadeId : cidadeId;
 
         router.get(
             index.url(),
             {
                 aba: abaAtual === 'convidados' ? abaAtual : undefined,
                 busca: busca || undefined,
-                status:
-                    abaAtual === 'convidados' && status && status !== 'todos'
-                        ? status
-                        : undefined,
+                status: status && status !== 'todos' ? status : undefined,
                 cidade_id: cidadeAtual !== 'todas' ? cidadeAtual : 'todas',
             },
             {
@@ -121,7 +124,12 @@ const Index: React.FC<Props> = ({
     };
 
     const handleCidadeChange = (novaCidadeId: number | 'todas') => {
-        atualizarFiltros({ busca, status: statusFiltro, aba, cidadeId: novaCidadeId });
+        atualizarFiltros({
+            busca,
+            status: statusFiltro,
+            aba,
+            cidadeId: novaCidadeId,
+        });
     };
 
     const handleAbrirModal = () => {
@@ -168,6 +176,11 @@ const Index: React.FC<Props> = ({
         router.delete(`/voluntarios/${voluntario.id}/convite`, {
             preserveScroll: true,
         });
+    };
+
+    const handleGerenciarAfastamento = (voluntario: VoluntarioListagem) => {
+        setVoluntarioSelecionadoAfastamento(voluntario);
+        setAfastamentoModalAberto(true);
     };
 
     return (
@@ -220,6 +233,7 @@ const Index: React.FC<Props> = ({
                     onInativar={handleInativar}
                     onReenviarConvite={handleReenviarConvite}
                     onCancelarConvite={handleCancelarConvite}
+                    onGerenciarAfastamento={handleGerenciarAfastamento}
                 />
                 <Paginacao paginacao={voluntarios} />
             </div>
@@ -229,6 +243,12 @@ const Index: React.FC<Props> = ({
                 form={conviteForm}
                 onOpenChange={setModalAberto}
                 onSubmit={handleEnviarConvite}
+            />
+
+            <AfastamentoModal
+                aberto={afastamentoModalAberto}
+                voluntario={voluntarioSelecionadoAfastamento}
+                onOpenChange={setAfastamentoModalAberto}
             />
         </PainelLayout>
     );

@@ -76,7 +76,9 @@ export default function Index({
         router.get(
             visitasPorHospital().url,
             Object.fromEntries(
-                Object.entries(novosFiltros).filter(([, valor]) => valor !== ''),
+                Object.entries(novosFiltros).filter(
+                    ([, valor]) => valor !== '',
+                ),
             ),
             { preserveState: true, preserveScroll: true, replace: true },
         );
@@ -118,7 +120,11 @@ export default function Index({
                             <input
                                 type="month"
                                 value={form.mes_inicio}
-                                onChange={(event) => aplicarFiltros({ mes_inicio: event.target.value })}
+                                onChange={(event) =>
+                                    aplicarFiltros({
+                                        mes_inicio: event.target.value,
+                                    })
+                                }
                                 className="h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm shadow-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none"
                                 required
                             />
@@ -127,26 +133,42 @@ export default function Index({
                             <input
                                 type="month"
                                 value={form.mes_fim}
-                                onChange={(event) => aplicarFiltros({ mes_fim: event.target.value })}
+                                onChange={(event) =>
+                                    aplicarFiltros({
+                                        mes_fim: event.target.value,
+                                    })
+                                }
                                 className="h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm shadow-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none"
                                 required
                             />
                         </Campo>
                         <Campo label="Cidade">
                             <select
-                                value={form.visao_global ? 'todas' : form.cidade_id}
+                                value={
+                                    form.visao_global ? 'todas' : form.cidade_id
+                                }
                                 disabled={!escopo_global}
                                 onChange={(event) =>
                                     aplicarFiltros({
-                                        cidade_id: event.target.value === 'todas' ? '' : event.target.value,
-                                        visao_global: event.target.value === 'todas' ? '1' : '',
+                                        cidade_id:
+                                            event.target.value === 'todas'
+                                                ? ''
+                                                : event.target.value,
+                                        visao_global:
+                                            event.target.value === 'todas'
+                                                ? '1'
+                                                : '',
                                         hospital_id: '',
                                         ala_id: '',
                                     })
                                 }
                                 className="h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm shadow-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none disabled:bg-amber-50"
                             >
-                                {escopo_global && <option value="todas">Todas as cidades</option>}
+                                {escopo_global && (
+                                    <option value="todas">
+                                        Todas as cidades
+                                    </option>
+                                )}
                                 {opcoes.cidades.map((cidade) => (
                                     <option key={cidade.id} value={cidade.id}>
                                         {cidade.nome}
@@ -168,7 +190,10 @@ export default function Index({
                             >
                                 <option value="">Todos</option>
                                 {opcoes.hospitais.map((hospital) => (
-                                    <option key={hospital.id} value={hospital.id}>
+                                    <option
+                                        key={hospital.id}
+                                        value={hospital.id}
+                                    >
                                         {hospital.nome}
                                     </option>
                                 ))}
@@ -178,7 +203,11 @@ export default function Index({
                             <select
                                 value={form.ala_id}
                                 disabled={!form.hospital_id}
-                                onChange={(event) => aplicarFiltros({ ala_id: event.target.value })}
+                                onChange={(event) =>
+                                    aplicarFiltros({
+                                        ala_id: event.target.value,
+                                    })
+                                }
                                 className="h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm shadow-sm focus:border-amber-300 focus:ring-2 focus:ring-amber-100 focus:outline-none disabled:bg-gray-50"
                             >
                                 <option value="">Todas</option>
@@ -202,28 +231,65 @@ export default function Index({
                 </section>
 
                 <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-                    <Indicador icon={CalendarRange} titulo="Visitas" valor={formatarNumero(indicadores.total_visitas)} />
-                    <Indicador icon={Building2} titulo="Hospitais visitados" valor={formatarNumero(indicadores.hospitais_visitados)} />
-                    <Indicador icon={UsersRound} titulo="Participações confirmadas" valor={formatarNumero(indicadores.total_participacoes)} />
-                    <Indicador icon={BarChart3} titulo="Média por visita" valor={formatarNumero(indicadores.media_participantes, 1)} />
-                    <Indicador icon={Sparkles} titulo="Impacto estimado" valor={formatarNumero(indicadores.impacto_estimado)} detalhe={`${indicadores.visitas_sem_impacto} sem impacto informado`} />
+                    <Indicador
+                        icon={CalendarRange}
+                        titulo="Visitas"
+                        valor={formatarNumero(indicadores.total_visitas)}
+                    />
+                    <Indicador
+                        icon={Building2}
+                        titulo="Hospitais visitados"
+                        valor={formatarNumero(indicadores.hospitais_visitados)}
+                    />
+                    <Indicador
+                        icon={UsersRound}
+                        titulo="Participações confirmadas"
+                        valor={formatarNumero(indicadores.total_participacoes)}
+                    />
+                    <Indicador
+                        icon={BarChart3}
+                        titulo="Média por visita"
+                        valor={formatarNumero(
+                            indicadores.media_participantes,
+                            1,
+                        )}
+                    />
+                    <Indicador
+                        icon={Sparkles}
+                        titulo="Impacto estimado"
+                        valor={formatarNumero(indicadores.impacto_estimado)}
+                        detalhe={`${indicadores.visitas_sem_impacto} sem impacto informado`}
+                    />
                 </section>
 
                 <section className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm">
-                    <h2 className="font-semibold text-amber-950">Evolução mensal</h2>
-                    <p className="mt-1 text-sm text-amber-900/50">Quantidade de visitas não canceladas por mês.</p>
+                    <h2 className="font-semibold text-amber-950">
+                        Evolução mensal
+                    </h2>
+                    <p className="mt-1 text-sm text-amber-900/50">
+                        Quantidade de visitas não canceladas por mês.
+                    </p>
                     <div className="mt-6 flex min-h-48 items-end gap-3 overflow-x-auto pb-2">
                         {evolucao.map((item) => (
-                            <div key={item.mes} className="flex min-w-14 flex-1 flex-col items-center gap-2">
-                                <span className="text-xs font-semibold text-amber-900">{item.total}</span>
+                            <div
+                                key={item.mes}
+                                className="flex min-w-14 flex-1 flex-col items-center gap-2"
+                            >
+                                <span className="text-xs font-semibold text-amber-900">
+                                    {item.total}
+                                </span>
                                 <div className="flex h-32 w-full items-end rounded-lg bg-amber-50 p-1">
                                     <div
                                         className="w-full rounded-md bg-gradient-to-t from-amber-600 to-yellow-400 transition-all"
-                                        style={{ height: `${Math.max((item.total / maiorEvolucao) * 100, item.total ? 6 : 0)}%` }}
+                                        style={{
+                                            height: `${Math.max((item.total / maiorEvolucao) * 100, item.total ? 6 : 0)}%`,
+                                        }}
                                         aria-label={`${item.rotulo}: ${item.total} visitas`}
                                     />
                                 </div>
-                                <span className="text-center text-[11px] text-gray-500 capitalize">{item.rotulo}</span>
+                                <span className="text-center text-[11px] text-gray-500 capitalize">
+                                    {item.rotulo}
+                                </span>
                             </div>
                         ))}
                     </div>
@@ -231,35 +297,75 @@ export default function Index({
 
                 <section className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
                     <div className="border-b border-amber-100 p-5">
-                        <h2 className="font-semibold text-amber-950">Hospitais no período</h2>
-                        <p className="mt-1 text-sm text-amber-900/50">Selecione um hospital para abrir o detalhamento.</p>
+                        <h2 className="font-semibold text-amber-950">
+                            Hospitais no período
+                        </h2>
+                        <p className="mt-1 text-sm text-amber-900/50">
+                            Selecione um hospital para abrir o detalhamento.
+                        </p>
                     </div>
                     {hospitais.length === 0 ? (
                         <EstadoVazio />
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[760px] text-left text-sm">
-                                <thead className="bg-amber-50/70 text-xs uppercase tracking-wide text-amber-900/60">
+                                <thead className="bg-amber-50/70 text-xs tracking-wide text-amber-900/60 uppercase">
                                     <tr>
-                                        <th className="px-5 py-3">Hospital</th><th className="px-4 py-3">Visitas</th><th className="px-4 py-3">Participações</th><th className="px-4 py-3">Média</th><th className="px-4 py-3">Impacto estimado</th>
+                                        <th className="px-5 py-3">Hospital</th>
+                                        <th className="px-4 py-3">Visitas</th>
+                                        <th className="px-4 py-3">
+                                            Participações
+                                        </th>
+                                        <th className="px-4 py-3">Média</th>
+                                        <th className="px-4 py-3">
+                                            Impacto estimado
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-amber-50">
                                     {hospitais.map((hospital) => (
-                                        <tr key={hospital.id} className="transition hover:bg-amber-50/40">
+                                        <tr
+                                            key={hospital.id}
+                                            className="transition hover:bg-amber-50/40"
+                                        >
                                             <td className="px-5 py-4">
                                                 <Link
-                                                    href={visitasPorHospital({ query: { ...filtros, hospital_id: hospital.id, ala_id: undefined } })}
+                                                    href={visitasPorHospital({
+                                                        query: {
+                                                            ...filtros,
+                                                            hospital_id:
+                                                                hospital.id,
+                                                            ala_id: undefined,
+                                                        },
+                                                    })}
                                                     className="font-semibold text-amber-800 hover:text-amber-950 hover:underline"
                                                 >
                                                     {hospital.nome}
                                                 </Link>
-                                                <span className="mt-0.5 block text-xs text-gray-500">{hospital.cidade}{hospital.possui_alas ? ' · possui alas' : ''}</span>
+                                                <span className="mt-0.5 block text-xs text-gray-500">
+                                                    {hospital.cidade}
+                                                    {hospital.possui_alas
+                                                        ? ' · possui alas'
+                                                        : ''}
+                                                </span>
                                             </td>
-                                            <td className="px-4 py-4 font-semibold">{hospital.total_visitas}</td>
-                                            <td className="px-4 py-4">{hospital.total_participacoes}</td>
-                                            <td className="px-4 py-4">{formatarNumero(hospital.media_participantes, 1)}</td>
-                                            <td className="px-4 py-4">{formatarNumero(hospital.impacto_estimado)}</td>
+                                            <td className="px-4 py-4 font-semibold">
+                                                {hospital.total_visitas}
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                {hospital.total_participacoes}
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                {formatarNumero(
+                                                    hospital.media_participantes,
+                                                    1,
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-4">
+                                                {formatarNumero(
+                                                    hospital.impacto_estimado,
+                                                )}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -271,38 +377,119 @@ export default function Index({
                 {detalhes && (
                     <section className="grid gap-6 xl:grid-cols-[0.8fr_2fr]">
                         <div className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm">
-                            <h2 className="font-semibold text-amber-950">Distribuição por ala</h2>
+                            <h2 className="font-semibold text-amber-950">
+                                Distribuição por ala
+                            </h2>
                             <div className="mt-4 space-y-3">
                                 {!detalhes.possui_alas && (
                                     <p className="rounded-xl bg-amber-50/70 px-4 py-3 text-sm text-amber-900/60">
-                                        Este hospital não possui alas cadastradas.
+                                        Este hospital não possui alas
+                                        cadastradas.
                                     </p>
                                 )}
                                 {detalhes.alas.map((ala) => (
-                                    <div key={ala.id ?? 'sem-ala'} className="flex items-center justify-between rounded-xl bg-amber-50/70 px-4 py-3">
-                                        <span className="text-sm font-medium text-amber-950">{ala.nome}</span>
-                                        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-amber-800">{ala.total_visitas}</span>
+                                    <div
+                                        key={ala.id ?? 'sem-ala'}
+                                        className="flex items-center justify-between rounded-xl bg-amber-50/70 px-4 py-3"
+                                    >
+                                        <span className="text-sm font-medium text-amber-950">
+                                            {ala.nome}
+                                        </span>
+                                        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-amber-800">
+                                            {ala.total_visitas}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
                         </div>
                         <div className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
-                            <div className="border-b border-amber-100 p-5"><h2 className="font-semibold text-amber-950">Visitas consideradas</h2></div>
+                            <div className="border-b border-amber-100 p-5">
+                                <h2 className="font-semibold text-amber-950">
+                                    Visitas consideradas
+                                </h2>
+                            </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[680px] text-left text-sm">
-                                    <thead className="bg-amber-50/70 text-xs uppercase text-amber-900/60"><tr><th className="px-5 py-3">Data</th><th className="px-4 py-3">Ala</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Participantes</th><th className="px-4 py-3">Impacto</th></tr></thead>
+                                    <thead className="bg-amber-50/70 text-xs text-amber-900/60 uppercase">
+                                        <tr>
+                                            <th className="px-5 py-3">Data</th>
+                                            <th className="px-4 py-3">Ala</th>
+                                            <th className="px-4 py-3">
+                                                Status
+                                            </th>
+                                            <th className="px-4 py-3">
+                                                Participantes
+                                            </th>
+                                            <th className="px-4 py-3">
+                                                Impacto
+                                            </th>
+                                        </tr>
+                                    </thead>
                                     <tbody className="divide-y divide-amber-50">
                                         {detalhes.visitas.data.map((visita) => (
-                                            <tr key={visita.id}><td className="px-5 py-4 font-medium">{formatarData(visita.inicio_em)}</td><td className="px-4 py-4">{visita.ala}</td><td className="px-4 py-4 capitalize">{visita.status.replaceAll('_', ' ')}</td><td className="px-4 py-4">{visita.participantes}</td><td className="px-4 py-4">{visita.impacto_estimado === null ? <span className="text-gray-400">Não informado</span> : formatarNumero(visita.impacto_estimado)}</td></tr>
+                                            <tr key={visita.id}>
+                                                <td className="px-5 py-4 font-medium">
+                                                    {formatarData(
+                                                        visita.inicio_em,
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    {visita.ala}
+                                                </td>
+                                                <td className="px-4 py-4 capitalize">
+                                                    {visita.status.replaceAll(
+                                                        '_',
+                                                        ' ',
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    {visita.participantes}
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    {visita.impacto_estimado ===
+                                                    null ? (
+                                                        <span className="text-gray-400">
+                                                            Não informado
+                                                        </span>
+                                                    ) : (
+                                                        formatarNumero(
+                                                            visita.impacto_estimado,
+                                                        )
+                                                    )}
+                                                </td>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
                             <div className="flex items-center justify-between border-t border-amber-100 p-4 text-sm text-gray-500">
-                                <span>Página {detalhes.visitas.current_page} de {detalhes.visitas.last_page}</span>
+                                <span>
+                                    Página {detalhes.visitas.current_page} de{' '}
+                                    {detalhes.visitas.last_page}
+                                </span>
                                 <div className="flex gap-2">
-                                    {detalhes.visitas.prev_page_url && <Link href={detalhes.visitas.prev_page_url} preserveScroll className="rounded-full border border-amber-200 px-3 py-1.5 text-amber-800 hover:bg-amber-50">Anterior</Link>}
-                                    {detalhes.visitas.next_page_url && <Link href={detalhes.visitas.next_page_url} preserveScroll className="rounded-full border border-amber-200 px-3 py-1.5 text-amber-800 hover:bg-amber-50">Próxima</Link>}
+                                    {detalhes.visitas.prev_page_url && (
+                                        <Link
+                                            href={
+                                                detalhes.visitas.prev_page_url
+                                            }
+                                            preserveScroll
+                                            className="rounded-full border border-amber-200 px-3 py-1.5 text-amber-800 hover:bg-amber-50"
+                                        >
+                                            Anterior
+                                        </Link>
+                                    )}
+                                    {detalhes.visitas.next_page_url && (
+                                        <Link
+                                            href={
+                                                detalhes.visitas.next_page_url
+                                            }
+                                            preserveScroll
+                                            className="rounded-full border border-amber-200 px-3 py-1.5 text-amber-800 hover:bg-amber-50"
+                                        >
+                                            Próxima
+                                        </Link>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -313,14 +500,58 @@ export default function Index({
     );
 }
 
-function Campo({ label, children }: { label: string; children: React.ReactNode }) {
-    return <label className="space-y-1.5 text-sm font-medium text-amber-950"><span>{label}</span>{children}</label>;
+function Campo({
+    label,
+    children,
+}: {
+    label: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <label className="space-y-1.5 text-sm font-medium text-amber-950">
+            <span>{label}</span>
+            {children}
+        </label>
+    );
 }
 
-function Indicador({ icon: Icone, titulo, valor, detalhe }: { icon: typeof CalendarRange; titulo: string; valor: string; detalhe?: string }) {
-    return <article className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><span className="text-sm font-medium text-amber-900/60">{titulo}</span><Icone className="size-5 text-amber-600/70" /></div><p className="mt-3 text-3xl font-bold tracking-tight text-amber-950">{valor}</p>{detalhe && <p className="mt-1 text-xs text-gray-400">{detalhe}</p>}</article>;
+function Indicador({
+    icon: Icone,
+    titulo,
+    valor,
+    detalhe,
+}: {
+    icon: typeof CalendarRange;
+    titulo: string;
+    valor: string;
+    detalhe?: string;
+}) {
+    return (
+        <article className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-amber-900/60">
+                    {titulo}
+                </span>
+                <Icone className="size-5 text-amber-600/70" />
+            </div>
+            <p className="mt-3 text-3xl font-bold tracking-tight text-amber-950">
+                {valor}
+            </p>
+            {detalhe && <p className="mt-1 text-xs text-gray-400">{detalhe}</p>}
+        </article>
+    );
 }
 
 function EstadoVazio() {
-    return <div className="px-5 py-12 text-center"><Building2 className="mx-auto size-9 text-amber-300" /><p className="mt-3 font-medium text-amber-950">Nenhuma visita encontrada</p><p className="mt-1 text-sm text-gray-500">Ajuste o período ou os filtros para consultar outros registros.</p></div>;
+    return (
+        <div className="px-5 py-12 text-center">
+            <Building2 className="mx-auto size-9 text-amber-300" />
+            <p className="mt-3 font-medium text-amber-950">
+                Nenhuma visita encontrada
+            </p>
+            <p className="mt-1 text-sm text-gray-500">
+                Ajuste o período ou os filtros para consultar outros registros.
+            </p>
+        </div>
+    );
 }

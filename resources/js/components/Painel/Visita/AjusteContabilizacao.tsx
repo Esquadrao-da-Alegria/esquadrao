@@ -1,25 +1,267 @@
-import InputError from '@/components/input-error'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { useForm } from '@inertiajs/react'
-import { History, ShieldCheck, UserRoundCog } from 'lucide-react'
-import { FormEvent, useState } from 'react'
+import InputError from '@/components/input-error';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { useForm } from '@inertiajs/react';
+import { History, ShieldCheck, UserRoundCog } from 'lucide-react';
+import { FormEvent, useState } from 'react';
 
-type Pessoa = { id: number; name: string }
-type Ajuste = { id: number; tipo: string; justificativa: string; created_at: string; voluntario: Pessoa; administrador: Pessoa }
-type Relatorio = { id: number; enviado_em: string; autor: Pessoa }
+type Pessoa = { id: number; name: string };
+type Ajuste = {
+    id: number;
+    tipo: string;
+    justificativa: string;
+    created_at: string;
+    voluntario: Pessoa;
+    administrador: Pessoa;
+};
+type Relatorio = { id: number; enviado_em: string; autor: Pessoa };
 
-export default function AjusteContabilizacao({ visitaId, voluntarios, relatorios, ajustes }: { visitaId: number; voluntarios: Pessoa[]; relatorios: Relatorio[]; ajustes: Ajuste[] }) {
-    const [aberto, setAberto] = useState(false)
-    const form = useForm({ tipo: 'correcao_participacao', voluntario_id: '', tipo_participacao: 'palhaco', relatorio_id: '', justificativa: '' })
-    const enviar = (event: FormEvent) => { event.preventDefault(); form.post(`/visitas/${visitaId}/ajustes-contabilizacao`, { preserveScroll: true, onSuccess: () => { form.reset(); setAberto(false) } }) }
+export default function AjusteContabilizacao({
+    visitaId,
+    voluntarios,
+    relatorios,
+    ajustes,
+}: {
+    visitaId: number;
+    voluntarios: Pessoa[];
+    relatorios: Relatorio[];
+    ajustes: Ajuste[];
+}) {
+    const [aberto, setAberto] = useState(false);
+    const form = useForm({
+        tipo: 'correcao_participacao',
+        voluntario_id: '',
+        tipo_participacao: 'palhaco',
+        relatorio_id: '',
+        justificativa: '',
+    });
+    const enviar = (event: FormEvent) => {
+        event.preventDefault();
+        form.post(`/visitas/${visitaId}/ajustes-contabilizacao`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                form.reset();
+                setAberto(false);
+            },
+        });
+    };
 
-    return <section className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><div><div className="flex items-center gap-2"><ShieldCheck className="size-4 text-amber-700" /><h3 className="font-semibold text-amber-950">Ajustes de contabilização</h3></div><p className="mt-1 text-xs text-amber-900/55">Correções excepcionais ficam registradas permanentemente.</p></div>
-            <Dialog open={aberto} onOpenChange={setAberto}><DialogTrigger asChild><button type="button" className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-50"><UserRoundCog className="size-4" />Novo ajuste</button></DialogTrigger><DialogContent className="max-h-[90vh] overflow-y-auto border-amber-100 bg-white sm:max-w-lg"><DialogHeader><DialogTitle>Ajustar contabilização</DialogTitle><DialogDescription>Selecione a correção e informe uma justificativa verificável.</DialogDescription></DialogHeader><form onSubmit={enviar} className="space-y-4">
-                <div><label className="mb-1 block text-sm font-medium text-amber-950">Correção</label><select className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm" value={form.data.tipo} onChange={e => form.setData('tipo', e.target.value)}><option value="correcao_participacao">Corrigir participante</option><option value="aceite_relatorio_fora_prazo">Aceitar relatório fora do prazo</option></select></div>
-                {form.data.tipo === 'correcao_participacao' ? <><div><label className="mb-1 block text-sm font-medium text-amber-950">Voluntário</label><select className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm" value={form.data.voluntario_id} onChange={e => form.setData('voluntario_id', e.target.value)}><option value="">Selecione</option>{voluntarios.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}</select><InputError message={form.errors.voluntario_id} /></div><div><label className="mb-1 block text-sm font-medium text-amber-950">Participação correta</label><select className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm" value={form.data.tipo_participacao} onChange={e => form.setData('tipo_participacao', e.target.value)}><option value="palhaco">Palhaço/artista</option><option value="paisana">Paisana</option></select></div></> : <div><label className="mb-1 block text-sm font-medium text-amber-950">Relatório atrasado</label><select className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm" value={form.data.relatorio_id} onChange={e => form.setData('relatorio_id', e.target.value)}><option value="">Selecione</option>{relatorios.map(r => <option key={r.id} value={r.id}>{r.autor.name} · {new Date(r.enviado_em).toLocaleDateString('pt-BR')}</option>)}</select><InputError message={form.errors.relatorio_id} /></div>}
-                <div><label className="mb-1 block text-sm font-medium text-amber-950">Justificativa</label><textarea rows={4} className="w-full resize-none rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm" value={form.data.justificativa} onChange={e => form.setData('justificativa', e.target.value)} /><InputError message={form.errors.justificativa} /></div><button disabled={form.processing} className="w-full rounded-full border-2 border-amber-600 bg-white px-5 py-2.5 font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-50">Registrar ajuste</button>
-            </form></DialogContent></Dialog>
-        </div><div className="p-5"><div className="mb-3 flex items-center gap-2 text-sm font-medium text-amber-950"><History className="size-4" />Histórico auditável</div>{!ajustes.length ? <p className="text-sm text-amber-900/50">Nenhum ajuste registrado.</p> : <div className="space-y-3">{ajustes.map(a => <div key={a.id} className="rounded-xl border border-amber-100 bg-amber-50/30 p-4 text-sm"><div className="flex flex-wrap justify-between gap-2"><strong className="text-amber-950">{a.tipo === 'correcao_participacao' ? 'Participação corrigida' : 'Relatório atrasado aceito'}</strong><span className="text-amber-900/45">{new Date(a.created_at).toLocaleString('pt-BR')}</span></div><p className="mt-1 text-amber-900/70">{a.voluntario.name} · por {a.administrador.name}</p><p className="mt-2 text-amber-900/60">{a.justificativa}</p></div>)}</div>}</div>
-    </section>
+    return (
+        <section className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
+            <div className="flex flex-col gap-3 border-b border-amber-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <ShieldCheck className="size-4 text-amber-700" />
+                        <h3 className="font-semibold text-amber-950">
+                            Ajustes de contabilização
+                        </h3>
+                    </div>
+                    <p className="mt-1 text-xs text-amber-900/55">
+                        Correções excepcionais ficam registradas
+                        permanentemente.
+                    </p>
+                </div>
+                <Dialog open={aberto} onOpenChange={setAberto}>
+                    <DialogTrigger asChild>
+                        <button
+                            type="button"
+                            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-50"
+                        >
+                            <UserRoundCog className="size-4" />
+                            Novo ajuste
+                        </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto border-amber-100 bg-white sm:max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle>Ajustar contabilização</DialogTitle>
+                            <DialogDescription>
+                                Selecione a correção e informe uma justificativa
+                                verificável.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={enviar} className="space-y-4">
+                            <InputError
+                                message={
+                                    (form.errors as Record<string, string>)
+                                        .visita ||
+                                    (form.errors as Record<string, string>)
+                                        .geral
+                                }
+                            />
+                            <div>
+                                <label className="mb-1 block text-sm font-medium text-amber-950">
+                                    Correção
+                                </label>
+                                <select
+                                    className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm"
+                                    value={form.data.tipo}
+                                    onChange={(e) =>
+                                        form.setData('tipo', e.target.value)
+                                    }
+                                >
+                                    <option value="correcao_participacao">
+                                        Corrigir participante
+                                    </option>
+                                    <option value="aceite_relatorio_fora_prazo">
+                                        Aceitar relatório fora do prazo
+                                    </option>
+                                </select>
+                            </div>
+                            {form.data.tipo === 'correcao_participacao' ? (
+                                <>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-amber-950">
+                                            Voluntário
+                                        </label>
+                                        <select
+                                            className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm"
+                                            value={form.data.voluntario_id}
+                                            onChange={(e) =>
+                                                form.setData(
+                                                    'voluntario_id',
+                                                    e.target.value,
+                                                )
+                                            }
+                                        >
+                                            <option value="">Selecione</option>
+                                            {voluntarios.map((v) => (
+                                                <option key={v.id} value={v.id}>
+                                                    {v.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <InputError
+                                            message={form.errors.voluntario_id}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="mb-1 block text-sm font-medium text-amber-950">
+                                            Participação correta
+                                        </label>
+                                        <select
+                                            className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm"
+                                            value={form.data.tipo_participacao}
+                                            onChange={(e) =>
+                                                form.setData(
+                                                    'tipo_participacao',
+                                                    e.target.value,
+                                                )
+                                            }
+                                        >
+                                            <option value="palhaco">
+                                                Palhaço/artista
+                                            </option>
+                                            <option value="paisana">
+                                                Paisana
+                                            </option>
+                                        </select>
+                                    </div>
+                                </>
+                            ) : (
+                                <div>
+                                    <label className="mb-1 block text-sm font-medium text-amber-950">
+                                        Relatório atrasado
+                                    </label>
+                                    <select
+                                        className="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm"
+                                        value={form.data.relatorio_id}
+                                        onChange={(e) =>
+                                            form.setData(
+                                                'relatorio_id',
+                                                e.target.value,
+                                            )
+                                        }
+                                    >
+                                        <option value="">Selecione</option>
+                                        {relatorios.map((r) => (
+                                            <option key={r.id} value={r.id}>
+                                                {r.autor.name} ·{' '}
+                                                {new Date(
+                                                    r.enviado_em,
+                                                ).toLocaleDateString('pt-BR')}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError
+                                        message={form.errors.relatorio_id}
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <label className="mb-1 block text-sm font-medium text-amber-950">
+                                    Justificativa
+                                </label>
+                                <textarea
+                                    rows={4}
+                                    className="w-full resize-none rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm"
+                                    value={form.data.justificativa}
+                                    onChange={(e) =>
+                                        form.setData(
+                                            'justificativa',
+                                            e.target.value,
+                                        )
+                                    }
+                                />
+                                <InputError
+                                    message={form.errors.justificativa}
+                                />
+                            </div>
+                            <button
+                                disabled={form.processing}
+                                className="w-full rounded-full border-2 border-amber-600 bg-white px-5 py-2.5 font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-50"
+                            >
+                                Registrar ajuste
+                            </button>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+            </div>
+            <div className="p-5">
+                <div className="mb-3 flex items-center gap-2 text-sm font-medium text-amber-950">
+                    <History className="size-4" />
+                    Histórico auditável
+                </div>
+                {!ajustes.length ? (
+                    <p className="text-sm text-amber-900/50">
+                        Nenhum ajuste registrado.
+                    </p>
+                ) : (
+                    <div className="space-y-3">
+                        {ajustes.map((a) => (
+                            <div
+                                key={a.id}
+                                className="rounded-xl border border-amber-100 bg-amber-50/30 p-4 text-sm"
+                            >
+                                <div className="flex flex-wrap justify-between gap-2">
+                                    <strong className="text-amber-950">
+                                        {a.tipo === 'correcao_participacao'
+                                            ? 'Participação corrigida'
+                                            : 'Relatório atrasado aceito'}
+                                    </strong>
+                                    <span className="text-amber-900/45">
+                                        {new Date(a.created_at).toLocaleString(
+                                            'pt-BR',
+                                        )}
+                                    </span>
+                                </div>
+                                <p className="mt-1 text-amber-900/70">
+                                    {a.voluntario.name} · por{' '}
+                                    {a.administrador.name}
+                                </p>
+                                <p className="mt-2 text-amber-900/60">
+                                    {a.justificativa}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </section>
+    );
 }

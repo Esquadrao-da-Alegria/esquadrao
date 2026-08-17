@@ -1,17 +1,17 @@
-import { type FC } from 'react'
-import type { Evento } from '@/types'
-import { Calendar } from 'lucide-react'
+import type { Evento } from '@/types';
+import { Calendar } from 'lucide-react';
+import { type FC } from 'react';
 
 interface Props {
-    evento: Evento
-    onClick: () => void
+    evento: Evento;
+    onClick: () => void;
 }
 
 const EventoCardShow: FC<Props> = ({ evento, onClick }) => {
     const hora = new Date(evento.data_inicio).toLocaleTimeString('pt-BR', {
         hour: '2-digit',
         minute: '2-digit',
-    })
+    });
 
     return (
         <button
@@ -21,10 +21,12 @@ const EventoCardShow: FC<Props> = ({ evento, onClick }) => {
         >
             <span className="flex items-center gap-1 truncate">
                 <Calendar className="size-3 shrink-0 opacity-80" />
-                <span className="truncate">{hora} · {evento.titulo}</span>
+                <span className="truncate">
+                    {hora} · {evento.titulo}
+                </span>
             </span>
         </button>
-    )
-}
+    );
+};
 
-export default EventoCardShow
+export default EventoCardShow;

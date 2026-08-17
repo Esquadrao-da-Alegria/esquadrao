@@ -61,6 +61,22 @@ Registra os convites emitidos:
 - status, envio, uso e expiração;
 - usuário administrador que criou o convite, quando disponível.
 
+### Tabela `voluntario_afastamentos`
+
+Registra licenças e atestados médicos dos voluntários:
+
+| Coluna | Obrigatoriedade | Descrição |
+|---|---|---|
+| `id` | obrigatória | Chave primária. |
+| `voluntario_id` | obrigatória | FK para `voluntarios.id` com `cascadeOnDelete`. |
+| `registrado_por_id` | opcional | FK para `users.id` (administrador que registrou a licença), com `nullOnDelete`. |
+| `data_inicio` | obrigatória | Data inicial do afastamento. |
+| `data_fim` | obrigatória | Data final do afastamento. |
+| `motivo` | obrigatória | Enum `MotivoAfastamento` (`atestado_medico`, `licenca_pessoal`, `estudos`, `outro`). |
+| `observacoes` | opcional | Justificativa / texto livre sobre o afastamento ou histórico de prorrogações. |
+| `status` | obrigatória | Enum `StatusAfastamento` (`ativo`, `encerrado`, `prorrogado`, `cancelado`). |
+| `created_at`, `updated_at` | automáticas | Auditoria básica. |
+
 ### Cargos
 
 Os cargos continuam pertencendo à conta de acesso. A pivot histórica `voluntario_cargo` conserva esse nome, mas sua coluna `voluntario_id` referencia `users.id`, não `voluntarios.id`.
@@ -78,9 +94,13 @@ Voluntario::user()              // hasOne User
 Voluntario::cidadeBase()        // belongsTo Cidade
 Voluntario::convitesCadastro()  // hasMany ConviteCadastro
 Voluntario::conviteCadastroAtual() // hasOne, latestOfMany
+Voluntario::afastamentos()      // hasMany VoluntarioAfastamento
+Voluntario::afastamentoAtivo()  // hasOne VoluntarioAfastamento (ativo no período atual)
+VoluntarioAfastamento::voluntario() // belongsTo Voluntario
+VoluntarioAfastamento::registradoPor() // belongsTo User
 ```
 
-O model `Voluntario` expõe alguns accessors de compatibilidade (`name`, cargos e datas de convite) para manter as páginas administrativas funcionando enquanto elas consomem a entidade separada.
+O model `Voluntario` expõe accessors de compatibilidade (`name`, cargos e datas de convite) e controle de licença (`esta_afastado`, `afastamento_atual`).
 
 ---
 
@@ -95,6 +115,8 @@ Os estados preservados no código são:
 | `User::STATUS_INATIVO` | `inativo` | Voluntário inativado. |
 
 Os convites possuem estados próprios em `ConviteCadastro`: pendente, enviado, utilizado, expirado e cancelado.
+
+Os afastamentos possuem estados próprios em `StatusAfastamento`: ativo, encerrado, prorrogado e cancelado.
 
 Na listagem administrativa, esses estados são consolidados como `Pendente`, `Aceito`, `Expirado` e `Cancelado`. Convites enviados e ainda válidos são apresentados como pendentes.
 
@@ -141,6 +163,21 @@ Na conclusão, uma transação atualiza o voluntário, define a data de entrada 
 
 A exclusão administrativa é lógica no fluxo de serviço: o voluntário e sua conta recebem status inativo, e a conta registra `inativado_em`. O administrador não pode inativar o próprio voluntário pela tela.
 
+### Gerenciamento de Afastamentos e Atestados
+
+1. **Cadastro de Afastamento / Atestado**:
+   - Administrador ou gestor informa data de início, data de fim, motivo (`atestado_medico`, `licenca_pessoal`, `estudos`, `outro`) e observações.
+   - O sistema cria o registro com status `ativo`.
+   - Automaticamente cancela todas as inscrições agendadas do voluntário (`visitas_participantes`) em visitas com `inicio_em` compreendido dentro do período de afastamento.
+2. **Bloqueio de Novas Inscrições**:
+   - Durante o período de afastamento (`$voluntario->estaAfastado($visita->inicio_em)`), qualquer tentativa de auto-inscrição do voluntário ou adição manual por gestor é bloqueada com mensagem clara explicativa.
+3. **Prorrogação de Afastamento**:
+   - Administrador pode prorrogar a licença informando nova data de fim (maior que a atual) e justificativa.
+   - O status é atualizado para `prorrogado`, as observações registram o histórico com timestamp e as visitas agendadas no novo período estendido são canceladas.
+4. **Encerramento Antecipado**:
+   - Administrador pode encerrar o afastamento a qualquer momento.
+   - O status é atualizado para `encerrado`, a `data_fim` é definida como a data atual e o voluntário volta a poder participar de novas visitas normalmente.
+
 ---
 
 ## Autenticação e autorização
@@ -170,13 +207,20 @@ A exclusão administrativa é lógica no fluxo de serviço: o voluntário e sua 
 
 - `app/Models/User.php`
 - `app/Models/Voluntario.php`
+- `app/Models/VoluntarioAfastamento.php`
 - `app/Models/ConviteCadastro.php`
+- `app/Enums/StatusAfastamento.php`
+- `app/Enums/MotivoAfastamento.php`
 - `app/Http/Controllers/Web/VoluntarioController.php`
 - `app/Http/Controllers/Web/ConviteCadastroController.php`
+- `app/Http/Controllers/Web/Voluntario/Afastamento/Controller.php`
 - `app/Services/Voluntario/Service.php`
+- `app/Services/Voluntario/Afastamento/Service.php`
 - `app/Queries/Voluntario/Queries.php`
+- `app/Queries/Voluntario/Afastamento/Queries.php`
 - `app/Http/Middleware/UserAdministrador.php`
 - `resources/js/Pages/Voluntario/`
+- `resources/js/components/Painel/Voluntario/Listagem/AfastamentoModal.tsx`
 - `resources/js/Pages/Convites/CompletarCadastro.tsx`
 - `resources/js/layouts/PainelLayout.tsx`
 - `routes/web.php`
@@ -187,6 +231,7 @@ Migrations principais:
 - `2026_06_08_010000_create_convites_cadastro_table.php`
 - `2026_06_23_000000_add_complementary_fields_to_voluntarios_table.php`
 - `2026_06_23_010000_extend_pending_invites_to_seven_days.php`
+- `2026_08_15_000000_create_voluntario_afastamentos_table.php`
 
 ---
 

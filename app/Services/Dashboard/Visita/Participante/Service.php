@@ -31,10 +31,21 @@ class Service
             $tipo = $this->metaService->tipo($user);
             $validas = $dados['visitasValidas']->where('voluntario_id', $user->id);
             $porMes = $validas->groupBy(fn ($visita) => substr($visita->inicio_em, 0, 7))->map->count()->all();
+
+            $mesInicio = $user->voluntario?->data_entrada_ong
+                ? Carbon::parse($user->voluntario->data_entrada_ong)->format('Y-m')
+                : ($user->created_at ? $user->created_at->format('Y-m') : null);
+
+            $mesesCalculoUsuario = $mesInicio
+                ? array_values(array_filter($mesesCalculo, fn ($m) => $m >= $mesInicio))
+                : $mesesCalculo;
+
+            $mesesExibidosUsuario = array_values(array_filter($mesesExibidos, fn ($m) => ! $mesInicio || $m >= $mesInicio));
+
             $compensacoes = $tipo === 'visitas'
                 ? array_values(array_filter(
-                    $this->compensacaoService->calcular($porMes, $mesesCalculo),
-                    fn (array $mes) => in_array($mes['mes'], $mesesExibidos, true)
+                    $this->compensacaoService->calcular($porMes, $mesesCalculoUsuario),
+                    fn (array $mes) => in_array($mes['mes'], $mesesExibidosUsuario, true)
                 ))
                 : [];
             $presencas = $this->presencas($user, $dados, $filtros);
@@ -59,7 +70,7 @@ class Service
                 'oficinas' => $presencas['oficina'],
                 'ultima_atividade' => $ultimaAtividade?->toIso8601String(),
                 'dias_sem_atividade' => $diasSemAtividade,
-                'relatorios_pendentes' => $participacoes->where('possui_relatorio', 0)->count(),
+                'relatorios_pendentes' => $participacoes->where('possui_relatorio', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
                 'relatorios_fora_prazo' => $participacoes->where('possui_relatorio', 1)->where('possui_relatorio_no_prazo', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
                 'situacao' => $situacao,
             ];
@@ -180,7 +191,14 @@ class Service
 
     private function presencas(User $user, array $dados, array $filtros): array
     {
-        $eventosCidade = $dados['eventos']->where('cidade_id', $user->voluntario->cidade_base_id);
+        $mesInicio = $user->voluntario?->data_entrada_ong
+            ? Carbon::parse($user->voluntario->data_entrada_ong)->startOfMonth()
+            : ($user->created_at ? $user->created_at->copy()->startOfMonth() : null);
+
+        $eventosCidade = $dados['eventos']
+            ->where('cidade_id', $user->voluntario->cidade_base_id)
+            ->when($mesInicio, fn ($coll) => $coll->filter(fn ($e) => Carbon::parse($e->data_inicio)->gte($mesInicio)));
+
         $presentes = $dados['presencas']->where('user_id', $user->id);
         $resultado = [];
 
@@ -205,10 +223,16 @@ class Service
         if (in_array($tipo, ['administrativo', 'dados_insuficientes'], true)) return 'dados_insuficientes';
         if ($tipo === 'isento') return 'isento';
         if ($dias === null || $dias >= MetaService::INATIVIDADE_DIAS) return 'requer_analise';
-        if (collect($compensacoes)->contains('situacao', 'requer_analise')) return 'requer_analise';
 
-        if (collect($compensacoes)->contains('situacao', 'compensacao_pendente')) return 'compensacao_pendente';
-        if (collect($compensacoes)->contains('situacao', 'atencao')) return 'atencao';
+        $mesAtualFormatado = now()->format('Y-m');
+        $compMesAtual = collect($compensacoes)->firstWhere('mes', $mesAtualFormatado)
+            ?? ($compensacoes ? $compensacoes[array_key_last($compensacoes)] : null);
+
+        $compensacaoAtual = $compMesAtual ? $compMesAtual['situacao'] : null;
+
+        if ($compensacaoAtual === 'requer_analise') return 'requer_analise';
+        if ($compensacaoAtual === 'compensacao_pendente') return 'compensacao_pendente';
+        if ($compensacaoAtual === 'atencao') return 'atencao';
         if (collect($presencas)->contains(fn ($item) => $item['percentual'] !== null && $item['percentual'] < MetaService::META_PRESENCA)) return 'atencao';
 
         return 'dentro_meta';

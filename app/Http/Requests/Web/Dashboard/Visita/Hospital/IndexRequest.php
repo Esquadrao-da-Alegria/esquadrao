@@ -23,7 +23,11 @@ class IndexRequest extends FormRequest
             return true;
         }
 
-        $cidadeId = (int) $user->voluntario->cidade_base_id;
+        $cidadeId = (int) ($user->voluntario?->cidade_base_id ?? 0);
+        if ($cidadeId === 0) {
+            return false;
+        }
+
         $cidadeSolicitada = $this->integer('cidade_id') ?: null;
         $hospitalId = $this->integer('hospital_id') ?: null;
 

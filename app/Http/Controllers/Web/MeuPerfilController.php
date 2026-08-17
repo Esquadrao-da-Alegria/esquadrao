@@ -21,9 +21,17 @@ class MeuPerfilController extends Controller
 
         return Inertia::render('MeuPerfil/Edit', [
             'voluntario' => $voluntario ? [
-                ...$voluntario->toArray(),
+                'id'             => $voluntario->id,
+                'nome_completo'  => $voluntario->nome_completo,
+                'nome_doutor'    => $voluntario->nome_doutor,
+                'telefone'       => $voluntario->telefone,
                 'data_nascimento' => $voluntario->data_nascimento?->format('Y-m-d'),
+                'status'         => $voluntario->status,
                 'data_entrada_ong' => $voluntario->data_entrada_ong?->format('Y-m-d'),
+                'url_foto'       => $voluntario->url_foto,
+                'cidade_base'    => $voluntario->cidadeBase
+                    ? ['nome' => $voluntario->cidadeBase->nome]
+                    : null,
             ] : null,
         ]);
     }
@@ -36,12 +44,19 @@ class MeuPerfilController extends Controller
             return back()->with('mensagem_erro', 'Perfil de voluntário não encontrado.');
         }
 
-        $validated = $request->validate([
+        $ehArtista = $request->user()->cargos?->contains('slug', 'artista') ?? false;
+
+        $rules = [
             'nome_completo'   => ['required', 'string', 'max:255'],
-            'nome_doutor'     => ['nullable', 'string', 'max:255'],
             'telefone'        => ['nullable', 'string', 'max:30'],
             'data_nascimento' => ['nullable', 'date', 'before:today'],
-        ]);
+        ];
+
+        if ($ehArtista) {
+            $rules['nome_doutor'] = ['nullable', 'string', 'max:255'];
+        }
+
+        $validated = $request->validate($rules);
 
         $voluntario->update($validated);
 
@@ -60,9 +75,7 @@ class MeuPerfilController extends Controller
             'foto' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        if ($voluntario->foto_perfil) {
-            Storage::disk('public')->delete($voluntario->foto_perfil);
-        }
+        $fotoAnterior = $voluntario->foto_perfil;
 
         $caminho = "voluntarios/{$voluntario->id}/" . Str::uuid() . '.jpg';
 
@@ -72,6 +85,10 @@ class MeuPerfilController extends Controller
 
         Storage::disk('public')->put($caminho, $encoded);
         $voluntario->update(['foto_perfil' => $caminho]);
+
+        if ($fotoAnterior) {
+            Storage::disk('public')->delete($fotoAnterior);
+        }
 
         return back()->with('mensagem_sucesso', 'Foto atualizada com sucesso.');
     }

@@ -20,6 +20,7 @@ class UpdateRequest extends FormRequest
         return [
             'tipo_relatorio'                 => ['required', 'string', Rule::enum(TipoRelatorio::class)],
             'ala_unidade_id'                 => ['nullable', 'integer', 'exists:alas_hospitais,id'],
+            'unidades_visitadas'             => ['nullable', 'string', 'max:5000'],
             'resumo'                         => ['required', 'string', 'max:5000'],
             'feedback'                       => ['nullable', 'string', 'max:5000'],
             'quartos_visitados'              => ['nullable', 'integer', 'min:0'],

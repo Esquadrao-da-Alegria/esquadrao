@@ -110,7 +110,9 @@ class Service
             ->where('status_participacao', StatusParticipacao::Confirmado->value)
             ->first();
 
-        if (! $participacao) {
+        $autorEhAdmin = $autor->cargos()->where('slug', 'administrador')->exists();
+
+        if (! $participacao && ! $autorEhAdmin) {
             throw ValidationException::withMessages(['relatorio_id' => 'O autor precisa possuir participação confirmada nesta visita.']);
         }
 
@@ -118,13 +120,15 @@ class Service
             throw ValidationException::withMessages(['relatorio_id' => 'Este relatório já possui aceite administrativo.']);
         }
 
+        $tipoParticipacao = $participacao?->tipo_participacao?->value ?? TipoParticipacao::Palhaco->value;
+
         return VisitaAjusteContabilizacao::query()->create([
             'visita_id' => $visita->id,
             'voluntario_id' => $autor->id,
             'relatorio_id' => $relatorio->id,
             'administrador_id' => $administrador->id,
             'tipo' => TipoAjusteContabilizacao::AceiteRelatorioForaPrazo,
-            'tipo_participacao' => $participacao->tipo_participacao,
+            'tipo_participacao' => $tipoParticipacao,
             'justificativa' => $dados['justificativa'],
             'dados_anteriores' => ['fora_do_prazo' => true, 'aceito_para_contabilizacao' => false],
             'dados_posteriores' => ['fora_do_prazo' => true, 'aceito_para_contabilizacao' => true],
@@ -139,8 +143,6 @@ class Service
 
     private function validarConflitoInteresse(User $administrador, User $voluntario): void
     {
-        if ($administrador->is($voluntario)) {
-            throw ValidationException::withMessages(['voluntario_id' => 'O administrador não pode registrar um ajuste para si mesmo.']);
-        }
+        // Permite que administradores registrem ajustes para qualquer voluntário/relatório, incluindo si mesmos.
     }
 }

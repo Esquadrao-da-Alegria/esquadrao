@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cargo;
 use App\Models\User;
 use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,7 +60,6 @@ class MeuPerfilTest extends TestCase
         $this->actingAs($user)
             ->patch(route('meu-perfil.update'), [
                 'nome_completo'   => 'Novo Nome Completo',
-                'nome_doutor'     => 'Dr. Novo',
                 'telefone'        => '51999998888',
                 'data_nascimento' => '1995-03-15',
             ])
@@ -68,12 +68,46 @@ class MeuPerfilTest extends TestCase
         $this->assertDatabaseHas('voluntarios', [
             'id'            => $voluntario->id,
             'nome_completo' => 'Novo Nome Completo',
-            'nome_doutor'   => 'Dr. Novo',
             'telefone'      => '51999998888',
         ]);
 
         $voluntario->refresh();
         $this->assertEquals('1995-03-15', $voluntario->data_nascimento->format('Y-m-d'));
+    }
+
+    public function test_artista_pode_atualizar_nome_doutor(): void
+    {
+        [$user, $voluntario] = $this->criarUsuarioVoluntario(['nome_doutor' => null]);
+        $cargo = Cargo::query()->firstOrCreate(['slug' => 'artista'], ['nome' => 'Artista']);
+        $user->cargos()->attach($cargo);
+        $user->unsetRelation('cargos');
+
+        $this->actingAs($user)
+            ->patch(route('meu-perfil.update'), [
+                'nome_completo' => $voluntario->nome_completo,
+                'nome_doutor'   => 'Dr. Alegria',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('voluntarios', [
+            'id'          => $voluntario->id,
+            'nome_doutor' => 'Dr. Alegria',
+        ]);
+    }
+
+    public function test_nao_artista_nao_pode_alterar_nome_doutor(): void
+    {
+        [$user, $voluntario] = $this->criarUsuarioVoluntario(['nome_doutor' => 'Dr. Original']);
+
+        $this->actingAs($user)
+            ->patch(route('meu-perfil.update'), [
+                'nome_completo' => $voluntario->nome_completo,
+                'nome_doutor'   => 'Dr. Invasor',
+            ])
+            ->assertRedirect();
+
+        $voluntario->refresh();
+        $this->assertEquals('Dr. Original', $voluntario->nome_doutor);
     }
 
     public function test_nome_completo_e_obrigatorio(): void
