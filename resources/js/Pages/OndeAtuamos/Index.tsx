@@ -1,7 +1,7 @@
 import MarketingLayout from '@/layouts/MarketingLayout';
+import { Hospital } from '@/types';
 import { useState } from 'react';
 import '../../../css/pages/hospitais.css';
-import { Hospital } from '@/types';
 
 interface ListaHospitais {
     porto_alegre: Hospital[];
@@ -16,8 +16,7 @@ interface Props {
 }
 
 const Index: React.FC<Props> = ({ hospitais }) => {
-
-    console.log(hospitais)
+    console.log(hospitais);
 
     const [cidadeSelecionada, setCidadeSelecionada] =
         useState<string>('porto_alegre');
@@ -37,15 +36,17 @@ const Index: React.FC<Props> = ({ hospitais }) => {
     const HospitalCard = ({ hospital }: { hospital: any }) => (
         <div className="mb-16 last:mb-0">
             <div
-                className={`flex flex-col items-center gap-8 lg:flex-row ${hospital.layout === 'reverse' ? 'lg:flex-row-reverse' : ''
-                    }`}
+                className={`flex flex-col items-center gap-8 lg:flex-row ${
+                    hospital.layout === 'reverse' ? 'lg:flex-row-reverse' : ''
+                }`}
             >
                 {/* Informações do Hospital */}
                 <div
-                    className={`flex-1 ${hospital.layout === 'reverse'
-                        ? 'lg:pl-8 lg:text-right'
-                        : 'lg:pr-8'
-                        }`}
+                    className={`flex-1 ${
+                        hospital.layout === 'reverse'
+                            ? 'lg:pl-8 lg:text-right'
+                            : 'lg:pr-8'
+                    }`}
                 >
                     <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-purple-50 p-8 shadow-lg transition-all duration-300 hover:shadow-xl">
                         <h3 className="mb-4 text-2xl leading-tight font-bold text-gray-800 md:text-3xl">
@@ -68,7 +69,7 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                     <img
                         src={hospital.url_foto}
                         alt={hospital.name}
-                        className="w-full h-64 md:h-90 object-contain"
+                        className="h-64 w-full object-contain md:h-90"
                     />
                 </div>
             </div>
@@ -136,10 +137,11 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                 {cidades.map((cidade) => (
                     <div
                         key={cidade.id}
-                        className={`group relative flex min-w-[220px] cursor-pointer items-center justify-between rounded-2xl border-2 border-transparent px-8 py-4 transition-all duration-500 ${cidadeSelecionada === cidade.id
-                            ? '-translate-y-2 scale-105 transform border-white/30 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl'
-                            : 'bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm hover:scale-105 hover:border-purple-300 hover:bg-gradient-to-r hover:from-white hover:to-purple-50 hover:shadow-xl'
-                            } `}
+                        className={`group relative flex min-w-[220px] cursor-pointer items-center justify-between rounded-2xl border-2 border-transparent px-8 py-4 transition-all duration-500 ${
+                            cidadeSelecionada === cidade.id
+                                ? '-translate-y-2 scale-105 transform border-white/30 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl'
+                                : 'bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm hover:scale-105 hover:border-purple-300 hover:bg-gradient-to-r hover:from-white hover:to-purple-50 hover:shadow-xl'
+                        } `}
                         onClick={() => handleExibriConteudo(cidade.id)}
                     >
                         {/* Efeito de brilho para o estado ativo */}
@@ -154,12 +156,11 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                         </span>
 
                         <div
-                            className={`
-                            relative ml-5 text-xl transition-all duration-500
-                            ${cidadeSelecionada === cidade.id
+                            className={`relative ml-5 text-xl transition-all duration-500 ${
+                                cidadeSelecionada === cidade.id
                                     ? 'rotate-180 text-purple-600'
-                                    : 'text-purple-500 group-hover:text-pink-500'}
-                        `}
+                                    : 'text-purple-500 group-hover:text-pink-500'
+                            } `}
                         >
                             ▾
                         </div>
@@ -174,36 +175,45 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Conteúdo das Cidades */}
                     <div className="space-y-12">
-                        {Object.entries(hospitais).map(([cidadeLoop, listaAgrupada]) => (
-                            <div
-                                key={cidadeLoop}
-                                className={`rounded-3xl p-8 transition-all duration-500 ${cidadeSelecionada === cidadeLoop
-                                    ? 'block scale-100 opacity-100'
-                                    : 'hidden scale-95 opacity-0'
+                        {Object.entries(hospitais).map(
+                            ([cidadeLoop, listaAgrupada]) => (
+                                <div
+                                    key={cidadeLoop}
+                                    className={`rounded-3xl p-8 transition-all duration-500 ${
+                                        cidadeSelecionada === cidadeLoop
+                                            ? 'block scale-100 opacity-100'
+                                            : 'hidden scale-95 opacity-0'
                                     }`}
-                            >
-                                <div className="mb-12 text-center">
-                                    <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-4xl font-black text-transparent md:text-5xl">
-                                        {cidadeLoop === 'porto_alegre' &&
-                                            'PORTO ALEGRE'}
-                                        {cidadeLoop === 'santa_maria' && 'SANTA MARIA'}
-                                        {cidadeLoop === 'pelotas' && 'PELOTAS'}
-                                        {cidadeLoop === 'canoas' && 'CANOAS'}
-                                        {cidadeLoop === 'sao_leopoldo' && 'SÃO LEOPOLDO'}
-                                    </h2>
-                                    <div className="mx-auto h-1 w-24 rounded-full bg-gradient-to-r from-purple-400 to-blue-400"></div>
-                                </div>
+                                >
+                                    <div className="mb-12 text-center">
+                                        <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-4xl font-black text-transparent md:text-5xl">
+                                            {cidadeLoop === 'porto_alegre' &&
+                                                'PORTO ALEGRE'}
+                                            {cidadeLoop === 'santa_maria' &&
+                                                'SANTA MARIA'}
+                                            {cidadeLoop === 'pelotas' &&
+                                                'PELOTAS'}
+                                            {cidadeLoop === 'canoas' &&
+                                                'CANOAS'}
+                                            {cidadeLoop === 'sao_leopoldo' &&
+                                                'SÃO LEOPOLDO'}
+                                        </h2>
+                                        <div className="mx-auto h-1 w-24 rounded-full bg-gradient-to-r from-purple-400 to-blue-400"></div>
+                                    </div>
 
-                                <div className="space-y-8">
-                                    {listaAgrupada.map((hospital: Hospital) => (
-                                        <HospitalCard
-                                            key={hospital.id}
-                                            hospital={hospital}
-                                        />
-                                    ))}
+                                    <div className="space-y-8">
+                                        {listaAgrupada.map(
+                                            (hospital: Hospital) => (
+                                                <HospitalCard
+                                                    key={hospital.id}
+                                                    hospital={hospital}
+                                                />
+                                            ),
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ),
+                        )}
                     </div>
                 </div>
             </div>

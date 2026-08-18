@@ -1,6 +1,6 @@
 // REACT/INERTIA
-import { useEffect, useState } from 'react';
 import { Link, router, usePage, type InertiaLinkProps } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 // UI
 import {
@@ -16,18 +16,19 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
 import { itensDashboards } from '@/lib/dashboard';
+import { cn } from '@/lib/utils';
 import { toastAviso, toastErro, toastSucesso } from '@/lib/utils/toast';
 
 // ROTAS
 import { dashboard, home, login, logout } from '@/routes';
+import { index as eventosIndex } from '@/routes/eventos';
 import { index } from '@/routes/hospitais';
-import { edit } from '@/routes/profile';
-import { index as eventosIndex } from '@/routes/eventos'
-import { index as visitasIndex } from '@/routes/visitas'
-import { index as voluntariosIndex } from '@/routes/voluntarios';
+import { edit as editMeuPerfil } from '@/routes/meu-perfil';
 import { index as patrocinadoresIndex } from '@/routes/patrocinadores';
+import { edit } from '@/routes/profile';
+import { index as visitasIndex } from '@/routes/visitas';
+import { index as voluntariosIndex } from '@/routes/voluntarios';
 
 // TIPOS
 import { type SharedData } from '@/types';
@@ -76,7 +77,9 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const user = props.auth?.user;
     const ehAdministrador = props.eh_administrador === true;
     const dashboardsVisiveis = itensDashboards.filter(
-        (item) => item.permissao === null || props.permissoes_dashboards?.[item.permissao] === true,
+        (item) =>
+            item.permissao === null ||
+            props.permissoes_dashboards?.[item.permissao] === true,
     );
 
     useEffect(() => {
@@ -87,11 +90,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
         if (mensagemSucesso) toastSucesso(mensagemSucesso);
         if (mensagemErro) toastErro(mensagemErro);
         if (mensagemAlerta) toastAviso(mensagemAlerta);
-    }, [
-        props.mensagem_sucesso,
-        props.mensagem_erro,
-        props.mensagem_alerta,
-    ]);
+    }, [props.mensagem_sucesso, props.mensagem_erro, props.mensagem_alerta]);
 
     useEffect(() => {
         if (rotaDashboardAtiva) setDashboardsOpen(true);
@@ -143,7 +142,8 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             titulo: 'Eventos',
             href: eventosIndex(),
             icone: CalendarDays,
-            ativo: pathname === '/eventos' || /^\/eventos(\/.*)?$/.test(pathname),
+            ativo:
+                pathname === '/eventos' || /^\/eventos(\/.*)?$/.test(pathname),
             visivel: true,
         },
         {
@@ -184,9 +184,17 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                 className="flex max-w-[14rem] items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pr-2 pl-2 text-left text-sm shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
                 aria-label="Menu da conta"
             >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-800">
-                    <User className="size-4" aria-hidden />
-                </span>
+                {user.voluntario?.url_foto ? (
+                    <img
+                        src={user.voluntario.url_foto}
+                        alt={user.name}
+                        className="size-8 shrink-0 rounded-full object-cover"
+                    />
+                ) : (
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-800">
+                        <User className="size-4" aria-hidden />
+                    </span>
+                )}
                 <span className="hidden min-w-0 flex-1 truncate sm:block">
                     <span className="block truncate font-medium text-gray-900">
                         {user.name}
@@ -202,15 +210,27 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                     Conta
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link
-                        href={edit()}
-                        className="flex cursor-pointer items-center gap-2"
-                    >
-                        <User className="size-4 shrink-0" />
-                        Perfil
-                    </Link>
-                </DropdownMenuItem>
+                {user?.voluntario ? (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            href={editMeuPerfil()}
+                            className="flex cursor-pointer items-center gap-2"
+                        >
+                            <User className="size-4 shrink-0" />
+                            Meu perfil
+                        </Link>
+                    </DropdownMenuItem>
+                ) : (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            href={edit()}
+                            className="flex cursor-pointer items-center gap-2"
+                        >
+                            <User className="size-4 shrink-0" />
+                            Perfil
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                     className="flex cursor-pointer items-center gap-2 text-gray-600 focus:text-gray-900"
@@ -277,7 +297,9 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     className="size-4 shrink-0 opacity-70"
                                     aria-hidden
                                 />
-                                <span className="flex-1 text-left">Dashboards</span>
+                                <span className="flex-1 text-left">
+                                    Dashboards
+                                </span>
                                 <ChevronRight
                                     className={`size-4 transition-transform ${
                                         dashboardsOpen ? 'rotate-90' : ''
@@ -289,7 +311,10 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 {dashboardsVisiveis.map((item) => {
                                     const Icone = item.icone;
                                     const ativo =
-                                        pathname === item.caminho || pathname.startsWith(`${item.caminho}/`) ||
+                                        pathname === item.caminho ||
+                                        pathname.startsWith(
+                                            `${item.caminho}/`,
+                                        ) ||
                                         pathname === item.caminho;
 
                                     return (
@@ -380,7 +405,9 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                             </span>
                                             <ChevronRight
                                                 className={`size-4 transition-transform ${
-                                                    dashboardsOpen ? 'rotate-90' : ''
+                                                    dashboardsOpen
+                                                        ? 'rotate-90'
+                                                        : ''
                                                 }`}
                                                 aria-hidden
                                             />
@@ -389,7 +416,10 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                             {dashboardsVisiveis.map((item) => {
                                                 const Icone = item.icone;
                                                 const ativo =
-                                                    pathname === item.caminho || pathname.startsWith(`${item.caminho}/`) ||
+                                                    pathname === item.caminho ||
+                                                    pathname.startsWith(
+                                                        `${item.caminho}/`,
+                                                    ) ||
                                                     pathname === item.caminho;
 
                                                 return (

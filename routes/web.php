@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\EventoPresencaController;
 use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\MeuEventoController;
+use App\Http\Controllers\Web\MeuPerfilController;
 use App\Http\Controllers\Web\ConviteCadastroController;
 use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
 use App\Http\Controllers\Web\Visita\Ajuste\Controller as VisitaAjusteController;
@@ -99,6 +100,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
+
+    Route::get('/meu-perfil', [MeuPerfilController::class, 'edit'])->name('meu-perfil.edit');
+    Route::patch('/meu-perfil', [MeuPerfilController::class, 'update'])->name('meu-perfil.update');
+    Route::post('/meu-perfil/foto', [MeuPerfilController::class, 'updateFoto'])->name('meu-perfil.foto.update');
+    Route::delete('/meu-perfil/foto', [MeuPerfilController::class, 'destroyFoto'])->name('meu-perfil.foto.destroy');
 
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
     Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');

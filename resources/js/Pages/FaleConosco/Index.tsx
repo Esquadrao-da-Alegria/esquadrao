@@ -107,7 +107,10 @@ const Index: React.FC = () => {
                                         className="space-y-6"
                                     >
                                         {/* Campo Honeypot (Armadilha Anti-Bot) */}
-                                        <div className="hidden" aria-hidden="true">
+                                        <div
+                                            className="hidden"
+                                            aria-hidden="true"
+                                        >
                                             <input
                                                 type="text"
                                                 name="honeypot"
@@ -183,9 +186,11 @@ const Index: React.FC = () => {
                                             type="button"
                                             onClick={handleSubmit}
                                             disabled={enviando}
-                                            className="w-full transform rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full transform rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
                                         >
-                                            {enviando ? 'Enviando...' : 'Enviar Mensagem'}
+                                            {enviando
+                                                ? 'Enviando...'
+                                                : 'Enviar Mensagem'}
                                         </button>
                                     </form>
                                 </div>
@@ -197,7 +202,7 @@ const Index: React.FC = () => {
                                         <img
                                             src="/assets/images/conheca_2.png"
                                             alt="Ilustração de contato"
-                                            className="relative w-full h-full rounded-2xl shadow-lg"
+                                            className="relative h-full w-full rounded-2xl shadow-lg"
                                         />
 
                                         {/* Elementos decorativos */}

@@ -1,36 +1,36 @@
-import PainelLayout from '@/layouts/PainelLayout'
-import { index, update } from '@/routes/hospitais'
-import { toast } from 'react-toastify'
-import React from 'react'
-import { Link, router, useForm } from '@inertiajs/react'
-import { ArrowLeft, Check } from 'lucide-react'
-import { AlaHospital, Cidade, Hospital } from '@/types'
+import PainelLayout from '@/layouts/PainelLayout';
+import { index, update } from '@/routes/hospitais';
+import { AlaHospital, Cidade, Hospital } from '@/types';
+import { Link, router, useForm } from '@inertiajs/react';
+import { ArrowLeft, Check } from 'lucide-react';
+import React from 'react';
+import { toast } from 'react-toastify';
 
 const inputClass =
-    'w-full rounded-xl border bg-white px-4 py-3 focus:outline-none focus:ring-2'
+    'w-full rounded-xl border bg-white px-4 py-3 focus:outline-none focus:ring-2';
 
-const labelClass = 'mb-2 block text-sm font-medium text-amber-900'
+const labelClass = 'mb-2 block text-sm font-medium text-amber-900';
 
 interface Props {
-    cidades: Cidade[]
-    hospital: Hospital
+    cidades: Cidade[];
+    hospital: Hospital;
 }
 
 interface CamposFormulario {
-    cidade_id: number
-    nome: string
-    cnpj: string
-    endereco: string
-    telefone: string
-    email: string
-    ativo: boolean
-    foto: File | null
-    alas: AlaHospital[]
-    observacoes?: string
+    cidade_id: number;
+    nome: string;
+    cnpj: string;
+    endereco: string;
+    telefone: string;
+    email: string;
+    ativo: boolean;
+    foto: File | null;
+    alas: AlaHospital[];
+    observacoes?: string;
 }
 
 const Edit: React.FC<Props> = ({ hospital, cidades }) => {
-    const [novaAla, setNovaAla] = React.useState('')
+    const [novaAla, setNovaAla] = React.useState('');
 
     const { data, setData, processing } = useForm<CamposFormulario>({
         cidade_id: hospital.cidade_id,
@@ -42,57 +42,58 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
         ativo: hospital.ativo,
         foto: null,
         alas: hospital.alas || [],
-        observacoes: hospital.observacoes
-    })
+        observacoes: hospital.observacoes,
+    });
 
     const handleDataChange = (campo: keyof CamposFormulario, valor: any) => {
-
         setData((prevData) => ({
             ...prevData,
-            [campo]: valor
-        }))
-    }
+            [campo]: valor,
+        }));
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] || null
+        const file = e.target.files?.[0] || null;
 
-        handleDataChange('foto', file)
-    }
+        handleDataChange('foto', file);
+    };
 
     const adicionarAla = () => {
-        const ala = novaAla.trim()
+        const ala = novaAla.trim();
 
-        if (!ala) return
+        if (!ala) return;
 
         if (data.alas.some((a) => a.nome === ala)) {
-            toast.warning('Essa ala ja foi adicionada.')
-            return
+            toast.warning('Essa ala ja foi adicionada.');
+            return;
         }
 
-        handleDataChange('alas', [...data.alas, { nome: ala }])
+        handleDataChange('alas', [...data.alas, { nome: ala }]);
 
-        setNovaAla('')
-    }
+        setNovaAla('');
+    };
 
     const removerAla = (nome: string) => {
-
-        handleDataChange('alas', data.alas.filter((ala) => ala.nome !== nome))
-    }
+        handleDataChange(
+            'alas',
+            data.alas.filter((ala) => ala.nome !== nome),
+        );
+    };
 
     const handleSubmit = async () => {
         if (!data.nome || !data.cnpj || !data.email || !data.telefone) {
-            toast.error('Preencha todos os campos obrigatórios!')
-            return
+            toast.error('Preencha todos os campos obrigatórios!');
+            return;
         }
 
         const url = update({ hospital: hospital.id! }).url;
 
-        router.post(url, { ...data as {}, _method: 'put' })
-    }
+        router.post(url, { ...(data as {}), _method: 'put' });
+    };
 
     return (
         <PainelLayout>
-            <section className="mx-auto w-full max-w-8xl px-4 py-16">
+            <section className="max-w-8xl mx-auto w-full px-4 py-16">
                 <div className="flex justify-center">
                     <div className="w-full max-w-7xl">
                         <div className="overflow-hidden rounded-3xl border bg-white">
@@ -104,13 +105,16 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                 <form
                                     id="hospital-form"
                                     onSubmit={(e) => {
-                                        e.preventDefault()
-                                        handleSubmit()
+                                        e.preventDefault();
+                                        handleSubmit();
                                     }}
                                     className="space-y-6"
                                 >
                                     <div>
-                                        <label htmlFor="nome" className={labelClass}>
+                                        <label
+                                            htmlFor="nome"
+                                            className={labelClass}
+                                        >
                                             Nome *
                                         </label>
                                         <input
@@ -120,13 +124,21 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             required
                                             placeholder="Digite o nome do hospital"
                                             value={data.nome}
-                                            onChange={(e) => handleDataChange('nome', e.target.value)}
+                                            onChange={(e) =>
+                                                handleDataChange(
+                                                    'nome',
+                                                    e.target.value,
+                                                )
+                                            }
                                             className={inputClass}
                                         />
                                     </div>
 
                                     <div>
-                                        <label htmlFor="cnpj" className={labelClass}>
+                                        <label
+                                            htmlFor="cnpj"
+                                            className={labelClass}
+                                        >
                                             CNPJ *
                                         </label>
                                         <input
@@ -136,14 +148,22 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             required
                                             placeholder="Digite o CNPJ (apenas números)"
                                             value={data.cnpj}
-                                            onChange={(e) => handleDataChange('cnpj', e.target.value)}
+                                            onChange={(e) =>
+                                                handleDataChange(
+                                                    'cnpj',
+                                                    e.target.value,
+                                                )
+                                            }
                                             maxLength={14}
                                             className={inputClass}
                                         />
                                     </div>
 
                                     <div>
-                                        <label htmlFor="email" className={labelClass}>
+                                        <label
+                                            htmlFor="email"
+                                            className={labelClass}
+                                        >
                                             Email *
                                         </label>
                                         <input
@@ -153,13 +173,21 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             required
                                             placeholder="Digite o email"
                                             value={data.email}
-                                            onChange={(e) => handleDataChange('email', e.target.value)}
+                                            onChange={(e) =>
+                                                handleDataChange(
+                                                    'email',
+                                                    e.target.value,
+                                                )
+                                            }
                                             className={inputClass}
                                         />
                                     </div>
 
                                     <div>
-                                        <label htmlFor="telefone" className={labelClass}>
+                                        <label
+                                            htmlFor="telefone"
+                                            className={labelClass}
+                                        >
                                             Telefone *
                                         </label>
                                         <input
@@ -169,13 +197,21 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             required
                                             placeholder="Digite o telefone"
                                             value={data.telefone}
-                                            onChange={(e) => handleDataChange('telefone', e.target.value)}
+                                            onChange={(e) =>
+                                                handleDataChange(
+                                                    'telefone',
+                                                    e.target.value,
+                                                )
+                                            }
                                             className={inputClass}
                                         />
                                     </div>
 
                                     <div>
-                                        <label htmlFor="endereco" className={labelClass}>
+                                        <label
+                                            htmlFor="endereco"
+                                            className={labelClass}
+                                        >
                                             Endereço *
                                         </label>
                                         <input
@@ -185,7 +221,12 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             required
                                             placeholder="Ex: R. Prof. Dr. Araújo, 538 - Centro, Pelotas - RS"
                                             value={data.endereco}
-                                            onChange={(e) => handleDataChange('endereco', e.target.value)}
+                                            onChange={(e) =>
+                                                handleDataChange(
+                                                    'endereco',
+                                                    e.target.value,
+                                                )
+                                            }
                                             className={inputClass}
                                         />
                                     </div>
@@ -203,13 +244,23 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             id="cidade_id"
                                             required
                                             value={data.cidade_id}
-                                            onChange={(e) => handleDataChange('cidade_id', Number(e.target.value))}
+                                            onChange={(e) =>
+                                                handleDataChange(
+                                                    'cidade_id',
+                                                    Number(e.target.value),
+                                                )
+                                            }
                                             className={inputClass}
                                         >
-                                            <option value="">Selecione uma cidade...</option>
+                                            <option value="">
+                                                Selecione uma cidade...
+                                            </option>
 
                                             {cidades.map((cidade: Cidade) => (
-                                                <option key={cidade.id} value={cidade.id}>
+                                                <option
+                                                    key={cidade.id}
+                                                    value={cidade.id}
+                                                >
                                                     {cidade.nome}
                                                 </option>
                                             ))}
@@ -217,7 +268,10 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="nova_ala" className={labelClass}>
+                                        <label
+                                            htmlFor="nova_ala"
+                                            className={labelClass}
+                                        >
                                             Alas do hospital
                                         </label>
 
@@ -228,11 +282,13 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                                 id="nova_ala"
                                                 placeholder="Digite o nome da ala"
                                                 value={novaAla}
-                                                onChange={(e) => setNovaAla(e.target.value)}
+                                                onChange={(e) =>
+                                                    setNovaAla(e.target.value)
+                                                }
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
-                                                        e.preventDefault()
-                                                        adicionarAla()
+                                                        e.preventDefault();
+                                                        adicionarAla();
                                                     }
                                                 }}
                                                 className={inputClass}
@@ -257,7 +313,9 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
 
                                                     <button
                                                         type="button"
-                                                        onClick={() => removerAla(ala.nome)}
+                                                        onClick={() =>
+                                                            removerAla(ala.nome)
+                                                        }
                                                         className="rounded-full px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-50 hover:text-amber-900"
                                                     >
                                                         Remover
@@ -268,7 +326,10 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="foto" className={labelClass}>
+                                        <label
+                                            htmlFor="foto"
+                                            className={labelClass}
+                                        >
                                             Foto
                                         </label>
                                         <input
@@ -282,7 +343,10 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="observacoes" className={labelClass}>
+                                        <label
+                                            htmlFor="observacoes"
+                                            className={labelClass}
+                                        >
                                             Observações
                                         </label>
                                         <textarea
@@ -291,9 +355,13 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             rows={4}
                                             placeholder="Digite observações adicionais"
                                             value={data.observacoes}
-                                            onChange={(e) => handleDataChange('observacoes', e.target.value)}
+                                            onChange={(e) =>
+                                                handleDataChange(
+                                                    'observacoes',
+                                                    e.target.value,
+                                                )
+                                            }
                                             className={`${inputClass} resize-none`}
-
                                         />
                                     </div>
 
@@ -303,14 +371,21 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             name="ativo"
                                             id="ativo"
                                             checked={data.ativo}
-                                            onChange={(e) => handleDataChange('ativo', e.target.checked)}
+                                            onChange={(e) =>
+                                                handleDataChange(
+                                                    'ativo',
+                                                    e.target.checked,
+                                                )
+                                            }
                                             className="h-4 w-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
                                         />
-                                        <label htmlFor="ativo" className="text-sm font-medium text-amber-900">
+                                        <label
+                                            htmlFor="ativo"
+                                            className="text-sm font-medium text-amber-900"
+                                        >
                                             Ativo
                                         </label>
                                     </div>
-
                                 </form>
                             </div>
 
@@ -338,7 +413,7 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                 </div>
             </section>
         </PainelLayout>
-    )
-}
+    );
+};
 
-export default Edit
+export default Edit;

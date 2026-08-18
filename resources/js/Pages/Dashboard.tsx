@@ -64,18 +64,21 @@ export default function Dashboard({
     resumo,
 }: Props) {
     const primeiroNome = contexto.nome.trim().split(' ')[0] || contexto.nome;
-    const meta = resumo.meta.situacao === 'isento'
-        ? 'Isento'
-        : resumo.meta.situacao === 'aplicavel'
-          ? `${resumo.meta.atual} de ${resumo.meta.objetivo}`
-          : 'Indisponível';
+    const meta =
+        resumo.meta.situacao === 'isento'
+            ? 'Isento'
+            : resumo.meta.situacao === 'aplicavel'
+              ? `${resumo.meta.atual} de ${resumo.meta.objetivo}`
+              : 'Indisponível';
 
     return (
         <PainelLayout>
             <Head title="Visão Geral" />
             <div className="mx-auto max-w-7xl space-y-6 px-5 py-8 sm:px-6 lg:px-8">
                 <header>
-                    <p className="text-sm font-semibold text-amber-700">Visão Geral</p>
+                    <p className="text-sm font-semibold text-amber-700">
+                        Visão Geral
+                    </p>
                     <h1 className="mt-1 text-2xl font-semibold text-amber-950 sm:text-3xl">
                         Olá, {primeiroNome}
                     </h1>
@@ -96,7 +99,9 @@ export default function Dashboard({
                             Conta administrativa sem voluntário vinculado
                         </h2>
                         <p className="mt-1 text-sm leading-relaxed text-amber-900/70">
-                            As informações pessoais permanecem vazias. Nenhum dado de outro voluntário é usado para preencher esta página.
+                            As informações pessoais permanecem vazias. Nenhum
+                            dado de outro voluntário é usado para preencher esta
+                            página.
                         </p>
                     </section>
                 )}
@@ -108,8 +113,15 @@ export default function Dashboard({
                     >
                         {proximas_atividades.length === 0 ? (
                             <Vazio texto="Você não possui atividades futuras confirmadas.">
-                                <Link href="/visitas" className="mt-2 inline-flex items-center gap-1 font-semibold text-amber-700 hover:underline">
-                                    Ver visitas disponíveis <ArrowRight className="size-4" aria-hidden />
+                                <Link
+                                    href="/visitas"
+                                    className="mt-2 inline-flex items-center gap-1 font-semibold text-amber-700 hover:underline"
+                                >
+                                    Ver visitas disponíveis{' '}
+                                    <ArrowRight
+                                        className="size-4"
+                                        aria-hidden
+                                    />
                                 </Link>
                             </Vazio>
                         ) : (
@@ -121,8 +133,10 @@ export default function Dashboard({
                                     >
                                         <div className="min-w-0">
                                             <div className="flex flex-wrap items-center gap-2">
-                                                <span className="text-xs font-semibold uppercase text-amber-700">
-                                                    {rotuloCategoria(atividade.categoria)}
+                                                <span className="text-xs font-semibold text-amber-700 uppercase">
+                                                    {rotuloCategoria(
+                                                        atividade.categoria,
+                                                    )}
                                                 </span>
                                                 <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                                                     {atividade.situacao}
@@ -132,10 +146,19 @@ export default function Dashboard({
                                                 {atividade.titulo}
                                             </h3>
                                             <p className="mt-1 truncate text-xs text-gray-500">
-                                                {formatarData(atividade.inicio_em)} às {formatarHora(atividade.inicio_em)} · {atividade.local}
+                                                {formatarData(
+                                                    atividade.inicio_em,
+                                                )}{' '}
+                                                às{' '}
+                                                {formatarHora(
+                                                    atividade.inicio_em,
+                                                )}{' '}
+                                                · {atividade.local}
                                             </p>
                                             {atividade.cidade && (
-                                                <p className="truncate text-xs text-gray-500">{atividade.cidade}</p>
+                                                <p className="truncate text-xs text-gray-500">
+                                                    {atividade.cidade}
+                                                </p>
                                             )}
                                         </div>
                                         <Link
@@ -143,7 +166,10 @@ export default function Dashboard({
                                             aria-label={`Ver ${atividade.titulo}`}
                                             className="flex size-9 shrink-0 items-center justify-center rounded-full border border-amber-200 text-amber-700 hover:bg-amber-50"
                                         >
-                                            <ArrowRight className="size-4" aria-hidden />
+                                            <ArrowRight
+                                                className="size-4"
+                                                aria-hidden
+                                            />
                                         </Link>
                                     </article>
                                 ))}
@@ -157,7 +183,10 @@ export default function Dashboard({
                     >
                         {pendencias.length === 0 ? (
                             <p className="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-                                <CheckCircle2 className="size-4 shrink-0" aria-hidden />
+                                <CheckCircle2
+                                    className="size-4 shrink-0"
+                                    aria-hidden
+                                />
                                 Está tudo em dia por aqui
                             </p>
                         ) : (
@@ -166,24 +195,39 @@ export default function Dashboard({
                                     <article
                                         key={pendencia.id}
                                         className={`rounded-xl border p-4 ${
-                                            pendencia.estado_prazo === 'atrasado'
+                                            pendencia.estado_prazo ===
+                                            'atrasado'
                                                 ? 'border-red-100 bg-red-50/60'
-                                                : pendencia.estado_prazo === 'prazo_proximo'
+                                                : pendencia.estado_prazo ===
+                                                    'prazo_proximo'
                                                   ? 'border-amber-200 bg-amber-50/70'
                                                   : 'border-amber-100'
                                         }`}
                                     >
                                         <div className="flex items-start gap-2">
-                                            <FileWarning className={`mt-0.5 size-4 shrink-0 ${pendencia.estado_prazo === 'atrasado' ? 'text-red-600' : 'text-amber-600'}`} aria-hidden />
+                                            <FileWarning
+                                                className={`mt-0.5 size-4 shrink-0 ${pendencia.estado_prazo === 'atrasado' ? 'text-red-600' : 'text-amber-600'}`}
+                                                aria-hidden
+                                            />
                                             <div>
-                                                <h3 className="text-sm font-semibold text-amber-950">{pendencia.titulo}</h3>
-                                                <p className="mt-1 text-xs text-gray-500">{pendencia.descricao}</p>
-                                                <p className={`mt-2 text-xs font-medium ${pendencia.estado_prazo === 'atrasado' ? 'text-red-700' : 'text-amber-800'}`}>
-                                                    {pendencia.estado_prazo === 'atrasado'
+                                                <h3 className="text-sm font-semibold text-amber-950">
+                                                    {pendencia.titulo}
+                                                </h3>
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    {pendencia.descricao}
+                                                </p>
+                                                <p
+                                                    className={`mt-2 text-xs font-medium ${pendencia.estado_prazo === 'atrasado' ? 'text-red-700' : 'text-amber-800'}`}
+                                                >
+                                                    {pendencia.estado_prazo ===
+                                                    'atrasado'
                                                         ? 'Prazo de 48 horas encerrado'
                                                         : `Prazo: ${formatarData(pendencia.prazo_em)} às ${formatarHora(pendencia.prazo_em)}`}
                                                 </p>
-                                                <Link href={pendencia.acao.url} className="mt-3 inline-flex text-sm font-semibold text-amber-700 hover:underline">
+                                                <Link
+                                                    href={pendencia.acao.url}
+                                                    className="mt-3 inline-flex text-sm font-semibold text-amber-700 hover:underline"
+                                                >
                                                     {pendencia.acao.titulo}
                                                 </Link>
                                             </div>
@@ -198,11 +242,22 @@ export default function Dashboard({
                 <section aria-labelledby="resumo-pessoal">
                     <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
                         <div>
-                            <h2 id="resumo-pessoal" className="font-semibold text-amber-950">Resumo pessoal</h2>
-                            <p className="mt-1 text-sm text-gray-500">Um recorte rápido da sua participação atual.</p>
+                            <h2
+                                id="resumo-pessoal"
+                                className="font-semibold text-amber-950"
+                            >
+                                Resumo pessoal
+                            </h2>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Um recorte rápido da sua participação atual.
+                            </p>
                         </div>
-                        <Link href="/dashboards/meu" className="inline-flex items-center gap-1 text-sm font-semibold text-amber-700 hover:underline">
-                            Ver meu dashboard <ArrowRight className="size-4" aria-hidden />
+                        <Link
+                            href="/dashboards/meu"
+                            className="inline-flex items-center gap-1 text-sm font-semibold text-amber-700 hover:underline"
+                        >
+                            Ver meu dashboard{' '}
+                            <ArrowRight className="size-4" aria-hidden />
                         </Link>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -228,7 +283,11 @@ export default function Dashboard({
                             icon={Target}
                             titulo="Situação da meta"
                             valor={meta}
-                            detalhe={resumo.meta.situacao === 'aplicavel' ? 'Visitas válidas neste mês' : 'Confira os detalhes no seu dashboard'}
+                            detalhe={
+                                resumo.meta.situacao === 'aplicavel'
+                                    ? 'Visitas válidas neste mês'
+                                    : 'Confira os detalhes no seu dashboard'
+                            }
                         />
                     </div>
                 </section>
@@ -236,25 +295,38 @@ export default function Dashboard({
                 <section className="rounded-2xl border border-amber-100 bg-gradient-to-r from-amber-50 to-yellow-50/50 p-5">
                     <div className="flex items-center gap-2">
                         <Bell className="size-4 text-amber-600" aria-hidden />
-                        <h2 className="font-semibold text-amber-950">Avisos e comunicados</h2>
+                        <h2 className="font-semibold text-amber-950">
+                            Avisos e comunicados
+                        </h2>
                     </div>
                     {avisos.length === 0 ? (
-                        <p className="mt-3 text-sm text-amber-900/60">Nenhum aviso no momento.</p>
+                        <p className="mt-3 text-sm text-amber-900/60">
+                            Nenhum aviso no momento.
+                        </p>
                     ) : (
                         <div className="mt-3 grid gap-2 md:grid-cols-2">
                             {avisos.map((aviso) => (
-                                <article key={aviso.id} className="flex gap-2 rounded-xl bg-white/80 px-4 py-3">
-                                    <CircleAlert className="mt-0.5 size-4 shrink-0 text-amber-600" aria-hidden />
+                                <article
+                                    key={aviso.id}
+                                    className="flex gap-2 rounded-xl bg-white/80 px-4 py-3"
+                                >
+                                    <CircleAlert
+                                        className="mt-0.5 size-4 shrink-0 text-amber-600"
+                                        aria-hidden
+                                    />
                                     <div>
-                                        <h3 className="text-sm font-semibold text-amber-950">{aviso.titulo}</h3>
-                                        <p className="mt-1 text-sm leading-relaxed text-amber-900/70">{aviso.mensagem}</p>
+                                        <h3 className="text-sm font-semibold text-amber-950">
+                                            {aviso.titulo}
+                                        </h3>
+                                        <p className="mt-1 text-sm leading-relaxed text-amber-900/70">
+                                            {aviso.mensagem}
+                                        </p>
                                     </div>
                                 </article>
                             ))}
                         </div>
                     )}
                 </section>
-
             </div>
         </PainelLayout>
     );
@@ -275,8 +347,12 @@ function Indicador({
         <article className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3">
                 <div>
-                    <p className="text-xs font-medium text-amber-900/60">{titulo}</p>
-                    <p className="mt-1 text-2xl font-bold text-amber-950">{valor}</p>
+                    <p className="text-xs font-medium text-amber-900/60">
+                        {titulo}
+                    </p>
+                    <p className="mt-1 text-2xl font-bold text-amber-950">
+                        {valor}
+                    </p>
                 </div>
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-50">
                     <Icone className="size-4 text-amber-600" aria-hidden />
@@ -305,7 +381,13 @@ function Bloco({
     );
 }
 
-function Vazio({ texto, children }: { texto: string; children?: React.ReactNode }) {
+function Vazio({
+    texto,
+    children,
+}: {
+    texto: string;
+    children?: React.ReactNode;
+}) {
     return (
         <div className="p-6 text-center text-sm text-gray-500">
             <p>{texto}</p>

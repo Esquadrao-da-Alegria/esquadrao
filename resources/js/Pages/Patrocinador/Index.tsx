@@ -1,27 +1,27 @@
-import PainelLayout from '@/layouts/PainelLayout'
-import { create } from '@/routes/patrocinadores'
-import { Link, router } from '@inertiajs/react'
-import { Handshake, Pencil, Plus } from 'lucide-react'
-import React from 'react'
+import PainelLayout from '@/layouts/PainelLayout';
+import { create } from '@/routes/patrocinadores';
+import { Link, router } from '@inertiajs/react';
+import { Handshake, Pencil, Plus } from 'lucide-react';
+import React from 'react';
 
 interface Patrocinador {
-    id?: string
-    nome: string
-    site?: string
-    categoria?: string
-    logo_path?: string
-    ativo: boolean
-    ordem_exibicao: number
+    id?: string;
+    nome: string;
+    site?: string;
+    categoria?: string;
+    logo_path?: string;
+    ativo: boolean;
+    ordem_exibicao: number;
 }
 
 interface Props {
-    patrocinadores: Patrocinador[]
+    patrocinadores: Patrocinador[];
 }
 
 const Index: React.FC<Props> = ({ patrocinadores }) => {
     const handleCriarClick = () => {
-        router.visit(create.url())
-    }
+        router.visit(create.url());
+    };
 
     return (
         <PainelLayout>
@@ -40,7 +40,7 @@ const Index: React.FC<Props> = ({ patrocinadores }) => {
                     <button
                         onClick={handleCriarClick}
                         type="button"
-                        className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 sm:w-auto"
+                        className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
                     >
                         <Plus className="size-5" strokeWidth={2} aria-hidden />
                         Novo patrocinador
@@ -85,7 +85,7 @@ const Index: React.FC<Props> = ({ patrocinadores }) => {
                                             )}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <h2 className="text-base font-semibold leading-snug text-amber-950 sm:text-lg">
+                                            <h2 className="text-base leading-snug font-semibold text-amber-950 sm:text-lg">
                                                 {patrocinador.nome}
                                             </h2>
                                             {patrocinador.categoria ? (
@@ -94,28 +94,36 @@ const Index: React.FC<Props> = ({ patrocinadores }) => {
                                                 </p>
                                             ) : null}
                                             <div className="mt-3 flex flex-wrap gap-1.5">
-                                                <span className="inline-flex items-center rounded-full border border-amber-200/80 bg-amber-50/80 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-amber-900">
-                                                    Ordem {patrocinador.ordem_exibicao}
+                                                <span className="inline-flex items-center rounded-full border border-amber-200/80 bg-amber-50/80 px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-amber-900 uppercase">
+                                                    Ordem{' '}
+                                                    {
+                                                        patrocinador.ordem_exibicao
+                                                    }
                                                 </span>
                                                 <span
-                                                    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide ${
+                                                    className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase ${
                                                         patrocinador.ativo
                                                             ? 'border-amber-200/80 bg-amber-50/80 text-amber-900'
                                                             : 'border-amber-100 bg-white text-amber-900/45'
                                                     }`}
                                                 >
-                                                    {patrocinador.ativo ? 'Ativo' : 'Inativo'}
+                                                    {patrocinador.ativo
+                                                        ? 'Ativo'
+                                                        : 'Inativo'}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="flex shrink-0 items-center justify-end border-t border-amber-50 pt-4 sm:w-auto sm:border-t-0 sm:border-l sm:border-amber-50 sm:pl-6 sm:pt-0">
+                                        <div className="flex shrink-0 items-center justify-end border-t border-amber-50 pt-4 sm:w-auto sm:border-t-0 sm:border-l sm:border-amber-50 sm:pt-0 sm:pl-6">
                                             <Link
                                                 href={`/patrocinadores/${patrocinador.id}/edit`}
                                                 prefetch
                                                 className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                                                 aria-label={`Editar ${patrocinador.nome}`}
                                             >
-                                                <Pencil size={17} strokeWidth={1.75} />
+                                                <Pencil
+                                                    size={17}
+                                                    strokeWidth={1.75}
+                                                />
                                             </Link>
                                         </div>
                                     </div>
@@ -126,7 +134,7 @@ const Index: React.FC<Props> = ({ patrocinadores }) => {
                 )}
             </div>
         </PainelLayout>
-    )
-}
+    );
+};
 
-export default Index
+export default Index;

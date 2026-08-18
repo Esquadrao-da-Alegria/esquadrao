@@ -1,25 +1,30 @@
-import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
-import { Cargo } from '@/types'
-import React from 'react'
+import {
+    painelInputClass,
+    painelLabelClass,
+} from '@/lib/painelFormFieldClasses';
+import { Cargo } from '@/types';
+import React from 'react';
 
 export interface VoluntarioFormValues {
-    name: string
-    email: string
-    password: string
-    password_confirmation: string
-    cargo_ids: number[]
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    cargo_ids: number[];
 }
 
 interface Props {
-    data: VoluntarioFormValues
-    errors: Partial<Record<keyof VoluntarioFormValues | 'cargo_ids' | 'cargo_ids.0', string>> &
-        Record<string, string | undefined>
-    cargos: Cargo[]
-    mode: 'create' | 'edit'
+    data: VoluntarioFormValues;
+    errors: Partial<
+        Record<keyof VoluntarioFormValues | 'cargo_ids' | 'cargo_ids.0', string>
+    > &
+        Record<string, string | undefined>;
+    cargos: Cargo[];
+    mode: 'create' | 'edit';
     onFieldChange: <K extends keyof VoluntarioFormValues>(
         campo: K,
         valor: VoluntarioFormValues[K],
-    ) => void
+    ) => void;
 }
 
 const VoluntarioFormShow: React.FC<Props> = ({
@@ -30,14 +35,14 @@ const VoluntarioFormShow: React.FC<Props> = ({
     onFieldChange,
 }) => {
     const toggleCargo = (cargoId: number) => {
-        const set = new Set(data.cargo_ids)
+        const set = new Set(data.cargo_ids);
         if (set.has(cargoId)) {
-            set.delete(cargoId)
+            set.delete(cargoId);
         } else {
-            set.add(cargoId)
+            set.add(cargoId);
         }
-        onFieldChange('cargo_ids', Array.from(set))
-    }
+        onFieldChange('cargo_ids', Array.from(set));
+    };
 
     return (
         <div className="space-y-6">
@@ -84,7 +89,10 @@ const VoluntarioFormShow: React.FC<Props> = ({
             {mode === 'create' ? (
                 <>
                     <div>
-                        <label htmlFor="voluntario_password" className={painelLabelClass}>
+                        <label
+                            htmlFor="voluntario_password"
+                            className={painelLabelClass}
+                        >
                             Senha *
                         </label>
                         <input
@@ -94,15 +102,22 @@ const VoluntarioFormShow: React.FC<Props> = ({
                             required
                             autoComplete="new-password"
                             value={data.password}
-                            onChange={(e) => onFieldChange('password', e.target.value)}
+                            onChange={(e) =>
+                                onFieldChange('password', e.target.value)
+                            }
                             className={painelInputClass}
                         />
                         {errors.password ? (
-                            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                            <p className="mt-1 text-sm text-red-600">
+                                {errors.password}
+                            </p>
                         ) : null}
                     </div>
                     <div>
-                        <label htmlFor="voluntario_password_confirmation" className={painelLabelClass}>
+                        <label
+                            htmlFor="voluntario_password_confirmation"
+                            className={painelLabelClass}
+                        >
                             Confirmar senha *
                         </label>
                         <input
@@ -113,7 +128,10 @@ const VoluntarioFormShow: React.FC<Props> = ({
                             autoComplete="new-password"
                             value={data.password_confirmation}
                             onChange={(e) =>
-                                onFieldChange('password_confirmation', e.target.value)
+                                onFieldChange(
+                                    'password_confirmation',
+                                    e.target.value,
+                                )
                             }
                             className={painelInputClass}
                         />
@@ -122,7 +140,10 @@ const VoluntarioFormShow: React.FC<Props> = ({
             ) : (
                 <>
                     <div>
-                        <label htmlFor="voluntario_password_edit" className={painelLabelClass}>
+                        <label
+                            htmlFor="voluntario_password_edit"
+                            className={painelLabelClass}
+                        >
                             Nova senha (opcional)
                         </label>
                         <input
@@ -131,11 +152,15 @@ const VoluntarioFormShow: React.FC<Props> = ({
                             id="voluntario_password_edit"
                             autoComplete="new-password"
                             value={data.password}
-                            onChange={(e) => onFieldChange('password', e.target.value)}
+                            onChange={(e) =>
+                                onFieldChange('password', e.target.value)
+                            }
                             className={painelInputClass}
                         />
                         {errors.password ? (
-                            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                            <p className="mt-1 text-sm text-red-600">
+                                {errors.password}
+                            </p>
                         ) : null}
                     </div>
                     <div>
@@ -152,7 +177,10 @@ const VoluntarioFormShow: React.FC<Props> = ({
                             autoComplete="new-password"
                             value={data.password_confirmation}
                             onChange={(e) =>
-                                onFieldChange('password_confirmation', e.target.value)
+                                onFieldChange(
+                                    'password_confirmation',
+                                    e.target.value,
+                                )
                             }
                             className={painelInputClass}
                         />
@@ -161,7 +189,9 @@ const VoluntarioFormShow: React.FC<Props> = ({
             )}
 
             <fieldset>
-                <legend className={`${painelLabelClass} mb-3`}>Cargos * (um ou mais)</legend>
+                <legend className={`${painelLabelClass} mb-3`}>
+                    Cargos * (um ou mais)
+                </legend>
                 <p className="mb-3 text-sm text-amber-900/60">
                     Marque todas as funções deste voluntário na organização.
                 </p>
@@ -183,11 +213,13 @@ const VoluntarioFormShow: React.FC<Props> = ({
                     ))}
                 </ul>
                 {errors.cargo_ids ? (
-                    <p className="mt-1 text-sm text-red-600">{errors.cargo_ids}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                        {errors.cargo_ids}
+                    </p>
                 ) : null}
             </fieldset>
         </div>
-    )
-}
+    );
+};
 
-export default VoluntarioFormShow
+export default VoluntarioFormShow;

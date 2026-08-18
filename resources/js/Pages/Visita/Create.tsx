@@ -1,63 +1,75 @@
 // REACT
-import { type FC } from 'react'
-import { Link, useForm, usePage } from '@inertiajs/react'
+import { Link, useForm, usePage } from '@inertiajs/react';
+import { type FC } from 'react';
 
 // UI
-import VisitaForm from '@/components/Painel/Visita/Formulario/Form'
-import PainelLayout from '@/layouts/PainelLayout'
-import { hojeLocal } from '@/lib/visita'
-import { ArrowLeft, Check } from 'lucide-react'
-import { toast } from 'react-toastify'
+import VisitaForm from '@/components/Painel/Visita/Formulario/Form';
+import PainelLayout from '@/layouts/PainelLayout';
+import { hojeLocal } from '@/lib/visita';
+import { ArrowLeft, Check } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 // TIPOS
-import type { Cidade, Hospital, SharedData, User } from '@/types'
-import type { DadosFormulario } from '@/types/visita'
+import type { Cidade, Hospital, SharedData, User } from '@/types';
+import type { DadosFormulario } from '@/types/visita';
 
 // ROTAS
-import { index, store } from '@/routes/visitas'
+import { index, store } from '@/routes/visitas';
 
 // SERVICES
-import { Service } from '@/Services/Visita/Service'
+import { Service } from '@/Services/Visita/Service';
 
 interface Props {
-    hospitais: Hospital[]
-    cidades?: Cidade[]
-    lideres: User[]
+    hospitais: Hospital[];
+    cidades?: Cidade[];
+    lideres: User[];
 }
 
 const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
-    const { auth } = usePage<SharedData>().props
+    const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, transform, post, processing, errors } = useForm<DadosFormulario>({
-        hospital_id: '',
-        ala_unidade_id: null,
-        data: hojeLocal(),
-        hora_inicio: '',
-        hora_fim: '',
-        tipo: 'hospital',
-        limite_participantes: '',
-        lider_id: auth.user.id,
-        observacoes: '',
-    })
+    const { data, setData, transform, post, processing, errors } =
+        useForm<DadosFormulario>({
+            hospital_id: '',
+            ala_unidade_id: null,
+            data: hojeLocal(),
+            hora_inicio: '',
+            hora_fim: '',
+            tipo: 'hospital',
+            limite_participantes: '',
+            lider_id: auth.user.id,
+            observacoes: '',
+        });
 
-    const handleCampoChange = <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => {
-        setData((prev) => ({ ...prev, [campo]: valor }))
-    }
+    const handleCampoChange = <K extends keyof DadosFormulario>(
+        campo: K,
+        valor: DadosFormulario[K],
+    ) => {
+        setData((prev) => ({ ...prev, [campo]: valor }));
+    };
 
     const handleSubmit = () => {
-        const exigeHospital = data.tipo === 'hospital' || data.tipo === 'residencia'
-        if ((exigeHospital && !data.hospital_id) || !data.data || !data.hora_inicio || !data.hora_fim || !data.tipo || !data.lider_id) {
-            toast.error('Preencha todos os campos obrigatórios.')
-            return
+        const exigeHospital =
+            data.tipo === 'hospital' || data.tipo === 'residencia';
+        if (
+            (exigeHospital && !data.hospital_id) ||
+            !data.data ||
+            !data.hora_inicio ||
+            !data.hora_fim ||
+            !data.tipo ||
+            !data.lider_id
+        ) {
+            toast.error('Preencha todos os campos obrigatórios.');
+            return;
         }
 
-        transform(() => Service.montarPayload(data, 'criar'))
-        post(store().url)
-    }
+        transform(() => Service.montarPayload(data, 'criar'));
+        post(store().url);
+    };
 
     return (
         <PainelLayout>
-            <section className="mx-auto w-full max-w-8xl px-4 py-16">
+            <section className="max-w-8xl mx-auto w-full px-4 py-16">
                 <div className="flex justify-center">
                     <div className="w-full max-w-7xl">
                         <div className="overflow-hidden rounded-3xl border bg-white">
@@ -69,9 +81,13 @@ const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
                                 {errors && Object.keys(errors).length > 0 && (
                                     <div className="mb-4 rounded-lg border border-amber-200 bg-white p-4 text-amber-800">
                                         <ul>
-                                            {Object.entries(errors).map(([campo, mensagem]) => (
-                                                <li key={campo}>{mensagem}</li>
-                                            ))}
+                                            {Object.entries(errors).map(
+                                                ([campo, mensagem]) => (
+                                                    <li key={campo}>
+                                                        {mensagem}
+                                                    </li>
+                                                ),
+                                            )}
                                         </ul>
                                     </div>
                                 )}
@@ -79,8 +95,8 @@ const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
                                 <form
                                     id="visita-form"
                                     onSubmit={(e) => {
-                                        e.preventDefault()
-                                        handleSubmit()
+                                        e.preventDefault();
+                                        handleSubmit();
                                     }}
                                     className="space-y-6"
                                 >
@@ -120,7 +136,7 @@ const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
                 </div>
             </section>
         </PainelLayout>
-    )
-}
+    );
+};
 
-export default Create
+export default Create;

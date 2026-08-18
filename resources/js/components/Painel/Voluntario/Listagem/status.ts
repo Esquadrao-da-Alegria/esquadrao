@@ -95,9 +95,7 @@ export const getEquipe = (voluntario: User) => {
 
 export const getCidade = (voluntario: User) => {
     const cidadeBase = voluntario.cidade_base as
-        | { nome?: string | null }
-        | null
-        | undefined;
+        { nome?: string | null } | null | undefined;
 
     return cidadeBase?.nome ?? '-';
 };
@@ -146,4 +144,3 @@ export const getAfastamentoBadge = (voluntario: User) => {
         className: 'bg-rose-50 text-rose-700 border-rose-200',
     };
 };
-
