@@ -129,6 +129,7 @@ class RelatorioStoreTest extends TestCase
 
     public function test_apos_48h_fora_do_prazo_true_e_store_com_sucesso(): void
     {
+        $this->travelTo(Carbon::parse('2026-06-15 12:00:00'));
         $autor  = $this->criarVoluntario();
         $visita = $this->criarVisita($autor, fimEm: '2026-06-15 12:00:00');
 
@@ -401,6 +402,7 @@ class RelatorioStoreTest extends TestCase
 
     private function criarVisita(
         User $criador,
+        ?string $inicioEm = null,
         ?string $fimEm = null,
         VisitaStatus $status = VisitaStatus::Agendada,
     ): Visita {
@@ -410,7 +412,7 @@ class RelatorioStoreTest extends TestCase
             'hospital_id'   => $hospital->id,
             'criado_por_id' => $criador->id,
             'lider_id'      => $criador->id,
-            'inicio_em'     => '2026-06-15 10:00:00',
+            'inicio_em'     => $inicioEm ?? '2026-06-15 10:00:00',
             'fim_em'        => $fimEm ?? '2026-06-15 12:00:00',
             'tipo'          => VisitaTipo::Hospital,
             'status'        => $status,

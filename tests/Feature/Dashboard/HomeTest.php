@@ -117,6 +117,48 @@ class HomeTest extends TestCase
                 ->where('resumo.meta.situacao', 'aplicavel'));
     }
 
+    public function test_visitas_contabilizadas_sao_validas_e_refletem_na_meta_da_visao_geral(): void
+    {
+        $this->travelTo(now()->setDate(2026, 8, 18));
+        $cidade = $this->criarCidade();
+        $usuario = $this->criarUsuario($cidade);
+        $hospital = $this->criarHospital($cidade);
+
+        $visita1 = $this->criarVisita($hospital, $usuario, now()->subDays(5), VisitaStatus::Contabilizada);
+        $visita2 = $this->criarVisita($hospital, $usuario, now()->subDays(3), VisitaStatus::Contabilizada);
+        $this->participar($visita1, $usuario);
+        $this->participar($visita2, $usuario);
+
+        $this->actingAs($usuario)->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('resumo.visitas_validas_mes', 2)
+                ->where('resumo.meta.situacao', 'aplicavel')
+                ->where('resumo.meta.atual', 2)
+                ->where('resumo.meta.objetivo', 2)
+                ->has('pendencias', 0));
+    }
+
+    public function test_visitas_nao_contabilizadas_e_canceladas_nao_entram_nas_visitas_validas_da_visao_geral(): void
+    {
+        $this->travelTo(now()->setDate(2026, 8, 18));
+        $cidade = $this->criarCidade();
+        $usuario = $this->criarUsuario($cidade);
+        $hospital = $this->criarHospital($cidade);
+
+        $naoContabilizada = $this->criarVisita($hospital, $usuario, now()->subDays(4), VisitaStatus::NaoContabilizada);
+        $cancelada = $this->criarVisita($hospital, $usuario, now()->subDays(2), VisitaStatus::Cancelada);
+        $this->participar($naoContabilizada, $usuario);
+        $this->participar($cancelada, $usuario);
+
+        $this->actingAs($usuario)->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('resumo.visitas_validas_mes', 0)
+                ->where('resumo.meta.atual', 0)
+                ->has('pendencias', 0));
+    }
+
     public function test_conta_sem_vinculo_recebe_estado_seguro_sem_metricas_pessoais(): void
     {
         $usuario = User::factory()->create();

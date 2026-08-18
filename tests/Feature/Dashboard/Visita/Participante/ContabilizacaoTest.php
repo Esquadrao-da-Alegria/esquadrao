@@ -284,10 +284,47 @@ class ContabilizacaoTest extends TestCase
                 ->where('participantes.data.0.oficinas.percentual', 100));
     }
 
+    public function test_visitas_contabilizadas_e_nao_contabilizadas_no_dashboard_de_participante(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidade);
+        $voluntario = $this->criarUsuario('voluntario', $cidade);
+        $hospital = $this->criarHospital($cidade);
+
+        $contabilizada = $this->criarVisita($hospital, $gestor, '2026-08-05 10:00:00', VisitaStatus::Contabilizada);
+        $naoContabilizada = $this->criarVisita($hospital, $gestor, '2026-08-10 10:00:00', VisitaStatus::NaoContabilizada);
+
+        $this->participar($contabilizada, $voluntario, TipoParticipacao::Palhaco);
+        $this->participar($naoContabilizada, $voluntario, TipoParticipacao::Palhaco);
+
+        $this->actingAs($gestor)
+            ->get(route('dashboards.visitas-por-participante', [
+                'periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8,
+                'participante_id' => $voluntario->id,
+            ]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('participantes.data.0.visitas_validas', 1)
+                ->where('participantes.data.0.relatorios_pendentes', 0)
+                ->where('participantes.data.0.relatorios_fora_prazo', 0));
+
+        $this->actingAs($gestor)
+            ->get(route('dashboards.visitas-por-participante.show', [
+                'voluntario' => $voluntario,
+                'periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8,
+            ]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('participacoes.0.valida', true)
+                ->where('participacoes.0.motivo', 'Visita válida')
+                ->where('participacoes.1.valida', false)
+                ->where('participacoes.1.motivo', 'Visita não contabilizada'));
+    }
+
     private function criarUsuario(string $slug, Cidade $cidade): User
     {
-        $voluntario = Voluntario::query()->create(['nome_completo' => uniqid('Voluntário '), 'email' => uniqid().'@teste.com', 'cidade_base_id' => $cidade->id, 'status' => 'ativo']);
-        $user = User::factory()->create(['voluntario_id' => $voluntario->id]);
+        $voluntario = Voluntario::query()->create(['nome_completo' => uniqid('Voluntário '), 'email' => uniqid().'@teste.com', 'cidade_base_id' => $cidade->id, 'status' => 'ativo', 'data_entrada_ong' => '2026-01-01']);
+        $user = User::factory()->create(['voluntario_id' => $voluntario->id, 'created_at' => '2026-01-01 00:00:00']);
         $cargo = Cargo::query()->firstOrCreate(['slug' => $slug], ['nome' => $slug]);
         $user->cargos()->attach($cargo);
         $user->unsetRelation('cargos');

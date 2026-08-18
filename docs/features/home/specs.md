@@ -75,7 +75,8 @@ O Service entrega avisos gerais e avisos da cidade-base, respeita o período e l
 
 ## Resumo pessoal
 
-- visitas válidas no mês atual seguem a mesma regra coletiva para palhaços e pessoal para paisanas, incluindo aceite administrativo de relatório atrasado;
+- visitas válidas no mês atual consideram visitas com status `contabilizada` diretamente, e visitas com status `realizada` seguindo a mesma regra coletiva para palhaços e pessoal para paisanas, incluindo aceite administrativo de relatório atrasado;
+- visitas com status `nao_contabilizada` ou `cancelada` não são contabilizadas;
 - oficinas e reuniões frequentadas usam eventos finalizados com presença `presente` no semestre atual;
 - a meta reutiliza `Dashboard\Visita\Participante\Meta\Service`;
 - apoio recebe isenção; ausência de classificação segura recebe dados insuficientes;

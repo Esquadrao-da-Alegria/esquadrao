@@ -59,8 +59,8 @@ class Service
                 'impacto_estimado' => round($visitasRealizadas->sum('impacto_estimado')),
                 'hospitais_visitados' => $visitasValidas->pluck('local')->unique()->count(),
                 'ultima_visita_valida' => $ultimaVisita?->inicio_em,
-                'relatorios_pendentes' => $visitasRealizadas->where('possui_relatorio', 0)->count(),
-                'relatorios_fora_prazo' => $visitasRealizadas->where('possui_relatorio', 1)->where('possui_relatorio_no_prazo', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
+                'relatorios_pendentes' => $visitasRealizadas->where('status', VisitaStatus::Realizada->value)->where('possui_relatorio', 0)->count(),
+                'relatorios_fora_prazo' => $visitasRealizadas->where('status', VisitaStatus::Realizada->value)->where('possui_relatorio', 1)->where('possui_relatorio_no_prazo', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
             ],
             'evolucao' => $this->evolucao($visitas, $filtros, $tipoAtuacao),
             'compensacoes' => $compensacoes,
@@ -111,13 +111,28 @@ class Service
 
     private function realizada(object $visita): bool
     {
-        return $visita->status === VisitaStatus::Realizada->value
-            && $visita->status_participacao === StatusParticipacao::Confirmado->value;
+        return in_array($visita->status, [
+            VisitaStatus::Realizada->value,
+            VisitaStatus::Contabilizada->value,
+            VisitaStatus::NaoContabilizada->value,
+        ], true) && $visita->status_participacao === StatusParticipacao::Confirmado->value;
     }
 
     private function valida(object $visita): bool
     {
-        return $this->realizada($visita) && ((bool) $visita->possui_relatorio_no_prazo || (bool) $visita->possui_relatorio_por_ajuste);
+        if ($visita->status_participacao !== StatusParticipacao::Confirmado->value) {
+            return false;
+        }
+
+        if ($visita->status === VisitaStatus::Contabilizada->value) {
+            return true;
+        }
+
+        if ($visita->status === VisitaStatus::Realizada->value) {
+            return (bool) $visita->possui_relatorio_no_prazo || (bool) $visita->possui_relatorio_por_ajuste;
+        }
+
+        return false;
     }
 
     private function compensacoes(Collection $visitas, array $filtros): array
@@ -170,7 +185,9 @@ class Service
             'id' => (int) $visita->id, 'tipo' => 'visita', 'titulo' => 'Visita hospitalar', 'data' => $visita->inicio_em,
             'local' => $visita->local, 'cidade' => $visita->cidade, 'ala' => $visita->ala ?? 'Sem ala informada',
             'tipo_participacao' => $visita->tipo_participacao, 'situacao' => $this->valida($visita) ? 'contabilizada' : 'nao_contabilizada',
-            'motivo' => $this->motivo($visita), 'relatorio' => ! $visita->possui_relatorio ? 'pendente' : ($visita->possui_relatorio_no_prazo ? 'enviado' : 'fora_do_prazo'),
+            'motivo' => $this->motivo($visita), 'relatorio' => ! in_array($visita->status, [VisitaStatus::Realizada->value, VisitaStatus::PendenteRelatorio->value], true)
+                ? ($visita->possui_relatorio ? ($visita->possui_relatorio_no_prazo ? 'enviado' : 'fora_do_prazo') : null)
+                : (! $visita->possui_relatorio ? 'pendente' : ($visita->possui_relatorio_no_prazo ? 'enviado' : 'fora_do_prazo')),
             'impacto_estimado' => $visita->impacto_estimado !== null ? round((float) $visita->impacto_estimado) : null,
         ]);
         $historicoEventos = $eventos->map(fn ($evento) => [
@@ -188,8 +205,17 @@ class Service
 
     private function motivo(object $visita): string
     {
-        if ($visita->status !== VisitaStatus::Realizada->value) return 'A visita ainda não foi marcada como realizada';
+        if ($visita->status === VisitaStatus::Cancelada->value) return 'Visita cancelada';
+        if ($visita->status === VisitaStatus::Agendada->value) return 'A visita ainda não foi marcada como realizada';
+        if ($visita->status === VisitaStatus::NaoContabilizada->value) return 'Visita não contabilizada';
         if ($visita->status_participacao !== StatusParticipacao::Confirmado->value) return 'Participação não confirmada';
+
+        if ($visita->status === VisitaStatus::Contabilizada->value) {
+            return 'Visita contabilizada';
+        }
+
+        if ($visita->status !== VisitaStatus::Realizada->value) return 'A visita ainda não foi marcada como realizada';
+
         if (! $visita->possui_relatorio) return $visita->tipo_participacao === 'palhaco' ? 'O grupo de palhaços ainda não enviou um relatório' : 'Seu relatório pessoal ainda não foi enviado';
         if (! $visita->possui_relatorio_no_prazo && ! $visita->possui_relatorio_por_ajuste) return 'O relatório aplicável foi enviado fora do prazo';
 

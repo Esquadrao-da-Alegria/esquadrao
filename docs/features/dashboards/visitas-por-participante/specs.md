@@ -23,11 +23,12 @@ Quando existir um tipo de atuação explícito, ele deverá substituir somente o
 
 ## Visita válida
 
-Uma visita conta no máximo uma vez por participante quando:
+Uma visita conta no máximo uma vez por participante quando a participação está `confirmado` e:
 
-- possui `status = realizada`;
-- a participação está `confirmado`;
-- a regra de relatório correspondente ao `tipo_participacao` foi atendida no prazo.
+- possui `status = contabilizada`; ou
+- possui `status = realizada` e a regra de relatório correspondente ao `tipo_participacao` foi atendida no prazo (ou aceita por ajuste administrativo auditável).
+
+Visitas com status `nao_contabilizada` ou `cancelada` não contam para o cômputo de visitas válidas.
 
 Para `tipo_participacao = palhaco`, um relatório no prazo escrito por qualquer palhaço confirmado da mesma visita valida a participação de todos os palhaços confirmados. O relatório de um paisana não valida o grupo de palhaços.
 

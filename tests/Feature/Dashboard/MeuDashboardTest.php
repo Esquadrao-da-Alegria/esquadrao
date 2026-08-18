@@ -122,6 +122,92 @@ class MeuDashboardTest extends TestCase
                 ->where('indicadores.meta_mensal', 2));
     }
 
+    public function test_visitas_contabilizadas_sao_consideradas_validas_no_meu_dashboard(): void
+    {
+        $cidade = $this->criarCidade();
+        $usuario = $this->criarUsuario($cidade, ['voluntario']);
+        $hospital = $this->criarHospital($cidade);
+        $visita1 = $this->criarVisita($hospital, $usuario, '2026-08-05 10:00:00', VisitaStatus::Contabilizada);
+        $visita2 = $this->criarVisita($hospital, $usuario, '2026-08-12 10:00:00', VisitaStatus::Contabilizada);
+        $this->participar($visita1, $usuario);
+        $this->participar($visita2, $usuario);
+
+        $this->actingAs($usuario)
+            ->get(route('dashboards.meu', ['periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Dashboard/Meu')
+                ->where('indicadores.visitas_validas', 2)
+                ->where('indicadores.visitas_realizadas', 2)
+                ->where('indicadores.saldo', 0)
+                ->where('indicadores.relatorios_pendentes', 0)
+                ->has('historico.data', 2)
+                ->where('historico.data.0.situacao', 'contabilizada')
+                ->where('historico.data.0.motivo', 'Visita contabilizada')
+                ->where('historico.data.0.relatorio', null)
+                ->where('evolucao.0.validas', 2)
+                ->where('evolucao.0.nao_contabilizadas', 0));
+    }
+
+    public function test_visita_nao_contabilizada_e_cancelada_no_meu_dashboard(): void
+    {
+        $cidade = $this->criarCidade();
+        $usuario = $this->criarUsuario($cidade, ['voluntario']);
+        $hospital = $this->criarHospital($cidade);
+        $naoContabilizada = $this->criarVisita($hospital, $usuario, '2026-08-05 10:00:00', VisitaStatus::NaoContabilizada);
+        $cancelada = $this->criarVisita($hospital, $usuario, '2026-08-12 10:00:00', VisitaStatus::Cancelada);
+        $this->participar($naoContabilizada, $usuario);
+        $this->participar($cancelada, $usuario);
+
+        $this->actingAs($usuario)
+            ->get(route('dashboards.meu', ['periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Dashboard/Meu')
+                ->where('indicadores.visitas_validas', 0)
+                ->where('indicadores.visitas_realizadas', 1)
+                ->has('historico.data', 2)
+                ->where('historico.data.0.situacao', 'nao_contabilizada')
+                ->where('historico.data.0.motivo', 'Visita cancelada')
+                ->where('historico.data.1.situacao', 'nao_contabilizada')
+                ->where('historico.data.1.motivo', 'Visita não contabilizada'));
+    }
+
+    public function test_visao_geral_e_meu_dashboard_possuem_mesmo_numero_de_visitas_validas(): void
+    {
+        $this->travelTo(now()->setDate(2026, 8, 18));
+        $cidade = $this->criarCidade();
+        $usuario = $this->criarUsuario($cidade, ['voluntario']);
+        $hospital = $this->criarHospital($cidade);
+
+        $contabilizada = $this->criarVisita($hospital, $usuario, '2026-08-05 10:00:00', VisitaStatus::Contabilizada);
+        $realizadaComRelatorio = $this->criarVisita($hospital, $usuario, '2026-08-08 10:00:00', VisitaStatus::Realizada);
+        $naoContabilizada = $this->criarVisita($hospital, $usuario, '2026-08-10 10:00:00', VisitaStatus::NaoContabilizada);
+        $cancelada = $this->criarVisita($hospital, $usuario, '2026-08-12 10:00:00', VisitaStatus::Cancelada);
+
+        $this->participar($contabilizada, $usuario);
+        $this->participar($realizadaComRelatorio, $usuario);
+        $this->participar($naoContabilizada, $usuario);
+        $this->participar($cancelada, $usuario);
+
+        $this->relatar($realizadaComRelatorio, $usuario, 25);
+
+        // Visão Geral
+        $this->actingAs($usuario)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('resumo.visitas_validas_mes', 2)
+                ->where('resumo.meta.atual', 2));
+
+        // Meu Dashboard
+        $this->actingAs($usuario)
+            ->get(route('dashboards.meu', ['periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('indicadores.visitas_validas', 2));
+    }
+
     public function test_periodo_personalizado_bloqueia_intervalo_superior_a_vinte_e_quatro_meses(): void
     {
         $usuario = $this->criarUsuario($this->criarCidade(), ['voluntario']);
