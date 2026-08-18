@@ -43,12 +43,10 @@ export type PermissaoDashboard =
     | 'dashboard.visitas_por_participante';
 
 export type MotivoAfastamento =
-    | 'atestado_medico'
-    | 'licenca_pessoal'
-    | 'estudos'
-    | 'outro';
+    'atestado_medico' | 'licenca_pessoal' | 'estudos' | 'outro';
 
-export type StatusAfastamento = 'ativo' | 'encerrado' | 'prorrogado' | 'cancelado';
+export type StatusAfastamento =
+    'ativo' | 'encerrado' | 'prorrogado' | 'cancelado';
 
 export interface VoluntarioAfastamento {
     id: number;
@@ -74,12 +72,7 @@ export interface User {
     convite_enviado_em?: string | null;
     convite_expira_em?: string | null;
     convite_status?:
-        | 'PENDENTE'
-        | 'ENVIADO'
-        | 'UTILIZADO'
-        | 'EXPIRADO'
-        | 'CANCELADO'
-        | null;
+        'PENDENTE' | 'ENVIADO' | 'UTILIZADO' | 'EXPIRADO' | 'CANCELADO' | null;
     convite_utilizado_em?: string | null;
     inativado_em?: string | null;
     cidade_base_id?: number | null;
@@ -91,6 +84,9 @@ export interface User {
     voluntario?: {
         id: number;
         cidade_base_id?: number | null;
+        nome_completo?: string;
+        foto_perfil?: string | null;
+        url_foto?: string | null;
     };
     esta_afastado?: boolean;
     afastamento_atual?: VoluntarioAfastamento | null;
@@ -115,6 +111,26 @@ export interface Cargo {
 }
 
 // RECURSOS
+
+export interface Voluntario {
+    id: number;
+    nome_completo: string;
+    nome_doutor: string | null;
+    email: string;
+    telefone: string | null;
+    data_nascimento: string | null;
+    cpf: string | null;
+    cidade_base_id: number | null;
+    cidade_base?: Cidade | null;
+    data_entrada_ong: string | null;
+    status: string;
+    observacoes: string | null;
+    foto_perfil: string | null;
+    url_foto: string | null;
+    cargos?: Cargo[];
+    created_at: string;
+    updated_at: string;
+}
 
 export interface Estado {
     id: number;

@@ -1,49 +1,52 @@
-import PainelLayout from '@/layouts/PainelLayout'
+import PainelLayout from '@/layouts/PainelLayout';
 import {
     formatarDataHora,
     labelTipoRelatorio,
     podeCriarRelatorio,
     podeEditarRelatorio,
-} from '@/lib/visita'
-import { index as visitasIndex } from '@/routes/visitas'
-import { create, edit, pdf, show } from '@/routes/visitas/relatorios'
-import type { SharedData } from '@/types'
-import type { Visita, VisitaRelatorio } from '@/types/visita'
-import { Link, router, usePage } from '@inertiajs/react'
-import { ArrowLeft, Download, Eye, FileText, Pencil, Plus } from 'lucide-react'
-import { type FC, useState } from 'react'
+} from '@/lib/visita';
+import { index as visitasIndex } from '@/routes/visitas';
+import { create, edit, pdf, show } from '@/routes/visitas/relatorios';
+import type { SharedData } from '@/types';
+import type { Visita, VisitaRelatorio } from '@/types/visita';
+import { Link, router, usePage } from '@inertiajs/react';
+import { ArrowLeft, Download, Eye, FileText, Pencil, Plus } from 'lucide-react';
+import { type FC, useState } from 'react';
 
 interface Props {
-    visita: Visita
-    relatorios: VisitaRelatorio[]
+    visita: Visita;
+    relatorios: VisitaRelatorio[];
 }
 
 function resumoCurto(texto: string, limite = 120): string {
     if (texto.length <= limite) {
-        return texto
+        return texto;
     }
 
-    return `${texto.slice(0, limite)}…`
+    return `${texto.slice(0, limite)}…`;
 }
 
 const Index: FC<Props> = ({ visita, relatorios }) => {
-    const { auth } = usePage<SharedData>().props
-    const [baixandoId, setBaixandoId] = useState<number | null>(null)
-    const permissaoCriar = podeCriarRelatorio(auth.user, visita)
+    const { auth } = usePage<SharedData>().props;
+    const [baixandoId, setBaixandoId] = useState<number | null>(null);
+    const permissaoCriar = podeCriarRelatorio(auth.user, visita);
 
     const handleCriar = () => {
-        router.visit(create.url({ visita: visita.id! }))
-    }
+        router.visit(create.url({ visita: visita.id! }));
+    };
 
     const handlePdf = (relatorio: VisitaRelatorio) => {
         if (!relatorio.id || baixandoId !== null) {
-            return
+            return;
         }
 
-        setBaixandoId(relatorio.id)
-        window.location.href = pdf({ visita: visita.id!, relatorio: relatorio.id }).url
-        window.setTimeout(() => setBaixandoId(null), 3000)
-    }
+        setBaixandoId(relatorio.id);
+        window.location.href = pdf({
+            visita: visita.id!,
+            relatorio: relatorio.id,
+        }).url;
+        window.setTimeout(() => setBaixandoId(null), 3000);
+    };
 
     return (
         <PainelLayout>
@@ -75,9 +78,13 @@ const Index: FC<Props> = ({ visita, relatorios }) => {
                         <button
                             onClick={handleCriar}
                             type="button"
-                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 sm:w-auto"
+                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
                         >
-                            <Plus className="size-5" strokeWidth={2} aria-hidden />
+                            <Plus
+                                className="size-5"
+                                strokeWidth={2}
+                                aria-hidden
+                            />
                             Novo relatório
                         </button>
                     )}
@@ -85,7 +92,10 @@ const Index: FC<Props> = ({ visita, relatorios }) => {
 
                 {relatorios.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-amber-200 bg-white px-6 py-20 text-center">
-                        <FileText className="mb-4 size-10 text-amber-300" aria-hidden />
+                        <FileText
+                            className="mb-4 size-10 text-amber-300"
+                            aria-hidden
+                        />
                         <p className="text-sm text-amber-900/50">
                             Nenhum relatório cadastrado para esta visita.
                         </p>
@@ -103,7 +113,11 @@ const Index: FC<Props> = ({ visita, relatorios }) => {
                 ) : (
                     <ul className="flex w-full flex-col gap-5">
                         {relatorios.map((relatorio) => {
-                            const podeEditar = podeEditarRelatorio(auth.user, visita, relatorio)
+                            const podeEditar = podeEditarRelatorio(
+                                auth.user,
+                                visita,
+                                relatorio,
+                            );
 
                             return (
                                 <li key={relatorio.id} className="w-full">
@@ -111,66 +125,109 @@ const Index: FC<Props> = ({ visita, relatorios }) => {
                                         <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:gap-6 sm:p-6">
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="inline-flex items-center rounded-full border border-amber-200/80 bg-amber-50/80 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-amber-900">
-                                                        {labelTipoRelatorio(relatorio.tipo_relatorio)}
+                                                    <span className="inline-flex items-center rounded-full border border-amber-200/80 bg-amber-50/80 px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-amber-900 uppercase">
+                                                        {labelTipoRelatorio(
+                                                            relatorio.tipo_relatorio,
+                                                        )}
                                                     </span>
                                                     {relatorio.fora_do_prazo && (
-                                                        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-orange-800">
+                                                        <span className="inline-flex items-center rounded-full border border-orange-200 bg-orange-50 px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-orange-800 uppercase">
                                                             Fora do prazo
                                                         </span>
                                                     )}
                                                 </div>
                                                 <p className="mt-3 text-sm leading-relaxed text-amber-950/80">
-                                                    {resumoCurto(relatorio.resumo)}
+                                                    {resumoCurto(
+                                                        relatorio.resumo,
+                                                    )}
                                                 </p>
                                                 <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
                                                     <div>
-                                                        <dt className="text-xs font-medium uppercase text-amber-900/45">Autor</dt>
-                                                        <dd className="text-amber-900">{relatorio.autor?.name ?? '—'}</dd>
+                                                        <dt className="text-xs font-medium text-amber-900/45 uppercase">
+                                                            Autor
+                                                        </dt>
+                                                        <dd className="text-amber-900">
+                                                            {relatorio.autor
+                                                                ?.name ?? '—'}
+                                                        </dd>
                                                     </div>
                                                     <div>
-                                                        <dt className="text-xs font-medium uppercase text-amber-900/45">Enviado em</dt>
-                                                        <dd className="text-amber-900">{formatarDataHora(relatorio.enviado_em)}</dd>
+                                                        <dt className="text-xs font-medium text-amber-900/45 uppercase">
+                                                            Enviado em
+                                                        </dt>
+                                                        <dd className="text-amber-900">
+                                                            {formatarDataHora(
+                                                                relatorio.enviado_em,
+                                                            )}
+                                                        </dd>
                                                     </div>
                                                 </dl>
                                             </div>
-                                            <div className="flex shrink-0 flex-wrap items-center gap-2 border-t border-amber-50 pt-4 sm:border-t-0 sm:border-l sm:border-amber-50 sm:pl-6 sm:pt-0">
+                                            <div className="flex shrink-0 flex-wrap items-center gap-2 border-t border-amber-50 pt-4 sm:border-t-0 sm:border-l sm:border-amber-50 sm:pt-0 sm:pl-6">
                                                 <Link
-                                                    href={show({ visita: visita.id!, relatorio: relatorio.id! }).url}
+                                                    href={
+                                                        show({
+                                                            visita: visita.id!,
+                                                            relatorio:
+                                                                relatorio.id!,
+                                                        }).url
+                                                    }
                                                     className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800 transition hover:bg-amber-50"
                                                 >
-                                                    <Eye className="size-3.5" aria-hidden />
+                                                    <Eye
+                                                        className="size-3.5"
+                                                        aria-hidden
+                                                    />
                                                     Ver
                                                 </Link>
                                                 {podeEditar && (
                                                     <Link
-                                                        href={edit({ visita: visita.id!, relatorio: relatorio.id! }).url}
+                                                        href={
+                                                            edit({
+                                                                visita: visita.id!,
+                                                                relatorio:
+                                                                    relatorio.id!,
+                                                            }).url
+                                                        }
                                                         className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800 transition hover:bg-amber-50"
                                                     >
-                                                        <Pencil className="size-3.5" aria-hidden />
+                                                        <Pencil
+                                                            className="size-3.5"
+                                                            aria-hidden
+                                                        />
                                                         Editar
                                                     </Link>
                                                 )}
                                                 <button
                                                     type="button"
-                                                    onClick={() => handlePdf(relatorio)}
-                                                    disabled={baixandoId === relatorio.id}
+                                                    onClick={() =>
+                                                        handlePdf(relatorio)
+                                                    }
+                                                    disabled={
+                                                        baixandoId ===
+                                                        relatorio.id
+                                                    }
                                                     className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800 transition hover:bg-amber-50 disabled:opacity-60"
                                                 >
-                                                    <Download className="size-3.5" aria-hidden />
-                                                    {baixandoId === relatorio.id ? 'Baixando...' : 'PDF'}
+                                                    <Download
+                                                        className="size-3.5"
+                                                        aria-hidden
+                                                    />
+                                                    {baixandoId === relatorio.id
+                                                        ? 'Baixando...'
+                                                        : 'PDF'}
                                                 </button>
                                             </div>
                                         </div>
                                     </article>
                                 </li>
-                            )
+                            );
                         })}
                     </ul>
                 )}
             </div>
         </PainelLayout>
-    )
-}
+    );
+};
 
-export default Index
+export default Index;

@@ -2,6 +2,7 @@
 
 namespace App\Services\Dashboard\Visita\Participante;
 
+use App\Enums\VisitaStatus;
 use App\Models\Cargo;
 use App\Models\Cidade;
 use App\Models\User;
@@ -70,8 +71,8 @@ class Service
                 'oficinas' => $presencas['oficina'],
                 'ultima_atividade' => $ultimaAtividade?->toIso8601String(),
                 'dias_sem_atividade' => $diasSemAtividade,
-                'relatorios_pendentes' => $participacoes->where('possui_relatorio', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
-                'relatorios_fora_prazo' => $participacoes->where('possui_relatorio', 1)->where('possui_relatorio_no_prazo', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
+                'relatorios_pendentes' => $participacoes->where('status', VisitaStatus::Realizada->value)->where('possui_relatorio', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
+                'relatorios_fora_prazo' => $participacoes->where('status', VisitaStatus::Realizada->value)->where('possui_relatorio', 1)->where('possui_relatorio_no_prazo', 0)->where('possui_relatorio_por_ajuste', 0)->count(),
                 'situacao' => $situacao,
             ];
         })->when($filtros['tipo_atuacao'], fn ($itens, $tipo) => $itens->where('tipo_atuacao', $tipo))
@@ -123,16 +124,21 @@ class Service
             'data' => $item->inicio_em,
             'hospital' => $item->hospital,
             'outra_cidade' => (int) $item->cidade_id !== (int) $participante['cidade_id'],
-            'motivo' => ! $item->possui_relatorio
-                ? ($item->tipo_participacao === 'palhaco' ? 'Relatório do grupo de palhaços pendente' : 'Relatório pessoal pendente')
-                : (! $item->possui_relatorio_no_prazo && ! $item->possui_relatorio_por_ajuste
-                    ? 'Relatório aplicável enviado fora do prazo'
-                    : ($item->possui_relatorio_por_ajuste
-                        ? 'Visita válida por ajuste administrativo'
-                    : ($item->tipo_participacao === 'palhaco' && ! $item->relatorio_proprio_no_prazo
-                        ? 'Visita válida por relatório do grupo de palhaços'
-                        : 'Visita válida'))),
-            'valida' => (bool) $item->possui_relatorio_no_prazo || (bool) $item->possui_relatorio_por_ajuste,
+            'motivo' => $item->status === VisitaStatus::Contabilizada->value
+                ? 'Visita válida'
+                : ($item->status === VisitaStatus::NaoContabilizada->value
+                    ? 'Visita não contabilizada'
+                    : (! $item->possui_relatorio
+                        ? ($item->tipo_participacao === 'palhaco' ? 'Relatório do grupo de palhaços pendente' : 'Relatório pessoal pendente')
+                        : (! $item->possui_relatorio_no_prazo && ! $item->possui_relatorio_por_ajuste
+                            ? 'Relatório aplicável enviado fora do prazo'
+                            : ($item->possui_relatorio_por_ajuste
+                                ? 'Visita válida por ajuste administrativo'
+                            : ($item->tipo_participacao === 'palhaco' && ! $item->relatorio_proprio_no_prazo
+                                ? 'Visita válida por relatório do grupo de palhaços'
+                                : 'Visita válida'))))),
+            'valida' => $item->status === VisitaStatus::Contabilizada->value
+                || ($item->status === VisitaStatus::Realizada->value && ((bool) $item->possui_relatorio_no_prazo || (bool) $item->possui_relatorio_por_ajuste)),
         ])->values();
 
         return [

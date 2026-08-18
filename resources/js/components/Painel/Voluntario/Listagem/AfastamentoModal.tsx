@@ -43,9 +43,13 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
 }) => {
     const voluntarioId = (voluntario.voluntario?.id || voluntario.id) as number;
     const afastamentoAtual = voluntario.afastamento_atual;
-    const temAfastamentoAtivo = Boolean(voluntario.esta_afastado || afastamentoAtual);
+    const temAfastamentoAtivo = Boolean(
+        voluntario.esta_afastado || afastamentoAtual,
+    );
 
-    const [aba, setAba] = useState<TabType>(temAfastamentoAtivo ? 'prorrogar' : 'novo');
+    const [aba, setAba] = useState<TabType>(
+        temAfastamentoAtivo ? 'prorrogar' : 'novo',
+    );
 
     useEffect(() => {
         if (temAfastamentoAtivo) {
@@ -72,7 +76,9 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
     const dataFimAtual = afastamentoAtual?.data_fim
         ? new Date(afastamentoAtual.data_fim)
         : new Date();
-    const dataFimProrrogadaPadrao = new Date(dataFimAtual.getTime() + 15 * 24 * 60 * 60 * 1000)
+    const dataFimProrrogadaPadrao = new Date(
+        dataFimAtual.getTime() + 15 * 24 * 60 * 60 * 1000,
+    )
         .toISOString()
         .split('T')[0];
 
@@ -88,7 +94,9 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
 
     const setNovoPrazoDias = (dias: number) => {
         const dataInicio = new Date(novoForm.data.data_inicio || Date.now());
-        const novaFim = new Date(dataInicio.getTime() + dias * 24 * 60 * 60 * 1000)
+        const novaFim = new Date(
+            dataInicio.getTime() + dias * 24 * 60 * 60 * 1000,
+        )
             .toISOString()
             .split('T')[0];
         novoForm.setData('data_fim', novaFim);
@@ -127,7 +135,7 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                     onOpenChange(false);
                     prorrogarForm.reset();
                 },
-            }
+            },
         );
     };
 
@@ -143,7 +151,7 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                     onOpenChange(false);
                     encerrarForm.reset();
                 },
-            }
+            },
         );
     };
 
@@ -161,20 +169,22 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
             {temAfastamentoAtivo && afastamentoAtual && (
                 <div className="rounded-2xl border border-rose-200 bg-rose-50/70 p-4 text-rose-950">
                     <div className="flex items-start gap-3">
-                        <AlertTriangle className="size-5 shrink-0 text-rose-600 mt-0.5" />
+                        <AlertTriangle className="mt-0.5 size-5 shrink-0 text-rose-600" />
                         <div className="flex-1 text-sm">
                             <p className="font-semibold text-rose-900">
-                                Voluntário atualmente afastado ({getMotivoLabel(afastamentoAtual.motivo)})
+                                Voluntário atualmente afastado (
+                                {getMotivoLabel(afastamentoAtual.motivo)})
                             </p>
                             <p className="mt-1 text-rose-800/90">
                                 Período:{' '}
                                 <strong>
-                                    {formatarData(afastamentoAtual.data_inicio)} até{' '}
+                                    {formatarData(afastamentoAtual.data_inicio)}{' '}
+                                    até{' '}
                                     {formatarData(afastamentoAtual.data_fim)}
                                 </strong>
                             </p>
                             {afastamentoAtual.observacoes && (
-                                <p className="mt-2 whitespace-pre-line rounded-lg bg-white/60 p-2 text-xs text-rose-900 border border-rose-100">
+                                <p className="mt-2 rounded-lg border border-rose-100 bg-white/60 p-2 text-xs whitespace-pre-line text-rose-900">
                                     {afastamentoAtual.observacoes}
                                 </p>
                             )}
@@ -256,43 +266,62 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                 <form onSubmit={handleNovoSubmit} className="space-y-4 pt-2">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                            <label htmlFor="data_inicio" className={painelLabelClass}>
+                            <label
+                                htmlFor="data_inicio"
+                                className={painelLabelClass}
+                            >
                                 Data de Início *
                             </label>
                             <input
                                 id="data_inicio"
                                 type="date"
                                 value={novoForm.data.data_inicio}
-                                onChange={(e) => novoForm.setData('data_inicio', e.target.value)}
+                                onChange={(e) =>
+                                    novoForm.setData(
+                                        'data_inicio',
+                                        e.target.value,
+                                    )
+                                }
                                 className={painelInputClass}
                                 required
                             />
                             {novoForm.errors.data_inicio && (
-                                <p className="mt-1 text-xs text-red-600">{novoForm.errors.data_inicio}</p>
+                                <p className="mt-1 text-xs text-red-600">
+                                    {novoForm.errors.data_inicio}
+                                </p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="data_fim" className={painelLabelClass}>
+                            <label
+                                htmlFor="data_fim"
+                                className={painelLabelClass}
+                            >
                                 Data de Fim *
                             </label>
                             <input
                                 id="data_fim"
                                 type="date"
                                 value={novoForm.data.data_fim}
-                                onChange={(e) => novoForm.setData('data_fim', e.target.value)}
+                                onChange={(e) =>
+                                    novoForm.setData('data_fim', e.target.value)
+                                }
                                 className={painelInputClass}
                                 required
                             />
                             {novoForm.errors.data_fim && (
-                                <p className="mt-1 text-xs text-red-600">{novoForm.errors.data_fim}</p>
+                                <p className="mt-1 text-xs text-red-600">
+                                    {novoForm.errors.data_fim}
+                                </p>
                             )}
                         </div>
                     </div>
 
                     {/* Botões de atalho de prazo */}
                     <div className="flex items-center gap-2 text-xs text-amber-900">
-                        <span className="font-medium text-gray-500">Atalhos de duração:</span>
+                        <span className="font-medium text-gray-500">
+                            Atalhos de duração:
+                        </span>
                         <button
                             type="button"
                             onClick={() => setNovoPrazoDias(15)}
@@ -324,43 +353,64 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             id="motivo"
                             value={novoForm.data.motivo}
                             onChange={(e) =>
-                                novoForm.setData('motivo', e.target.value as MotivoAfastamento)
+                                novoForm.setData(
+                                    'motivo',
+                                    e.target.value as MotivoAfastamento,
+                                )
                             }
                             className={painelInputClass}
                             required
                         >
-                            <option value="atestado_medico">Atestado Médico / Tratamento de Saúde</option>
-                            <option value="licenca_pessoal">Licença Pessoal / Viagem</option>
-                            <option value="estudos">Estudos / Provas / Concurso</option>
+                            <option value="atestado_medico">
+                                Atestado Médico / Tratamento de Saúde
+                            </option>
+                            <option value="licenca_pessoal">
+                                Licença Pessoal / Viagem
+                            </option>
+                            <option value="estudos">
+                                Estudos / Provas / Concurso
+                            </option>
                             <option value="outro">Outro Motivo</option>
                         </select>
                         {novoForm.errors.motivo && (
-                            <p className="mt-1 text-xs text-red-600">{novoForm.errors.motivo}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {novoForm.errors.motivo}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="observacoes" className={painelLabelClass}>
+                        <label
+                            htmlFor="observacoes"
+                            className={painelLabelClass}
+                        >
                             Observações (Opcional)
                         </label>
                         <textarea
                             id="observacoes"
                             rows={3}
                             value={novoForm.data.observacoes}
-                            onChange={(e) => novoForm.setData('observacoes', e.target.value)}
+                            onChange={(e) =>
+                                novoForm.setData('observacoes', e.target.value)
+                            }
                             placeholder="Detalhes adicionais, recomendações médicas ou informações da licença..."
                             className={painelInputClass}
                         />
                         {novoForm.errors.observacoes && (
-                            <p className="mt-1 text-xs text-red-600">{novoForm.errors.observacoes}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {novoForm.errors.observacoes}
+                            </p>
                         )}
                     </div>
 
                     {/* Aviso sobre cancelamento de visitas */}
-                    <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-950 flex items-start gap-2">
-                        <AlertTriangle className="size-4 shrink-0 text-amber-700 mt-0.5" />
+                    <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-950">
+                        <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-700" />
                         <span>
-                            <strong>Aviso:</strong> Todas as inscrições deste voluntário em visitas agendadas dentro do período serão automaticamente canceladas e novas inscrições ficarão bloqueadas até o término da licença.
+                            <strong>Aviso:</strong> Todas as inscrições deste
+                            voluntário em visitas agendadas dentro do período
+                            serão automaticamente canceladas e novas inscrições
+                            ficarão bloqueadas até o término da licença.
                         </span>
                     </div>
 
@@ -378,7 +428,9 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 disabled:opacity-60"
                         >
                             <CheckCircle2 className="size-4" />
-                            {novoForm.processing ? 'Registrando...' : 'Registrar Afastamento'}
+                            {novoForm.processing
+                                ? 'Registrando...'
+                                : 'Registrar Afastamento'}
                         </button>
                     </DialogFooter>
                 </form>
@@ -386,7 +438,10 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
 
             {/* Conteúdo Aba: PRORROGAR AFASTAMENTO */}
             {aba === 'prorrogar' && afastamentoAtual && (
-                <form onSubmit={handleProrrogarSubmit} className="space-y-4 pt-2">
+                <form
+                    onSubmit={handleProrrogarSubmit}
+                    className="space-y-4 pt-2"
+                >
                     <div>
                         <label className={painelLabelClass}>
                             Data Final Atual
@@ -397,26 +452,38 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                     </div>
 
                     <div>
-                        <label htmlFor="nova_data_fim" className={painelLabelClass}>
+                        <label
+                            htmlFor="nova_data_fim"
+                            className={painelLabelClass}
+                        >
                             Nova Data Final *
                         </label>
                         <input
                             id="nova_data_fim"
                             type="date"
                             value={prorrogarForm.data.nova_data_fim}
-                            onChange={(e) => prorrogarForm.setData('nova_data_fim', e.target.value)}
+                            onChange={(e) =>
+                                prorrogarForm.setData(
+                                    'nova_data_fim',
+                                    e.target.value,
+                                )
+                            }
                             min={afastamentoAtual.data_fim}
                             className={painelInputClass}
                             required
                         />
                         {prorrogarForm.errors.nova_data_fim && (
-                            <p className="mt-1 text-xs text-red-600">{prorrogarForm.errors.nova_data_fim}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {prorrogarForm.errors.nova_data_fim}
+                            </p>
                         )}
                     </div>
 
                     {/* Atalhos para prorrogação */}
                     <div className="flex items-center gap-2 text-xs text-amber-900">
-                        <span className="font-medium text-gray-500">Adicionar dias:</span>
+                        <span className="font-medium text-gray-500">
+                            Adicionar dias:
+                        </span>
                         <button
                             type="button"
                             onClick={() => setProrrogarPrazoDias(15)}
@@ -441,19 +508,29 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                     </div>
 
                     <div>
-                        <label htmlFor="prorrogar_observacoes" className={painelLabelClass}>
+                        <label
+                            htmlFor="prorrogar_observacoes"
+                            className={painelLabelClass}
+                        >
                             Justificativa / Observações da Prorrogação
                         </label>
                         <textarea
                             id="prorrogar_observacoes"
                             rows={3}
                             value={prorrogarForm.data.observacoes}
-                            onChange={(e) => prorrogarForm.setData('observacoes', e.target.value)}
+                            onChange={(e) =>
+                                prorrogarForm.setData(
+                                    'observacoes',
+                                    e.target.value,
+                                )
+                            }
                             placeholder="Informe o motivo da prorrogação ou novo laudo médico..."
                             className={painelInputClass}
                         />
                         {prorrogarForm.errors.observacoes && (
-                            <p className="mt-1 text-xs text-red-600">{prorrogarForm.errors.observacoes}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {prorrogarForm.errors.observacoes}
+                            </p>
                         )}
                     </div>
 
@@ -471,7 +548,9 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 disabled:opacity-60"
                         >
                             <CalendarPlus className="size-4" />
-                            {prorrogarForm.processing ? 'Prorrogando...' : 'Confirmar Prorrogação'}
+                            {prorrogarForm.processing
+                                ? 'Prorrogando...'
+                                : 'Confirmar Prorrogação'}
                         </button>
                     </DialogFooter>
                 </form>
@@ -479,35 +558,53 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
 
             {/* Conteúdo Aba: ENCERRAR ANTECIPADAMENTE */}
             {aba === 'encerrar' && afastamentoAtual && (
-                <form onSubmit={handleEncerrarSubmit} className="space-y-4 pt-2">
+                <form
+                    onSubmit={handleEncerrarSubmit}
+                    className="space-y-4 pt-2"
+                >
                     <div className="rounded-2xl border border-red-200 bg-red-50/70 p-4 text-sm text-red-950">
                         <div className="flex items-start gap-3">
-                            <XCircle className="size-5 shrink-0 text-red-600 mt-0.5" />
+                            <XCircle className="mt-0.5 size-5 shrink-0 text-red-600" />
                             <div>
                                 <h4 className="font-bold text-red-900">
-                                    Deseja realmente encerrar este afastamento hoje?
+                                    Deseja realmente encerrar este afastamento
+                                    hoje?
                                 </h4>
-                                <p className="mt-1 text-red-800 text-xs leading-relaxed">
-                                    Ao encerrar, o status do afastamento passará para <strong>Encerrado</strong>, a data final será ajustada para hoje e o voluntário poderá voltar a se inscrever em visitas normalmente.
+                                <p className="mt-1 text-xs leading-relaxed text-red-800">
+                                    Ao encerrar, o status do afastamento passará
+                                    para <strong>Encerrado</strong>, a data
+                                    final será ajustada para hoje e o voluntário
+                                    poderá voltar a se inscrever em visitas
+                                    normalmente.
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="encerrar_observacoes" className={painelLabelClass}>
+                        <label
+                            htmlFor="encerrar_observacoes"
+                            className={painelLabelClass}
+                        >
                             Motivo do Encerramento Antecipado (Opcional)
                         </label>
                         <textarea
                             id="encerrar_observacoes"
                             rows={3}
                             value={encerrarForm.data.observacoes}
-                            onChange={(e) => encerrarForm.setData('observacoes', e.target.value)}
+                            onChange={(e) =>
+                                encerrarForm.setData(
+                                    'observacoes',
+                                    e.target.value,
+                                )
+                            }
                             placeholder="Ex: Alta médica concedida antes do prazo previsto..."
                             className={painelInputClass}
                         />
                         {encerrarForm.errors.observacoes && (
-                            <p className="mt-1 text-xs text-red-600">{encerrarForm.errors.observacoes}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {encerrarForm.errors.observacoes}
+                            </p>
                         )}
                     </div>
 
@@ -525,7 +622,9 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60"
                         >
                             <XCircle className="size-4" />
-                            {encerrarForm.processing ? 'Encerrando...' : 'Encerrar Afastamento'}
+                            {encerrarForm.processing
+                                ? 'Encerrando...'
+                                : 'Encerrar Afastamento'}
                         </button>
                     </DialogFooter>
                 </form>
@@ -549,12 +648,12 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                                         {getMotivoLabel(afast.motivo)}
                                     </span>
                                     <span
-                                        className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
+                                        className={`rounded-full px-2 py-0.5 text-[11px] font-bold tracking-wide uppercase ${
                                             afast.status === 'ativo'
                                                 ? 'bg-rose-100 text-rose-800'
                                                 : afast.status === 'encerrado'
-                                                ? 'bg-gray-200 text-gray-700'
-                                                : 'bg-amber-100 text-amber-800'
+                                                  ? 'bg-gray-200 text-gray-700'
+                                                  : 'bg-amber-100 text-amber-800'
                                         }`}
                                     >
                                         {afast.status}
@@ -563,11 +662,12 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                                 <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-600">
                                     <Clock className="size-3 text-gray-400" />
                                     <span>
-                                        {formatarData(afast.data_inicio)} até {formatarData(afast.data_fim)}
+                                        {formatarData(afast.data_inicio)} até{' '}
+                                        {formatarData(afast.data_fim)}
                                     </span>
                                 </div>
                                 {afast.observacoes && (
-                                    <p className="mt-2 whitespace-pre-line rounded-lg bg-white p-2 text-xs text-gray-700 border border-gray-100">
+                                    <p className="mt-2 rounded-lg border border-gray-100 bg-white p-2 text-xs whitespace-pre-line text-gray-700">
                                         {afast.observacoes}
                                     </p>
                                 )}

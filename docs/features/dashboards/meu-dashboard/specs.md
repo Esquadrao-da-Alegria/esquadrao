@@ -36,7 +36,11 @@ O dashboard reutiliza as fontes do dashboard gerencial de participação:
 - `Dashboard\Visita\Participante\Compensacao\Service`: créditos, débitos e janela de compensação;
 - `Visita\Relatorio\Prazo\Service`: prazo de relatório preenchido em `visitas_relatorios.fora_do_prazo`.
 
-Uma visita é válida quando está `realizada`, a participação está confirmada e a regra de relatório foi atendida no prazo. Para palhaços, um relatório de qualquer palhaço confirmado valida o grupo; para paisanas, o relatório deve ser pessoal. O `tipo_participacao` daquela visita define a regra, independentemente dos cargos permanentes. Múltiplos relatórios não duplicam a visita. Regra confirmada pela coordenação em 10/08/2026.
+Uma visita é válida quando a participação está confirmada e:
+- o status é `contabilizada` (já validada previamente); ou
+- o status é `realizada` e a regra de relatório foi atendida no prazo (ou aceita por ajuste administrativo auditável). Para palhaços, um relatório de qualquer palhaço confirmado valida o grupo; para paisanas, o relatório deve ser pessoal. O `tipo_participacao` daquela visita define a regra, independentemente dos cargos permanentes. Múltiplos relatórios não duplicam a visita.
+
+Visitas com status `nao_contabilizada` ou `cancelada` não contam como válidas para a meta. Regra confirmada pela coordenação em 10/08/2026.
 
 ## Classificação de atuação
 

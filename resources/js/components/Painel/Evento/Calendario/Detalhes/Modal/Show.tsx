@@ -1,14 +1,14 @@
-import { Link } from '@inertiajs/react'
-import { type FC } from 'react'
+import { Link } from '@inertiajs/react';
+import { type FC } from 'react';
 
-import Modal from '@/components/Modal/Show'
-import { labelStatus, labelTipo } from '@/lib/evento'
-import { show } from '@/routes/eventos'
-import type { Evento } from '@/types'
+import Modal from '@/components/Modal/Show';
+import { labelStatus, labelTipo } from '@/lib/evento';
+import { show } from '@/routes/eventos';
+import type { Evento } from '@/types';
 
 interface Props {
-    evento: Evento | null
-    onFechar: () => void
+    evento: Evento | null;
+    onFechar: () => void;
 }
 
 const Show: FC<Props> = ({ evento, onFechar }) => {
@@ -18,10 +18,10 @@ const Show: FC<Props> = ({ evento, onFechar }) => {
             day: '2-digit',
             month: 'long',
             year: 'numeric',
-        })
+        });
 
     const formatarHora = (d: Date) =>
-        d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
     return (
         <Modal isOpen={evento !== null} onClose={onFechar} className="max-w-md">
@@ -43,24 +43,36 @@ const Show: FC<Props> = ({ evento, onFechar }) => {
 
                     <dl className="space-y-3 text-sm">
                         <div>
-                            <dt className="text-xs font-medium uppercase text-gray-400">Título</dt>
-                            <dd className="mt-0.5 font-medium text-gray-900">{evento.titulo}</dd>
+                            <dt className="text-xs font-medium text-gray-400 uppercase">
+                                Título
+                            </dt>
+                            <dd className="mt-0.5 font-medium text-gray-900">
+                                {evento.titulo}
+                            </dd>
                         </div>
 
                         <div>
-                            <dt className="text-xs font-medium uppercase text-gray-400">Tipo</dt>
-                            <dd className="mt-0.5 text-gray-700">{labelTipo(evento.tipo)}</dd>
+                            <dt className="text-xs font-medium text-gray-400 uppercase">
+                                Tipo
+                            </dt>
+                            <dd className="mt-0.5 text-gray-700">
+                                {labelTipo(evento.tipo)}
+                            </dd>
                         </div>
 
                         <div>
-                            <dt className="text-xs font-medium uppercase text-gray-400">Data</dt>
+                            <dt className="text-xs font-medium text-gray-400 uppercase">
+                                Data
+                            </dt>
                             <dd className="mt-0.5 text-gray-700 capitalize">
                                 {formatarData(new Date(evento.data_inicio))}
                             </dd>
                         </div>
 
                         <div>
-                            <dt className="text-xs font-medium uppercase text-gray-400">Horário</dt>
+                            <dt className="text-xs font-medium text-gray-400 uppercase">
+                                Horário
+                            </dt>
                             <dd className="mt-0.5 text-gray-700">
                                 {formatarHora(new Date(evento.data_inicio))}
                                 {evento.data_fim
@@ -70,12 +82,18 @@ const Show: FC<Props> = ({ evento, onFechar }) => {
                         </div>
 
                         <div>
-                            <dt className="text-xs font-medium uppercase text-gray-400">Local</dt>
-                            <dd className="mt-0.5 text-gray-700">{evento.local ?? '—'}</dd>
+                            <dt className="text-xs font-medium text-gray-400 uppercase">
+                                Local
+                            </dt>
+                            <dd className="mt-0.5 text-gray-700">
+                                {evento.local ?? '—'}
+                            </dd>
                         </div>
 
                         <div>
-                            <dt className="text-xs font-medium uppercase text-gray-400">Status</dt>
+                            <dt className="text-xs font-medium text-gray-400 uppercase">
+                                Status
+                            </dt>
                             <dd className="mt-0.5">
                                 <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
                                     {labelStatus(evento.status)}
@@ -84,7 +102,9 @@ const Show: FC<Props> = ({ evento, onFechar }) => {
                         </div>
 
                         <div>
-                            <dt className="text-xs font-medium uppercase text-gray-400">Vagas</dt>
+                            <dt className="text-xs font-medium text-gray-400 uppercase">
+                                Vagas
+                            </dt>
                             <dd className="mt-0.5 text-gray-700">
                                 {evento.participantes_ativos_count ?? 0}/
                                 {evento.limite_participantes ?? '∞'}
@@ -93,8 +113,12 @@ const Show: FC<Props> = ({ evento, onFechar }) => {
 
                         {evento.responsavel && (
                             <div>
-                                <dt className="text-xs font-medium uppercase text-gray-400">Responsável</dt>
-                                <dd className="mt-0.5 text-gray-700">{evento.responsavel.name}</dd>
+                                <dt className="text-xs font-medium text-gray-400 uppercase">
+                                    Responsável
+                                </dt>
+                                <dd className="mt-0.5 text-gray-700">
+                                    {evento.responsavel.name}
+                                </dd>
                             </div>
                         )}
                     </dl>
@@ -111,7 +135,7 @@ const Show: FC<Props> = ({ evento, onFechar }) => {
                 </div>
             )}
         </Modal>
-    )
-}
+    );
+};
 
-export default Show
+export default Show;

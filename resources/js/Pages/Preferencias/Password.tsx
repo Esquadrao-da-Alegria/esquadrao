@@ -7,7 +7,10 @@ import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
-import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses';
+import {
+    painelInputClass,
+    painelLabelClass,
+} from '@/lib/painelFormFieldClasses';
 import { Check } from 'lucide-react';
 
 export default function Password() {

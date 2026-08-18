@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import PainelLayout from '@/layouts/PainelLayout';
 import SettingsLayout from '@/layouts/Settings/Layout';
-import { disable, enable, show } from '@/routes/two-factor';
+import { disable, enable } from '@/routes/two-factor';
 import { Form, Head } from '@inertiajs/react';
 import { ShieldBan, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
@@ -46,11 +46,11 @@ export default function TwoFactor({
                             <div className="flex flex-col items-start justify-start space-y-4">
                                 <Badge variant="default">Ativado</Badge>
                                 <p className="text-muted-foreground">
-                                    Com a autenticação em dois fatores
-                                    ativada, você precisará informar um código
-                                    seguro e aleatório ao entrar. Use um
-                                    aplicativo compatível com TOTP no seu
-                                    celular para gerar o código.
+                                    Com a autenticação em dois fatores ativada,
+                                    você precisará informar um código seguro e
+                                    aleatório ao entrar. Use um aplicativo
+                                    compatível com TOTP no seu celular para
+                                    gerar o código.
                                 </p>
 
                                 <TwoFactorRecoveryCodes

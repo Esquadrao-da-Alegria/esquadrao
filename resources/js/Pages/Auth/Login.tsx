@@ -80,7 +80,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     />
                                     <Label
                                         htmlFor="remember"
-                                        className="cursor-pointer text-sm font-normal leading-none text-muted-foreground"
+                                        className="cursor-pointer text-sm leading-none font-normal text-muted-foreground"
                                     >
                                         Manter conectado
                                     </Label>

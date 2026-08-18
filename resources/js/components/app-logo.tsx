@@ -1,7 +1,6 @@
 import AppLogoIcon from './app-logo-icon';
 
-const appName =
-    import.meta.env.VITE_APP_NAME || 'Esquadrão da Alegria';
+const appName = import.meta.env.VITE_APP_NAME || 'Esquadrão da Alegria';
 
 export default function AppLogo() {
     return (

@@ -1,56 +1,64 @@
-import { type FC } from 'react'
-import type { Evento } from '@/types'
-import type { Visita } from '@/types/visita'
-import CardShow from '@/components/Painel/Visita/Card/Show'
-import EventoCardShow from '@/components/Painel/Visita/Card/EventoCardShow'
+import EventoCardShow from '@/components/Painel/Visita/Card/EventoCardShow';
+import CardShow from '@/components/Painel/Visita/Card/Show';
+import type { Evento } from '@/types';
+import type { Visita } from '@/types/visita';
+import { type FC } from 'react';
 
-const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-const MAX_CARDS = 2
+const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const MAX_CARDS = 2;
 
 export type ItemCalendarioVisita =
     | { tipo: 'visita'; data: Visita; dataInicio: Date }
-    | { tipo: 'evento'; data: Evento; dataInicio: Date }
+    | { tipo: 'evento'; data: Evento; dataInicio: Date };
 
 interface Props {
-    visitas: Visita[]
-    eventos?: Evento[]
-    mes: string // YYYY-MM
-    onSelecionarVisita: (visita: Visita) => void
-    onSelecionarEvento?: (evento: Evento) => void
-    onAbrirListaCompleta: (dia: Date, visitas: Visita[], eventos: Evento[]) => void
+    visitas: Visita[];
+    eventos?: Evento[];
+    mes: string; // YYYY-MM
+    onSelecionarVisita: (visita: Visita) => void;
+    onSelecionarEvento?: (evento: Evento) => void;
+    onAbrirListaCompleta: (
+        dia: Date,
+        visitas: Visita[],
+        eventos: Evento[],
+    ) => void;
 }
 
 function gerarDiasDoMes(mes: string): Date[] {
-    const [ano, mesNum] = mes.split('-').map(Number)
-    const primeiroDia = new Date(ano, mesNum - 1, 1)
-    const ultimoDia = new Date(ano, mesNum, 0)
+    const [ano, mesNum] = mes.split('-').map(Number);
+    const primeiroDia = new Date(ano, mesNum - 1, 1);
+    const ultimoDia = new Date(ano, mesNum, 0);
 
-    const dias: Date[] = []
+    const dias: Date[] = [];
 
     // Dias do mês anterior para completar a primeira semana
-    const diaInicio = primeiroDia.getDay() // 0 = Dom
+    const diaInicio = primeiroDia.getDay(); // 0 = Dom
     for (let i = diaInicio - 1; i >= 0; i--) {
-        const d = new Date(primeiroDia)
-        d.setDate(d.getDate() - (i + 1))
-        dias.push(d)
+        const d = new Date(primeiroDia);
+        d.setDate(d.getDate() - (i + 1));
+        dias.push(d);
     }
 
     // Dias do mês atual
-    for (let d = new Date(primeiroDia); d <= ultimoDia; d.setDate(d.getDate() + 1)) {
-        dias.push(new Date(d))
+    for (
+        let d = new Date(primeiroDia);
+        d <= ultimoDia;
+        d.setDate(d.getDate() + 1)
+    ) {
+        dias.push(new Date(d));
     }
 
     // Dias do próximo mês para completar a última semana
-    const restante = 7 - (dias.length % 7)
+    const restante = 7 - (dias.length % 7);
     if (restante < 7) {
         for (let i = 1; i <= restante; i++) {
-            const d = new Date(ultimoDia)
-            d.setDate(d.getDate() + i)
-            dias.push(d)
+            const d = new Date(ultimoDia);
+            d.setDate(d.getDate() + i);
+            dias.push(d);
         }
     }
 
-    return dias
+    return dias;
 }
 
 function mesmodia(d1: Date, d2: Date): boolean {
@@ -58,7 +66,7 @@ function mesmodia(d1: Date, d2: Date): boolean {
         d1.getFullYear() === d2.getFullYear() &&
         d1.getMonth() === d2.getMonth() &&
         d1.getDate() === d2.getDate()
-    )
+    );
 }
 
 const Show: FC<Props> = ({
@@ -69,9 +77,9 @@ const Show: FC<Props> = ({
     onSelecionarEvento,
     onAbrirListaCompleta,
 }) => {
-    const dias = gerarDiasDoMes(mes)
-    const [ano, mesNum] = mes.split('-').map(Number)
-    const hoje = new Date()
+    const dias = gerarDiasDoMes(mes);
+    const [ano, mesNum] = mes.split('-').map(Number);
+    const hoje = new Date();
 
     return (
         <div className="overflow-x-auto rounded-2xl border border-amber-100 bg-white shadow-sm">
@@ -81,7 +89,7 @@ const Show: FC<Props> = ({
                     {DIAS_SEMANA.map((dia) => (
                         <div
                             key={dia}
-                            className="py-2 text-center text-xs font-semibold uppercase tracking-wide text-amber-700/70"
+                            className="py-2 text-center text-xs font-semibold tracking-wide text-amber-700/70 uppercase"
                         >
                             {dia}
                         </div>
@@ -91,13 +99,15 @@ const Show: FC<Props> = ({
                 {/* Grade de dias */}
                 <div className="grid grid-cols-7">
                     {dias.map((dia, idx) => {
-                        const ehMesAtual = dia.getMonth() === mesNum - 1 && dia.getFullYear() === ano
+                        const ehMesAtual =
+                            dia.getMonth() === mesNum - 1 &&
+                            dia.getFullYear() === ano;
                         const visitasDoDia = visitas.filter((v) =>
                             mesmodia(new Date(v.inicio_em), dia),
-                        )
+                        );
                         const eventosDoDia = eventos.filter((e) =>
                             mesmodia(new Date(e.data_inicio), dia),
-                        )
+                        );
 
                         const itensDoDia: ItemCalendarioVisita[] = [
                             ...visitasDoDia.map((v) => ({
@@ -110,17 +120,20 @@ const Show: FC<Props> = ({
                                 data: e,
                                 dataInicio: new Date(e.data_inicio),
                             })),
-                        ].sort((a, b) => a.dataInicio.getTime() - b.dataInicio.getTime())
+                        ].sort(
+                            (a, b) =>
+                                a.dataInicio.getTime() - b.dataInicio.getTime(),
+                        );
 
-                        const itensVisiveis = itensDoDia.slice(0, MAX_CARDS)
-                        const overflow = itensDoDia.length - MAX_CARDS
+                        const itensVisiveis = itensDoDia.slice(0, MAX_CARDS);
+                        const overflow = itensDoDia.length - MAX_CARDS;
 
-                        const ehHoje = mesmodia(dia, hoje)
+                        const ehHoje = mesmodia(dia, hoje);
 
                         return (
                             <div
                                 key={idx}
-                                className={`min-h-[6rem] border-b border-r border-gray-100 p-1.5 ${
+                                className={`min-h-[6rem] border-r border-b border-gray-100 p-1.5 ${
                                     !ehMesAtual ? 'bg-gray-50/50' : ''
                                 }`}
                             >
@@ -142,13 +155,21 @@ const Show: FC<Props> = ({
                                             <CardShow
                                                 key={`visita-${item.data.id}`}
                                                 visita={item.data}
-                                                onClick={() => onSelecionarVisita(item.data)}
+                                                onClick={() =>
+                                                    onSelecionarVisita(
+                                                        item.data,
+                                                    )
+                                                }
                                             />
                                         ) : (
                                             <EventoCardShow
                                                 key={`evento-${item.data.id}`}
                                                 evento={item.data}
-                                                onClick={() => onSelecionarEvento?.(item.data)}
+                                                onClick={() =>
+                                                    onSelecionarEvento?.(
+                                                        item.data,
+                                                    )
+                                                }
                                             />
                                         ),
                                     )}
@@ -157,7 +178,11 @@ const Show: FC<Props> = ({
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                onAbrirListaCompleta(dia, visitasDoDia, eventosDoDia)
+                                                onAbrirListaCompleta(
+                                                    dia,
+                                                    visitasDoDia,
+                                                    eventosDoDia,
+                                                )
                                             }
                                             className="w-full rounded px-1 py-0.5 text-left text-xs text-amber-700 hover:bg-amber-50"
                                         >
@@ -166,12 +191,12 @@ const Show: FC<Props> = ({
                                     )}
                                 </div>
                             </div>
-                        )
+                        );
                     })}
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Show
+export default Show;

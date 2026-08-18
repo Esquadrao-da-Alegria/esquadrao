@@ -2,7 +2,8 @@ import { User } from '@/types';
 
 export type StatusKey = 'pendente' | 'aceito' | 'expirado' | 'cancelado';
 
-export type StatusFiltro = StatusKey | 'afastados' | 'ativos' | 'todos' | string;
+export type StatusFiltro =
+    StatusKey | 'afastados' | 'ativos' | 'todos' | string;
 
 export type AbaKey = 'voluntarios' | 'convidados';
 

@@ -1,13 +1,12 @@
 import MarketingLayout from '@/layouts/MarketingLayout';
 import { toastSucesso } from '@/lib/utils/toast';
-import { toast } from 'react-toastify';
 
 const Index: React.FC = () => {
     const pixCode = 'SEU_CODIGO_PIX_AQUI'; // Substitua pelo código PIX real
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(pixCode);
-        toastSucesso("Código PIX copiado para a área de transferência");
+        toastSucesso('Código PIX copiado para a área de transferência');
     };
 
     return (
