@@ -74,6 +74,12 @@ export const formatarData = (data?: string) => {
         return '-';
     }
 
+    const match = data.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+        const [, ano, mes, dia] = match;
+        return `${dia}/${mes}/${ano}`;
+    }
+
     return new Intl.DateTimeFormat('pt-BR').format(new Date(data));
 };
 

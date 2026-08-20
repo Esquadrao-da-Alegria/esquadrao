@@ -174,9 +174,14 @@ A exclusão administrativa é lógica no fluxo de serviço: o voluntário e sua 
 3. **Prorrogação de Afastamento**:
    - Administrador pode prorrogar a licença informando nova data de fim (maior que a atual) e justificativa.
    - O status é atualizado para `prorrogado`, as observações registram o histórico com timestamp e as visitas agendadas no novo período estendido são canceladas.
-4. **Encerramento Antecipado**:
+4. **Edição e Ajuste de Afastamento**:
+   - Administrador pode alterar a qualquer momento a `data_inicio`, `data_fim`, `motivo` e `observacoes` de um afastamento ativo ou histórico.
+   - Permite correções e reduções de prazo (ex: de 18/09/2026 para 01/09/2026), com validação de sobreposição exclusiva para outros afastamentos do voluntário e novo cancelamento de visitas agendadas no período atualizado.
+5. **Encerramento Antecipado**:
    - Administrador pode encerrar o afastamento a qualquer momento.
    - O status é atualizado para `encerrado`, a `data_fim` é definida como a data atual e o voluntário volta a poder participar de novas visitas normalmente.
+6. **Exclusão de Afastamento**:
+   - Administrador pode excluir um registro de afastamento lançado indevidamente ou por engano.
 
 ---
 
@@ -214,6 +219,10 @@ A exclusão administrativa é lógica no fluxo de serviço: o voluntário e sua 
 - `app/Http/Controllers/Web/VoluntarioController.php`
 - `app/Http/Controllers/Web/ConviteCadastroController.php`
 - `app/Http/Controllers/Web/Voluntario/Afastamento/Controller.php`
+- `app/Http/Requests/Web/Voluntario/Afastamento/StoreRequest.php`
+- `app/Http/Requests/Web/Voluntario/Afastamento/UpdateRequest.php`
+- `app/Http/Requests/Web/Voluntario/Afastamento/ProrrogarRequest.php`
+- `app/Http/Requests/Web/Voluntario/Afastamento/EncerrarRequest.php`
 - `app/Services/Voluntario/Service.php`
 - `app/Services/Voluntario/Afastamento/Service.php`
 - `app/Queries/Voluntario/Queries.php`
