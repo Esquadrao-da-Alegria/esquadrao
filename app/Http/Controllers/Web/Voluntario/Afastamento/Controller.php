@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller as BaseController;
 use App\Http\Requests\Web\Voluntario\Afastamento\EncerrarRequest;
 use App\Http\Requests\Web\Voluntario\Afastamento\ProrrogarRequest;
 use App\Http\Requests\Web\Voluntario\Afastamento\StoreRequest;
+use App\Http\Requests\Web\Voluntario\Afastamento\UpdateRequest;
 use App\Models\Voluntario;
 use App\Models\VoluntarioAfastamento;
 use App\Services\Voluntario\Afastamento\Service;
@@ -16,6 +17,31 @@ class Controller extends BaseController
     public function store(StoreRequest $request, Voluntario $voluntario, Service $service): RedirectResponse
     {
         $service->store($voluntario, $request->user(), $request->validated());
+
+        return back();
+    }
+
+    public function update(
+        UpdateRequest $request,
+        Voluntario $voluntario,
+        VoluntarioAfastamento $afastamento,
+        Service $service
+    ): RedirectResponse {
+        abort_if((int) $afastamento->voluntario_id !== (int) $voluntario->id, 404);
+
+        $service->update($afastamento, $request->validated(), $request->user());
+
+        return back();
+    }
+
+    public function destroy(
+        Voluntario $voluntario,
+        VoluntarioAfastamento $afastamento,
+        Service $service
+    ): RedirectResponse {
+        abort_if((int) $afastamento->voluntario_id !== (int) $voluntario->id, 404);
+
+        $service->destroy($afastamento);
 
         return back();
     }

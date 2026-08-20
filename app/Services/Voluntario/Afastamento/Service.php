@@ -110,6 +110,139 @@ class Service
         }
     }
 
+    public function update(VoluntarioAfastamento $afastamento, array $dados, ?User $usuario = null): array
+    {
+        try {
+            DB::beginTransaction();
+
+            $dataInicio = Carbon::parse($dados['data_inicio'])->toDateString();
+            $dataFim = Carbon::parse($dados['data_fim'])->toDateString();
+
+            if ($dataInicio > $dataFim) {
+                DB::rollBack();
+
+                return [
+                    'sucesso' => false,
+                    'dados' => [],
+                    'erros' => ['A data de início não pode ser posterior à data de fim.'],
+                ];
+            }
+
+            $sobreposicao = VoluntarioAfastamento::query()
+                ->where('voluntario_id', $afastamento->voluntario_id)
+                ->where('id', '!=', $afastamento->id)
+                ->whereIn('status', [StatusAfastamento::Ativo->value, StatusAfastamento::Prorrogado->value])
+                ->where(function ($query) use ($dataInicio, $dataFim) {
+                    $query->where('data_inicio', '<=', $dataFim)
+                        ->where('data_fim', '>=', $dataInicio);
+                })
+                ->exists();
+
+            if ($sobreposicao) {
+                DB::rollBack();
+                session()->flash('mensagem_erro', 'O voluntário já possui outro afastamento ativo no período informado.');
+
+                return [
+                    'sucesso' => false,
+                    'dados' => [],
+                    'erros' => ['O voluntário já possui outro afastamento ativo no período informado.'],
+                ];
+            }
+
+            $motivo = isset($dados['motivo'])
+                ? ($dados['motivo'] instanceof MotivoAfastamento ? $dados['motivo']->value : (string) $dados['motivo'])
+                : ($afastamento->motivo instanceof MotivoAfastamento ? $afastamento->motivo->value : (string) $afastamento->motivo);
+
+            $status = isset($dados['status'])
+                ? ($dados['status'] instanceof StatusAfastamento ? $dados['status']->value : (string) $dados['status'])
+                : ($afastamento->status instanceof StatusAfastamento ? $afastamento->status->value : (string) $afastamento->status);
+
+            $payload = [
+                'data_inicio' => $dataInicio,
+                'data_fim' => $dataFim,
+                'motivo' => $motivo,
+                'status' => $status,
+                'observacoes' => $dados['observacoes'] ?? null,
+            ];
+
+            $retorno = $this->queries->update($afastamento->id, $payload);
+
+            if (! $retorno['sucesso']) {
+                DB::rollBack();
+                session()->flash('mensagem_erro', 'Erro ao atualizar afastamento.');
+
+                return $retorno;
+            }
+
+            $voluntario = $afastamento->voluntario;
+            if ($voluntario && in_array($status, [StatusAfastamento::Ativo->value, StatusAfastamento::Prorrogado->value], true)) {
+                $this->cancelarInscricoesVisitasNoPeriodo($voluntario, $dataInicio, $dataFim);
+            }
+
+            session()->flash('mensagem_sucesso', 'Afastamento atualizado com sucesso!');
+
+            DB::commit();
+
+            return [
+                'sucesso' => true,
+                'dados' => ['model' => $afastamento->fresh()],
+                'erros' => [],
+            ];
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error('Erro ao atualizar afastamento de voluntário.', [
+                'erro' => formatarMensagemErro($th),
+                'afastamento_id' => $afastamento->id,
+            ]);
+            session()->flash('mensagem_erro', 'Erro ao atualizar afastamento.');
+
+            return [
+                'sucesso' => false,
+                'dados' => [],
+                'erros' => [formatarMensagemErro($th)],
+            ];
+        }
+    }
+
+    public function destroy(VoluntarioAfastamento $afastamento): array
+    {
+        try {
+            DB::beginTransaction();
+
+            $retorno = $this->queries->destroy($afastamento->id);
+
+            if (! $retorno['sucesso']) {
+                DB::rollBack();
+                session()->flash('mensagem_erro', 'Erro ao excluir afastamento.');
+
+                return $retorno;
+            }
+
+            session()->flash('mensagem_sucesso', 'Afastamento excluído com sucesso!');
+
+            DB::commit();
+
+            return [
+                'sucesso' => true,
+                'dados' => [],
+                'erros' => [],
+            ];
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error('Erro ao excluir afastamento de voluntário.', [
+                'erro' => formatarMensagemErro($th),
+                'afastamento_id' => $afastamento->id,
+            ]);
+            session()->flash('mensagem_erro', 'Erro ao excluir afastamento.');
+
+            return [
+                'sucesso' => false,
+                'dados' => [],
+                'erros' => [formatarMensagemErro($th)],
+            ];
+        }
+    }
+
     public function prorrogar(VoluntarioAfastamento $afastamento, array $dados, ?User $usuario = null): array
     {
         try {
