@@ -378,5 +378,150 @@ class AfastamentoTest extends TestCase
             ['observacoes' => 'Teste']
         );
         $responseEncerrar->assertNotFound();
+
+        // Tentativa cruzada de editar
+        $responseUpdate = $this->actingAs($admin)->put(
+            route('voluntarios.afastamentos.update', [$voluntarioA, $afastamentoB]),
+            [
+                'data_inicio' => now()->toDateString(),
+                'data_fim' => now()->addDays(20)->toDateString(),
+                'motivo' => MotivoAfastamento::AtestadoMedico->value,
+            ]
+        );
+        $responseUpdate->assertNotFound();
+
+        // Tentativa cruzada de excluir
+        $responseDestroy = $this->actingAs($admin)->delete(
+            route('voluntarios.afastamentos.destroy', [$voluntarioA, $afastamentoB])
+        );
+        $responseDestroy->assertNotFound();
+    }
+
+    public function test_administrador_pode_editar_afastamento_e_reduzir_data_fim(): void
+    {
+        $admin = $this->criarAdmin();
+        [$voluntario] = $this->criarVoluntario();
+
+        $afastamento = VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntario->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->toDateString(),
+            'data_fim' => now()->addDays(30)->toDateString(),
+            'motivo' => MotivoAfastamento::AtestadoMedico,
+            'observacoes' => 'Criado com prazo longo padrão',
+            'status' => StatusAfastamento::Ativo,
+        ]);
+
+        $novaDataFim = now()->addDays(12)->toDateString();
+
+        $response = $this->actingAs($admin)->put(
+            route('voluntarios.afastamentos.update', [$voluntario, $afastamento]),
+            [
+                'data_inicio' => now()->toDateString(),
+                'data_fim' => $novaDataFim,
+                'motivo' => MotivoAfastamento::LicencaPessoal->value,
+                'observacoes' => 'Ajustado retorno para 12 dias',
+            ]
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('mensagem_sucesso');
+
+        $afastamentoAtualizado = $afastamento->fresh();
+        $this->assertEquals($novaDataFim, $afastamentoAtualizado->data_fim->toDateString());
+        $this->assertEquals(MotivoAfastamento::LicencaPessoal, $afastamentoAtualizado->motivo);
+        $this->assertEquals('Ajustado retorno para 12 dias', $afastamentoAtualizado->observacoes);
+    }
+
+    public function test_administrador_pode_excluir_afastamento(): void
+    {
+        $admin = $this->criarAdmin();
+        [$voluntario] = $this->criarVoluntario();
+
+        $afastamento = VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntario->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->toDateString(),
+            'data_fim' => now()->addDays(15)->toDateString(),
+            'motivo' => MotivoAfastamento::AtestadoMedico,
+            'status' => StatusAfastamento::Ativo,
+        ]);
+
+        $this->assertDatabaseHas('voluntario_afastamentos', ['id' => $afastamento->id]);
+
+        $response = $this->actingAs($admin)->delete(
+            route('voluntarios.afastamentos.destroy', [$voluntario, $afastamento])
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('mensagem_sucesso');
+
+        $this->assertDatabaseMissing('voluntario_afastamentos', ['id' => $afastamento->id]);
+    }
+
+    public function test_nao_permite_editar_afastamento_com_data_inicio_posterior_a_data_fim(): void
+    {
+        $admin = $this->criarAdmin();
+        [$voluntario] = $this->criarVoluntario();
+
+        $afastamento = VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntario->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->toDateString(),
+            'data_fim' => now()->addDays(15)->toDateString(),
+            'motivo' => MotivoAfastamento::AtestadoMedico,
+            'status' => StatusAfastamento::Ativo,
+        ]);
+
+        $response = $this->actingAs($admin)->put(
+            route('voluntarios.afastamentos.update', [$voluntario, $afastamento]),
+            [
+                'data_inicio' => now()->addDays(10)->toDateString(),
+                'data_fim' => now()->addDays(5)->toDateString(),
+                'motivo' => MotivoAfastamento::AtestadoMedico->value,
+            ]
+        );
+
+        $response->assertSessionHasErrors(['data_fim']);
+    }
+
+    public function test_nao_permite_editar_afastamento_sobrepondo_outro_afastamento_ativo(): void
+    {
+        $admin = $this->criarAdmin();
+        [$voluntario] = $this->criarVoluntario();
+
+        $afastamento1 = VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntario->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->toDateString(),
+            'data_fim' => now()->addDays(10)->toDateString(),
+            'motivo' => MotivoAfastamento::AtestadoMedico,
+            'status' => StatusAfastamento::Ativo,
+        ]);
+
+        $afastamento2 = VoluntarioAfastamento::create([
+            'voluntario_id' => $voluntario->id,
+            'registrado_por_id' => $admin->id,
+            'data_inicio' => now()->addDays(20)->toDateString(),
+            'data_fim' => now()->addDays(30)->toDateString(),
+            'motivo' => MotivoAfastamento::LicencaPessoal,
+            'status' => StatusAfastamento::Ativo,
+        ]);
+
+        // Tenta editar afastamento 2 para cobrir o período do afastamento 1
+        $response = $this->actingAs($admin)->put(
+            route('voluntarios.afastamentos.update', [$voluntario, $afastamento2]),
+            [
+                'data_inicio' => now()->addDays(5)->toDateString(),
+                'data_fim' => now()->addDays(25)->toDateString(),
+                'motivo' => MotivoAfastamento::LicencaPessoal->value,
+            ]
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHas('mensagem_erro');
+
+        // Garante que afastamento 2 manteve as datas originais
+        $this->assertEquals(now()->addDays(20)->toDateString(), $afastamento2->fresh()->data_inicio->toDateString());
     }
 }

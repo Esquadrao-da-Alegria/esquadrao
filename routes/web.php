@@ -157,6 +157,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::prefix('voluntarios/{voluntario}/afastamentos')->scopeBindings()->name('voluntarios.afastamentos.')->group(function () {
             Route::post('/', [VoluntarioAfastamentoController::class, 'store'])->name('store');
+            Route::put('{afastamento}', [VoluntarioAfastamentoController::class, 'update'])->name('update');
+            Route::delete('{afastamento}', [VoluntarioAfastamentoController::class, 'destroy'])->name('destroy');
             Route::post('{afastamento}/prorrogar', [VoluntarioAfastamentoController::class, 'prorrogar'])->name('prorrogar');
             Route::post('{afastamento}/encerrar', [VoluntarioAfastamentoController::class, 'encerrar'])->name('encerrar');
         });
