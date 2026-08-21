@@ -30,6 +30,18 @@ Para que o reviewer consiga realizar a análise, é necessário configurar a cha
 
 *Nota: Se a secret não estiver configurada, o workflow executará sem falhar, mas emitirá um aviso nos logs indicando que a revisão foi ignorada.*
 
+## 🧠 Configuração do Modelo (GEMINI_MODEL)
+
+O reviewer utiliza `gemini-3.6-flash` por padrão. Para substituir o modelo sem alterar o código:
+
+1. No repositório do GitHub, acesse **Settings** > **Secrets and variables** > **Actions**.
+2. Selecione a aba **Variables**.
+3. Crie ou atualize a variável de repositório `GEMINI_MODEL` com o identificador do modelo desejado.
+
+A variável deve ser criada em **Variables**, não em **Secrets**. Quando ela estiver ausente ou vazia, o script utilizará automaticamente `gemini-3.6-flash`.
+
+O script tenta primeiro a Interactions API e utiliza `generateContent` como fallback. O modelo selecionado e eventuais erros das duas tentativas são registrados nos logs do workflow.
+
 ---
 
 ## 📚 Fonte de Regras do Reviewer
