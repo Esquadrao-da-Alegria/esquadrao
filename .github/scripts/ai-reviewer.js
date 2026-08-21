@@ -9,7 +9,7 @@ import path from 'path';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
 const GITHUB_EVENT_PATH = process.env.GITHUB_EVENT_PATH;
 
@@ -27,6 +27,7 @@ const DIRETORIOS_IGNORADOS = [
 
 async function executarRevisao() {
     console.log('🤖 Iniciando Esquadrão AI Reviewer...');
+    console.log(`🧠 Modelo Gemini: ${GEMINI_MODEL}`);
 
     if (!GEMINI_API_KEY) {
         console.warn('⚠️ GEMINI_API_KEY não encontrada nos Secrets. O AI Reviewer será ignorado.');
@@ -226,9 +227,28 @@ Sua resposta DEVE ser um objeto JSON estrito no seguinte formato:
             model: GEMINI_MODEL,
             input: promptText,
             system_instruction: systemInstruction,
-            generation_config: {
-                temperature: 0.2,
-                response_mime_type: 'application/json'
+            response_format: {
+                type: 'text',
+                mime_type: 'application/json',
+                schema: {
+                    type: 'object',
+                    properties: {
+                        summaryMarkdown: { type: 'string' },
+                        inlineComments: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    path: { type: 'string' },
+                                    line: { type: 'integer' },
+                                    body: { type: 'string' }
+                                },
+                                required: ['path', 'line', 'body']
+                            }
+                        }
+                    },
+                    required: ['summaryMarkdown', 'inlineComments']
+                }
             }
         };
 
@@ -240,13 +260,20 @@ Sua resposta DEVE ser um objeto JSON estrito no seguinte formato:
 
         if (resInteractions.ok) {
             const data = await resInteractions.json();
-            const rawText = data?.output || data?.outputs?.[0]?.text || data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.text;
+            const etapaModelo = data?.steps?.findLast((step) => step.type === 'model_output');
+            const rawText = etapaModelo?.content?.find((content) => content.type === 'text')?.text || data?.output_text;
+
             if (rawText) {
                 return parsearRespostaJson(rawText);
             }
+
+            console.warn('⚠️ Interactions API retornou uma resposta sem conteúdo. Tentando generateContent...');
+        } else {
+            const errText = await resInteractions.text();
+            console.warn(`⚠️ Interactions API falhou: ${resInteractions.status} ${errText}. Tentando generateContent...`);
         }
-    } catch (e) {
-        console.log('ℹ️ Tentativa via Interactions API falhou, tentando generateContent...');
+    } catch (erro) {
+        console.warn(`⚠️ Interactions API falhou: ${erro.message || erro}. Tentando generateContent...`);
     }
 
     // 2. Fallback para API generateContent legada
@@ -262,7 +289,6 @@ Sua resposta DEVE ser um objeto JSON estrito no seguinte formato:
             parts: [{ text: systemInstruction }]
         },
         generationConfig: {
-            temperature: 0.2,
             responseMimeType: 'application/json'
         }
     };
