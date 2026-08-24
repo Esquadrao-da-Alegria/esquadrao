@@ -21,8 +21,10 @@ import CalendarioShow from '@/components/Painel/Visita/Calendario/Show';
 // ICONS
 import {
     CalendarDays,
+    ChevronDown,
     ChevronLeft,
     ChevronRight,
+    Download,
     MapPin,
     Plus,
 } from 'lucide-react';
@@ -78,6 +80,7 @@ const Index: FC<Props> = ({
     const [diaOverflow, setDiaOverflow] = useState<Date | null>(null);
     const [visitasOverflow, setVisitasOverflow] = useState<Visita[]>([]);
     const [eventosOverflow, setEventosOverflow] = useState<Evento[]>([]);
+    const [mostrarExport, setMostrarExport] = useState(false);
 
     const navegar = (novoMes: string, novaCidade: number | 'todas') => {
         const query: Record<string, string | number> = { mes: novoMes };
@@ -195,6 +198,37 @@ const Index: FC<Props> = ({
                             >
                                 <ChevronRight className="size-4" />
                             </button>
+                        </div>
+
+                        {/* Exportar para calendário */}
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setMostrarExport(!mostrarExport)}
+                                className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border border-amber-300 bg-white px-4 py-2.5 text-sm font-medium text-amber-700 shadow-sm transition hover:bg-amber-50 focus:outline-none sm:w-auto"
+                            >
+                                <Download className="size-4" aria-hidden />
+                                Exportar
+                                <ChevronDown className="size-3.5" aria-hidden />
+                            </button>
+                            {mostrarExport && (
+                                <div className="absolute right-0 z-10 mt-2 w-52 rounded-xl border border-amber-100 bg-white shadow-lg">
+                                    <a
+                                        href="/calendario/exportar/visitas?tipo=minhas"
+                                        className="flex rounded-t-xl px-4 py-2.5 text-sm text-amber-900 hover:bg-amber-50"
+                                        onClick={() => setMostrarExport(false)}
+                                    >
+                                        Minhas visitas
+                                    </a>
+                                    <a
+                                        href="/calendario/exportar/visitas?tipo=cidade"
+                                        className="flex rounded-b-xl px-4 py-2.5 text-sm text-amber-900 hover:bg-amber-50"
+                                        onClick={() => setMostrarExport(false)}
+                                    >
+                                        Todas da minha cidade
+                                    </a>
+                                </div>
+                            )}
                         </div>
 
                         {/* Botão nova visita */}
