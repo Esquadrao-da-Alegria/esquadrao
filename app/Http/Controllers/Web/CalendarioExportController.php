@@ -28,13 +28,18 @@ class CalendarioExportController extends Controller
             $user->loadMissing('voluntario');
             $cidadeId = $user->voluntario?->cidade_base_id;
 
-            if ($cidadeId) {
-                $query->where(function ($q) use ($cidadeId) {
-                    $q->whereHas('hospital', fn ($h) => $h->where('cidade_id', $cidadeId))
-                        ->orWhere(fn ($h) => $h->whereNull('hospital_id')
-                            ->whereHas('lider.voluntario', fn ($v) => $v->where('cidade_base_id', $cidadeId)));
-                });
+            if (! $cidadeId) {
+                return $this->respostaIcs(
+                    $this->gerarIcs('Visitas - Minha Cidade', collect(), fn ($v) => $this->visitaParaVevent($v)),
+                    'visitas.ics',
+                );
             }
+
+            $query->where(function ($q) use ($cidadeId) {
+                $q->whereHas('hospital', fn ($h) => $h->where('cidade_id', $cidadeId))
+                    ->orWhere(fn ($h) => $h->whereNull('hospital_id')
+                        ->whereHas('lider.voluntario', fn ($v) => $v->where('cidade_base_id', $cidadeId)));
+            });
         } else {
             $query->whereHas('participantes', fn ($q) => $q->where('voluntario_id', $user->id));
         }
@@ -129,7 +134,7 @@ class CalendarioExportController extends Controller
             'DTEND:' . $fim->format('Ymd\THis\Z'),
             'SUMMARY:' . $this->escaparIcs($titulo),
             'LOCATION:' . $this->escaparIcs($local),
-            'DESCRIPTION:' . $this->escaparIcs(implode('\\n', $descricao)),
+            'DESCRIPTION:' . $this->escaparIcs(implode("\n", $descricao)),
             'END:VEVENT',
         ];
     }
