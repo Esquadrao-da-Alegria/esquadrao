@@ -56,7 +56,9 @@ class CalendarioExportController extends Controller
 
         $eventos = Evento::query()
             ->where('status', '!=', 'cancelado')
-            ->when($cidadeId, fn ($q) => $q->where('cidade_id', $cidadeId))
+            ->when($cidadeId, fn ($q) => $q->where(
+                fn ($sub) => $sub->where('cidade_id', $cidadeId)->orWhereNull('cidade_id')
+            ))
             ->with(['cidade'])
             ->orderBy('data_inicio')
             ->get();
@@ -169,6 +171,7 @@ class CalendarioExportController extends Controller
         $valor = str_replace('\\', '\\\\', $valor);
         $valor = str_replace(';', '\;', $valor);
         $valor = str_replace(',', '\,', $valor);
+        $valor = str_replace(["\r\n", "\r", "\n"], '\n', $valor);
 
         return $valor;
     }
