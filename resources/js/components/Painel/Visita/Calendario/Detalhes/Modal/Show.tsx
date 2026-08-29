@@ -1,5 +1,12 @@
 // REACT/INERTIA
 import { Link, router, usePage } from '@inertiajs/react';
+import {
+    ArrowUpRight,
+    FileText,
+    TriangleAlert,
+    UserPlus,
+    Zap,
+} from 'lucide-react';
 import { type FC, useEffect, useState } from 'react';
 
 import Modal from '@/components/Modal/Show';
@@ -27,6 +34,11 @@ interface Props {
     onFechar: () => void;
 }
 type Passo = 'detalhes' | 'inscricao';
+
+const botaoAcaoClass =
+    'inline-flex w-full items-center justify-center gap-2 rounded-lg border border-amber-600 bg-white px-3.5 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-50';
+const botaoPerigoClass =
+    'inline-flex w-full items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50';
 
 const Show: FC<Props> = ({ visita, onFechar }) => {
     const { auth, eh_administrador } = usePage<SharedData>().props;
@@ -256,8 +268,11 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                         )}
                     </dl>
 
-                    <div className="mt-6 rounded-2xl border border-amber-100 bg-amber-50/40 p-4">
-                        <h3 className="mb-3 text-sm font-semibold tracking-wide text-amber-900/70 uppercase">
+                    <hr className="my-3 border-gray-200" />
+
+                    <div>
+                        <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900">
+                            <FileText className="size-4" aria-hidden />
                             Relatórios
                         </h3>
                         <div className="flex flex-col gap-2">
@@ -266,7 +281,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                                     visita: visita.id!,
                                 })}
                                 onClick={fecharModal}
-                                className="inline-flex items-center justify-center rounded-full border border-amber-200 bg-white px-4 py-2.5 text-sm font-semibold text-amber-800 transition hover:bg-amber-50"
+                                className={botaoAcaoClass}
                             >
                                 Ver relatórios
                             </Link>
@@ -274,7 +289,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                                 <Link
                                     href={create.url({ visita: visita.id! })}
                                     onClick={fecharModal}
-                                    className="inline-flex items-center justify-center rounded-full border-2 border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
+                                    className={botaoAcaoClass}
                                 >
                                     Criar relatório
                                 </Link>
@@ -282,58 +297,73 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                         </div>
                     </div>
 
-                    {podeEditarVisita(auth.user, visita) && (
-                        <div className="mt-6">
-                            <Link
-                                href={edit({ visita: visita.id! }).url}
-                                onClick={fecharModal}
-                                className="inline-flex w-full items-center justify-center rounded-lg border border-amber-600 bg-white px-4 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
-                            >
-                                Visualizar Detalhes
-                            </Link>
-                        </div>
-                    )}
+                    <hr className="my-3 border-gray-200" />
 
-                    {podeCancelarVisita && visitaAgendada && (
-                        <div className="mt-3">
-                            <Button
-                                className="w-full"
-                                variant="destructive"
-                                onClick={handleCancelarVisita}
-                                disabled={cancelandoVisita}
-                            >
-                                {cancelandoVisita
-                                    ? 'Cancelando visita...'
-                                    : 'Cancelar visita'}
-                            </Button>
-                        </div>
-                    )}
-
-                    {visitaAgendada && !ehLider && (
-                        <div className="mt-6">
-                            {jaInscrito ? (
-                                <Button
-                                    className="w-full"
-                                    variant="outline"
-                                    onClick={handleCancelarInscricao}
-                                    disabled={cancelando}
+                    <div>
+                        <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900">
+                            <Zap className="size-4" aria-hidden />
+                            Ações
+                        </h3>
+                        <div className="flex flex-col gap-2">
+                            {podeEditarVisita(auth.user, visita) && (
+                                <Link
+                                    href={edit({ visita: visita.id! }).url}
+                                    onClick={fecharModal}
+                                    className={botaoAcaoClass}
                                 >
-                                    {cancelando
-                                        ? 'Cancelando...'
-                                        : 'Cancelar inscrição'}
-                                </Button>
-                            ) : (
-                                !dataFimPassou && (
-                                    <Button
-                                        className="w-full"
-                                        onClick={handleParticipar}
+                                    Visualizar detalhes
+                                    <ArrowUpRight
+                                        className="size-4"
+                                        aria-hidden
+                                    />
+                                </Link>
+                            )}
+                            {visitaAgendada &&
+                                !ehLider &&
+                                (jaInscrito ? (
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelarInscricao}
+                                        disabled={cancelando}
+                                        className={botaoAcaoClass}
                                     >
-                                        Participar
-                                    </Button>
-                                )
+                                        {cancelando
+                                            ? 'Cancelando...'
+                                            : 'Cancelar inscrição'}
+                                    </button>
+                                ) : (
+                                    !dataFimPassou && (
+                                        <button
+                                            type="button"
+                                            onClick={handleParticipar}
+                                            className={botaoAcaoClass}
+                                        >
+                                            Participar
+                                            <UserPlus
+                                                className="size-4"
+                                                aria-hidden
+                                            />
+                                        </button>
+                                    )
+                                ))}
+                            {podeCancelarVisita && visitaAgendada && (
+                                <button
+                                    type="button"
+                                    onClick={handleCancelarVisita}
+                                    disabled={cancelandoVisita}
+                                    className={botaoPerigoClass}
+                                >
+                                    {cancelandoVisita
+                                        ? 'Cancelando visita...'
+                                        : 'Cancelar visita'}
+                                    <TriangleAlert
+                                        className="size-4"
+                                        aria-hidden
+                                    />
+                                </button>
                             )}
                         </div>
-                    )}
+                    </div>
                 </div>
             )}
 
@@ -352,25 +382,26 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                             ✕
                         </button>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         <button
                             type="button"
                             onClick={() => setTipo('palhaco')}
-                            className={`w-full rounded-lg border p-4 text-left transition-colors ${tipo === 'palhaco' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}
+                            className={`w-full rounded-lg border p-3 text-left transition-colors ${tipo === 'palhaco' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}
                         >
                             <span className="mr-2">🎪</span>Palhaço
                         </button>
                         <button
                             type="button"
                             onClick={() => setTipo('paisana')}
-                            className={`w-full rounded-lg border p-4 text-left transition-colors ${tipo === 'paisana' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}
+                            className={`w-full rounded-lg border p-3 text-left transition-colors ${tipo === 'paisana' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300'}`}
                         >
                             <span className="mr-2">👔</span>Paisana
                         </button>
                     </div>
-                    <div className="mt-6 flex gap-3">
+                    <div className="mt-5 flex gap-2">
                         <Button
                             variant="outline"
+                            size="sm"
                             className="flex-1"
                             onClick={() => setPasso('detalhes')}
                             disabled={enviando}
@@ -378,6 +409,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                             Voltar
                         </Button>
                         <Button
+                            size="sm"
                             className="flex-1"
                             onClick={handleConfirmar}
                             disabled={!tipo || enviando}

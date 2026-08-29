@@ -102,8 +102,8 @@ class Service
 
     public function show(User $gestor, User $voluntario, array $filtros): array
     {
-        $gestor->loadMissing(['cargos', 'voluntario']);
-        $voluntario->loadMissing('voluntario');
+        resolverUsuario($gestor);
+        resolverUsuario($voluntario);
 
         if (! $this->possuiEscopoGlobal($gestor)
             && (int) $voluntario->voluntario?->cidade_base_id !== (int) $gestor->voluntario->cidade_base_id) {
@@ -165,7 +165,7 @@ class Service
             $fim = $inicio->copy()->endOfYear();
         }
 
-        $gestor->loadMissing(['cargos', 'voluntario']);
+        resolverUsuario($gestor);
         $cidadeId = isset($filtros['cidade_id']) ? (int) $filtros['cidade_id'] : null;
 
         if ($this->possuiEscopoGlobal($gestor)
@@ -303,7 +303,7 @@ class Service
 
     private function possuiEscopoGlobal(User $user): bool
     {
-        $user->loadMissing('cargos');
+        resolverUsuario($user);
         return $user->cargos->contains(fn ($cargo) => in_array($cargo->slug, ['administrador', 'coordenador_geral'], true));
     }
 }

@@ -11,13 +11,11 @@ class IndexRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $user = $this->user();
+        $user = usuarioAutenticado();
 
         if (! $user?->can(DashboardPermissaoService::VISITAS_POR_HOSPITAL)) {
             return false;
         }
-
-        $user->loadMissing(['cargos', 'voluntario']);
 
         if ($user->cargos->contains(fn ($cargo) => in_array($cargo->slug, ['administrador', 'coordenador_geral'], true))) {
             return true;

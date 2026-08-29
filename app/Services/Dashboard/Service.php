@@ -19,7 +19,7 @@ class Service
 
     public function index(User $user): array
     {
-        $user->loadMissing(['cargos', 'voluntario.cidadeBase']);
+        resolverUsuario($user);
         $agora = now();
         $inicioSemestre = $agora->month <= 6
             ? $agora->copy()->startOfYear()

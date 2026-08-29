@@ -6,10 +6,13 @@ use App\Models\Cidade;
 use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
+use App\Services\Visita\Agenda\Liberacao\Service as LiberacaoAgendaService;
 use Illuminate\Support\Facades\Auth;
 
 class Service
 {
+    public function __construct(private LiberacaoAgendaService $liberacaoAgendaService) {}
+
     public function buscarDados(?Visita $visita): array
     {
         $hospitais = Hospital::query()
@@ -54,9 +57,10 @@ class Service
         $lideres = $lideres->sortBy('name')->values();
 
         $retorno = [
-            'hospitais' => $hospitais,
-            'cidades'   => $cidades,
-            'lideres'   => $lideres,
+            'hospitais'        => $hospitais,
+            'cidades'          => $cidades,
+            'lideres'          => $lideres,
+            'meses_liberados'  => $this->buscarMesesLiberados(),
         ];
 
         if ($visita) {
@@ -67,5 +71,31 @@ class Service
         }
 
         return $retorno;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function buscarMesesLiberados(): array
+    {
+        $userId = Auth::id();
+
+        if (! $userId) {
+            return [];
+        }
+
+        $user = User::query()->with('voluntario')->find($userId);
+
+        if (! $user) {
+            return [];
+        }
+
+        $cidadeBaseId = $user->voluntario?->cidade_base_id;
+
+        if (! $cidadeBaseId) {
+            return [];
+        }
+
+        return $this->liberacaoAgendaService->listarMesesLiberados((int) $cidadeBaseId);
     }
 }

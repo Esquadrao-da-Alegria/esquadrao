@@ -1,5 +1,5 @@
 // REACT/INERTIA
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { type FC, useState } from 'react';
 
 // UI
@@ -9,7 +9,7 @@ import PainelLayout from '@/layouts/PainelLayout';
 import { create, index } from '@/routes/visitas';
 
 // TIPOS
-import type { Evento } from '@/types';
+import type { Evento, SharedData } from '@/types';
 import type { Visita } from '@/types/visita';
 
 // COMPONENTES
@@ -19,13 +19,7 @@ import ListaCompletaModalShow from '@/components/Painel/Visita/Calendario/ListaC
 import CalendarioShow from '@/components/Painel/Visita/Calendario/Show';
 
 // ICONS
-import {
-    CalendarDays,
-    ChevronLeft,
-    ChevronRight,
-    MapPin,
-    Plus,
-} from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, MapPin, Plus } from 'lucide-react';
 
 interface CidadeOption {
     id: number;
@@ -60,6 +54,9 @@ function mesSeguinte(mes: string): string {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
+const controleToolbarClass =
+    'flex h-10 items-center rounded-full border border-amber-200 bg-white shadow-sm';
+
 const Index: FC<Props> = ({
     visitas,
     eventos = [],
@@ -69,6 +66,10 @@ const Index: FC<Props> = ({
     cidadeUsuarioId = null,
     visitaId = null,
 }) => {
+    const { auth } = usePage<SharedData>().props;
+    const cidadeBaseUsuario =
+        cidadeUsuarioId ?? auth?.user?.voluntario?.cidade_base_id ?? null;
+
     const [visitaSelecionada, setVisitaSelecionada] = useState<Visita | null>(
         visitas.find((visita) => visita.id === visitaId) ?? null,
     );
@@ -129,13 +130,13 @@ const Index: FC<Props> = ({
                         </div>
                     </div>
 
-                    <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+                    <div className="flex flex-col gap-3 w-full sm:w-auto sm:flex-row sm:items-center sm:gap-2">
                         {/* Seletor de cidade */}
                         {cidades.length > 0 && (
-                            <div className="flex w-full items-center gap-2 rounded-full border border-amber-200 bg-white px-3.5 py-1.5 shadow-sm sm:w-auto">
+                            <div className={`${controleToolbarClass} w-full gap-2 px-3 sm:w-auto`}>
                                 <MapPin className="size-4 shrink-0 text-amber-700/70" />
                                 <select
-                                    value={cidadeId}
+                                    value={cidadeId === 'todas' ? 'todas' : String(cidadeId)}
                                     onChange={(e) =>
                                         navegar(
                                             mes,
@@ -144,19 +145,14 @@ const Index: FC<Props> = ({
                                                 : Number(e.target.value),
                                         )
                                     }
-                                    className="w-full cursor-pointer bg-transparent pr-1 text-sm font-medium text-amber-900 focus:outline-none sm:w-auto"
+                                    className="w-full bg-transparent text-sm font-medium text-amber-900 focus:outline-none cursor-pointer pr-1 sm:w-auto"
                                     aria-label="Filtrar por cidade"
                                 >
-                                    <option value="todas">
-                                        Todas as cidades
-                                    </option>
+                                    <option value="todas">Todas as cidades</option>
                                     {cidades.map((cidade) => (
-                                        <option
-                                            key={cidade.id}
-                                            value={cidade.id}
-                                        >
+                                        <option key={cidade.id} value={cidade.id}>
                                             {cidade.nome}
-                                            {cidade.id === cidadeUsuarioId
+                                            {cidade.id === cidadeBaseUsuario
                                                 ? ' (Sua cidade)'
                                                 : ''}
                                         </option>
@@ -166,13 +162,11 @@ const Index: FC<Props> = ({
                         )}
 
                         {/* Seletor de mês */}
-                        <div className="flex w-full items-center justify-between gap-1 rounded-full border border-amber-200 bg-white p-1 shadow-sm sm:w-auto">
+                        <div className={`${controleToolbarClass} w-full gap-0.5 px-1 sm:w-auto`}>
                             <button
                                 type="button"
-                                onClick={() =>
-                                    navegar(mesAnterior(mes), cidadeId)
-                                }
-                                className="flex size-8 items-center justify-center rounded-full text-amber-700 transition hover:bg-amber-50"
+                                onClick={() => navegar(mesAnterior(mes), cidadeId)}
+                                className="flex size-8 shrink-0 items-center justify-center rounded-full text-amber-700 transition hover:bg-amber-50"
                                 aria-label="Mês anterior"
                             >
                                 <ChevronLeft className="size-4" />
@@ -180,17 +174,13 @@ const Index: FC<Props> = ({
                             <input
                                 type="month"
                                 value={mes}
-                                onChange={(e) =>
-                                    navegar(e.target.value, cidadeId)
-                                }
-                                className="rounded px-2 py-1 text-sm font-medium text-amber-900 focus:outline-none"
+                                onChange={(e) => navegar(e.target.value, cidadeId)}
+                                className="bg-transparent px-1.5 text-sm font-medium text-amber-900 focus:outline-none"
                             />
                             <button
                                 type="button"
-                                onClick={() =>
-                                    navegar(mesSeguinte(mes), cidadeId)
-                                }
-                                className="flex size-8 items-center justify-center rounded-full text-amber-700 transition hover:bg-amber-50"
+                                onClick={() => navegar(mesSeguinte(mes), cidadeId)}
+                                className="flex size-8 shrink-0 items-center justify-center rounded-full text-amber-700 transition hover:bg-amber-50"
                                 aria-label="Próximo mês"
                             >
                                 <ChevronRight className="size-4" />
@@ -200,10 +190,10 @@ const Index: FC<Props> = ({
                         {/* Botão nova visita */}
                         <Link
                             href={create().url}
-                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-5 py-2.5 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
+                            className={`${controleToolbarClass} w-full shrink-0 justify-center gap-2 border-amber-600 px-4 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto`}
                         >
                             <Plus
-                                className="size-5"
+                                className="size-4"
                                 strokeWidth={2}
                                 aria-hidden
                             />
