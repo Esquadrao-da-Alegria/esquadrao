@@ -12,11 +12,41 @@ class MetaHospitalTest extends TestCase
         $semanas = MetaHospital::semanasDoMes(2026, 4);
 
         $this->assertSame([
-            ['semana' => 1, 'dia_inicio' => 1, 'dia_fim' => 4],
-            ['semana' => 2, 'dia_inicio' => 5, 'dia_fim' => 11],
-            ['semana' => 3, 'dia_inicio' => 12, 'dia_fim' => 18],
-            ['semana' => 4, 'dia_inicio' => 19, 'dia_fim' => 25],
-            ['semana' => 5, 'dia_inicio' => 26, 'dia_fim' => 30],
+            [
+                'semana'          => 1,
+                'dia_inicio'      => 1,
+                'dia_fim'         => 4,
+                'nome_dia_inicio' => 'quarta-feira',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 2,
+                'dia_inicio'      => 5,
+                'dia_fim'         => 11,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 3,
+                'dia_inicio'      => 12,
+                'dia_fim'         => 18,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 4,
+                'dia_inicio'      => 19,
+                'dia_fim'         => 25,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 5,
+                'dia_inicio'      => 26,
+                'dia_fim'         => 30,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'quinta-feira',
+            ],
         ], $semanas);
     }
 
@@ -25,10 +55,34 @@ class MetaHospitalTest extends TestCase
         $semanas = MetaHospital::semanasDoMes(2026, 2);
 
         $this->assertSame([
-            ['semana' => 1, 'dia_inicio' => 1, 'dia_fim' => 7],
-            ['semana' => 2, 'dia_inicio' => 8, 'dia_fim' => 14],
-            ['semana' => 3, 'dia_inicio' => 15, 'dia_fim' => 21],
-            ['semana' => 4, 'dia_inicio' => 22, 'dia_fim' => 28],
+            [
+                'semana'          => 1,
+                'dia_inicio'      => 1,
+                'dia_fim'         => 7,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 2,
+                'dia_inicio'      => 8,
+                'dia_fim'         => 14,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 3,
+                'dia_inicio'      => 15,
+                'dia_fim'         => 21,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 4,
+                'dia_inicio'      => 22,
+                'dia_fim'         => 28,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
         ], $semanas);
     }
 
@@ -37,12 +91,48 @@ class MetaHospitalTest extends TestCase
         $semanas = MetaHospital::semanasDoMes(2026, 8);
 
         $this->assertSame([
-            ['semana' => 1, 'dia_inicio' => 1, 'dia_fim' => 1],
-            ['semana' => 2, 'dia_inicio' => 2, 'dia_fim' => 8],
-            ['semana' => 3, 'dia_inicio' => 9, 'dia_fim' => 15],
-            ['semana' => 4, 'dia_inicio' => 16, 'dia_fim' => 22],
-            ['semana' => 5, 'dia_inicio' => 23, 'dia_fim' => 29],
-            ['semana' => 6, 'dia_inicio' => 30, 'dia_fim' => 31],
+            [
+                'semana'          => 1,
+                'dia_inicio'      => 1,
+                'dia_fim'         => 1,
+                'nome_dia_inicio' => 'sábado',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 2,
+                'dia_inicio'      => 2,
+                'dia_fim'         => 8,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 3,
+                'dia_inicio'      => 9,
+                'dia_fim'         => 15,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 4,
+                'dia_inicio'      => 16,
+                'dia_fim'         => 22,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 5,
+                'dia_inicio'      => 23,
+                'dia_fim'         => 29,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'sábado',
+            ],
+            [
+                'semana'          => 6,
+                'dia_inicio'      => 30,
+                'dia_fim'         => 31,
+                'nome_dia_inicio' => 'domingo',
+                'nome_dia_fim'    => 'segunda-feira',
+            ],
         ], $semanas);
     }
 

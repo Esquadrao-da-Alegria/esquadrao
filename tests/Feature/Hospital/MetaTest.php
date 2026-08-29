@@ -47,9 +47,11 @@ class MetaTest extends TestCase
                 ->where('mes', 6)
                 ->has('semanas', 5)
                 ->where('semanas.0', [
-                    'semana'     => 1,
-                    'dia_inicio' => 1,
-                    'dia_fim'    => 6,
+                    'semana'          => 1,
+                    'dia_inicio'      => 1,
+                    'dia_fim'         => 6,
+                    'nome_dia_inicio' => 'segunda-feira',
+                    'nome_dia_fim'    => 'sábado',
                 ])
             );
 

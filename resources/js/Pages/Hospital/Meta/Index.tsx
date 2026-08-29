@@ -60,6 +60,8 @@ interface SemanaMes {
     semana: number
     dia_inicio: number
     dia_fim: number
+    nome_dia_inicio: string
+    nome_dia_fim: string
 }
 
 interface Props {
@@ -109,18 +111,34 @@ const selecionarTextoInputMeta = (event: FocusEvent<HTMLInputElement>) => {
     event.currentTarget.select()
 }
 
-const labelSemana = (semana: number, semanas: SemanaMes[]): string => {
-    const faixa = semanas.find((item) => item.semana === semana)
+const abreviarDia = (nome: string): string => nome.split('-')[0].slice(0, 3)
 
-    if (!faixa) {
-        return `Semana ${semana}`
+const formatarPeriodoSemana = (faixa: SemanaMes): string => {
+    const diaInicio = abreviarDia(faixa.nome_dia_inicio)
+    const diaFim = abreviarDia(faixa.nome_dia_fim)
+
+    if (faixa.dia_inicio === faixa.dia_fim) {
+        return `Dia ${faixa.dia_inicio} · ${diaInicio}`
     }
 
-    const periodo = faixa.dia_inicio === faixa.dia_fim
-        ? String(faixa.dia_inicio)
-        : `${faixa.dia_inicio}–${faixa.dia_fim}`
+    return `${faixa.dia_inicio}–${faixa.dia_fim} · ${diaInicio}–${diaFim}`
+}
 
-    return `Semana ${semana} (${periodo})`
+const CelulaSemana: FC<{ semana: number; semanas: SemanaMes[] }> = ({ semana, semanas }) => {
+    const faixa = semanas.find((item) => item.semana === semana)
+
+    return (
+        <div>
+            <span className="block text-sm font-medium text-foreground">
+                Semana {semana}
+            </span>
+            {faixa ? (
+                <span className="block text-xs text-muted-foreground">
+                    {formatarPeriodoSemana(faixa)}
+                </span>
+            ) : null}
+        </div>
+    )
 }
 
 const numerosSemanas = (semanas: SemanaMes[]): number[] => semanas.map((item) => item.semana)
@@ -478,8 +496,11 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                                                         {alaNome ?? '—'}
                                                                     </td>
                                                                 ) : null}
-                                                                <td className={`${painelTableTdClass} text-muted-foreground`}>
-                                                                    {labelSemana(item.semana, semanasMes)}
+                                                                <td className={painelTableTdClass}>
+                                                                    <CelulaSemana
+                                                                        semana={item.semana}
+                                                                        semanas={semanasMes}
+                                                                    />
                                                                 </td>
                                                                 <td className={painelTableTdClass}>
                                                                     <input

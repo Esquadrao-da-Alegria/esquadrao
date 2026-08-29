@@ -14,7 +14,13 @@ class MetaHospital
      * - Primeira semana quebrada: quando o mês não começa no domingo (dia 1 até o sábado).
      * - Última semana quebrada: quando o mês não termina no sábado (domingo até o último dia).
      *
-     * @return array<int, array{semana: int, dia_inicio: int, dia_fim: int}>
+     * @return array<int, array{
+     *     semana: int,
+     *     dia_inicio: int,
+     *     dia_fim: int,
+     *     nome_dia_inicio: string,
+     *     nome_dia_fim: string,
+     * }>
      */
     public static function semanasDoMes(int $ano, int $mes): array
     {
@@ -33,9 +39,11 @@ class MetaHospital
             }
 
             $semanas[] = [
-                'semana'     => $numero,
-                'dia_inicio' => $dia,
-                'dia_fim'    => $diaFim,
+                'semana'          => $numero,
+                'dia_inicio'      => $dia,
+                'dia_fim'         => $diaFim,
+                'nome_dia_inicio' => self::nomeDia($ano, $mes, $dia),
+                'nome_dia_fim'    => self::nomeDia($ano, $mes, $diaFim),
             ];
 
             $dia = $diaFim + 1;
@@ -43,6 +51,13 @@ class MetaHospital
         }
 
         return $semanas;
+    }
+
+    private static function nomeDia(int $ano, int $mes, int $dia): string
+    {
+        return mb_strtolower(
+            Carbon::create($ano, $mes, $dia)->locale('pt_BR')->translatedFormat('l'),
+        );
     }
 
     /**
