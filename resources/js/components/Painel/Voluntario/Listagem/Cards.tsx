@@ -4,10 +4,19 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { edit } from '@/routes/voluntarios'
-import { Link } from '@inertiajs/react'
-import { Ban, Calendar, Clock, Mail, MailPlus, MapPin, MoreHorizontal, Pencil } from 'lucide-react'
+} from '@/components/ui/dropdown-menu';
+import { edit } from '@/routes/voluntarios';
+import { Link } from '@inertiajs/react';
+import {
+    Ban,
+    Calendar,
+    Clock,
+    Mail,
+    MailPlus,
+    MapPin,
+    MoreHorizontal,
+    Pencil,
+} from 'lucide-react';
 import {
     formatarData,
     getAfastamentoBadge,
@@ -17,17 +26,17 @@ import {
     podeCancelarConvite,
     podeReenviarConvite,
     statusMap,
-} from './status'
-import { AbaKey, VoluntarioListagem } from './types'
+} from './status';
+import { AbaKey, VoluntarioListagem } from './types';
 
 interface Props {
-    aba: AbaKey
-    voluntarios: VoluntarioListagem[]
-    ehAdministrador: boolean
-    onInativar: (voluntario: VoluntarioListagem) => void
-    onReenviarConvite: (voluntario: VoluntarioListagem) => void
-    onCancelarConvite: (voluntario: VoluntarioListagem) => void
-    onGerenciarAfastamento?: (voluntario: VoluntarioListagem) => void
+    aba: AbaKey;
+    voluntarios: VoluntarioListagem[];
+    ehAdministrador: boolean;
+    onInativar: (voluntario: VoluntarioListagem) => void;
+    onReenviarConvite: (voluntario: VoluntarioListagem) => void;
+    onCancelarConvite: (voluntario: VoluntarioListagem) => void;
+    onGerenciarAfastamento?: (voluntario: VoluntarioListagem) => void;
 }
 
 const Cards: React.FC<Props> = ({
@@ -39,7 +48,7 @@ const Cards: React.FC<Props> = ({
     onCancelarConvite,
     onGerenciarAfastamento,
 }) => {
-    const convidados = aba === 'convidados'
+    const convidados = aba === 'convidados';
 
     if (voluntarios.length === 0) {
         return (
@@ -48,14 +57,14 @@ const Cards: React.FC<Props> = ({
                     Nenhum registro encontrado.
                 </p>
             </div>
-        )
+        );
     }
 
     return (
         <ul className="mt-6 flex w-full flex-col gap-5">
             {voluntarios.map((voluntario) => {
-                const statusConvite = statusMap.get(voluntario.statusKey)
-                const statusVoluntario = getStatusVoluntario(voluntario)
+                const statusConvite = statusMap.get(voluntario.statusKey);
+                const statusVoluntario = getStatusVoluntario(voluntario);
 
                 return (
                     <li key={voluntario.id} className="w-full">
@@ -68,7 +77,7 @@ const Cards: React.FC<Props> = ({
                                 </div>
 
                                 <div className="min-w-0 flex-1">
-                                    <h2 className="text-base font-semibold leading-snug text-amber-950 sm:text-lg">
+                                    <h2 className="text-base leading-snug font-semibold text-amber-950 sm:text-lg">
                                         {voluntario.name}
                                     </h2>
                                     <p className="mt-1.5 flex gap-1.5 text-sm leading-relaxed text-amber-900/50">
@@ -77,7 +86,9 @@ const Cards: React.FC<Props> = ({
                                             strokeWidth={2}
                                             aria-hidden
                                         />
-                                        <span className="truncate">{voluntario.email}</span>
+                                        <span className="truncate">
+                                            {voluntario.email}
+                                        </span>
                                     </p>
 
                                     {convidados ? (
@@ -121,26 +132,36 @@ const Cards: React.FC<Props> = ({
                                     <div className="mt-3 flex flex-wrap gap-1.5">
                                         {convidados ? (
                                             <span
-                                                className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide ${statusConvite?.className ?? 'border-transparent bg-amber-50 text-amber-700'}`}
+                                                className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase ${statusConvite?.className ?? 'border-transparent bg-amber-50 text-amber-700'}`}
                                             >
-                                                {statusConvite?.label ?? 'Pendente'}
+                                                {statusConvite?.label ??
+                                                    'Pendente'}
                                             </span>
                                         ) : (
                                             <>
                                                 <span
-                                                    className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide ${statusVoluntario.className}`}
+                                                    className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase ${statusVoluntario.className}`}
                                                 >
                                                     {statusVoluntario.label}
                                                 </span>
-                                                {getAfastamentoBadge(voluntario) && (
+                                                {getAfastamentoBadge(
+                                                    voluntario,
+                                                ) && (
                                                     <span
-                                                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${getAfastamentoBadge(voluntario)?.className}`}
+                                                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold tracking-wide uppercase ${getAfastamentoBadge(voluntario)?.className}`}
                                                     >
-                                                        {getAfastamentoBadge(voluntario)?.label}
+                                                        {
+                                                            getAfastamentoBadge(
+                                                                voluntario,
+                                                            )?.label
+                                                        }
                                                     </span>
                                                 )}
-                                                <span className="inline-flex items-center rounded-full border border-amber-200/80 bg-amber-50/80 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-amber-900">
-                                                    Cadastro {formatarData(voluntario.created_at)}
+                                                <span className="inline-flex items-center rounded-full border border-amber-200/80 bg-amber-50/80 px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-amber-900 uppercase">
+                                                    Cadastro{' '}
+                                                    {formatarData(
+                                                        voluntario.created_at,
+                                                    )}
                                                 </span>
                                             </>
                                         )}
@@ -148,19 +169,26 @@ const Cards: React.FC<Props> = ({
                                 </div>
 
                                 {ehAdministrador ? (
-                                    <div className="flex shrink-0 items-center justify-between gap-4 border-t border-amber-50 pt-4 sm:w-auto sm:justify-end sm:border-t-0 sm:border-l sm:border-amber-50 sm:pl-6 sm:pt-0">
+                                    <div className="flex shrink-0 items-center justify-between gap-4 border-t border-amber-50 pt-4 sm:w-auto sm:justify-end sm:border-t-0 sm:border-l sm:border-amber-50 sm:pt-0 sm:pl-6">
                                         {convidados &&
-                                        podeReenviarConvite(voluntario.statusKey) ? (
+                                        podeReenviarConvite(
+                                            voluntario.statusKey,
+                                        ) ? (
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    onReenviarConvite(voluntario)
+                                                    onReenviarConvite(
+                                                        voluntario,
+                                                    )
                                                 }
                                                 className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                                                 aria-label={`Reenviar convite para ${voluntario.name}`}
                                                 title={`Reenviar convite para ${voluntario.name}`}
                                             >
-                                                <MailPlus size={17} strokeWidth={1.75} />
+                                                <MailPlus
+                                                    size={17}
+                                                    strokeWidth={1.75}
+                                                />
                                             </button>
                                         ) : null}
 
@@ -171,22 +199,34 @@ const Cards: React.FC<Props> = ({
                                                 className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                                                 aria-label={`Editar ${voluntario.name}`}
                                             >
-                                                <Pencil size={17} strokeWidth={1.75} />
+                                                <Pencil
+                                                    size={17}
+                                                    strokeWidth={1.75}
+                                                />
                                             </Link>
                                         ) : null}
 
                                         {(!convidados ||
-                                            podeCancelarConvite(voluntario.statusKey)) && (
+                                            podeCancelarConvite(
+                                                voluntario.statusKey,
+                                            )) && (
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
-                                                    <MoreHorizontal size={17} strokeWidth={1.75} />
-                                                    <span className="sr-only">Ações</span>
+                                                    <MoreHorizontal
+                                                        size={17}
+                                                        strokeWidth={1.75}
+                                                    />
+                                                    <span className="sr-only">
+                                                        Ações
+                                                    </span>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     {convidados ? (
                                                         <DropdownMenuItem
                                                             onSelect={() =>
-                                                                onCancelarConvite(voluntario)
+                                                                onCancelarConvite(
+                                                                    voluntario,
+                                                                )
                                                             }
                                                             className="flex cursor-pointer items-center gap-2 text-red-600 focus:text-red-700"
                                                         >
@@ -195,9 +235,13 @@ const Cards: React.FC<Props> = ({
                                                         </DropdownMenuItem>
                                                     ) : (
                                                         <>
-                                                            <DropdownMenuItem asChild>
+                                                            <DropdownMenuItem
+                                                                asChild
+                                                            >
                                                                 <Link
-                                                                    href={edit.url(voluntario.id)}
+                                                                    href={edit.url(
+                                                                        voluntario.id,
+                                                                    )}
                                                                     className="flex cursor-pointer items-center gap-2"
                                                                 >
                                                                     <Pencil className="size-4" />
@@ -207,18 +251,23 @@ const Cards: React.FC<Props> = ({
                                                             {onGerenciarAfastamento && (
                                                                 <DropdownMenuItem
                                                                     onSelect={() =>
-                                                                        onGerenciarAfastamento(voluntario)
+                                                                        onGerenciarAfastamento(
+                                                                            voluntario,
+                                                                        )
                                                                     }
                                                                     className="flex cursor-pointer items-center gap-2 text-amber-900 focus:text-amber-950"
                                                                 >
                                                                     <Clock className="size-4 text-amber-700" />
-                                                                    Gerenciar afastamento
+                                                                    Gerenciar
+                                                                    afastamento
                                                                 </DropdownMenuItem>
                                                             )}
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem
                                                                 onSelect={() =>
-                                                                    onInativar(voluntario)
+                                                                    onInativar(
+                                                                        voluntario,
+                                                                    )
                                                                 }
                                                                 className="flex cursor-pointer items-center gap-2 text-red-600 focus:text-red-700"
                                                             >
@@ -235,10 +284,10 @@ const Cards: React.FC<Props> = ({
                             </div>
                         </article>
                     </li>
-                )
+                );
             })}
         </ul>
-    )
-}
+    );
+};
 
-export default Cards
+export default Cards;

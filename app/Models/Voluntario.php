@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Storage;
 
 class Voluntario extends Model
 {
@@ -23,6 +24,7 @@ class Voluntario extends Model
         'data_entrada_ong',
         'status',
         'observacoes',
+        'foto_perfil',
     ];
 
     protected $appends = [
@@ -34,6 +36,7 @@ class Voluntario extends Model
         'convite_utilizado_em',
         'inativado_em',
         'cargos',
+        'url_foto',
         'esta_afastado',
         'afastamento_atual',
     ];
@@ -184,5 +187,10 @@ class Voluntario extends Model
     public function getCargosAttribute(): mixed
     {
         return $this->user?->cargos ?? collect();
+    }
+
+    public function getUrlFotoAttribute(): ?string
+    {
+        return $this->foto_perfil ? Storage::disk('public')->url($this->foto_perfil) : null;
     }
 }

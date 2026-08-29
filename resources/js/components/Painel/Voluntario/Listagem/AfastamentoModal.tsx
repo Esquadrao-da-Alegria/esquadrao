@@ -10,7 +10,7 @@ import {
     painelLabelClass,
 } from '@/lib/painelFormFieldClasses';
 import { MotivoAfastamento, User } from '@/types';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import {
     AlertTriangle,
     Calendar,
@@ -18,6 +18,8 @@ import {
     CheckCircle2,
     Clock,
     History,
+    Pencil,
+    Trash2,
     XCircle,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -30,12 +32,36 @@ interface Props {
     onOpenChange: (aberto: boolean) => void;
 }
 
-type TabType = 'novo' | 'prorrogar' | 'encerrar' | 'historico';
+type TabType = 'editar' | 'prorrogar' | 'encerrar' | 'novo' | 'historico';
 
 interface ContentProps {
     voluntario: VoluntarioListagem | User;
     onOpenChange: (aberto: boolean) => void;
 }
+
+const formatarDataInput = (data: Date): string => {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+};
+
+const somarDias = (dataStr: string, dias: number): string => {
+    if (!dataStr) return '';
+    const partes = dataStr.split('T')[0].split('-').map(Number);
+    if (partes.length < 3 || isNaN(partes[0]) || isNaN(partes[1]) || isNaN(partes[2])) {
+        return '';
+    }
+    const [ano, mes, dia] = partes;
+    const d = new Date(ano, mes - 1, dia);
+    d.setDate(d.getDate() + dias);
+    return formatarDataInput(d);
+};
+
+const extrairDataString = (data?: string | null): string => {
+    if (!data) return '';
+    return data.split('T')[0];
+};
 
 const AfastamentoModalContent: React.FC<ContentProps> = ({
     voluntario,
@@ -43,38 +69,54 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
 }) => {
     const voluntarioId = (voluntario.voluntario?.id || voluntario.id) as number;
     const afastamentoAtual = voluntario.afastamento_atual;
-    const temAfastamentoAtivo = Boolean(voluntario.esta_afastado || afastamentoAtual);
+    const temAfastamentoAtivo = Boolean(
+        voluntario.esta_afastado || afastamentoAtual,
+    );
 
-    const [aba, setAba] = useState<TabType>(temAfastamentoAtivo ? 'prorrogar' : 'novo');
+    const [aba, setAba] = useState<TabType>(
+        temAfastamentoAtivo ? 'editar' : 'novo',
+    );
 
     useEffect(() => {
         if (temAfastamentoAtivo) {
-            setAba('prorrogar');
+            setAba('editar');
         } else {
             setAba('novo');
         }
     }, [voluntario, temAfastamentoAtivo]);
 
-    // Formulário Novo Afastamento
-    const hoje = new Date().toISOString().split('T')[0];
-    const dataFimPadrao = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split('T')[0];
+    const hoje = formatarDataInput(new Date());
 
+    // Formulário Novo Afastamento
     const novoForm = useForm({
         data_inicio: hoje,
-        data_fim: dataFimPadrao,
+        data_fim: '',
         motivo: 'atestado_medico' as MotivoAfastamento,
         observacoes: '',
     });
 
+    // Formulário Editar Afastamento Atual
+    const editarForm = useForm({
+        data_inicio: extrairDataString(afastamentoAtual?.data_inicio) || hoje,
+        data_fim: extrairDataString(afastamentoAtual?.data_fim) || '',
+        motivo: (afastamentoAtual?.motivo || 'atestado_medico') as MotivoAfastamento,
+        observacoes: afastamentoAtual?.observacoes || '',
+    });
+
+    useEffect(() => {
+        if (afastamentoAtual) {
+            editarForm.setData({
+                data_inicio: extrairDataString(afastamentoAtual.data_inicio) || hoje,
+                data_fim: extrairDataString(afastamentoAtual.data_fim) || '',
+                motivo: (afastamentoAtual.motivo || 'atestado_medico') as MotivoAfastamento,
+                observacoes: afastamentoAtual.observacoes || '',
+            });
+        }
+    }, [afastamentoAtual]);
+
     // Formulário Prorrogar
-    const dataFimAtual = afastamentoAtual?.data_fim
-        ? new Date(afastamentoAtual.data_fim)
-        : new Date();
-    const dataFimProrrogadaPadrao = new Date(dataFimAtual.getTime() + 15 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split('T')[0];
+    const dataFimAtualStr = extrairDataString(afastamentoAtual?.data_fim) || hoje;
+    const dataFimProrrogadaPadrao = somarDias(dataFimAtualStr, 15);
 
     const prorrogarForm = useForm({
         nova_data_fim: dataFimProrrogadaPadrao,
@@ -87,21 +129,18 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
     });
 
     const setNovoPrazoDias = (dias: number) => {
-        const dataInicio = new Date(novoForm.data.data_inicio || Date.now());
-        const novaFim = new Date(dataInicio.getTime() + dias * 24 * 60 * 60 * 1000)
-            .toISOString()
-            .split('T')[0];
-        novoForm.setData('data_fim', novaFim);
+        const base = novoForm.data.data_inicio || hoje;
+        novoForm.setData('data_fim', somarDias(base, dias));
+    };
+
+    const setEditarPrazoDias = (dias: number) => {
+        const base = editarForm.data.data_inicio || hoje;
+        editarForm.setData('data_fim', somarDias(base, dias));
     };
 
     const setProrrogarPrazoDias = (dias: number) => {
-        const base = afastamentoAtual?.data_fim
-            ? new Date(afastamentoAtual.data_fim)
-            : new Date();
-        const novaFim = new Date(base.getTime() + dias * 24 * 60 * 60 * 1000)
-            .toISOString()
-            .split('T')[0];
-        prorrogarForm.setData('nova_data_fim', novaFim);
+        const base = dataFimAtualStr;
+        prorrogarForm.setData('nova_data_fim', somarDias(base, dias));
     };
 
     const handleNovoSubmit = (e: React.FormEvent) => {
@@ -113,6 +152,21 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                 novoForm.reset();
             },
         });
+    };
+
+    const handleEditarSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!afastamentoAtual) return;
+
+        editarForm.put(
+            `/voluntarios/${voluntarioId}/afastamentos/${afastamentoAtual.id}`,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    onOpenChange(false);
+                },
+            },
+        );
     };
 
     const handleProrrogarSubmit = (e: React.FormEvent) => {
@@ -127,7 +181,7 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                     onOpenChange(false);
                     prorrogarForm.reset();
                 },
-            }
+            },
         );
     };
 
@@ -143,8 +197,21 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                     onOpenChange(false);
                     encerrarForm.reset();
                 },
-            }
+            },
         );
+    };
+
+    const handleExcluirAfastamento = (afastamentoId: number) => {
+        if (!window.confirm('Tem certeza de que deseja excluir este registro de afastamento?')) {
+            return;
+        }
+
+        router.delete(`/voluntarios/${voluntarioId}/afastamentos/${afastamentoId}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                onOpenChange(false);
+            },
+        });
     };
 
     const listaHistorico = voluntario.afastamentos || [];
@@ -161,20 +228,22 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
             {temAfastamentoAtivo && afastamentoAtual && (
                 <div className="rounded-2xl border border-rose-200 bg-rose-50/70 p-4 text-rose-950">
                     <div className="flex items-start gap-3">
-                        <AlertTriangle className="size-5 shrink-0 text-rose-600 mt-0.5" />
+                        <AlertTriangle className="mt-0.5 size-5 shrink-0 text-rose-600" />
                         <div className="flex-1 text-sm">
                             <p className="font-semibold text-rose-900">
-                                Voluntário atualmente afastado ({getMotivoLabel(afastamentoAtual.motivo)})
+                                Voluntário atualmente afastado (
+                                {getMotivoLabel(afastamentoAtual.motivo)})
                             </p>
                             <p className="mt-1 text-rose-800/90">
                                 Período:{' '}
                                 <strong>
-                                    {formatarData(afastamentoAtual.data_inicio)} até{' '}
+                                    {formatarData(afastamentoAtual.data_inicio)}{' '}
+                                    até{' '}
                                     {formatarData(afastamentoAtual.data_fim)}
                                 </strong>
                             </p>
                             {afastamentoAtual.observacoes && (
-                                <p className="mt-2 whitespace-pre-line rounded-lg bg-white/60 p-2 text-xs text-rose-900 border border-rose-100">
+                                <p className="mt-2 rounded-lg border border-rose-100 bg-white/60 p-2 text-xs whitespace-pre-line text-rose-900">
                                     {afastamentoAtual.observacoes}
                                 </p>
                             )}
@@ -187,6 +256,18 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
             <div className="flex flex-wrap gap-2 border-b border-gray-100 pb-3">
                 {temAfastamentoAtivo ? (
                     <>
+                        <button
+                            type="button"
+                            onClick={() => setAba('editar')}
+                            className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition ${
+                                aba === 'editar'
+                                    ? 'bg-amber-600 text-white shadow-sm'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            <Pencil className="size-3.5" />
+                            Editar / Ajustar
+                        </button>
                         <button
                             type="button"
                             onClick={() => setAba('prorrogar')}
@@ -209,7 +290,7 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             }`}
                         >
                             <XCircle className="size-3.5" />
-                            Encerrar Antecipadamente
+                            Encerrar
                         </button>
                         <button
                             type="button"
@@ -251,48 +332,241 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                 )}
             </div>
 
-            {/* Conteúdo Aba: NOVO AFASTAMENTO */}
-            {aba === 'novo' && (
-                <form onSubmit={handleNovoSubmit} className="space-y-4 pt-2">
+            {/* Conteúdo Aba: EDITAR / AJUSTAR AFASTAMENTO */}
+            {aba === 'editar' && afastamentoAtual && (
+                <form onSubmit={handleEditarSubmit} className="space-y-4 pt-2">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                            <label htmlFor="data_inicio" className={painelLabelClass}>
+                            <label
+                                htmlFor="editar_data_inicio"
+                                className={painelLabelClass}
+                            >
                                 Data de Início *
                             </label>
                             <input
-                                id="data_inicio"
+                                id="editar_data_inicio"
                                 type="date"
-                                value={novoForm.data.data_inicio}
-                                onChange={(e) => novoForm.setData('data_inicio', e.target.value)}
+                                value={editarForm.data.data_inicio}
+                                onChange={(e) =>
+                                    editarForm.setData(
+                                        'data_inicio',
+                                        e.target.value,
+                                    )
+                                }
                                 className={painelInputClass}
                                 required
                             />
-                            {novoForm.errors.data_inicio && (
-                                <p className="mt-1 text-xs text-red-600">{novoForm.errors.data_inicio}</p>
+                            {editarForm.errors.data_inicio && (
+                                <p className="mt-1 text-xs text-red-600">
+                                    {editarForm.errors.data_inicio}
+                                </p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="data_fim" className={painelLabelClass}>
-                                Data de Fim *
+                            <label
+                                htmlFor="editar_data_fim"
+                                className={painelLabelClass}
+                            >
+                                Data de Fim (Retorno) *
                             </label>
                             <input
-                                id="data_fim"
+                                id="editar_data_fim"
                                 type="date"
-                                value={novoForm.data.data_fim}
-                                onChange={(e) => novoForm.setData('data_fim', e.target.value)}
+                                value={editarForm.data.data_fim}
+                                onChange={(e) =>
+                                    editarForm.setData('data_fim', e.target.value)
+                                }
                                 className={painelInputClass}
                                 required
                             />
-                            {novoForm.errors.data_fim && (
-                                <p className="mt-1 text-xs text-red-600">{novoForm.errors.data_fim}</p>
+                            {editarForm.errors.data_fim && (
+                                <p className="mt-1 text-xs text-red-600">
+                                    {editarForm.errors.data_fim}
+                                </p>
                             )}
                         </div>
                     </div>
 
                     {/* Botões de atalho de prazo */}
                     <div className="flex items-center gap-2 text-xs text-amber-900">
-                        <span className="font-medium text-gray-500">Atalhos de duração:</span>
+                        <span className="font-medium text-gray-500">
+                            Ajustar término:
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => setEditarPrazoDias(15)}
+                            className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 font-semibold text-amber-800 hover:bg-amber-100"
+                        >
+                            +15 dias
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setEditarPrazoDias(30)}
+                            className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 font-semibold text-amber-800 hover:bg-amber-100"
+                        >
+                            +30 dias
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setEditarPrazoDias(60)}
+                            className="rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 font-semibold text-amber-800 hover:bg-amber-100"
+                        >
+                            +60 dias
+                        </button>
+                    </div>
+
+                    <div>
+                        <label htmlFor="editar_motivo" className={painelLabelClass}>
+                            Motivo do Afastamento *
+                        </label>
+                        <select
+                            id="editar_motivo"
+                            value={editarForm.data.motivo}
+                            onChange={(e) =>
+                                editarForm.setData(
+                                    'motivo',
+                                    e.target.value as MotivoAfastamento,
+                                )
+                            }
+                            className={painelInputClass}
+                            required
+                        >
+                            <option value="atestado_medico">
+                                Atestado Médico / Tratamento de Saúde
+                            </option>
+                            <option value="licenca_pessoal">
+                                Licença Pessoal / Viagem
+                            </option>
+                            <option value="estudos">
+                                Estudos / Provas / Concurso
+                            </option>
+                            <option value="outro">Outro Motivo</option>
+                        </select>
+                        {editarForm.errors.motivo && (
+                            <p className="mt-1 text-xs text-red-600">
+                                {editarForm.errors.motivo}
+                            </p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="editar_observacoes"
+                            className={painelLabelClass}
+                        >
+                            Observações (Opcional)
+                        </label>
+                        <textarea
+                            id="editar_observacoes"
+                            rows={3}
+                            value={editarForm.data.observacoes}
+                            onChange={(e) =>
+                                editarForm.setData('observacoes', e.target.value)
+                            }
+                            placeholder="Detalhes adicionais, recomendações médicas ou informações da licença..."
+                            className={painelInputClass}
+                        />
+                        {editarForm.errors.observacoes && (
+                            <p className="mt-1 text-xs text-red-600">
+                                {editarForm.errors.observacoes}
+                            </p>
+                        )}
+                    </div>
+
+                    <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between pt-3">
+                        <button
+                            type="button"
+                            onClick={() => handleExcluirAfastamento(afastamentoAtual.id)}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-red-50/60 px-4 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 hover:text-red-800"
+                        >
+                            <Trash2 className="size-3.5" />
+                            Excluir Afastamento
+                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={() => onOpenChange(false)}
+                                className="inline-flex items-center justify-center rounded-full border px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={editarForm.processing}
+                                className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 disabled:opacity-60"
+                            >
+                                <CheckCircle2 className="size-4" />
+                                {editarForm.processing
+                                    ? 'Salvando...'
+                                    : 'Salvar Alterações'}
+                            </button>
+                        </div>
+                    </DialogFooter>
+                </form>
+            )}
+
+            {/* Conteúdo Aba: NOVO AFASTAMENTO */}
+            {aba === 'novo' && (
+                <form onSubmit={handleNovoSubmit} className="space-y-4 pt-2">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label
+                                htmlFor="data_inicio"
+                                className={painelLabelClass}
+                            >
+                                Data de Início *
+                            </label>
+                            <input
+                                id="data_inicio"
+                                type="date"
+                                value={novoForm.data.data_inicio}
+                                onChange={(e) =>
+                                    novoForm.setData(
+                                        'data_inicio',
+                                        e.target.value,
+                                    )
+                                }
+                                className={painelInputClass}
+                                required
+                            />
+                            {novoForm.errors.data_inicio && (
+                                <p className="mt-1 text-xs text-red-600">
+                                    {novoForm.errors.data_inicio}
+                                </p>
+                            )}
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="data_fim"
+                                className={painelLabelClass}
+                            >
+                                Data de Fim (Retorno) *
+                            </label>
+                            <input
+                                id="data_fim"
+                                type="date"
+                                value={novoForm.data.data_fim}
+                                onChange={(e) =>
+                                    novoForm.setData('data_fim', e.target.value)
+                                }
+                                className={painelInputClass}
+                                required
+                            />
+                            {novoForm.errors.data_fim && (
+                                <p className="mt-1 text-xs text-red-600">
+                                    {novoForm.errors.data_fim}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Botões de atalho de prazo */}
+                    <div className="flex items-center gap-2 text-xs text-amber-900">
+                        <span className="font-medium text-gray-500">
+                            Atalhos de duração:
+                        </span>
                         <button
                             type="button"
                             onClick={() => setNovoPrazoDias(15)}
@@ -324,43 +598,64 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             id="motivo"
                             value={novoForm.data.motivo}
                             onChange={(e) =>
-                                novoForm.setData('motivo', e.target.value as MotivoAfastamento)
+                                novoForm.setData(
+                                    'motivo',
+                                    e.target.value as MotivoAfastamento,
+                                )
                             }
                             className={painelInputClass}
                             required
                         >
-                            <option value="atestado_medico">Atestado Médico / Tratamento de Saúde</option>
-                            <option value="licenca_pessoal">Licença Pessoal / Viagem</option>
-                            <option value="estudos">Estudos / Provas / Concurso</option>
+                            <option value="atestado_medico">
+                                Atestado Médico / Tratamento de Saúde
+                            </option>
+                            <option value="licenca_pessoal">
+                                Licença Pessoal / Viagem
+                            </option>
+                            <option value="estudos">
+                                Estudos / Provas / Concurso
+                            </option>
                             <option value="outro">Outro Motivo</option>
                         </select>
                         {novoForm.errors.motivo && (
-                            <p className="mt-1 text-xs text-red-600">{novoForm.errors.motivo}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {novoForm.errors.motivo}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="observacoes" className={painelLabelClass}>
+                        <label
+                            htmlFor="observacoes"
+                            className={painelLabelClass}
+                        >
                             Observações (Opcional)
                         </label>
                         <textarea
                             id="observacoes"
                             rows={3}
                             value={novoForm.data.observacoes}
-                            onChange={(e) => novoForm.setData('observacoes', e.target.value)}
+                            onChange={(e) =>
+                                novoForm.setData('observacoes', e.target.value)
+                            }
                             placeholder="Detalhes adicionais, recomendações médicas ou informações da licença..."
                             className={painelInputClass}
                         />
                         {novoForm.errors.observacoes && (
-                            <p className="mt-1 text-xs text-red-600">{novoForm.errors.observacoes}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {novoForm.errors.observacoes}
+                            </p>
                         )}
                     </div>
 
                     {/* Aviso sobre cancelamento de visitas */}
-                    <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-950 flex items-start gap-2">
-                        <AlertTriangle className="size-4 shrink-0 text-amber-700 mt-0.5" />
+                    <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-950">
+                        <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-700" />
                         <span>
-                            <strong>Aviso:</strong> Todas as inscrições deste voluntário em visitas agendadas dentro do período serão automaticamente canceladas e novas inscrições ficarão bloqueadas até o término da licença.
+                            <strong>Aviso:</strong> Todas as inscrições deste
+                            voluntário em visitas agendadas dentro do período
+                            serão automaticamente canceladas e novas inscrições
+                            ficarão bloqueadas até o término da licença.
                         </span>
                     </div>
 
@@ -378,7 +673,9 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 disabled:opacity-60"
                         >
                             <CheckCircle2 className="size-4" />
-                            {novoForm.processing ? 'Registrando...' : 'Registrar Afastamento'}
+                            {novoForm.processing
+                                ? 'Registrando...'
+                                : 'Registrar Afastamento'}
                         </button>
                     </DialogFooter>
                 </form>
@@ -386,7 +683,10 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
 
             {/* Conteúdo Aba: PRORROGAR AFASTAMENTO */}
             {aba === 'prorrogar' && afastamentoAtual && (
-                <form onSubmit={handleProrrogarSubmit} className="space-y-4 pt-2">
+                <form
+                    onSubmit={handleProrrogarSubmit}
+                    className="space-y-4 pt-2"
+                >
                     <div>
                         <label className={painelLabelClass}>
                             Data Final Atual
@@ -397,26 +697,38 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                     </div>
 
                     <div>
-                        <label htmlFor="nova_data_fim" className={painelLabelClass}>
+                        <label
+                            htmlFor="nova_data_fim"
+                            className={painelLabelClass}
+                        >
                             Nova Data Final *
                         </label>
                         <input
                             id="nova_data_fim"
                             type="date"
                             value={prorrogarForm.data.nova_data_fim}
-                            onChange={(e) => prorrogarForm.setData('nova_data_fim', e.target.value)}
-                            min={afastamentoAtual.data_fim}
+                            onChange={(e) =>
+                                prorrogarForm.setData(
+                                    'nova_data_fim',
+                                    e.target.value,
+                                )
+                            }
+                            min={extrairDataString(afastamentoAtual.data_fim)}
                             className={painelInputClass}
                             required
                         />
                         {prorrogarForm.errors.nova_data_fim && (
-                            <p className="mt-1 text-xs text-red-600">{prorrogarForm.errors.nova_data_fim}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {prorrogarForm.errors.nova_data_fim}
+                            </p>
                         )}
                     </div>
 
                     {/* Atalhos para prorrogação */}
                     <div className="flex items-center gap-2 text-xs text-amber-900">
-                        <span className="font-medium text-gray-500">Adicionar dias:</span>
+                        <span className="font-medium text-gray-500">
+                            Adicionar dias:
+                        </span>
                         <button
                             type="button"
                             onClick={() => setProrrogarPrazoDias(15)}
@@ -441,19 +753,29 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                     </div>
 
                     <div>
-                        <label htmlFor="prorrogar_observacoes" className={painelLabelClass}>
+                        <label
+                            htmlFor="prorrogar_observacoes"
+                            className={painelLabelClass}
+                        >
                             Justificativa / Observações da Prorrogação
                         </label>
                         <textarea
                             id="prorrogar_observacoes"
                             rows={3}
                             value={prorrogarForm.data.observacoes}
-                            onChange={(e) => prorrogarForm.setData('observacoes', e.target.value)}
+                            onChange={(e) =>
+                                prorrogarForm.setData(
+                                    'observacoes',
+                                    e.target.value,
+                                )
+                            }
                             placeholder="Informe o motivo da prorrogação ou novo laudo médico..."
                             className={painelInputClass}
                         />
                         {prorrogarForm.errors.observacoes && (
-                            <p className="mt-1 text-xs text-red-600">{prorrogarForm.errors.observacoes}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {prorrogarForm.errors.observacoes}
+                            </p>
                         )}
                     </div>
 
@@ -471,7 +793,9 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 disabled:opacity-60"
                         >
                             <CalendarPlus className="size-4" />
-                            {prorrogarForm.processing ? 'Prorrogando...' : 'Confirmar Prorrogação'}
+                            {prorrogarForm.processing
+                                ? 'Prorrogando...'
+                                : 'Confirmar Prorrogação'}
                         </button>
                     </DialogFooter>
                 </form>
@@ -479,35 +803,53 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
 
             {/* Conteúdo Aba: ENCERRAR ANTECIPADAMENTE */}
             {aba === 'encerrar' && afastamentoAtual && (
-                <form onSubmit={handleEncerrarSubmit} className="space-y-4 pt-2">
+                <form
+                    onSubmit={handleEncerrarSubmit}
+                    className="space-y-4 pt-2"
+                >
                     <div className="rounded-2xl border border-red-200 bg-red-50/70 p-4 text-sm text-red-950">
                         <div className="flex items-start gap-3">
-                            <XCircle className="size-5 shrink-0 text-red-600 mt-0.5" />
+                            <XCircle className="mt-0.5 size-5 shrink-0 text-red-600" />
                             <div>
                                 <h4 className="font-bold text-red-900">
-                                    Deseja realmente encerrar este afastamento hoje?
+                                    Deseja realmente encerrar este afastamento
+                                    hoje?
                                 </h4>
-                                <p className="mt-1 text-red-800 text-xs leading-relaxed">
-                                    Ao encerrar, o status do afastamento passará para <strong>Encerrado</strong>, a data final será ajustada para hoje e o voluntário poderá voltar a se inscrever em visitas normalmente.
+                                <p className="mt-1 text-xs leading-relaxed text-red-800">
+                                    Ao encerrar, o status do afastamento passará
+                                    para <strong>Encerrado</strong>, a data
+                                    final será ajustada para hoje e o voluntário
+                                    poderá voltar a se inscrever em visitas
+                                    normalmente.
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="encerrar_observacoes" className={painelLabelClass}>
+                        <label
+                            htmlFor="encerrar_observacoes"
+                            className={painelLabelClass}
+                        >
                             Motivo do Encerramento Antecipado (Opcional)
                         </label>
                         <textarea
                             id="encerrar_observacoes"
                             rows={3}
                             value={encerrarForm.data.observacoes}
-                            onChange={(e) => encerrarForm.setData('observacoes', e.target.value)}
+                            onChange={(e) =>
+                                encerrarForm.setData(
+                                    'observacoes',
+                                    e.target.value,
+                                )
+                            }
                             placeholder="Ex: Alta médica concedida antes do prazo previsto..."
                             className={painelInputClass}
                         />
                         {encerrarForm.errors.observacoes && (
-                            <p className="mt-1 text-xs text-red-600">{encerrarForm.errors.observacoes}</p>
+                            <p className="mt-1 text-xs text-red-600">
+                                {encerrarForm.errors.observacoes}
+                            </p>
                         )}
                     </div>
 
@@ -525,7 +867,9 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                             className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 disabled:opacity-60"
                         >
                             <XCircle className="size-4" />
-                            {encerrarForm.processing ? 'Encerrando...' : 'Encerrar Afastamento'}
+                            {encerrarForm.processing
+                                ? 'Encerrando...'
+                                : 'Encerrar Afastamento'}
                         </button>
                     </DialogFooter>
                 </form>
@@ -548,26 +892,38 @@ const AfastamentoModalContent: React.FC<ContentProps> = ({
                                     <span className="font-semibold text-gray-900">
                                         {getMotivoLabel(afast.motivo)}
                                     </span>
-                                    <span
-                                        className={`rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
-                                            afast.status === 'ativo'
-                                                ? 'bg-rose-100 text-rose-800'
-                                                : afast.status === 'encerrado'
-                                                ? 'bg-gray-200 text-gray-700'
-                                                : 'bg-amber-100 text-amber-800'
-                                        }`}
-                                    >
-                                        {afast.status}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span
+                                            className={`rounded-full px-2 py-0.5 text-[11px] font-bold tracking-wide uppercase ${
+                                                afast.status === 'ativo'
+                                                    ? 'bg-rose-100 text-rose-800'
+                                                    : afast.status === 'encerrado'
+                                                      ? 'bg-gray-200 text-gray-700'
+                                                      : 'bg-amber-100 text-amber-800'
+                                            }`}
+                                        >
+                                            {afast.status}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleExcluirAfastamento(afast.id)}
+                                            title="Excluir este afastamento"
+                                            aria-label="Excluir este afastamento"
+                                            className="rounded-lg p-1 text-gray-400 transition hover:bg-red-50 hover:text-red-600 focus:outline-none"
+                                        >
+                                            <Trash2 className="size-3.5" />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-600">
                                     <Clock className="size-3 text-gray-400" />
                                     <span>
-                                        {formatarData(afast.data_inicio)} até {formatarData(afast.data_fim)}
+                                        {formatarData(afast.data_inicio)} até{' '}
+                                        {formatarData(afast.data_fim)}
                                     </span>
                                 </div>
                                 {afast.observacoes && (
-                                    <p className="mt-2 whitespace-pre-line rounded-lg bg-white p-2 text-xs text-gray-700 border border-gray-100">
+                                    <p className="mt-2 rounded-lg border border-gray-100 bg-white p-2 text-xs whitespace-pre-line text-gray-700">
                                         {afast.observacoes}
                                     </p>
                                 )}

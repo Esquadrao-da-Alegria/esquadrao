@@ -5,41 +5,40 @@ const corCancelamentoApp = '#6b7280';
 
 export const toastSucesso = (mensagem: string) => {
     Swal.fire({
-        title: "Sucesso!",
+        title: 'Sucesso!',
         text: mensagem,
-        icon: "success"
+        icon: 'success',
     });
-}
+};
 export const toastErro = (mensagem: string) => {
     Swal.fire({
-        title: "Erro!",
+        title: 'Erro!',
         text: mensagem,
-        icon: "error"
+        icon: 'error',
     });
-}
+};
 
 export const toastAviso = (mensagem: string) => {
     Swal.fire({
-        title: "Atenção!",
+        title: 'Atenção!',
         text: mensagem,
-        icon: "warning"
+        icon: 'warning',
     });
-}
+};
 
 export const toastInfo = (mensagem: string) => {
     Swal.fire({
-        title: "Informação",
+        title: 'Informação',
         text: mensagem,
-        icon: "info"
+        icon: 'info',
     });
-}
+};
 
 export const toastConfirmacao = async (mensagem: string) => {
-
     const retorno = await Swal.fire({
-        title: "Cuidado!",
+        title: 'Cuidado!',
         text: mensagem,
-        icon: "warning",
+        icon: 'warning',
         showCancelButton: true,
         reverseButtons: true,
         cancelButtonText: "Não",
@@ -48,5 +47,5 @@ export const toastConfirmacao = async (mensagem: string) => {
         cancelButtonColor: corCancelamentoApp,
     });
 
-    return retorno.isConfirmed
-}
+    return retorno.isConfirmed;
+};

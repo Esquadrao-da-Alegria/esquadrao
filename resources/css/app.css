@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 @utility campo-dashboard {
-    @apply block w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-amber-950 shadow-sm outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-200;
+    @apply block w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-amber-950 shadow-sm transition outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-200;
 }
 
 @plugin 'tailwindcss-animate';
@@ -175,6 +175,6 @@
 
 html,
 body {
-  background: #fff !important;
-  background-image: none !important;
+    background: #fff !important;
+    background-image: none !important;
 }

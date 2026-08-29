@@ -22,11 +22,7 @@ const Header: React.FC<Props> = ({ ehAdministrador, onCadastrar }) => {
                     type="button"
                     className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
                 >
-                    <UserPlus
-                        className="size-5"
-                        strokeWidth={2}
-                        aria-hidden
-                    />
+                    <UserPlus className="size-5" strokeWidth={2} aria-hidden />
                     Convidar voluntário
                 </button>
             ) : null}

@@ -52,7 +52,9 @@ const Filtros: React.FC<Props> = ({
                     <Select
                         value={String(cidadeId)}
                         onValueChange={(val) =>
-                            onCidadeChange?.(val === 'todas' ? 'todas' : Number(val))
+                            onCidadeChange?.(
+                                val === 'todas' ? 'todas' : Number(val),
+                            )
                         }
                     >
                         <SelectTrigger className="h-11 rounded-2xl border-gray-200 bg-white px-4 shadow-sm focus:ring-amber-100">
@@ -62,9 +64,14 @@ const Filtros: React.FC<Props> = ({
                             </div>
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="todas">Todas as cidades</SelectItem>
+                            <SelectItem value="todas">
+                                Todas as cidades
+                            </SelectItem>
                             {cidades.map((cidade) => (
-                                <SelectItem key={cidade.id} value={String(cidade.id)}>
+                                <SelectItem
+                                    key={cidade.id}
+                                    value={String(cidade.id)}
+                                >
                                     {cidade.nome}
                                     {cidade.id === cidadeUsuarioId
                                         ? ' (Sua cidade)'
@@ -82,9 +89,15 @@ const Filtros: React.FC<Props> = ({
                             <SelectValue placeholder="Todos os voluntários" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="todos">Todos os voluntários</SelectItem>
-                            <SelectItem value="afastados">Apenas Afastados</SelectItem>
-                            <SelectItem value="ativos">Apenas Ativos (Sem Afastamento)</SelectItem>
+                            <SelectItem value="todos">
+                                Todos os voluntários
+                            </SelectItem>
+                            <SelectItem value="afastados">
+                                Apenas Afastados
+                            </SelectItem>
+                            <SelectItem value="ativos">
+                                Apenas Ativos (Sem Afastamento)
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

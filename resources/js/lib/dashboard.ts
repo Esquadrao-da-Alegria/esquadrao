@@ -1,6 +1,15 @@
 import { dashboard } from '@/routes';
-import { meu, visitasPorHospital, visitasPorParticipante } from '@/routes/dashboards';
-import { ChartNoAxesCombined, Hospital, LayoutDashboard, UserRound } from 'lucide-react';
+import {
+    meu,
+    visitasPorHospital,
+    visitasPorParticipante,
+} from '@/routes/dashboards';
+import {
+    ChartNoAxesCombined,
+    Hospital,
+    LayoutDashboard,
+    UserRound,
+} from 'lucide-react';
 
 import type { PermissaoDashboard } from '@/types';
 

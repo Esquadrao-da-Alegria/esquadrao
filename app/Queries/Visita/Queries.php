@@ -2,6 +2,7 @@
 
 namespace App\Queries\Visita;
 
+use App\Enums\VisitaStatus;
 use App\Models\Visita;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,7 +13,8 @@ class Queries
     public function index(array $filtros): array
     {
         try {
-            $query = Visita::query();
+            $query = Visita::query()
+                ->where('status', '!=', VisitaStatus::Cancelada->value);
 
             $this->carregarRelacionamentos($query);
             $this->aplicarFiltros($query, $filtros);

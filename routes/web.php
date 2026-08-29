@@ -15,6 +15,7 @@ use App\Http\Controllers\Web\Hospital\Meta\Controller as HospitalMetaController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\MeuEventoController;
+use App\Http\Controllers\Web\MeuPerfilController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
 use App\Http\Controllers\Web\Visita\Agenda\Liberacao\Controller as VisitaAgendaLiberacaoController;
@@ -121,6 +122,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
 
+    Route::get('/meu-perfil', [MeuPerfilController::class, 'edit'])->name('meu-perfil.edit');
+    Route::patch('/meu-perfil', [MeuPerfilController::class, 'update'])->name('meu-perfil.update');
+    Route::post('/meu-perfil/foto', [MeuPerfilController::class, 'updateFoto'])->name('meu-perfil.foto.update');
+    Route::delete('/meu-perfil/foto', [MeuPerfilController::class, 'destroyFoto'])->name('meu-perfil.foto.destroy');
+
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
     Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
     Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
@@ -185,6 +191,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::prefix('voluntarios/{voluntario}/afastamentos')->scopeBindings()->name('voluntarios.afastamentos.')->group(function () {
             Route::post('/', [VoluntarioAfastamentoController::class, 'store'])->name('store');
+            Route::put('{afastamento}', [VoluntarioAfastamentoController::class, 'update'])->name('update');
+            Route::delete('{afastamento}', [VoluntarioAfastamentoController::class, 'destroy'])->name('destroy');
             Route::post('{afastamento}/prorrogar', [VoluntarioAfastamentoController::class, 'prorrogar'])->name('prorrogar');
             Route::post('{afastamento}/encerrar', [VoluntarioAfastamentoController::class, 'encerrar'])->name('encerrar');
         });

@@ -1,15 +1,15 @@
-import type { EventoStatus, EventoTipo } from '@/types'
+import type { EventoStatus, EventoTipo } from '@/types';
 
-export const EVENTO_TIPOS: EventoTipo[] = ['oficina', 'reuniao', 'evento']
+export const EVENTO_TIPOS: EventoTipo[] = ['oficina', 'reuniao', 'evento'];
 
 export function classeCardPorStatus(status: EventoStatus): string {
     switch (status) {
         case 'agendado':
-            return 'bg-amber-500 text-white border-amber-600'
+            return 'bg-amber-500 text-white border-amber-600';
         case 'cancelado':
-            return 'bg-gray-100 text-gray-500 border-gray-200'
+            return 'bg-gray-100 text-gray-500 border-gray-200';
         default:
-            return 'bg-gray-100 text-gray-500 border-gray-200'
+            return 'bg-gray-100 text-gray-500 border-gray-200';
     }
 }
 
@@ -18,8 +18,8 @@ export function labelStatus(status: EventoStatus): string {
         agendado: 'Agendado',
         cancelado: 'Cancelado',
         finalizado: 'Finalizado',
-    }
-    return labels[status] ?? status
+    };
+    return labels[status] ?? status;
 }
 
 export function labelTipo(tipo: EventoTipo): string {
@@ -27,18 +27,18 @@ export function labelTipo(tipo: EventoTipo): string {
         oficina: 'Oficina',
         reuniao: 'Reunião',
         evento: 'Evento',
-    }
-    return labels[tipo] ?? tipo
+    };
+    return labels[tipo] ?? tipo;
 }
 
 export function extrairData(iso: string): string {
-    return iso.slice(0, 10)
+    return iso.slice(0, 10);
 }
 
 export function extrairHora(iso: string): string {
-    return iso.slice(11, 16)
+    return iso.slice(11, 16);
 }
 
 export function montarDatetime(data: string, hora: string): string {
-    return `${data} ${hora}:00`
+    return `${data} ${hora}:00`;
 }

@@ -2,6 +2,7 @@
 
 namespace App\Queries\Dashboard;
 
+use App\Enums\VisitaStatus;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -74,10 +75,10 @@ class Queries
             ->join('visitas as v', 'v.id', '=', 'vp.visita_id')
             ->where('vp.voluntario_id', $userId)
             ->where('vp.status_participacao', 'confirmado')
-            ->where('v.status', 'realizada')
+            ->whereIn('v.status', [VisitaStatus::Realizada->value, VisitaStatus::Contabilizada->value])
             ->whereBetween('v.inicio_em', [$inicioMes, $inicioMes->copy()->endOfMonth()])
             ->select(['v.id', 'vp.tipo_participacao'])
-            ->selectRaw("CASE WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado' AND (vr.fora_do_prazo = 0 OR EXISTS(SELECT 1 FROM visitas_ajustes_contabilizacao vac WHERE vac.relatorio_id = vr.id AND vac.tipo = 'aceite_relatorio_fora_prazo'))) ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND (vr.fora_do_prazo = 0 OR EXISTS(SELECT 1 FROM visitas_ajustes_contabilizacao vac WHERE vac.relatorio_id = vr.id AND vac.tipo = 'aceite_relatorio_fora_prazo'))) END as valida")
+            ->selectRaw("CASE WHEN v.status = 'contabilizada' THEN 1 WHEN vp.tipo_participacao = 'palhaco' THEN EXISTS(SELECT 1 FROM visitas_relatorios vr JOIN visita_participante autor_vp ON autor_vp.visita_id = vr.visita_id AND autor_vp.voluntario_id = vr.autor_id WHERE vr.visita_id = v.id AND autor_vp.tipo_participacao = 'palhaco' AND autor_vp.status_participacao = 'confirmado' AND (vr.fora_do_prazo = 0 OR EXISTS(SELECT 1 FROM visitas_ajustes_contabilizacao vac WHERE vac.relatorio_id = vr.id AND vac.tipo = 'aceite_relatorio_fora_prazo'))) OR EXISTS(SELECT 1 FROM visitas_ajustes_contabilizacao vac WHERE vac.visita_id = v.id AND vac.voluntario_id = vp.voluntario_id) ELSE EXISTS(SELECT 1 FROM visitas_relatorios vr WHERE vr.visita_id = v.id AND vr.autor_id = vp.voluntario_id AND (vr.fora_do_prazo = 0 OR EXISTS(SELECT 1 FROM visitas_ajustes_contabilizacao vac WHERE vac.relatorio_id = vr.id AND vac.tipo = 'aceite_relatorio_fora_prazo'))) OR EXISTS(SELECT 1 FROM visitas_ajustes_contabilizacao vac WHERE vac.visita_id = v.id AND vac.voluntario_id = vp.voluntario_id) END as valida")
             ->get();
     }
 
