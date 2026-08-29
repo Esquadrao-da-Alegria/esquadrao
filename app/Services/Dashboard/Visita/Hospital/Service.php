@@ -80,7 +80,7 @@ class Service
 
     private function aplicarEscopo(User $user, array $filtros): array
     {
-        $user->loadMissing(['cargos', 'voluntario']);
+        resolverUsuario($user);
 
         $filtros = [
             'mes_inicio' => $filtros['mes_inicio'],
@@ -134,7 +134,7 @@ class Service
 
     private function possuiEscopoGlobal(User $user): bool
     {
-        $user->loadMissing('cargos');
+        resolverUsuario($user);
 
         return $user->cargos->contains(fn ($cargo) => in_array($cargo->slug, ['administrador', 'coordenador_geral'], true));
     }

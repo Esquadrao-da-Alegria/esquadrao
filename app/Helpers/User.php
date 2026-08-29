@@ -22,7 +22,7 @@ class User
 
     public static function ehGestor(UserModel $user): bool
     {
-        $user->loadMissing(['cargos', 'voluntario']);
+        resolverUsuario($user);
 
         if (! $user->voluntario?->cidade_base_id) {
             return false;

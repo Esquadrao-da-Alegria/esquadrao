@@ -230,10 +230,23 @@ class Service
     {
         $erros = [];
 
+        $hospitalIds = array_values(array_unique(array_map(
+            fn (array $payload) => (int) $payload['hospital_id'],
+            $hospitaisPayload,
+        )));
+
+        $hospitais = Hospital::query()
+            ->whereIn('id', $hospitalIds)
+            ->where('cidade_id', $cidadeBaseId)
+            ->where('ativo', true)
+            ->with(['alas:id,hospital_id,nome'])
+            ->get()
+            ->keyBy('id');
+
         foreach ($hospitaisPayload as $indice => $hospitalPayload) {
             $erros = array_merge(
                 $erros,
-                $this->validarHospitalPayload($hospitalPayload, $indice, $cidadeBaseId, $ano, $mes),
+                $this->validarHospitalPayload($hospitalPayload, $indice, $hospitais, $ano, $mes),
             );
         }
 
@@ -244,16 +257,17 @@ class Service
      * @param  array<string, mixed>  $hospitalPayload
      * @return array<int, string>
      */
-    private function validarHospitalPayload(array $hospitalPayload, int $indice, int $cidadeBaseId, int $ano, int $mes): array
-    {
+    private function validarHospitalPayload(
+        array $hospitalPayload,
+        int $indice,
+        Collection $hospitais,
+        int $ano,
+        int $mes,
+    ): array {
         $hospitalId = (int) $hospitalPayload['hospital_id'];
         $prefixo    = "hospitais.{$indice}";
 
-        $hospital = Hospital::query()
-            ->whereKey($hospitalId)
-            ->where('cidade_id', $cidadeBaseId)
-            ->where('ativo', true)
-            ->first();
+        $hospital = $hospitais->get($hospitalId);
 
         if (! $hospital) {
             return ["{$prefixo}: hospital não pertence à sua cidade-base ou está inativo."];

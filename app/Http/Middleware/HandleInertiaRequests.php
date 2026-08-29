@@ -40,11 +40,7 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        $user = $request->user();
-
-        if ($user) {
-            $user->loadMissing(['cargos', 'voluntario:id,cidade_base_id,nome_completo,foto_perfil']);
-        }
+        $user = usuarioAutenticado();
 
         return [
             ...parent::share($request),

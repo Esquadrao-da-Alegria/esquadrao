@@ -137,7 +137,7 @@ class Service
 
     private function validarAdministrador(User $user): void
     {
-        $user->loadMissing('cargos');
+        resolverUsuario($user);
         abort_unless($user->cargos->contains('slug', 'administrador'), 403);
     }
 

@@ -63,7 +63,7 @@ class Service
             return true;
         }
 
-        $user->loadMissing(['cargos', 'voluntario']);
+        resolverUsuario($user);
         $visita->loadMissing('hospital');
 
         foreach ($user->cargos as $cargo) {

@@ -14,7 +14,6 @@ use App\Services\Visita\Form\Service as FormService;
 use App\Services\Visita\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class VisitaController extends Controller
@@ -28,8 +27,7 @@ class VisitaController extends Controller
     {
         $mes = $this->normalizarMes($request->query('mes'));
 
-        $user = Auth::user();
-        $user?->loadMissing('voluntario');
+        $user = usuarioAutenticado();
         $cidadeUsuarioId = $user?->voluntario?->cidade_base_id;
 
         if ($request->has('cidade_id')) {
@@ -93,15 +91,16 @@ class VisitaController extends Controller
 
     public function edit(Visita $visita, AjusteService $ajusteService): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-        if (! $this->service->podeEditarVisita(Auth::user(), $visita)) {
+        $user = usuarioAutenticado();
+
+        if (! $user || ! $this->service->podeEditarVisita($user, $visita)) {
             return redirect()->route('visitas.index')
                 ->with('mensagem_erro', 'Você não tem permissão para editar esta visita.');
         }
 
         $dados = $this->formService->buscarDados($visita);
-        $user = Auth::user();
 
-        if ($user?->temCargo('administrador') && $visita->status === VisitaStatus::Realizada) {
+        if ($user->temCargo('administrador') && $visita->status === VisitaStatus::Realizada) {
             $dados['ajustes_contabilizacao'] = $ajusteService->index($visita);
         }
 
@@ -110,7 +109,9 @@ class VisitaController extends Controller
 
     public function update(UpdateRequest $request, Visita $visita): \Illuminate\Http\RedirectResponse
     {
-        if (! $this->service->podeEditarVisita(Auth::user(), $visita)) {
+        $user = usuarioAutenticado();
+
+        if (! $user || ! $this->service->podeEditarVisita($user, $visita)) {
             return redirect()->route('visitas.index')
                 ->with('mensagem_erro', 'Você não tem permissão para editar esta visita.');
         }
@@ -126,8 +127,7 @@ class VisitaController extends Controller
 
     public function cancelar(Visita $visita): \Illuminate\Http\RedirectResponse
     {
-        $user = Auth::user();
-        $user?->loadMissing('cargos');
+        $user = usuarioAutenticado();
 
         $ehAdministrador = $user?->cargos->contains('slug', 'administrador') ?? false;
         $ehLider = $user !== null && $visita->lider_id !== null && $user->id === $visita->lider_id;

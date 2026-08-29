@@ -20,6 +20,12 @@ return new class extends Migration
             return;
         }
 
+        $cidadeBaseId = DB::table('cidades')
+            ->where('id', self::CIDADE_BASE_PORTO_ALEGRE_ID)
+            ->exists()
+            ? self::CIDADE_BASE_PORTO_ALEGRE_ID
+            : null;
+
         $agora = now();
 
         $voluntario = DB::table('voluntarios')
@@ -27,19 +33,22 @@ return new class extends Migration
             ->first();
 
         if ($voluntario) {
+            $dadosAtualizacao = ['updated_at' => $agora];
+
+            if ($cidadeBaseId !== null) {
+                $dadosAtualizacao['cidade_base_id'] = $cidadeBaseId;
+            }
+
             DB::table('voluntarios')
                 ->where('id', $voluntario->id)
-                ->update([
-                    'cidade_base_id' => self::CIDADE_BASE_PORTO_ALEGRE_ID,
-                    'updated_at' => $agora,
-                ]);
+                ->update($dadosAtualizacao);
 
             $voluntarioId = $voluntario->id;
         } else {
             $voluntarioId = DB::table('voluntarios')->insertGetId([
                 'nome_completo' => $usuario->name,
                 'email' => self::EMAIL_ADMINISTRADOR,
-                'cidade_base_id' => self::CIDADE_BASE_PORTO_ALEGRE_ID,
+                'cidade_base_id' => $cidadeBaseId,
                 'status' => $usuario->status ?? User::STATUS_ATIVO,
                 'created_at' => $agora,
                 'updated_at' => $agora,
