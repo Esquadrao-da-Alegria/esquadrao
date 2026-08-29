@@ -25,7 +25,7 @@ Documento de referência sobre **metas mensais/semanais por hospital** e **liber
 4. **Soma semanal = meta mensal** — quando houver metas semanais, a soma de todas as semanas (e alas, se aplicável) deve ser **exatamente** igual à meta mensal.
 5. **Modo hospital ou por ala** — por hospital/mês, apenas um modo: semanas do hospital (`ala_unidade_id` nulo) **ou** semanas por ala (`ala_unidade_id` preenchido). Trocar o modo remove registros do modo anterior.
 6. **Ala da meta** — meta por ala só aceita alas do próprio hospital. Visita **sem** ala conta no resumo hospitalar, não na meta da ala.
-7. **Semanas do mês** — faixas alinhadas ao calendário (domingo a sábado), a partir do dia 1: a semana 1 vai do dia 1 até o sábado daquela semana; as seguintes seguem domingo–sábado até o fim do mês. Helper: `App\Helpers\MetaHospital::semanasDoMes()`.
+7. **Semanas do mês** — semanas completas de **domingo a sábado** (fecham no sábado). A **primeira** semana é quebrada quando o mês não começa no domingo (ex.: quarta → sábado). A **última** é quebrada quando o mês não termina no sábado. Demais semanas começam no domingo. Helper: `App\Helpers\MetaHospital::semanasDoMes()`.
 8. **Escopo geográfico** — metas listam e persistem apenas hospitais **ativos** da **cidade-base** do usuário.
 
 ---

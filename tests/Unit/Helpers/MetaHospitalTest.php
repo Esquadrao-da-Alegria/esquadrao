@@ -20,6 +20,18 @@ class MetaHospitalTest extends TestCase
         ], $semanas);
     }
 
+    public function test_calcula_semanas_quando_mes_comeca_no_domingo(): void
+    {
+        $semanas = MetaHospital::semanasDoMes(2026, 2);
+
+        $this->assertSame([
+            ['semana' => 1, 'dia_inicio' => 1, 'dia_fim' => 7],
+            ['semana' => 2, 'dia_inicio' => 8, 'dia_fim' => 14],
+            ['semana' => 3, 'dia_inicio' => 15, 'dia_fim' => 21],
+            ['semana' => 4, 'dia_inicio' => 22, 'dia_fim' => 28],
+        ], $semanas);
+    }
+
     public function test_calcula_semanas_quando_mes_comeca_no_sabado(): void
     {
         $semanas = MetaHospital::semanasDoMes(2026, 8);

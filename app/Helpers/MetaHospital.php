@@ -8,7 +8,11 @@ use Carbon\Carbon;
 class MetaHospital
 {
     /**
-     * Semanas do mês alinhadas ao calendário (domingo a sábado), a partir do dia 1.
+     * Semanas do mês com ciclos de domingo a sábado.
+     *
+     * - Semanas completas: domingo → sábado (fecha no sábado).
+     * - Primeira semana quebrada: quando o mês não começa no domingo (dia 1 até o sábado).
+     * - Última semana quebrada: quando o mês não termina no sábado (domingo até o último dia).
      *
      * @return array<int, array{semana: int, dia_inicio: int, dia_fim: int}>
      */
@@ -20,9 +24,13 @@ class MetaHospital
         $numero    = 1;
 
         while ($dia <= $diasNoMes) {
-            $diaSemana     = Carbon::create($ano, $mes, $dia)->dayOfWeek;
-            $diasAteSabado = 6 - $diaSemana;
-            $diaFim        = min($dia + $diasAteSabado, $diasNoMes);
+            $diaSemana = Carbon::create($ano, $mes, $dia)->dayOfWeek;
+
+            if ($numero === 1 && $diaSemana !== Carbon::SUNDAY) {
+                $diaFim = min($dia + (Carbon::SATURDAY - $diaSemana), $diasNoMes);
+            } else {
+                $diaFim = min($dia + 6, $diasNoMes);
+            }
 
             $semanas[] = [
                 'semana'     => $numero,
