@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Web\Hospital\Meta;
 // CONTROLLERS
 use App\Http\Controllers\Controller as BaseController;
 
+// HELPERS
+use App\Helpers\MetaHospital as MetaHospitalHelper;
+
 // FORM REQUESTS
 use App\Http\Requests\Web\Hospital\Meta\IndexRequest;
 use App\Http\Requests\Web\Hospital\Meta\UpdateRequest;
@@ -28,9 +31,13 @@ class Controller extends BaseController
         $retorno = $this->service->index($request->user(), $request->validated());
 
         if (! $retorno['sucesso']) {
+            $ano = (int) $request->input('ano', now()->year);
+            $mes = (int) $request->input('mes', now()->month);
+
             return Inertia::render('Hospital/Meta/Index', [
-                'ano'       => (int) $request->input('ano', now()->year),
-                'mes'       => (int) $request->input('mes', now()->month),
+                'ano'       => $ano,
+                'mes'       => $mes,
+                'semanas'   => MetaHospitalHelper::semanasDoMes($ano, $mes),
                 'hospitais' => [],
             ])->with('mensagem_erro', $retorno['erros'][0] ?? 'Erro ao carregar metas.');
         }

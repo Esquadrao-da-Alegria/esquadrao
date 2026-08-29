@@ -45,6 +45,12 @@ class MetaTest extends TestCase
                 ->component('Hospital/Meta/Index')
                 ->where('ano', 2026)
                 ->where('mes', 6)
+                ->has('semanas', 5)
+                ->where('semanas.0', [
+                    'semana'     => 1,
+                    'dia_inicio' => 1,
+                    'dia_fim'    => 6,
+                ])
             );
 
         $this->assertDatabaseHas('hospitais', [

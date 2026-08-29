@@ -56,9 +56,16 @@ interface HospitalMeta {
     metas_semanais: MetaSemanal[]
 }
 
+interface SemanaMes {
+    semana: number
+    dia_inicio: number
+    dia_fim: number
+}
+
 interface Props {
     ano: number
     mes: number
+    semanas: SemanaMes[]
     hospitais: HospitalMeta[]
 }
 
@@ -102,23 +109,21 @@ const selecionarTextoInputMeta = (event: FocusEvent<HTMLInputElement>) => {
     event.currentTarget.select()
 }
 
-const labelSemana = (semana: number): string => {
-    const faixas: Record<number, string> = {
-        1: '1–7',
-        2: '8–14',
-        3: '15–21',
-        4: '22–28',
-        5: '29–fim',
+const labelSemana = (semana: number, semanas: SemanaMes[]): string => {
+    const faixa = semanas.find((item) => item.semana === semana)
+
+    if (!faixa) {
+        return `Semana ${semana}`
     }
 
-    return `Semana ${semana} (${faixas[semana] ?? ''})`
+    const periodo = faixa.dia_inicio === faixa.dia_fim
+        ? String(faixa.dia_inicio)
+        : `${faixa.dia_inicio}–${faixa.dia_fim}`
+
+    return `Semana ${semana} (${periodo})`
 }
 
-const semanasDoMes = (ano: number, mes: number): number[] => {
-    const dias = new Date(ano, mes, 0).getDate()
-
-    return dias >= 29 ? [1, 2, 3, 4, 5] : [1, 2, 3, 4]
-}
+const numerosSemanas = (semanas: SemanaMes[]): number[] => semanas.map((item) => item.semana)
 
 const montarMetasSemanaisVazias = (
     hospital: HospitalMeta,
@@ -143,13 +148,13 @@ const montarMetasSemanaisVazias = (
     }))
 }
 
-const Index: FC<Props> = ({ ano, mes, hospitais: hospitaisIniciais }) => {
+const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisIniciais }) => {
     const { errors } = usePage<SharedData>().props
     const errosRef = useRef<HTMLDivElement>(null)
     const [hospitais, setHospitais] = useState<HospitalMeta[]>(hospitaisIniciais)
     const [salvando, setSalvando] = useState(false)
 
-    const semanas = useMemo(() => semanasDoMes(ano, mes), [ano, mes])
+    const semanas = useMemo(() => numerosSemanas(semanasMes), [semanasMes])
 
     useEffect(() => {
         setHospitais(hospitaisIniciais)
@@ -474,7 +479,7 @@ const Index: FC<Props> = ({ ano, mes, hospitais: hospitaisIniciais }) => {
                                                                     </td>
                                                                 ) : null}
                                                                 <td className={`${painelTableTdClass} text-muted-foreground`}>
-                                                                    {labelSemana(item.semana)}
+                                                                    {labelSemana(item.semana, semanasMes)}
                                                                 </td>
                                                                 <td className={painelTableTdClass}>
                                                                     <input

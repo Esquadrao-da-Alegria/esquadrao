@@ -6,6 +6,7 @@ namespace App\Services\Hospital\Meta;
 use App\Queries\Hospital\Meta\Queries;
 
 // HELPERS
+use App\Helpers\MetaHospital as MetaHospitalHelper;
 use App\Helpers\User as UserHelper;
 use App\Helpers\Visita as VisitaHelper;
 
@@ -17,7 +18,6 @@ use App\Models\User;
 use App\Models\Visita;
 
 // LIBS EXTERNAS
-use Carbon\Carbon;
 
 // ELOQUENT
 use Illuminate\Support\Collection;
@@ -31,13 +31,6 @@ class Service
     public const META_MENSAL_MAXIMA = 10;
 
     public const META_SEMANAL_MAXIMA = 5;
-    private const SQL_SEMANA_VISITA = 'CASE
-                    WHEN DAY(inicio_em) BETWEEN 1 AND 7 THEN 1
-                    WHEN DAY(inicio_em) BETWEEN 8 AND 14 THEN 2
-                    WHEN DAY(inicio_em) BETWEEN 15 AND 21 THEN 3
-                    WHEN DAY(inicio_em) BETWEEN 22 AND 28 THEN 4
-                    ELSE 5
-                END';
 
     public function __construct(private Queries $queries) {}
 
@@ -87,7 +80,7 @@ class Service
             $mes              = (int) $dados['mes'];
             $hospitaisPayload = $dados['hospitais'];
 
-            $erros = $this->validarPayloadUpdate($hospitaisPayload, $cidadeBaseId);
+            $erros = $this->validarPayloadUpdate($hospitaisPayload, $cidadeBaseId, $ano, $mes);
 
             if ($erros !== []) {
                 session()->flash('mensagem_erro', $erros[0]);
@@ -233,14 +226,14 @@ class Service
      * @param  array<int, array<string, mixed>>  $hospitaisPayload
      * @return array<int, string>
      */
-    private function validarPayloadUpdate(array $hospitaisPayload, int $cidadeBaseId): array
+    private function validarPayloadUpdate(array $hospitaisPayload, int $cidadeBaseId, int $ano, int $mes): array
     {
         $erros = [];
 
         foreach ($hospitaisPayload as $indice => $hospitalPayload) {
             $erros = array_merge(
                 $erros,
-                $this->validarHospitalPayload($hospitalPayload, $indice, $cidadeBaseId),
+                $this->validarHospitalPayload($hospitalPayload, $indice, $cidadeBaseId, $ano, $mes),
             );
         }
 
@@ -251,7 +244,7 @@ class Service
      * @param  array<string, mixed>  $hospitalPayload
      * @return array<int, string>
      */
-    private function validarHospitalPayload(array $hospitalPayload, int $indice, int $cidadeBaseId): array
+    private function validarHospitalPayload(array $hospitalPayload, int $indice, int $cidadeBaseId, int $ano, int $mes): array
     {
         $hospitalId = (int) $hospitalPayload['hospital_id'];
         $prefixo    = "hospitais.{$indice}";
@@ -284,6 +277,8 @@ class Service
             $metaMensal,
             $metasPorAla,
             $prefixo,
+            $ano,
+            $mes,
         );
     }
 
@@ -297,13 +292,20 @@ class Service
         ?int $metaMensal,
         bool $metasPorAla,
         string $prefixo,
+        int $ano,
+        int $mes,
     ): array {
         $erros          = [];
         $somaSemanal    = 0;
         $chavesSemanais = [];
 
         foreach ($metasSemanais as $metaSemanal) {
-            $semana       = (int) $metaSemanal['semana'];
+            $semana = (int) $metaSemanal['semana'];
+
+            if (! MetaHospitalHelper::semanaValida($ano, $mes, $semana)) {
+                return ["{$prefixo}: semana {$semana} inválida para o mês informado."];
+            }
+
             $alaUnidadeId = $metaSemanal['ala_unidade_id'] ?? null;
             $chaveSemanal = $metasPorAla
                 ? "{$semana}-{$alaUnidadeId}"
@@ -409,7 +411,7 @@ class Service
         return [
             'ano'            => $ano,
             'mes'            => $mes,
-            'semanas'        => $this->semanasDoMes($ano, $mes),
+            'semanas'        => MetaHospitalHelper::numerosSemanasDoMes($ano, $mes),
             'metas_mensais'  => $metasMensais->keyBy('hospital_id'),
             'metas_semanais' => $metasSemanais->groupBy('hospital_id'),
             'realizadas'     => $this->buscarRealizadasAgregadas($hospitalIds, $ano, $mes),
@@ -465,6 +467,7 @@ class Service
             'dados'   => [
                 'ano'       => $ano,
                 'mes'       => $mes,
+                'semanas'   => MetaHospitalHelper::semanasDoMes($ano, $mes),
                 'hospitais' => $hospitais,
             ],
             'erros' => [],
@@ -510,11 +513,13 @@ class Service
      */
     private function buscarRealizadasAgregadas(array $hospitalIds, int $ano, int $mes): Collection
     {
+        $sqlSemana = MetaHospitalHelper::sqlSemanaVisita($ano, $mes);
+
         return Visita::query()
             ->select([
                 'hospital_id',
                 'ala_unidade_id',
-                DB::raw(self::SQL_SEMANA_VISITA . ' as semana'),
+                DB::raw("{$sqlSemana} as semana"),
                 DB::raw('COUNT(*) as total'),
             ])
             ->whereIn('hospital_id', $hospitalIds)
@@ -522,7 +527,7 @@ class Service
             ->whereMonth('inicio_em', $mes)
             ->whereIn('status', VisitaHelper::statusRealizadasValores())
             ->groupBy('hospital_id', 'ala_unidade_id')
-            ->groupByRaw(self::SQL_SEMANA_VISITA)
+            ->groupByRaw($sqlSemana)
             ->get();
     }
 
@@ -651,20 +656,6 @@ class Service
         }
 
         return (int) $query->sum('total');
-    }
-
-    /**
-     * @return array<int, int>
-     */
-    private function semanasDoMes(int $ano, int $mes): array
-    {
-        $semanas = [1, 2, 3, 4];
-
-        if (Carbon::create($ano, $mes, 1)->daysInMonth >= 29) {
-            $semanas[] = 5;
-        }
-
-        return $semanas;
     }
 
     private function logarErro(array $dados, string $acao, string $mensagemErro): void
