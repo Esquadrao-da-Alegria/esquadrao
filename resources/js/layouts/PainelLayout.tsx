@@ -29,6 +29,9 @@ import { index as visitasIndex } from '@/routes/visitas'
 import { index as voluntariosIndex } from '@/routes/voluntarios';
 import { index as patrocinadoresIndex } from '@/routes/patrocinadores';
 
+const ROTA_METAS = '/hospitais/metas';
+const ROTA_AGENDA_LIBERACAO = '/visitas/agenda-liberacao';
+
 // TIPOS
 import { type SharedData } from '@/types';
 import {
@@ -40,6 +43,9 @@ import {
     Handshake,
     LayoutDashboard,
     LogOut,
+    Settings2,
+    Target,
+    Unlock,
     User,
     UsersRound,
     type LucideIcon,
@@ -71,10 +77,14 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const pathname = (url.split('?')[0] ?? '').replace(/\/$/, '') || '/';
     const rotaDashboardAtiva =
         pathname === '/dashboard' || pathname.startsWith('/dashboards/');
+    const rotaAvancadoAtiva =
+        pathname === ROTA_METAS || pathname === ROTA_AGENDA_LIBERACAO;
     const [dashboardsOpen, setDashboardsOpen] = useState(rotaDashboardAtiva);
+    const [avancadoOpen, setAvancadoOpen] = useState(rotaAvancadoAtiva);
 
     const user = props.auth?.user;
     const ehAdministrador = props.eh_administrador === true;
+    const ehGestor = props.eh_gestor === true;
     const dashboardsVisiveis = itensDashboards.filter(
         (item) => item.permissao === null || props.permissoes_dashboards?.[item.permissao] === true,
     );
@@ -96,6 +106,10 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     useEffect(() => {
         if (rotaDashboardAtiva) setDashboardsOpen(true);
     }, [rotaDashboardAtiva]);
+
+    useEffect(() => {
+        if (rotaAvancadoAtiva) setAvancadoOpen(true);
+    }, [rotaAvancadoAtiva]);
 
     const closeMobile = () => setMobileOpen(false);
 
@@ -130,6 +144,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
         active
             ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-[inset_3px_0_0_0_var(--primary)]'
             : '';
+
+    const chevronSubmenuClass = (aberto: boolean) =>
+        cn(
+            'size-4 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+            aberto && 'rotate-90',
+        );
 
     const itensNavegacao: ItemNavegacaoPainel[] = [
         {
@@ -177,6 +197,17 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     ];
 
     const itensVisiveis = itensNavegacao.filter((item) => item.visivel);
+    const indicePatrocinadores = itensVisiveis.findIndex(
+        (item) => item.titulo === 'Patrocinadores',
+    );
+    const itensAntesAvancado =
+        indicePatrocinadores >= 0
+            ? itensVisiveis.slice(0, indicePatrocinadores + 1)
+            : itensVisiveis;
+    const itensDepoisAvancado =
+        indicePatrocinadores >= 0
+            ? itensVisiveis.slice(indicePatrocinadores + 1)
+            : [];
 
     const menuConta = user ? (
         <DropdownMenu>
@@ -279,13 +310,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                 />
                                 <span className="flex-1 text-left">Dashboards</span>
                                 <ChevronRight
-                                    className={`size-4 transition-transform ${
-                                        dashboardsOpen ? 'rotate-90' : ''
-                                    }`}
+                                    className={chevronSubmenuClass(dashboardsOpen)}
                                     aria-hidden
                                 />
                             </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-0.5 space-y-0.5 pl-5">
+                            <CollapsibleContent className="mt-0.5 pl-5">
+                                <div className="space-y-0.5 py-0.5">
                                 {dashboardsVisiveis.map((item) => {
                                     const Icone = item.icone;
                                     const ativo =
@@ -308,10 +338,80 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                         </Link>
                                     );
                                 })}
+                                </div>
                             </CollapsibleContent>
                         </Collapsible>
                     )}
-                    {itensVisiveis.map((item) => {
+                    {itensAntesAvancado.map((item) => {
+                        const Icone = item.icone;
+
+                        return (
+                            <Link
+                                key={item.titulo}
+                                href={item.href}
+                                className={`${sidebarLinkClass} ${sidebarLinkActive(
+                                    item.ativo,
+                                )}`}
+                            >
+                                <Icone
+                                    className="size-4 shrink-0 opacity-70"
+                                    aria-hidden
+                                />
+                                {item.titulo}
+                            </Link>
+                        );
+                    })}
+                    {ehGestor && (
+                        <Collapsible
+                            open={avancadoOpen}
+                            onOpenChange={setAvancadoOpen}
+                        >
+                            <CollapsibleTrigger
+                                className={`${sidebarLinkClass} ${sidebarLinkActive(
+                                    rotaAvancadoAtiva,
+                                )}`}
+                            >
+                                <Settings2
+                                    className="size-4 shrink-0 opacity-70"
+                                    aria-hidden
+                                />
+                                <span className="flex-1 text-left">Avançado</span>
+                                <ChevronRight
+                                    className={chevronSubmenuClass(avancadoOpen)}
+                                    aria-hidden
+                                />
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="mt-0.5 pl-5">
+                                <div className="space-y-0.5 py-0.5">
+                                <Link
+                                    href={ROTA_METAS}
+                                    className={`${sidebarLinkClass} ${sidebarLinkActive(
+                                        pathname === ROTA_METAS,
+                                    )}`}
+                                >
+                                    <Target
+                                        className="size-4 shrink-0 opacity-70"
+                                        aria-hidden
+                                    />
+                                    Metas
+                                </Link>
+                                <Link
+                                    href={ROTA_AGENDA_LIBERACAO}
+                                    className={`${sidebarLinkClass} ${sidebarLinkActive(
+                                        pathname === ROTA_AGENDA_LIBERACAO,
+                                    )}`}
+                                >
+                                    <Unlock
+                                        className="size-4 shrink-0 opacity-70"
+                                        aria-hidden
+                                    />
+                                    Liberar agendas
+                                </Link>
+                                </div>
+                            </CollapsibleContent>
+                        </Collapsible>
+                    )}
+                    {itensDepoisAvancado.map((item) => {
                         const Icone = item.icone;
 
                         return (
@@ -379,13 +479,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                                 Dashboards
                                             </span>
                                             <ChevronRight
-                                                className={`size-4 transition-transform ${
-                                                    dashboardsOpen ? 'rotate-90' : ''
-                                                }`}
+                                                className={chevronSubmenuClass(dashboardsOpen)}
                                                 aria-hidden
                                             />
                                         </CollapsibleTrigger>
-                                        <CollapsibleContent className="space-y-0.5 pl-5">
+                                        <CollapsibleContent className="pl-5">
+                                            <div className="space-y-0.5 py-0.5">
                                             {dashboardsVisiveis.map((item) => {
                                                 const Icone = item.icone;
                                                 const ativo =
@@ -409,10 +508,85 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                                     </Link>
                                                 );
                                             })}
+                                            </div>
                                         </CollapsibleContent>
                                     </Collapsible>
                                 )}
-                                {itensVisiveis.map((item) => {
+                                {itensAntesAvancado.map((item) => {
+                                    const Icone = item.icone;
+
+                                    return (
+                                        <Link
+                                            key={item.titulo}
+                                            href={item.href}
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                item.ativo,
+                                            )} flex items-center gap-2`}
+                                            onClick={closeMobile}
+                                        >
+                                            <Icone
+                                                className="size-4 shrink-0 opacity-70"
+                                                aria-hidden
+                                            />
+                                            {item.titulo}
+                                        </Link>
+                                    );
+                                })}
+                                {ehGestor && (
+                                    <Collapsible
+                                        open={avancadoOpen}
+                                        onOpenChange={setAvancadoOpen}
+                                    >
+                                        <CollapsibleTrigger
+                                            className={`${navLinkClass} ${navLinkActive(
+                                                rotaAvancadoAtiva,
+                                            )} flex w-full items-center gap-2`}
+                                        >
+                                            <Settings2
+                                                className="size-4 shrink-0 opacity-70"
+                                                aria-hidden
+                                            />
+                                            <span className="flex-1 text-left">
+                                                Avançado
+                                            </span>
+                                            <ChevronRight
+                                                className={chevronSubmenuClass(avancadoOpen)}
+                                                aria-hidden
+                                            />
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent className="pl-5">
+                                            <div className="space-y-0.5 py-0.5">
+                                            <Link
+                                                href={ROTA_METAS}
+                                                className={`${navLinkClass} ${navLinkActive(
+                                                    pathname === ROTA_METAS,
+                                                )} flex items-center gap-2`}
+                                                onClick={closeMobile}
+                                            >
+                                                <Target
+                                                    className="size-4 shrink-0 opacity-70"
+                                                    aria-hidden
+                                                />
+                                                Metas
+                                            </Link>
+                                            <Link
+                                                href={ROTA_AGENDA_LIBERACAO}
+                                                className={`${navLinkClass} ${navLinkActive(
+                                                    pathname === ROTA_AGENDA_LIBERACAO,
+                                                )} flex items-center gap-2`}
+                                                onClick={closeMobile}
+                                            >
+                                                <Unlock
+                                                    className="size-4 shrink-0 opacity-70"
+                                                    aria-hidden
+                                                />
+                                                Liberar agendas
+                                            </Link>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </Collapsible>
+                                )}
+                                {itensDepoisAvancado.map((item) => {
                                     const Icone = item.icone;
 
                                     return (

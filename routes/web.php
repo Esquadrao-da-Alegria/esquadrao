@@ -1,33 +1,46 @@
 <?php
 
-use App\Http\Controllers\Web\EventoController;
+// CONTROLLERS
+use App\Http\Controllers\Web\ConviteCadastroController;
 use App\Http\Controllers\Web\Dashboard\Controller as DashboardController;
 use App\Http\Controllers\Web\Dashboard\Meu\Controller as MeuDashboardController;
 use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVisitaHospitalController;
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
+use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
+use App\Http\Controllers\Web\EventoController;
 use App\Http\Controllers\Web\EventoFinalizacaoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
 use App\Http\Controllers\Web\EventoPresencaController;
-use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
+use App\Http\Controllers\Web\Hospital\Meta\Controller as HospitalMetaController;
 use App\Http\Controllers\Web\HospitalController;
-use App\Http\Controllers\Web\MeuEventoController;
-use App\Http\Controllers\Web\ConviteCadastroController;
-use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
-use App\Http\Controllers\Web\Visita\Ajuste\Controller as VisitaAjusteController;
-use App\Http\Controllers\Web\Visita\Relatorio\VisitaRelatorioController;
-use App\Http\Controllers\Web\Visita\VisitaController;
 use App\Http\Controllers\Web\Json\CidadeController;
+use App\Http\Controllers\Web\MeuEventoController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
+use App\Http\Controllers\Web\Visita\Agenda\Liberacao\Controller as VisitaAgendaLiberacaoController;
+use App\Http\Controllers\Web\Visita\Ajuste\Controller as VisitaAjusteController;
+use App\Http\Controllers\Web\Visita\Participante\VisitaParticipanteController;
+use App\Http\Controllers\Web\Visita\Relatorio\VisitaRelatorioController;
+use App\Http\Controllers\Web\Visita\VisitaController;
 use App\Http\Controllers\Web\Voluntario\Afastamento\Controller as VoluntarioAfastamentoController;
 use App\Http\Controllers\Web\VoluntarioController;
+
+// MODELS
 use App\Models\Patrocinador;
+
+// SERVICES
 use App\Services\Dashboard\Permissao\Service as DashboardPermissaoService;
+
+// FACADES
 use Illuminate\Support\Facades\Route;
+
+// INERTIA
 use Inertia\Inertia;
 
+// REDIRECIONAMENTOS
 Route::redirect('/index.html', '/', 301);
 
+// PÁGINAS PÚBLICAS
 Route::get('/', function () {
     return Inertia::render('Home', [
         'patrocinadores' => Patrocinador::where('ativo', true)
@@ -50,15 +63,20 @@ Route::get('/fale-conosco', function () {
     return Inertia::render('FaleConosco/Index');
 })->name('fale_conosco.index');
 
+// CONVITES
 Route::get('/convites/{token}', [ConviteCadastroController::class, 'show'])
     ->name('convites.show');
 
 Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'concluir'])
     ->name('convites.concluir');
 
+// AUTENTICADAS
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    // DASHBOARD
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // DASHBOARDS GERENCIAIS
     Route::prefix('dashboards')->name('dashboards.')->group(function () {
         Route::get('meu', [MeuDashboardController::class, 'index'])
             ->middleware('can:'.DashboardPermissaoService::MEU_DASHBOARD)->name('meu');
@@ -82,14 +100,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('visitas-por-participante.show');
     });
 
+    // AJUDA
     Route::get('ajuda', function () {
         return Inertia::render('Ajuda/Index');
     })->name('ajuda.index');
 
+    // JSON
     ROUTE::prefix('json')->name('json.')->group(function () {
         Route::get('cidades', [CidadeController::class, 'index'])->name('cidades.index');
     });
 
+    // EVENTOS
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
 
     Route::middleware(['administrador'])->group(function () {
@@ -104,6 +125,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
     Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
 
+    Route::post('/eventos/{evento}/finalizar', [EventoFinalizacaoController::class, 'store'])->name('eventos.finalizar');
+    Route::put('/eventos/{evento}/presencas', [EventoPresencaController::class, 'update'])->name('eventos.presencas.update');
+
+    // HOSPITAIS — METAS
+    Route::get('hospitais/metas', [HospitalMetaController::class, 'index'])->name('hospitais.metas.index');
+    Route::put('hospitais/metas', [HospitalMetaController::class, 'update'])->name('hospitais.metas.update');
+
+    // VISITAS — LIBERAÇÃO DE AGENDA
+    Route::get('visitas/agenda-liberacao', [VisitaAgendaLiberacaoController::class, 'index'])->name('visitas.agenda-liberacao.index');
+    Route::put('visitas/agenda-liberacao', [VisitaAgendaLiberacaoController::class, 'update'])->name('visitas.agenda-liberacao.update');
+
+    // VISITAS
     Route::prefix('visitas')->name('visitas.')->group(function () {
         Route::get('/', [VisitaController::class, 'index'])->name('index');
         Route::get('create', [VisitaController::class, 'create'])->name('create');
@@ -133,6 +166,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('participantes.destroy');
     });
 
+    // ADMINISTRADOR
     Route::middleware(['administrador'])->group(function () {
         Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
         Route::get('/eventos/{evento}/edit', [EventoController::class, 'edit'])->name('eventos.edit');
@@ -162,10 +196,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
         Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
     });
-
-    Route::post('/eventos/{evento}/finalizar', [EventoFinalizacaoController::class, 'store'])->name('eventos.finalizar');
-    Route::put('/eventos/{evento}/presencas', [EventoPresencaController::class, 'update'])->name('eventos.presencas.update');
 });
 
+// ROTAS AUXILIARES
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

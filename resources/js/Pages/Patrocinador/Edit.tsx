@@ -1,9 +1,10 @@
 import PainelLayout from '@/layouts/PainelLayout'
+import BotaoSalvar from '@/components/Painel/Forms/BotaoSalvar/Show'
+import FormularioRodape from '@/components/Painel/Forms/FormularioRodape/Show'
 import { useImageCompressor } from '@/hooks/use-image-compressor'
 import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { destroy, index, update } from '@/routes/patrocinadores'
-import { Link, router, useForm } from '@inertiajs/react'
-import { ArrowLeft, Check } from 'lucide-react'
+import { router, useForm } from '@inertiajs/react'
 import React from 'react'
 import { toast } from 'react-toastify'
 
@@ -217,16 +218,9 @@ const Edit: React.FC<Props> = ({ patrocinador }) => {
                                 </form>
                             </div>
 
-                            <div className="flex flex-col gap-3 border-t bg-white px-8 py-6 sm:flex-row sm:items-center sm:justify-between md:px-12">
-                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                    <Link
-                                        href={index().url}
-                                        className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-                                    >
-                                        <ArrowLeft className="size-4" aria-hidden />
-                                        Voltar
-                                    </Link>
-
+                            <FormularioRodape
+                                voltarHref={index().url}
+                                inicio={(
                                     <button
                                         type="button"
                                         onClick={handleDelete}
@@ -235,22 +229,22 @@ const Edit: React.FC<Props> = ({ patrocinador }) => {
                                     >
                                         Excluir
                                     </button>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    form="patrocinador-form"
-                                    disabled={processing || isCompressing}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
-                                >
-                                    <Check className="size-4" aria-hidden />
-                                    {isCompressing
-                                        ? 'Otimizando imagem...'
-                                        : processing
-                                          ? 'Salvando...'
-                                          : 'Salvar'}
-                                </button>
-                            </div>
+                                )}
+                                salvar={(
+                                    <BotaoSalvar
+                                        type="submit"
+                                        form="patrocinador-form"
+                                        disabled={processing || isCompressing}
+                                        salvando={processing || isCompressing}
+                                    >
+                                        {isCompressing
+                                            ? 'Otimizando imagem...'
+                                            : processing
+                                              ? 'Salvando...'
+                                              : 'Salvar'}
+                                    </BotaoSalvar>
+                                )}
+                            />
                         </div>
                     </div>
                 </div>

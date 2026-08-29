@@ -63,13 +63,16 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 10. **Participante automático na criação**  
     Ao criar visita (`store`), o service insere na mesma transaction uma linha em `visita_participante` para o `lider_id`: `papel_na_visita = participante`, `tipo_participacao = palhaco`, `status_participacao = confirmado` (via `create`, não `firstOrCreate`).
 
-11. **Cancelamento lógico de inscrição**  
+11. **Liberação de agenda (visitas hospitalares)**  
+    Visitas tipo `hospital` só podem ser criadas (ou ter `inicio_em` alterado no `update`) se o mês estiver liberado para a **cidade do hospital**. Backend: `Visita\Service` + `Visita\Agenda\Liberacao\Service::mesEstaLiberado`. Frontend: prop `meses_liberados` (YYYY-MM, cidade-base do usuário) alimenta selects de **mês** (somente liberados) e **dia** (todos os dias do mês); o submit envia `data` em `YYYY-MM-DD` como antes. Demais tipos usam input `date` sem essa restrição. Detalhes: [`docs/features/hospitais/specs.md`](../hospitais/specs.md).
+
+12. **Cancelamento lógico de inscrição**  
     `DELETE participantes` não remove a linha — atualiza `status_participacao = cancelado`. Participante pode auto-cancelar, exceto o líder atual (deve trocar o líder antes). Gestores com `podeEditarVisita` podem cancelar qualquer participante.
 
-12. **Reativação de inscrição cancelada**  
+13. **Reativação de inscrição cancelada**  
     Nova inscrição self-service reutiliza a linha existente `(visita_id, voluntario_id)` via `update`, reativando com `status_participacao = confirmado` e novo `tipo_participacao`.
 
-13. **Erro seguro ao validar vagas**  
+14. **Erro seguro ao validar vagas**  
     Falha ao consultar participantes ativos retorna: `Não foi possível validar as vagas desta visita. Tente novamente.` — nunca assume zero vagas ocupadas.
 
 ---
@@ -425,7 +428,7 @@ Sem permissão em `edit`/`update`: redirect `/visitas` + flash `mensagem_erro`.
 | `Pages/Visita/Create.tsx` | Cadastro — título "Cadastrar visita" |
 | `Pages/Visita/Edit.tsx` | Edição — título "Alterar visita" |
 | `components/Painel/Visita/Formulario/Form.tsx` | Campos compartilhados (create + edit) |
-| `lib/visita.ts` | `podeEditarVisita`, `labelTipo`, `extrairData`, `extrairHora`, `hojeLocal`, `VISITA_TIPOS`, `VISITA_STATUS` |
+| `lib/visita.ts` | `podeEditarVisita`, `labelTipo`, `extrairData`, `extrairHora`, `hojeLocal`, `dataPermitidaVisitaHospital`, `intervaloDatasLiberadas`, `VISITA_TIPOS`, `VISITA_STATUS` |
 
 ### Campos
 
@@ -433,7 +436,7 @@ Sem permissão em `edit`/`update`: redirect `/visitas` + flash `mensagem_erro`.
 |-------|--------|------|
 | Hospital | select (ativos) | select **disabled** |
 | Ala / Unidade | select opcional; limpa ao trocar hospital | select **disabled** |
-| Data | date; default hoje | date |
+| Data | tipo `hospital`: selects mês + dia (`meses_liberados`); submit `data` `YYYY-MM-DD` | tipo `hospital`: mês + dia; outros tipos: `date` |
 | Horário início / fim | time; vazios no create | time |
 | Tipo | select; default `hospital` | select |
 | Líder | select; default = user logado | select |
@@ -445,6 +448,7 @@ Sem permissão em `edit`/`update`: redirect `/visitas` + flash `mensagem_erro`.
 - Qualquer usuário autenticado pode criar.
 - Backend define `criado_por_id`, `origem = sistema`, `status = agendada`.
 - `StoreRequest` rejeita hospital inativo e ala de outro hospital.
+- Visitas tipo `hospital` exigem mês liberado na cidade do hospital (`Visita\Service::store`).
 - Líderes: users **ativos** com `voluntario_id` preenchido (sem exigir cargo `voluntario`); líder atual e usuário logado sempre incluídos no select quando ausentes da lista.
 - Na criação, o service insere automaticamente o líder como participante confirmado na mesma transaction.
 

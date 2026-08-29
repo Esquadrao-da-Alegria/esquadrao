@@ -1,12 +1,13 @@
 import VoluntarioFormShow, {
     type VoluntarioFormValues,
 } from '@/components/Painel/Voluntario/Form/Show'
+import BotaoSalvar from '@/components/Painel/Forms/BotaoSalvar/Show'
+import FormularioRodape from '@/components/Painel/Forms/FormularioRodape/Show'
 import PainelLayout from '@/layouts/PainelLayout'
 import { Cargo, User } from '@/types'
-import { Link, router, useForm } from '@inertiajs/react'
+import { router, useForm } from '@inertiajs/react'
 import { toast } from 'react-toastify'
 import React from 'react'
-import { ArrowLeft, Check } from 'lucide-react'
 import { index, update } from '@/routes/voluntarios'
 
 interface Props {
@@ -100,25 +101,17 @@ const Edit: React.FC<Props> = ({ cargos, voluntario }) => {
                                 </form>
                             </div>
 
-                            <div className="flex flex-col gap-3 border-t bg-white px-8 py-6 sm:flex-row sm:items-center sm:justify-between md:px-12">
-                                <Link
-                                    href={index().url}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-                                >
-                                    <ArrowLeft className="size-4" aria-hidden />
-                                    Voltar
-                                </Link>
-
-                                <button
-                                    type="submit"
-                                    form="voluntario-form"
-                                    disabled={processing}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
-                                >
-                                    <Check className="size-4" aria-hidden />
-                                    {processing ? 'Salvando...' : 'Salvar'}
-                                </button>
-                            </div>
+                            <FormularioRodape
+                                voltarHref={index().url}
+                                salvar={(
+                                    <BotaoSalvar
+                                        type="submit"
+                                        form="voluntario-form"
+                                        disabled={processing}
+                                        salvando={processing}
+                                    />
+                                )}
+                            />
                         </div>
                     </div>
                 </div>

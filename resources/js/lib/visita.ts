@@ -142,6 +142,88 @@ export function extrairData(iso: string): string {
     return iso.slice(0, 10)
 }
 
+export function mesDaData(data: string): string {
+    return data.slice(0, 7)
+}
+
+export function extrairDia(data: string): number {
+    return Number(data.slice(8, 10))
+}
+
+export function diasDoMes(anoMes: string): number[] {
+    const [ano, mes] = anoMes.split('-').map(Number)
+    const totalDias = new Date(ano, mes, 0).getDate()
+
+    return Array.from({ length: totalDias }, (_, indice) => indice + 1)
+}
+
+export function montarData(anoMes: string, dia: number): string {
+    return `${anoMes}-${String(dia).padStart(2, '0')}`
+}
+
+export function labelMes(anoMes: string): string {
+    const [ano, mes] = anoMes.split('-').map(Number)
+    const nome = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long' })
+
+    return nome.charAt(0).toUpperCase() + nome.slice(1)
+}
+
+export function labelAnoMes(anoMes: string): string {
+    const [ano, mes] = anoMes.split('-').map(Number)
+
+    return new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', {
+        month: 'long',
+        year: 'numeric',
+    })
+}
+
+export function mesesLiberadosParaSelecao(
+    mesesLiberados: string[],
+    dataAtual?: string,
+): string[] {
+    const meses = [...mesesLiberados]
+
+    if (dataAtual) {
+        const mesAtual = mesDaData(dataAtual)
+
+        if (mesAtual && !meses.includes(mesAtual)) {
+            meses.push(mesAtual)
+        }
+    }
+
+    return meses.sort()
+}
+
+export function dataPermitidaVisitaHospital(data: string, mesesLiberados: string[]): boolean {
+    if (!data || mesesLiberados.length === 0) {
+        return false
+    }
+
+    return mesesLiberados.includes(mesDaData(data))
+}
+
+export function ultimoDiaDoMes(anoMes: string): string {
+    const [ano, mes] = anoMes.split('-').map(Number)
+    const ultimoDia = new Date(ano, mes, 0).getDate()
+
+    return `${anoMes}-${String(ultimoDia).padStart(2, '0')}`
+}
+
+export function intervaloDatasLiberadas(mesesLiberados: string[]): { min: string; max: string } | null {
+    if (mesesLiberados.length === 0) {
+        return null
+    }
+
+    const ordenados = [...mesesLiberados].sort()
+    const primeiro = ordenados[0]
+    const ultimo = ordenados[ordenados.length - 1]
+
+    return {
+        min: `${primeiro}-01`,
+        max: ultimoDiaDoMes(ultimo),
+    }
+}
+
 export function hojeLocal(): string {
     const d = new Date()
     const mes = String(d.getMonth() + 1).padStart(2, '0')

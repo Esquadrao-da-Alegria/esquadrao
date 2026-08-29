@@ -28,6 +28,7 @@ export interface SharedData {
     auth: Auth;
     sidebarOpen: boolean;
     eh_administrador?: boolean;
+    eh_gestor?: boolean;
     permissoes_dashboards: Record<PermissaoDashboard, boolean>;
     mensagem_sucesso?: string | null;
     mensagem_erro?: string | null;

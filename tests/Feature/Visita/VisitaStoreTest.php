@@ -8,6 +8,7 @@ use App\Enums\TipoParticipacao;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
+use App\Models\AgendaLiberacaoCidade;
 use App\Models\Ala;
 use App\Models\Cargo;
 use App\Models\Cidade;
@@ -315,7 +316,7 @@ class VisitaStoreTest extends TestCase
             ->first()
             ?? Cidade::query()->forceCreate(['nome' => 'POA', 'estado_id' => $estado->id]);
 
-        return Hospital::query()->create([
+        $hospital = Hospital::query()->create([
             'cidade_id' => $cidade->id,
             'nome'      => 'Hospital Teste ' . uniqid(),
             'cnpj'      => (string) random_int(10000000000000, 99999999999999),
@@ -324,5 +325,24 @@ class VisitaStoreTest extends TestCase
             'email'     => 'a@b.com',
             'ativo'     => $ativo,
         ]);
+
+        $this->liberarAgenda($cidade->id, 2026, 6);
+
+        return $hospital;
+    }
+
+    private function liberarAgenda(int $cidadeId, int $ano, int $mes): void
+    {
+        AgendaLiberacaoCidade::query()->updateOrCreate(
+            [
+                'cidade_id' => $cidadeId,
+                'ano'       => $ano,
+                'mes'       => $mes,
+            ],
+            [
+                'liberado'        => true,
+                'liberado_por_id' => null,
+            ],
+        );
     }
 }

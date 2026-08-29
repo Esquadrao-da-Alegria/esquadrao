@@ -5,10 +5,19 @@ import { Link, useForm, usePage } from '@inertiajs/react'
 // UI
 import VisitaForm from '@/components/Painel/Visita/Formulario/Form'
 import AjusteContabilizacao from '@/components/Painel/Visita/AjusteContabilizacao'
+import BotaoSalvar from '@/components/Painel/Forms/BotaoSalvar/Show'
+import FormularioRodape from '@/components/Painel/Forms/FormularioRodape/Show'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import PainelLayout from '@/layouts/PainelLayout'
-import { painelLabelClass } from '@/lib/painelFormFieldClasses'
+import { painelLabelClass, painelSelectTriggerClass } from '@/lib/painelFormFieldClasses'
 import { extrairData, extrairHora, podeCriarRelatorio } from '@/lib/visita'
-import { ArrowLeft, Check, Trash2, UserPlus } from 'lucide-react'
+import { Trash2, UserPlus } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { obterCsrfHeaders } from '@/utils/form'
 
@@ -23,12 +32,19 @@ import { create, index as relatoriosIndex } from '@/routes/visitas/relatorios'
 // SERVICES
 import { Service } from '@/Services/Visita/Service'
 
+const VALOR_VAZIO = '_vazio'
+
 interface Props {
     hospitais: Hospital[]
     cidades?: Cidade[]
     lideres: User[]
+    meses_liberados?: string[]
     visita: Visita
-    ajustes_contabilizacao?: { ajustes: any[]; voluntarios: Array<{ id: number; name: string }>; relatorios_atrasados: any[] }
+    ajustes_contabilizacao?: {
+        ajustes: Array<{ id: number; tipo: string; justificativa: string; created_at: string; voluntario: { id: number; name: string }; administrador: { id: number; name: string } }>
+        voluntarios: Array<{ id: number; name: string }>
+        relatorios_atrasados: Array<{ id: number; enviado_em: string; autor: { id: number; name: string } }>
+    }
 }
 
 const labelTipoParticipacao = (tipo: VisitaParticipante['tipo_participacao']) =>
@@ -44,7 +60,7 @@ const labelStatusParticipacao = (status: VisitaParticipante['status_participacao
     return labels[status] ?? status
 }
 
-const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita, ajustes_contabilizacao }) => {
+const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [], visita, ajustes_contabilizacao }) => {
     const { auth, eh_administrador } = usePage<SharedData>().props
     const { data, setData, transform, put, processing, errors } = useForm<DadosFormulario>({
         hospital_id: visita.hospital_id ?? '',
@@ -182,7 +198,16 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita, ajustes_con
                                 )}
 
                                 <form id="visita-form" onSubmit={(e) => { e.preventDefault(); handleSubmit() }} className="space-y-6">
-                                    <VisitaForm data={data} errors={errors} mode="edit" hospitais={hospitais} cidades={cidades} lideres={lideres} onCampoChange={handleCampoChange} />
+                                    <VisitaForm
+                                        data={data}
+                                        errors={errors}
+                                        mode="edit"
+                                        hospitais={hospitais}
+                                        cidades={cidades}
+                                        lideres={lideres}
+                                        meses_liberados={meses_liberados}
+                                        onCampoChange={handleCampoChange}
+                                    />
 
                                     <div>
                                         <h3 className={painelLabelClass}>Participantes</h3>
@@ -211,14 +236,40 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita, ajustes_con
                                             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-700">Adicionar participante</h4>
                                             <p className="mb-3 text-xs text-gray-500">Selecione a pessoa e clique em <strong>Adicionar</strong>. A inclusão é feita imediatamente e não depende do botão Salvar.</p>
                                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                                <select value={novoVoluntarioId} onChange={(e) => setNovoVoluntarioId(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-amber-500 focus:outline-none sm:w-64">
-                                                    <option value="">Selecione um voluntário...</option>
-                                                    {voluntariosDisponiveis.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
-                                                </select>
-                                                <select value={novoTipo} onChange={(e) => setNovoTipo(e.target.value as TipoParticipacao)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-amber-500 focus:outline-none sm:w-36">
-                                                    <option value="palhaco">🎪 Palhaço</option>
-                                                    <option value="paisana">👔 Paisana</option>
-                                                </select>
+                                                <Select
+                                                    value={novoVoluntarioId || VALOR_VAZIO}
+                                                    onValueChange={(valor) =>
+                                                        setNovoVoluntarioId(valor === VALOR_VAZIO ? '' : valor)
+                                                    }
+                                                >
+                                                    <SelectTrigger className={`${painelSelectTriggerClass} sm:w-64`}>
+                                                        <SelectValue placeholder="Selecione um voluntário..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value={VALOR_VAZIO}>
+                                                            Selecione um voluntário...
+                                                        </SelectItem>
+                                                        {voluntariosDisponiveis.map((v) => (
+                                                            <SelectItem key={v.id} value={String(v.id)}>
+                                                                {v.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <Select
+                                                    value={novoTipo}
+                                                    onValueChange={(valor) =>
+                                                        setNovoTipo(valor as TipoParticipacao)
+                                                    }
+                                                >
+                                                    <SelectTrigger className={`${painelSelectTriggerClass} sm:w-36`}>
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="palhaco">🎪 Palhaço</SelectItem>
+                                                        <SelectItem value="paisana">👔 Paisana</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                                 <button type="button" onClick={handleAdicionarParticipante} disabled={adicionando || !novoVoluntarioId} className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-amber-600 bg-white px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-50">
                                                     <UserPlus className="size-4" aria-hidden />
                                                     {adicionando ? 'Adicionando...' : 'Adicionar participante'}
@@ -244,15 +295,18 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, visita, ajustes_con
                                 )}
                             </div>
 
-                            <div className="flex flex-col gap-3 border-t bg-white px-8 py-6 sm:flex-row sm:items-center sm:justify-between md:px-12">
-                                <Link href={index().url} className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50">
-                                    <ArrowLeft className="size-4" aria-hidden /> Voltar
-                                </Link>
-                                <button type="submit" form="visita-form" disabled={processing} className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70">
-                                    <Check className="size-4" aria-hidden />
-                                    {processing ? 'Salvando...' : 'Salvar dados gerais'}
-                                </button>
-                            </div>
+                            <FormularioRodape
+                                voltarHref={index().url}
+                                salvar={(
+                                    <BotaoSalvar
+                                        type="submit"
+                                        form="visita-form"
+                                        disabled={processing}
+                                        salvando={processing}
+                                        rotulo="Salvar dados gerais"
+                                    />
+                                )}
+                            />
                         </div>
                     </div>
                 </div>

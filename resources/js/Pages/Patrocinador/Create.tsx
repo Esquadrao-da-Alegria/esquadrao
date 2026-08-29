@@ -1,9 +1,10 @@
 import PainelLayout from '@/layouts/PainelLayout'
+import BotaoSalvar from '@/components/Painel/Forms/BotaoSalvar/Show'
+import FormularioRodape from '@/components/Painel/Forms/FormularioRodape/Show'
 import { useImageCompressor } from '@/hooks/use-image-compressor'
 import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses'
 import { index, store } from '@/routes/patrocinadores'
-import { Link, useForm } from '@inertiajs/react'
-import { ArrowLeft, Check } from 'lucide-react'
+import { useForm } from '@inertiajs/react'
 import React from 'react'
 import { toast } from 'react-toastify'
 
@@ -187,29 +188,23 @@ const Create: React.FC = () => {
                                 </form>
                             </div>
 
-                            <div className="flex flex-col gap-3 border-t bg-white px-8 py-6 sm:flex-row sm:items-center sm:justify-between md:px-12">
-                                <Link
-                                    href={index().url}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-                                >
-                                    <ArrowLeft className="size-4" aria-hidden />
-                                    Voltar
-                                </Link>
-
-                                <button
-                                    type="submit"
-                                    form="patrocinador-form"
-                                    disabled={processing || isCompressing}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
-                                >
-                                    <Check className="size-4" aria-hidden />
-                                    {isCompressing
-                                        ? 'Otimizando imagem...'
-                                        : processing
-                                          ? 'Salvando...'
-                                          : 'Salvar'}
-                                </button>
-                            </div>
+                            <FormularioRodape
+                                voltarHref={index().url}
+                                salvar={(
+                                    <BotaoSalvar
+                                        type="submit"
+                                        form="patrocinador-form"
+                                        disabled={processing || isCompressing}
+                                        salvando={processing || isCompressing}
+                                    >
+                                        {isCompressing
+                                            ? 'Otimizando imagem...'
+                                            : processing
+                                              ? 'Salvando...'
+                                              : 'Salvar'}
+                                    </BotaoSalvar>
+                                )}
+                            />
                         </div>
                     </div>
                 </div>

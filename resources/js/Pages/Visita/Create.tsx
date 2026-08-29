@@ -1,12 +1,13 @@
 // REACT
 import { type FC } from 'react'
-import { Link, useForm, usePage } from '@inertiajs/react'
+import { useForm, usePage } from '@inertiajs/react'
 
 // UI
 import VisitaForm from '@/components/Painel/Visita/Formulario/Form'
+import BotaoSalvar from '@/components/Painel/Forms/BotaoSalvar/Show'
+import FormularioRodape from '@/components/Painel/Forms/FormularioRodape/Show'
 import PainelLayout from '@/layouts/PainelLayout'
 import { hojeLocal } from '@/lib/visita'
-import { ArrowLeft, Check } from 'lucide-react'
 import { toast } from 'react-toastify'
 
 // TIPOS
@@ -23,9 +24,10 @@ interface Props {
     hospitais: Hospital[]
     cidades?: Cidade[]
     lideres: User[]
+    meses_liberados?: string[]
 }
 
-const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
+const Create: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [] }) => {
     const { auth } = usePage<SharedData>().props
 
     const { data, setData, transform, post, processing, errors } = useForm<DadosFormulario>({
@@ -91,30 +93,23 @@ const Create: FC<Props> = ({ hospitais, cidades = [], lideres }) => {
                                         hospitais={hospitais}
                                         cidades={cidades}
                                         lideres={lideres}
+                                        meses_liberados={meses_liberados}
                                         onCampoChange={handleCampoChange}
                                     />
                                 </form>
                             </div>
 
-                            <div className="flex flex-col gap-3 border-t bg-white px-8 py-6 sm:flex-row sm:items-center sm:justify-between md:px-12">
-                                <Link
-                                    href={index().url}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-                                >
-                                    <ArrowLeft className="size-4" aria-hidden />
-                                    Voltar
-                                </Link>
-
-                                <button
-                                    type="submit"
-                                    form="visita-form"
-                                    disabled={processing}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
-                                >
-                                    <Check className="size-4" aria-hidden />
-                                    {processing ? 'Salvando...' : 'Salvar'}
-                                </button>
-                            </div>
+                            <FormularioRodape
+                                voltarHref={index().url}
+                                salvar={(
+                                    <BotaoSalvar
+                                        type="submit"
+                                        form="visita-form"
+                                        disabled={processing}
+                                        salvando={processing}
+                                    />
+                                )}
+                            />
                         </div>
                     </div>
                 </div>
