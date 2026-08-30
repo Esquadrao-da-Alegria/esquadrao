@@ -24,12 +24,24 @@ class User
     {
         resolverUsuario($user);
 
-        if (! $user->voluntario?->cidade_base_id) {
+        $possuiCargoGestor = $user->cargos->contains(
+            fn ($cargo) => in_array($cargo->slug, self::slugsGestor(), true)
+        );
+
+        if (! $possuiCargoGestor) {
             return false;
         }
 
+        return self::possuiEscopoGlobal($user)
+            || $user->voluntario?->cidade_base_id !== null;
+    }
+
+    public static function possuiEscopoGlobal(UserModel $user): bool
+    {
+        resolverUsuario($user);
+
         return $user->cargos->contains(
-            fn ($cargo) => in_array($cargo->slug, self::slugsGestor(), true)
+            fn ($cargo) => in_array($cargo->slug, ['administrador', 'coordenador_geral'], true)
         );
     }
 }

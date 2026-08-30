@@ -15,6 +15,9 @@ use App\Http\Requests\Web\Hospital\Meta\UpdateRequest;
 // SERVICES
 use App\Services\Hospital\Meta\Service;
 
+// MODELS
+use App\Models\Hospital;
+
 // HTTP
 use Illuminate\Http\RedirectResponse;
 
@@ -26,9 +29,9 @@ class Controller extends BaseController
 {
     public function __construct(private Service $service) {}
 
-    public function index(IndexRequest $request): Response
+    public function index(IndexRequest $request, Hospital $hospital): Response
     {
-        $retorno = $this->service->index($request->user(), $request->validated());
+        $retorno = $this->service->index($request->user(), $hospital, $request->validated());
 
         if (! $retorno['sucesso']) {
             $ano = (int) $request->input('ano', now()->year);
@@ -39,15 +42,19 @@ class Controller extends BaseController
                 'mes'       => $mes,
                 'semanas'   => MetaHospitalHelper::semanasDoMes($ano, $mes),
                 'hospitais' => [],
+                'pode_editar_dados' => $request->user()->temCargo('administrador'),
             ])->with('mensagem_erro', $retorno['erros'][0] ?? 'Erro ao carregar metas.');
         }
 
-        return Inertia::render('Hospital/Meta/Index', $retorno['dados']);
+        return Inertia::render('Hospital/Meta/Index', [
+            ...$retorno['dados'],
+            'pode_editar_dados' => $request->user()->temCargo('administrador'),
+        ]);
     }
 
-    public function update(UpdateRequest $request): RedirectResponse
+    public function update(UpdateRequest $request, Hospital $hospital): RedirectResponse
     {
-        $retorno = $this->service->update($request->user(), $request->validated());
+        $retorno = $this->service->update($request->user(), $hospital, $request->validated());
 
         if (! $retorno['sucesso']) {
             $erros = $retorno['erros'] !== []
@@ -59,6 +66,7 @@ class Controller extends BaseController
 
         return redirect()
             ->route('hospitais.metas.index', [
+                'hospital' => $hospital,
                 'ano' => $request->integer('ano'),
                 'mes' => $request->integer('mes'),
             ]);

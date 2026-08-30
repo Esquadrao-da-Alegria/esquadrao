@@ -29,14 +29,12 @@ class UpdateRequest extends FormRequest
         return [
             'ano' => ['required', 'integer', 'min:2000', 'max:2100'],
             'mes' => ['required', 'integer', 'min:1', 'max:12'],
-            'hospitais' => ['required', 'array'],
-            'hospitais.*.hospital_id' => ['required', 'integer', 'exists:hospitais,id'],
-            'hospitais.*.meta_mensal' => ['nullable', 'integer', 'min:0', 'max:' . MetaService::META_MENSAL_MAXIMA],
-            'hospitais.*.metas_por_ala' => ['required', 'boolean'],
-            'hospitais.*.metas_semanais' => ['nullable', 'array'],
-            'hospitais.*.metas_semanais.*.semana' => ['required', 'integer', 'min:1', 'max:6'],
-            'hospitais.*.metas_semanais.*.quantidade' => ['required', 'integer', 'min:0', 'max:' . MetaService::META_SEMANAL_MAXIMA],
-            'hospitais.*.metas_semanais.*.ala_unidade_id' => ['nullable', 'integer', 'exists:alas_hospitais,id'],
+            'meta_mensal' => ['nullable', 'integer', 'min:0', 'max:' . MetaService::META_MENSAL_MAXIMA],
+            'metas_por_ala' => ['required', 'boolean'],
+            'metas_semanais' => ['nullable', 'array'],
+            'metas_semanais.*.semana' => ['required', 'integer', 'min:1', 'max:6'],
+            'metas_semanais.*.quantidade' => ['required', 'integer', 'min:0', 'max:' . MetaService::META_SEMANAL_MAXIMA],
+            'metas_semanais.*.ala_unidade_id' => ['nullable', 'integer', 'exists:alas_hospitais,id'],
         ];
     }
 }

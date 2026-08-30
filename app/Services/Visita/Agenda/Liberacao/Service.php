@@ -10,6 +10,7 @@ use App\Helpers\User as UserHelper;
 
 // MODELS
 use App\Models\AgendaLiberacaoCidade;
+use App\Models\Cidade;
 use App\Models\User;
 
 // FACADES
@@ -55,8 +56,11 @@ class Service
 
     public function update(User $user, array $dados): array
     {
+        $this->validarAcesso($user);
+        $cidadeId = (int) $dados['cidade_id'];
+        $this->validarCidade($user, $cidadeId);
+
         try {
-            $cidadeBaseId = $this->validarAcesso($user);
             $ano          = (int) $dados['ano'];
             $mes          = (int) $dados['mes'];
             $liberado     = (bool) $dados['liberado'];
@@ -73,7 +77,7 @@ class Service
 
             DB::beginTransaction();
 
-            $falha = $this->persistirLiberacao($cidadeBaseId, $ano, $mes, $liberado, $user->id);
+            $falha = $this->persistirLiberacao($cidadeId, $ano, $mes, $liberado, $user->id);
 
             if ($falha !== null) {
                 DB::rollBack();
@@ -119,6 +123,35 @@ class Service
         return $registro?->liberado === true;
     }
 
+    public function situacao(User $user, int $cidadeId, int $ano, int $mes): array
+    {
+        $this->validarAcesso($user);
+        $this->validarCidade($user, $cidadeId);
+
+        return [
+            'liberado' => $this->mesEstaLiberado($cidadeId, $ano, $mes),
+            'editavel' => $this->mesPermiteAlteracao($ano, $mes),
+        ];
+    }
+
+    public function situacaoConsulta(int $cidadeId, int $ano, int $mes): array
+    {
+        return [
+            'liberado' => $this->mesEstaLiberado($cidadeId, $ano, $mes),
+            'editavel' => $this->mesPermiteAlteracao($ano, $mes),
+        ];
+    }
+
+    public function podeGerenciarCidade(User $user, int $cidadeId): bool
+    {
+        if (! UserHelper::ehGestor($user)) {
+            return false;
+        }
+
+        return UserHelper::possuiEscopoGlobal($user)
+            || (int) $user->voluntario?->cidade_base_id === $cidadeId;
+    }
+
     /**
      * @return array<int, string>
      */
@@ -135,13 +168,27 @@ class Service
             ->all();
     }
 
-    private function validarAcesso(User $user): int
+    private function validarAcesso(User $user): ?int
     {
         if (! UserHelper::ehGestor($user)) {
             abort(403);
         }
 
-        return (int) $user->voluntario->cidade_base_id;
+        return $user->voluntario?->cidade_base_id
+            ? (int) $user->voluntario->cidade_base_id
+            : null;
+    }
+
+    private function validarCidade(User $user, int $cidadeId): void
+    {
+        if (! Cidade::query()->whereKey($cidadeId)->exists()) {
+            abort(404);
+        }
+
+        if (! UserHelper::possuiEscopoGlobal($user)
+            && (int) $user->voluntario->cidade_base_id !== $cidadeId) {
+            abort(403);
+        }
     }
 
     /**
