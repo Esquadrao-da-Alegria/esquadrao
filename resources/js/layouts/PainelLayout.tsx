@@ -30,9 +30,6 @@ import { edit } from '@/routes/profile';
 import { index as visitasIndex } from '@/routes/visitas';
 import { index as voluntariosIndex } from '@/routes/voluntarios';
 
-const ROTA_METAS = '/hospitais/metas';
-const ROTA_AGENDA_LIBERACAO = '/visitas/agenda-liberacao';
-
 // TIPOS
 import { type SharedData } from '@/types';
 import {
@@ -44,9 +41,6 @@ import {
     Handshake,
     LayoutDashboard,
     LogOut,
-    Settings2,
-    Target,
-    Unlock,
     User,
     UsersRound,
     type LucideIcon,
@@ -78,10 +72,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const pathname = (url.split('?')[0] ?? '').replace(/\/$/, '') || '/';
     const rotaDashboardAtiva =
         pathname === '/dashboard' || pathname.startsWith('/dashboards/');
-    const rotaAvancadoAtiva =
-        pathname === ROTA_METAS || pathname === ROTA_AGENDA_LIBERACAO;
     const [dashboardsOpen, setDashboardsOpen] = useState(rotaDashboardAtiva);
-    const [avancadoOpen, setAvancadoOpen] = useState(rotaAvancadoAtiva);
 
     const user = props.auth?.user;
     const ehAdministrador = props.eh_administrador === true;
@@ -106,17 +97,13 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
         if (rotaDashboardAtiva) setDashboardsOpen(true);
     }, [rotaDashboardAtiva]);
 
-    useEffect(() => {
-        if (rotaAvancadoAtiva) setAvancadoOpen(true);
-    }, [rotaAvancadoAtiva]);
-
     const closeMobile = () => setMobileOpen(false);
 
     const isAjuda = pathname === '/ajuda';
     const isHospitaisCreate = pathname === '/hospitais/create';
     const isHospitaisNav =
         pathname === '/hospitais' ||
-        /^\/hospitais\/[^/]+\/edit$/.test(pathname);
+        /^\/hospitais\/[^/]+\/(edit|metas)$/.test(pathname);
 
     const isVoluntariosCreate = pathname === '/voluntarios/create';
     const isVoluntariosNav =
@@ -156,7 +143,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             href: index(),
             icone: Building2,
             ativo: isHospitaisNav && !isHospitaisCreate,
-            visivel: ehAdministrador,
+            visivel: ehGestor,
         },
         {
             titulo: 'Eventos',
@@ -197,18 +184,6 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     ];
 
     const itensVisiveis = itensNavegacao.filter((item) => item.visivel);
-    const indicePatrocinadores = itensVisiveis.findIndex(
-        (item) => item.titulo === 'Patrocinadores',
-    );
-    const itensAntesAvancado =
-        indicePatrocinadores >= 0
-            ? itensVisiveis.slice(0, indicePatrocinadores + 1)
-            : itensVisiveis;
-    const itensDepoisAvancado =
-        indicePatrocinadores >= 0
-            ? itensVisiveis.slice(indicePatrocinadores + 1)
-            : [];
-
     const menuConta = user ? (
         <DropdownMenu>
             <DropdownMenuTrigger
@@ -367,76 +342,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                             </CollapsibleContent>
                         </Collapsible>
                     )}
-                    {itensAntesAvancado.map((item) => {
-                        const Icone = item.icone;
-
-                        return (
-                            <Link
-                                key={item.titulo}
-                                href={item.href}
-                                className={`${sidebarLinkClass} ${sidebarLinkActive(
-                                    item.ativo,
-                                )}`}
-                            >
-                                <Icone
-                                    className="size-4 shrink-0 opacity-70"
-                                    aria-hidden
-                                />
-                                {item.titulo}
-                            </Link>
-                        );
-                    })}
-                    {ehGestor && (
-                        <Collapsible
-                            open={avancadoOpen}
-                            onOpenChange={setAvancadoOpen}
-                        >
-                            <CollapsibleTrigger
-                                className={`${sidebarLinkClass} ${sidebarLinkActive(
-                                    rotaAvancadoAtiva,
-                                )}`}
-                            >
-                                <Settings2
-                                    className="size-4 shrink-0 opacity-70"
-                                    aria-hidden
-                                />
-                                <span className="flex-1 text-left">Avançado</span>
-                                <ChevronRight
-                                    className={chevronSubmenuClass(avancadoOpen)}
-                                    aria-hidden
-                                />
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-0.5 pl-5">
-                                <div className="space-y-0.5 py-0.5">
-                                <Link
-                                    href={ROTA_METAS}
-                                    className={`${sidebarLinkClass} ${sidebarLinkActive(
-                                        pathname === ROTA_METAS,
-                                    )}`}
-                                >
-                                    <Target
-                                        className="size-4 shrink-0 opacity-70"
-                                        aria-hidden
-                                    />
-                                    Metas
-                                </Link>
-                                <Link
-                                    href={ROTA_AGENDA_LIBERACAO}
-                                    className={`${sidebarLinkClass} ${sidebarLinkActive(
-                                        pathname === ROTA_AGENDA_LIBERACAO,
-                                    )}`}
-                                >
-                                    <Unlock
-                                        className="size-4 shrink-0 opacity-70"
-                                        aria-hidden
-                                    />
-                                    Liberar agendas
-                                </Link>
-                                </div>
-                            </CollapsibleContent>
-                        </Collapsible>
-                    )}
-                    {itensDepoisAvancado.map((item) => {
+                    {itensVisiveis.map((item) => {
                         const Icone = item.icone;
 
                         return (
@@ -540,81 +446,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                         </CollapsibleContent>
                                     </Collapsible>
                                 )}
-                                {itensAntesAvancado.map((item) => {
-                                    const Icone = item.icone;
-
-                                    return (
-                                        <Link
-                                            key={item.titulo}
-                                            href={item.href}
-                                            className={`${navLinkClass} ${navLinkActive(
-                                                item.ativo,
-                                            )} flex items-center gap-2`}
-                                            onClick={closeMobile}
-                                        >
-                                            <Icone
-                                                className="size-4 shrink-0 opacity-70"
-                                                aria-hidden
-                                            />
-                                            {item.titulo}
-                                        </Link>
-                                    );
-                                })}
-                                {ehGestor && (
-                                    <Collapsible
-                                        open={avancadoOpen}
-                                        onOpenChange={setAvancadoOpen}
-                                    >
-                                        <CollapsibleTrigger
-                                            className={`${navLinkClass} ${navLinkActive(
-                                                rotaAvancadoAtiva,
-                                            )} flex w-full items-center gap-2`}
-                                        >
-                                            <Settings2
-                                                className="size-4 shrink-0 opacity-70"
-                                                aria-hidden
-                                            />
-                                            <span className="flex-1 text-left">
-                                                Avançado
-                                            </span>
-                                            <ChevronRight
-                                                className={chevronSubmenuClass(avancadoOpen)}
-                                                aria-hidden
-                                            />
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent className="pl-5">
-                                            <div className="space-y-0.5 py-0.5">
-                                            <Link
-                                                href={ROTA_METAS}
-                                                className={`${navLinkClass} ${navLinkActive(
-                                                    pathname === ROTA_METAS,
-                                                )} flex items-center gap-2`}
-                                                onClick={closeMobile}
-                                            >
-                                                <Target
-                                                    className="size-4 shrink-0 opacity-70"
-                                                    aria-hidden
-                                                />
-                                                Metas
-                                            </Link>
-                                            <Link
-                                                href={ROTA_AGENDA_LIBERACAO}
-                                                className={`${navLinkClass} ${navLinkActive(
-                                                    pathname === ROTA_AGENDA_LIBERACAO,
-                                                )} flex items-center gap-2`}
-                                                onClick={closeMobile}
-                                            >
-                                                <Unlock
-                                                    className="size-4 shrink-0 opacity-70"
-                                                    aria-hidden
-                                                />
-                                                Liberar agendas
-                                            </Link>
-                                            </div>
-                                        </CollapsibleContent>
-                                    </Collapsible>
-                                )}
-                                {itensDepoisAvancado.map((item) => {
+                                {itensVisiveis.map((item) => {
                                     const Icone = item.icone;
 
                                     return (

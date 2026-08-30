@@ -2,16 +2,17 @@ import PainelLayout from '@/layouts/PainelLayout';
 import { create, edit } from '@/routes/hospitais';
 import { Hospital } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { MapPin, Pencil, Plus } from 'lucide-react';
+import { MapPin, Pencil, Plus, Target } from 'lucide-react';
 
 const placeholderImg =
     'https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=';
 
 interface Props {
     hospitais: Hospital[];
+    pode_editar_dados: boolean;
 }
 
-const Index: React.FC<Props> = ({ hospitais }) => {
+const Index: React.FC<Props> = ({ hospitais, pode_editar_dados }) => {
     const handleCriarClick = () => {
         router.visit(create.url());
     };
@@ -30,14 +31,14 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                                 : `${hospitais.length} ${hospitais.length === 1 ? 'cadastro' : 'cadastros'}`}
                         </p>
                     </div>
-                    <button
+                    {pode_editar_dados && <button
                         onClick={handleCriarClick}
                         type="button"
                         className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 text-sm font-semibold text-amber-700 shadow-sm transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto"
                     >
                         <Plus className="size-5" strokeWidth={2} aria-hidden />
                         Novo hospital
-                    </button>
+                    </button>}
                 </header>
 
                 {hospitais.length === 0 ? (
@@ -45,22 +46,22 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                         <p className="text-sm text-amber-900/50">
                             Nenhum hospital na lista.
                         </p>
-                        <button
+                        {pode_editar_dados && <button
                             type="button"
                             onClick={handleCriarClick}
                             className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-amber-600 bg-white px-5 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50"
                         >
                             <Plus className="size-4" aria-hidden />
                             Adicionar hospital
-                        </button>
+                        </button>}
                     </div>
                 ) : (
                     <ul className="flex w-full flex-col gap-5">
                         {hospitais.map((hospital) => (
                             <li key={hospital.id} className="w-full">
                                 <article className="w-full overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition duration-300 hover:border-amber-200 hover:shadow-md">
-                                    <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
-                                        <div className="shrink-0">
+                                    <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+                                        <div className="shrink-0 self-center sm:self-auto">
                                             <img
                                                 src={
                                                     hospital.url_foto ??
@@ -80,10 +81,10 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                                                     strokeWidth={2}
                                                     aria-hidden
                                                 />
-                                                <span>{hospital.endereco}</span>
+                                                <span className="min-w-0 break-words">{hospital.endereco}</span>
                                             </p>
                                         </div>
-                                        <div className="flex shrink-0 items-center justify-between gap-4 border-t border-amber-50 pt-4 sm:w-auto sm:justify-end sm:border-t-0 sm:border-l sm:border-amber-50 sm:pt-0 sm:pl-6">
+                                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-t border-amber-50 pt-4 sm:w-auto sm:shrink-0 sm:flex-nowrap sm:justify-end sm:gap-3 sm:border-t-0 sm:border-l sm:border-amber-50 sm:pt-0 sm:pl-6">
                                             <span
                                                 className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase ${
                                                     hospital.ativo
@@ -95,17 +96,18 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                                                     ? 'Ativo'
                                                     : 'Inativo'}
                                             </span>
-                                            <Link
-                                                href={edit.url(hospital.id!)}
-                                                prefetch
-                                                className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                                                aria-label={`Editar ${hospital.nome}`}
-                                            >
-                                                <Pencil
-                                                    size={17}
-                                                    strokeWidth={1.75}
-                                                />
-                                            </Link>
+                                            {hospital.ativo && <Link href={`/hospitais/${hospital.id}/metas`} prefetch className="inline-flex min-h-10 items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-50" aria-label={`Configurar metas de ${hospital.nome}`}>
+                                                    <Target size={17} strokeWidth={1.75} />
+                                                    Metas
+                                                </Link>}
+                                            {pode_editar_dados && <Link
+                                                    href={edit.url(hospital.id!)}
+                                                    prefetch
+                                                    className="inline-flex size-10 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                                                    aria-label={`Editar ${hospital.nome}`}
+                                                >
+                                                    <Pencil size={17} strokeWidth={1.75} />
+                                                </Link>}
                                         </div>
                                     </div>
                                 </article>

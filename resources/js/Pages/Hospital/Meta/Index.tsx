@@ -14,6 +14,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import PainelLayout from '@/layouts/PainelLayout'
+import AbasHospital from '@/components/Painel/Hospital/Abas/Show'
 import {
     painelInputClass,
     painelSelectTriggerClass,
@@ -28,7 +29,6 @@ import {
     painelTableWrapperClass,
 } from '@/lib/painelFormFieldClasses'
 import { toastAviso, toastConfirmacao, toastSucesso } from '@/lib/utils/toast'
-import { dashboard } from '@/routes'
 import { Building2, Calendar, CalendarDays } from 'lucide-react'
 
 // TIPOS
@@ -69,6 +69,7 @@ interface Props {
     mes: number
     semanas: SemanaMes[]
     hospitais: HospitalMeta[]
+    pode_editar_dados: boolean
 }
 
 const NOMES_MESES = [
@@ -166,7 +167,7 @@ const montarMetasSemanaisVazias = (
     }))
 }
 
-const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisIniciais }) => {
+const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisIniciais, pode_editar_dados }) => {
     const { errors } = usePage<SharedData>().props
     const errosRef = useRef<HTMLDivElement>(null)
     const [hospitais, setHospitais] = useState<HospitalMeta[]>(hospitaisIniciais)
@@ -179,7 +180,11 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
     }, [hospitaisIniciais])
 
     const handleFiltroChange = (campo: 'ano' | 'mes', valor: number) => {
-        router.get('/hospitais/metas', {
+        const hospitalId = hospitais[0]?.id
+
+        if (!hospitalId) return
+
+        router.get(`/hospitais/${hospitalId}/metas`, {
             ano: campo === 'ano' ? valor : ano,
             mes: campo === 'mes' ? valor : mes,
         }, { preserveScroll: true })
@@ -264,9 +269,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
         )
     }
 
-    const montarPayload = () =>
-        hospitais.map((hospital) => ({
-            hospital_id: hospital.id,
+    const montarPayload = (hospital: HospitalMeta) => ({
             meta_mensal: hospital.meta_mensal,
             metas_por_ala: hospital.metas_por_ala,
             metas_semanais: hospital.metas_semanais
@@ -278,7 +281,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                         ? { ala_unidade_id: item.ala_unidade_id }
                         : {}),
                 })),
-        }))
+        })
 
     const handleSalvar = () => {
         for (const hospital of hospitais) {
@@ -307,10 +310,14 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
 
         setSalvando(true)
 
-        router.put('/hospitais/metas', {
+        const hospital = hospitais[0]
+
+        if (!hospital) return
+
+        router.put(`/hospitais/${hospital.id}/metas`, {
             ano,
             mes,
-            hospitais: montarPayload(),
+            ...montarPayload(hospital),
         }, {
             preserveScroll: true,
             onSuccess: () => toastSucesso('Metas salvas com sucesso!'),
@@ -323,24 +330,32 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
 
     return (
         <PainelLayout>
-            <div className="mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
                 <header className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight text-amber-950 sm:text-3xl">
                             Metas hospitalares
                         </h1>
                         <p className="mt-1 text-sm text-amber-900/55">
-                            Configure metas mensais e semanais por hospital da sua cidade-base.
+                            Configure metas mensais e semanais do hospital selecionado.
                         </p>
                     </div>
-                    <BotaoSalvar
-                        tamanho="grande"
-                        onClick={handleSalvar}
-                        disabled={salvando}
-                        salvando={salvando}
-                        rotulo="Salvar metas"
-                    />
+                    <div className="w-full sm:w-auto [&>button]:w-full">
+                        <BotaoSalvar
+                            tamanho="grande"
+                            onClick={handleSalvar}
+                            disabled={salvando}
+                            salvando={salvando}
+                            rotulo="Salvar metas"
+                        />
+                    </div>
                 </header>
+
+                {hospitais[0] ? (
+                    <div className="mb-5">
+                        <AbasHospital hospitalId={hospitais[0].id} abaAtiva="metas" podeEditarDados={pode_editar_dados} />
+                    </div>
+                ) : null}
 
                 <div ref={errosRef}>
                     <CardErros erros={errors} />
@@ -391,7 +406,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
 
                 {hospitais.length === 0 ? (
                     <div className="rounded-2xl border border-dashed border-amber-300 bg-white px-5 py-12 text-center text-sm text-amber-900/50">
-                        Nenhum hospital ativo encontrado na sua cidade-base.
+                        Hospital indisponível para configuração de metas.
                     </div>
                 ) : (
                     <div className="space-y-5">
@@ -410,14 +425,14 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                         </h2>
                                     </div>
 
-                                    <div className="space-y-4 p-4">
+                                    <div className="space-y-4 p-3 sm:p-4">
                                         <div className="space-y-2">
                                             <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
                                                 <CalendarDays className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                                                 Meta mensal
                                             </h3>
                                             <div className={painelTableWrapperClass}>
-                                            <table className={painelTableClass}>
+                                            <table className={`${painelTableClass} min-w-[360px]`}>
                                                 <thead className={painelTableHeadClass}>
                                                     <tr>
                                                         <th className={painelTableThClass}>Meta</th>
@@ -450,12 +465,12 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                         </div>
 
                                         <div className="space-y-2">
-                                            <div className="flex items-center justify-between gap-4">
+                                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                                                 <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
                                                     <Calendar className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                                                     Metas semanais
                                                 </h3>
-                                            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <label className="flex min-h-10 items-center gap-2 rounded-xl bg-muted/40 px-3 text-sm text-muted-foreground sm:min-h-0 sm:bg-transparent sm:px-0">
                                                 <input
                                                     type="checkbox"
                                                     checked={hospital.metas_por_ala}
@@ -469,7 +484,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                             </div>
 
                                             <div className={painelTableWrapperClass}>
-                                            <table className={painelTableClass}>
+                                            <table className={`${painelTableClass} min-w-[520px]`}>
                                                 <thead className={painelTableHeadClass}>
                                                     <tr>
                                                         {hospital.metas_por_ala ? (
@@ -547,7 +562,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
 
                 <FormularioRodape
                     variante="pagina"
-                    voltarHref={dashboard().url}
+                    voltarHref="/hospitais"
                     salvar={(
                         <BotaoSalvar
                             onClick={handleSalvar}

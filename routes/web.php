@@ -135,11 +135,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/eventos/{evento}/presencas', [EventoPresencaController::class, 'update'])->name('eventos.presencas.update');
 
     // HOSPITAIS — METAS
-    Route::get('hospitais/metas', [HospitalMetaController::class, 'index'])->name('hospitais.metas.index');
-    Route::put('hospitais/metas', [HospitalMetaController::class, 'update'])->name('hospitais.metas.update');
+    Route::get('hospitais/{hospital}/metas', [HospitalMetaController::class, 'index'])->name('hospitais.metas.index');
+    Route::put('hospitais/{hospital}/metas', [HospitalMetaController::class, 'update'])->name('hospitais.metas.update');
 
     // VISITAS — LIBERAÇÃO DE AGENDA
-    Route::get('visitas/agenda-liberacao', [VisitaAgendaLiberacaoController::class, 'index'])->name('visitas.agenda-liberacao.index');
+    Route::redirect('visitas/agenda-liberacao', '/visitas')->name('visitas.agenda-liberacao.index');
     Route::put('visitas/agenda-liberacao', [VisitaAgendaLiberacaoController::class, 'update'])->name('visitas.agenda-liberacao.update');
 
     // VISITAS
@@ -201,9 +201,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->parameters(['voluntarios' => 'voluntario'])
             ->except(['show']);
 
-        Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital']);
+        Route::resource('/hospitais', HospitalController::class)->parameters(['hospitais' => 'hospital'])->except(['index']);
         Route::resource('/patrocinadores', PatrocinadorController::class)->parameters(['patrocinadores' => 'patrocinador']);
     });
+
+    Route::get('/hospitais', [HospitalController::class, 'index'])->name('hospitais.index');
 });
 
 // ROTAS AUXILIARES

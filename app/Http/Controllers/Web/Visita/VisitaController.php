@@ -12,6 +12,8 @@ use App\Models\Visita;
 use App\Services\Visita\Ajuste\Service as AjusteService;
 use App\Services\Visita\Form\Service as FormService;
 use App\Services\Visita\Service;
+use App\Services\Visita\Agenda\Liberacao\Service as LiberacaoAgendaService;
+use App\Helpers\User as UserHelper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -61,6 +63,22 @@ class VisitaController extends Controller
             ->orderBy('data_inicio')
             ->get();
 
+        $agendaLiberacao = null;
+        $podeGerenciarAgenda = false;
+
+        if ($cidadeId !== 'todas') {
+            $referencia = Carbon::createFromFormat('Y-m', $mes);
+            $liberacaoAgendaService = app(LiberacaoAgendaService::class);
+            $agendaLiberacao = $liberacaoAgendaService->situacaoConsulta(
+                (int) $cidadeId,
+                (int) $referencia->year,
+                (int) $referencia->month,
+            );
+            $podeGerenciarAgenda = $user
+                ? $liberacaoAgendaService->podeGerenciarCidade($user, (int) $cidadeId)
+                : false;
+        }
+
         return Inertia::render('Visita/Index', [
             'visitas'         => $retorno['dados'],
             'eventos'         => $eventos,
@@ -69,11 +87,34 @@ class VisitaController extends Controller
             'cidadeId'        => $cidadeId,
             'cidadeUsuarioId' => $cidadeUsuarioId ? (int) $cidadeUsuarioId : null,
             'visitaId'        => $request->integer('visita_id') ?: null,
+            'ehGestor'         => $user ? UserHelper::ehGestor($user) : false,
+            'agendaLiberacao'  => $agendaLiberacao,
+            'podeGerenciarAgenda' => $podeGerenciarAgenda,
         ]);
     }
 
-    public function create(): \Inertia\Response
+    public function create(Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
+        $mes = $this->normalizarMes($request->query('mes'));
+        $cidadeId = $request->integer('cidade_id') ?: usuarioAutenticado()?->voluntario?->cidade_base_id;
+
+        if (! $cidadeId) {
+            return redirect()->route('visitas.index', ['mes' => $mes])
+                ->with('mensagem_alerta', 'Selecione uma cidade antes de cadastrar uma nova visita.');
+        }
+
+        $referencia = Carbon::createFromFormat('Y-m', $mes);
+        $liberado = app(LiberacaoAgendaService::class)->mesEstaLiberado(
+            (int) $cidadeId,
+            (int) $referencia->year,
+            (int) $referencia->month,
+        );
+
+        if (! $liberado) {
+            return redirect()->route('visitas.index', ['mes' => $mes, 'cidade_id' => $cidadeId])
+                ->with('mensagem_alerta', 'O agendamento de novas visitas está bloqueado para o mês selecionado.');
+        }
+
         $dadosView = $this->formService->buscarDados(null);
         return Inertia::render('Visita/Create', $dadosView);
     }

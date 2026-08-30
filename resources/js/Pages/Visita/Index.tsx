@@ -4,6 +4,7 @@ import { type FC, useState } from 'react';
 
 // UI
 import PainelLayout from '@/layouts/PainelLayout';
+import { toastConfirmacao } from '@/lib/utils/toast';
 
 // ROTAS
 import { create, index } from '@/routes/visitas';
@@ -19,7 +20,7 @@ import ListaCompletaModalShow from '@/components/Painel/Visita/Calendario/ListaC
 import CalendarioShow from '@/components/Painel/Visita/Calendario/Show';
 
 // ICONS
-import { CalendarDays, ChevronLeft, ChevronRight, MapPin, Plus } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Lock, MapPin, Plus, Unlock } from 'lucide-react';
 
 interface CidadeOption {
     id: number;
@@ -34,6 +35,9 @@ interface Props {
     cidadeId?: number | 'todas';
     cidadeUsuarioId?: number | null;
     visitaId?: number | null;
+    ehGestor?: boolean;
+    agendaLiberacao?: { liberado: boolean; editavel: boolean } | null;
+    podeGerenciarAgenda?: boolean;
 }
 
 function nomeMes(mes: string): string {
@@ -65,6 +69,9 @@ const Index: FC<Props> = ({
     cidadeId = 'todas',
     cidadeUsuarioId = null,
     visitaId = null,
+    ehGestor = false,
+    agendaLiberacao = null,
+    podeGerenciarAgenda = false,
 }) => {
     const { auth } = usePage<SharedData>().props;
     const cidadeBaseUsuario =
@@ -79,6 +86,7 @@ const Index: FC<Props> = ({
     const [diaOverflow, setDiaOverflow] = useState<Date | null>(null);
     const [visitasOverflow, setVisitasOverflow] = useState<Visita[]>([]);
     const [eventosOverflow, setEventosOverflow] = useState<Evento[]>([]);
+    const [alterandoAgenda, setAlterandoAgenda] = useState(false);
 
     const navegar = (novoMes: string, novaCidade: number | 'todas') => {
         const query: Record<string, string | number> = { mes: novoMes };
@@ -110,6 +118,32 @@ const Index: FC<Props> = ({
     };
 
     const fecharDetalhes = () => setVisitaSelecionada(null);
+
+    const alterarAgenda = async () => {
+        if (cidadeId === 'todas' || !agendaLiberacao || alterandoAgenda) return;
+
+        const liberar = !agendaLiberacao.liberado;
+        const cidade = cidades.find((item) => item.id === Number(cidadeId));
+        const confirmado = await toastConfirmacao(
+            liberar
+                ? `Liberar o agendamento de visitas hospitalares em ${cidade?.nome ?? 'esta cidade'} para ${nomeMes(mes)}?`
+                : `Bloquear novos agendamentos de visitas hospitalares em ${cidade?.nome ?? 'esta cidade'} para ${nomeMes(mes)}? Visitas já cadastradas serão preservadas.`,
+        );
+
+        if (!confirmado) return;
+
+        const [ano, numeroMes] = mes.split('-').map(Number);
+        setAlterandoAgenda(true);
+        router.put('/visitas/agenda-liberacao', {
+            cidade_id: Number(cidadeId),
+            ano,
+            mes: numeroMes,
+            liberado: liberar,
+        }, {
+            preserveScroll: true,
+            onFinish: () => setAlterandoAgenda(false),
+        });
+    };
 
     return (
         <PainelLayout>
@@ -188,19 +222,53 @@ const Index: FC<Props> = ({
                         </div>
 
                         {/* Botão nova visita */}
-                        <Link
-                            href={create().url}
-                            className={`${controleToolbarClass} w-full shrink-0 justify-center gap-2 border-amber-600 px-4 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto`}
-                        >
-                            <Plus
-                                className="size-4"
-                                strokeWidth={2}
-                                aria-hidden
-                            />
-                            Nova visita
-                        </Link>
+                        {cidadeId !== 'todas' && agendaLiberacao?.liberado ? (
+                            <Link
+                                href={create({ query: { mes, cidade_id: cidadeId } }).url}
+                                className={`${controleToolbarClass} w-full shrink-0 justify-center gap-2 border-amber-600 px-4 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto`}
+                            >
+                                <Plus className="size-4" strokeWidth={2} aria-hidden />
+                                Nova visita
+                            </Link>
+                        ) : (
+                            <button type="button" disabled title={cidadeId === 'todas' ? 'Selecione uma cidade para cadastrar uma visita.' : 'O agendamento está bloqueado para este mês.'} className={`${controleToolbarClass} w-full shrink-0 cursor-not-allowed justify-center gap-2 border-gray-200 bg-gray-100 px-4 text-sm font-semibold text-gray-400 shadow-none sm:w-auto`}>
+                                <Lock className="size-4" aria-hidden />
+                                Nova visita bloqueada
+                            </button>
+                        )}
                     </div>
                 </header>
+
+                {ehGestor && (
+                    <section className="mb-6 flex flex-col gap-4 rounded-2xl border border-amber-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-start gap-3">
+                            <span className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full ${agendaLiberacao?.liberado ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                                {agendaLiberacao?.liberado ? <Unlock className="size-4" aria-hidden /> : <Lock className="size-4" aria-hidden />}
+                            </span>
+                            <div>
+                                <h2 className="text-sm font-semibold text-amber-950">
+                                    {cidadeId === 'todas'
+                                        ? 'Selecione uma cidade para controlar o agendamento'
+                                        : agendaLiberacao
+                                            ? `Agendamento ${agendaLiberacao.liberado ? 'liberado' : 'bloqueado'}`
+                                            : 'Agendamento sem permissão de alteração'}
+                                </h2>
+                                <p className="mt-1 text-xs leading-relaxed text-amber-900/55">
+                                    O controle vale para novas visitas hospitalares em {nomeMes(mes)}. Visitas já cadastradas não são canceladas pelo bloqueio.
+                                </p>
+                            </div>
+                        </div>
+                        {cidadeId !== 'todas' && podeGerenciarAgenda && agendaLiberacao?.editavel && (
+                            <button type="button" onClick={alterarAgenda} disabled={alterandoAgenda} className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 px-4 py-2.5 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60 sm:w-auto ${agendaLiberacao.liberado ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+                                {agendaLiberacao.liberado ? <Lock className="size-4" aria-hidden /> : <Unlock className="size-4" aria-hidden />}
+                                {alterandoAgenda
+                                    ? agendaLiberacao.liberado ? 'Bloqueando...' : 'Liberando...'
+                                    : agendaLiberacao.liberado ? 'Bloquear agendamento' : 'Liberar agendamento'}
+                            </button>
+                        )}
+                        {cidadeId !== 'todas' && agendaLiberacao && !agendaLiberacao.editavel && <span className="text-xs font-medium text-amber-900/50">Mês passado — somente leitura</span>}
+                    </section>
+                )}
 
                 {/* Calendário */}
                 <CalendarioShow

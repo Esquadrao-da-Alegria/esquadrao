@@ -6,6 +6,7 @@ import { toast } from 'react-toastify'
 import React from 'react'
 import { router, useForm } from '@inertiajs/react'
 import { AlaHospital, Cidade, Hospital } from '@/types'
+import AbasHospital from '@/components/Painel/Hospital/Abas/Show'
 
 const inputClass =
     'w-full rounded-xl border bg-white px-4 py-3 focus:outline-none focus:ring-2'
@@ -93,14 +94,18 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
 
     return (
         <PainelLayout>
-            <section className="mx-auto w-full max-w-8xl px-4 py-16">
+            <section className="mx-auto w-full max-w-8xl px-4 py-6 sm:px-6 sm:py-10 lg:py-16">
                 <div className="flex justify-center">
                     <div className="w-full max-w-7xl">
                         <div className="overflow-hidden rounded-3xl border bg-white">
-                            <div className="p-8 md:p-12">
-                                <h2 className="mb-8 text-3xl font-bold text-amber-800 md:text-4xl">
+                            <div className="p-4 sm:p-8 md:p-12">
+                                <h2 className="mb-6 text-2xl font-bold text-amber-800 sm:mb-8 sm:text-3xl md:text-4xl">
                                     Alterar Hospital
                                 </h2>
+
+                                <div className="mb-8">
+                                    <AbasHospital hospitalId={hospital.id!} abaAtiva="dados" podeEditarDados />
+                                </div>
 
                                 <form
                                     id="hospital-form"
@@ -222,7 +227,7 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             Alas do hospital
                                         </label>
 
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                                             <input
                                                 type="text"
                                                 name="nova_ala"
@@ -242,7 +247,7 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             <button
                                                 type="button"
                                                 onClick={adicionarAla}
-                                                className="shrink-0 rounded-full border-2 border-amber-600 bg-white px-5 py-3 font-semibold text-amber-700 transition hover:bg-amber-50"
+                                                className="min-h-11 w-full shrink-0 rounded-full border-2 border-amber-600 bg-white px-5 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 sm:w-auto"
                                             >
                                                 Adicionar
                                             </button>
@@ -252,9 +257,9 @@ const Edit: React.FC<Props> = ({ hospital, cidades }) => {
                                             {data.alas.map((ala) => (
                                                 <li
                                                     key={ala.nome}
-                                                    className="flex items-center justify-between rounded-xl border border-amber-200 bg-white px-4 py-2 text-sm text-amber-950"
+                                                    className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm text-amber-950 sm:px-4"
                                                 >
-                                                    <span>{ala.nome}</span>
+                                                    <span className="min-w-0 break-words">{ala.nome}</span>
 
                                                     <button
                                                         type="button"

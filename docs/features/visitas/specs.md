@@ -66,6 +66,10 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 11. **Liberação de agenda (visitas hospitalares)**  
     Visitas tipo `hospital` só podem ser criadas (ou ter `inicio_em` alterado no `update`) se o mês estiver liberado para a **cidade do hospital**. Backend: `Visita\Service` + `Visita\Agenda\Liberacao\Service::mesEstaLiberado`. Frontend: prop `meses_liberados` (YYYY-MM, cidade-base do usuário) alimenta selects de **mês** (somente liberados) e **dia** (todos os dias do mês); o submit envia `data` em `YYYY-MM-DD` como antes. Demais tipos usam input `date` sem essa restrição. Detalhes: [`docs/features/hospitais/specs.md`](../hospitais/specs.md).
 
+    Na listagem de Visitas, administradores, diretores, coordenadores gerais e coordenadores locais visualizam a situação do agendamento do mês e da cidade selecionados. As ações **Liberar agendamento** e **Bloquear agendamento** atualizam explicitamente aquele mês; meses sem liberação permanecem bloqueados. Coordenadores locais e diretores ficam restritos à cidade-base, enquanto administradores e coordenadores gerais podem atuar em outra cidade selecionada. Em **Todas as cidades**, nenhuma alteração é permitida.
+
+    O botão **Nova visita** só fica disponível quando uma cidade específica está selecionada e o respectivo mês está liberado. Quando bloqueado, a interface explica a indisponibilidade e a rota de criação repete a validação para impedir acesso direto ao formulário naquele contexto. O salvamento de visitas hospitalares mantém a validação definitiva pela cidade do hospital e pela data informada.
+
 12. **Cancelamento lógico de inscrição**  
     `DELETE participantes` não remove a linha — atualiza `status_participacao = cancelado`. Participante pode auto-cancelar, exceto o líder atual (deve trocar o líder antes). Gestores com `podeEditarVisita` podem cancelar qualquer participante.
 

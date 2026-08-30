@@ -26,7 +26,7 @@ Documento de referência sobre **metas mensais/semanais por hospital** e **liber
 5. **Modo hospital ou por ala** — por hospital/mês, apenas um modo: semanas do hospital (`ala_unidade_id` nulo) **ou** semanas por ala (`ala_unidade_id` preenchido). Trocar o modo remove registros do modo anterior.
 6. **Ala da meta** — meta por ala só aceita alas do próprio hospital. Visita **sem** ala conta no resumo hospitalar, não na meta da ala.
 7. **Semanas do mês** — semanas completas de **domingo a sábado** (fecham no sábado). A **primeira** semana é quebrada quando o mês não começa no domingo (ex.: quarta → sábado). A **última** é quebrada quando o mês não termina no sábado. Demais semanas começam no domingo. Helper: `App\Helpers\MetaHospital::semanasDoMes()`.
-8. **Escopo geográfico** — metas listam e persistem apenas hospitais **ativos** da **cidade-base** do usuário.
+8. **Escopo geográfico** — coordenadores locais e diretores configuram apenas hospitais **ativos** da cidade-base. Administradores e coordenadores gerais podem acessar hospitais de outras cidades.
 
 ---
 
@@ -48,12 +48,14 @@ Helper: `App\Helpers\User::ehGestor(User)`.
 | Requisito | Detalhe |
 |-----------|---------|
 | Cargos | `administrador`, `diretor`, `coordenador_geral`, `coordenador_local` |
-| Cidade-base | `user.voluntario.cidade_base_id` obrigatório — sem ela, acesso negado (403) |
-| Escopo | Operações sempre limitadas à cidade-base do usuário |
+| Cidade-base | Obrigatória para diretor e coordenador local; administrador e coordenador geral podem operar com escopo global sem cidade-base |
+| Escopo | Administrador e coordenador geral possuem escopo global; diretor e coordenador local ficam limitados à cidade-base |
 
 Shared Inertia: `eh_gestor` (via `HandleInertiaRequests`).
 
-Navegação: submenu **Avançado** no painel → **Metas** e **Liberar agendas**.
+Navegação: **Hospitais** lista os hospitais permitidos e abre a aba **Metas de visitas** de cada hospital. O controle de agenda fica na página **Visitas**, associado ao mês e à cidade selecionados.
+
+Administradores continuam sendo os únicos que alteram os dados cadastrais dos hospitais. Os demais gestores podem consultar a listagem para acessar metas, sem receber acesso ao formulário cadastral.
 
 ---
 
@@ -104,16 +106,16 @@ Unique: `(cidade_id, ano, mes)`.
 
 | Área | Service | Rotas |
 |------|---------|-------|
-| Metas | `App\Services\Hospital\Meta\Service` | `GET\|PUT /hospitais/metas` (`hospitais.metas.index\|update`) |
-| Liberação | `App\Services\Visita\Agenda\Liberacao\Service` | `GET\|PUT /visitas/agenda-liberacao` (`visitas.agenda-liberacao.index\|update`) |
+| Metas | `App\Services\Hospital\Meta\Service` | `GET\|PUT /hospitais/{hospital}/metas` (`hospitais.metas.index\|update`) |
+| Liberação | `App\Services\Visita\Agenda\Liberacao\Service` | `PUT /visitas/agenda-liberacao` (`visitas.agenda-liberacao.update`) |
 
 Helpers auxiliares:
 
 - `App\Helpers\User` — permissões de gestor (metas e liberação de agenda)
 - `App\Helpers\Visita::statusRealizadas()` / `statusRealizadasValores()` — status contabilizáveis nas realizadas
 
-**Metas — index:** agrega realizadas em uma consulta SQL sobre `visitas` (por hospital, semana e opcionalmente ala).  
-**Metas — update:** substitui metas do hospital/mês (delete + insert); valida soma semanal, alas e pertencimento à cidade-base.  
+**Metas — index:** carrega somente o hospital da rota e agrega realizadas em uma consulta SQL sobre `visitas` (por hospital, semana e opcionalmente ala).
+**Metas — update:** substitui metas do hospital/mês (delete + insert); valida soma semanal, alas e escopo geográfico.
 **Liberação — `mesEstaLiberado(cidadeId, ano, mes)`** e **`listarMesesLiberados(cidadeId)`** usados por `Visita\Service` e `Visita\Form\Service`.
 
 ---
@@ -122,8 +124,13 @@ Helpers auxiliares:
 
 | Página | Caminho |
 |--------|---------|
-| Metas | `resources/js/Pages/Hospital/Meta/Index.tsx` |
-| Liberar agendas | `resources/js/Pages/Visita/Agenda/Liberacao/Index.tsx` |
+| Dados e acesso às metas | `resources/js/Pages/Hospital/Index.tsx` e `resources/js/Pages/Hospital/Edit.tsx` |
+| Metas de um hospital | `resources/js/Pages/Hospital/Meta/Index.tsx` |
+| Liberar ou bloquear agendamento | `resources/js/Pages/Visita/Index.tsx` |
+
+A configuração do hospital usa as abas **Dados do hospital** e **Metas de visitas**, com rotas independentes. Gestores sem permissão cadastral veem somente a aba de metas.
+
+Na página de Visitas, gestores veem a situação do mês selecionado e ações explícitas **Liberar agendamento** ou **Bloquear agendamento**. A ação exige uma cidade específica; em **Todas as cidades**, a interface orienta selecionar uma cidade. Meses passados são somente leitura e um mês sem registro é considerado bloqueado.
 
 Formulário de visita (`Form.tsx`): prop `meses_liberados` (lista `YYYY-MM`); para tipo `hospital`, valida mês no change e aplica `min`/`max` derivados dos meses liberados (`lib/visita.ts`).
 
@@ -150,4 +157,4 @@ php artisan test tests/Feature/Hospital/MetaTest.php tests/Feature/Visita/Agenda
 - Metas para visitas sem hospital
 - Dashboard gerencial de metas de cobertura
 - Status visual OK/PENDENTE por semana
-- Seletor de cidade ou visão global para gestores
+- Liberação ou bloqueio em lote para várias cidades

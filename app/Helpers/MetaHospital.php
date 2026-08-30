@@ -68,13 +68,14 @@ class MetaHospital
         return array_column(self::semanasDoMes($ano, $mes), 'semana');
     }
 
-    public static function sqlSemanaVisita(int $ano, int $mes): string
+    public static function sqlSemanaVisita(int $ano, int $mes, string $expressaoDia = 'DAY(inicio_em)'): string
     {
         $quando = [];
 
         foreach (self::semanasDoMes($ano, $mes) as $faixa) {
             $quando[] = sprintf(
-                'WHEN DAY(inicio_em) BETWEEN %d AND %d THEN %d',
+                'WHEN %s BETWEEN %d AND %d THEN %d',
+                $expressaoDia,
                 $faixa['dia_inicio'],
                 $faixa['dia_fim'],
                 $faixa['semana'],

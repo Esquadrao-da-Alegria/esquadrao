@@ -26,6 +26,7 @@ class UpdateRequest extends FormRequest
         return [
             'ano'      => ['required', 'integer', 'min:2000', 'max:2100'],
             'mes'      => ['required', 'integer', 'min:1', 'max:12'],
+            'cidade_id' => ['required', 'integer', 'exists:cidades,id'],
             'liberado' => ['required', 'boolean'],
         ];
     }

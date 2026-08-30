@@ -34,18 +34,16 @@ class Service
 
     public function __construct(private Queries $queries) {}
 
-    public function index(User $user, array $filtros): array
+    public function index(User $user, Hospital $hospital, array $filtros): array
     {
+        $this->validarAcesso($user, $hospital);
+
         try {
-            $cidadeBaseId = $this->validarAcesso($user);
             $ano          = (int) ($filtros['ano'] ?? now()->year);
             $mes          = (int) ($filtros['mes'] ?? now()->month);
 
-            $hospitais = $this->buscarHospitaisAtivos($cidadeBaseId);
-
-            if ($hospitais->isEmpty()) {
-                return $this->respostaIndex($ano, $mes, []);
-            }
+            $hospital->load('alas:id,hospital_id,nome');
+            $hospitais = collect([$hospital]);
 
             $metasMensais = $this->buscarMetasMensais($hospitais, $ano, $mes);
 
@@ -72,15 +70,19 @@ class Service
         }
     }
 
-    public function update(User $user, array $dados): array
+    public function update(User $user, Hospital $hospital, array $dados): array
     {
-        try {
-            $cidadeBaseId     = $this->validarAcesso($user);
-            $ano              = (int) $dados['ano'];
-            $mes              = (int) $dados['mes'];
-            $hospitaisPayload = $dados['hospitais'];
+        $this->validarAcesso($user, $hospital);
 
-            $erros = $this->validarPayloadUpdate($hospitaisPayload, $cidadeBaseId, $ano, $mes);
+        try {
+            $ano = (int) $dados['ano'];
+            $mes = (int) $dados['mes'];
+            $hospitaisPayload = [[
+                ...$dados,
+                'hospital_id' => $hospital->id,
+            ]];
+
+            $erros = $this->validarPayloadUpdate($hospitaisPayload, (int) $hospital->cidade_id, $ano, $mes);
 
             if ($erros !== []) {
                 session()->flash('mensagem_erro', $erros[0]);
@@ -128,13 +130,20 @@ class Service
         }
     }
 
-    private function validarAcesso(User $user): int
+    private function validarAcesso(User $user, Hospital $hospital): void
     {
         if (! UserHelper::ehGestor($user)) {
             abort(403);
         }
 
-        return (int) $user->voluntario->cidade_base_id;
+        if (! UserHelper::possuiEscopoGlobal($user)
+            && (int) $user->voluntario->cidade_base_id !== (int) $hospital->cidade_id) {
+            abort(403);
+        }
+
+        if (! $hospital->ativo) {
+            abort(403);
+        }
     }
 
     /**
@@ -374,19 +383,6 @@ class Service
     }
 
     /**
-     * @return Collection<int, Hospital>
-     */
-    private function buscarHospitaisAtivos(int $cidadeBaseId): Collection
-    {
-        return Hospital::query()
-            ->where('cidade_id', $cidadeBaseId)
-            ->where('ativo', true)
-            ->with(['alas:id,hospital_id,nome'])
-            ->orderBy('nome')
-            ->get(['id', 'nome']);
-    }
-
-    /**
      * @param  Collection<int, Hospital>  $hospitais
      * @return array{sucesso: bool, dados: mixed, erros: array<int, string>}
      */
@@ -527,7 +523,10 @@ class Service
      */
     private function buscarRealizadasAgregadas(array $hospitalIds, int $ano, int $mes): Collection
     {
-        $sqlSemana = MetaHospitalHelper::sqlSemanaVisita($ano, $mes);
+        $expressaoDia = DB::connection()->getDriverName() === 'sqlite'
+            ? "CAST(strftime('%d', inicio_em) AS INTEGER)"
+            : 'DAY(inicio_em)';
+        $sqlSemana = MetaHospitalHelper::sqlSemanaVisita($ano, $mes, $expressaoDia);
 
         return Visita::query()
             ->select([
