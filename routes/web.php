@@ -92,6 +92,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('visitas-por-hospital', [DashboardVisitaHospitalController::class, 'index'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_HOSPITAL)
             ->name('visitas-por-hospital');
+        Route::get('visitas-por-hospital/{hospital}', [DashboardVisitaHospitalController::class, 'show'])
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_HOSPITAL)
+            ->name('visitas-por-hospital.show');
 
         Route::get('visitas-por-participante', [DashboardVisitaParticipanteController::class, 'index'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
