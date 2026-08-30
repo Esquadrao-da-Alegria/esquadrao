@@ -15,15 +15,18 @@ class Queries
         $base = $this->base($filtros);
         $participantes = $this->participantes();
         $impactos = $this->impactos();
+        $relatorios = $this->relatorios();
 
         $indicadores = (clone $base)
             ->leftJoinSub($participantes, 'participacoes', 'participacoes.visita_id', '=', 'v.id')
             ->leftJoinSub($impactos, 'impactos', 'impactos.visita_id', '=', 'v.id')
+            ->leftJoinSub($relatorios, 'relatorios', 'relatorios.visita_id', '=', 'v.id')
             ->selectRaw('COUNT(DISTINCT v.id) as total_visitas')
             ->selectRaw('COUNT(DISTINCT v.hospital_id) as hospitais_visitados')
             ->selectRaw('COALESCE(SUM(participacoes.quantidade), 0) as total_participacoes')
             ->selectRaw('COALESCE(SUM(impactos.media), 0) as impacto_estimado')
             ->selectRaw('COUNT(impactos.visita_id) as visitas_com_impacto')
+            ->selectRaw('COUNT(relatorios.visita_id) as visitas_com_relatorio')
             ->first();
 
         $evolucao = (clone $base)
@@ -46,10 +49,16 @@ class Queries
             ->orderBy('h.nome')
             ->get();
 
+        $realizadasMensais = (clone $base)
+            ->selectRaw("v.hospital_id, substr(v.inicio_em, 1, 7) as mes, COUNT(DISTINCT v.id) as total")
+            ->groupByRaw("v.hospital_id, substr(v.inicio_em, 1, 7)")
+            ->get();
+
         return [
             'indicadores' => $indicadores,
             'evolucao' => $evolucao,
             'hospitais' => $hospitais,
+            'realizadas_mensais' => $realizadasMensais,
             'detalhes' => $filtros['hospital_id']
                 ? $this->detalhes($base, $participantes, $impactos, $filtros['hospital_id'])
                 : null,
@@ -81,9 +90,11 @@ class Queries
             ->leftJoin('alas_hospitais as a', 'a.id', '=', 'v.ala_unidade_id')
             ->leftJoinSub($participantes, 'participacoes', 'participacoes.visita_id', '=', 'v.id')
             ->leftJoinSub($impactos, 'impactos', 'impactos.visita_id', '=', 'v.id')
+            ->leftJoinSub($this->relatorios(), 'relatorios', 'relatorios.visita_id', '=', 'v.id')
             ->select(['v.id', 'v.inicio_em', 'v.status', 'a.nome as ala'])
             ->selectRaw('COALESCE(participacoes.quantidade, 0) as participantes')
             ->selectRaw('impactos.media as impacto_estimado')
+            ->selectRaw('COALESCE(relatorios.quantidade, 0) as relatorios')
             ->orderByDesc('v.inicio_em')
             ->paginate(15)
             ->withQueryString();
@@ -118,6 +129,13 @@ class Queries
         return DB::table('visitas_relatorios')
             ->selectRaw('visita_id, AVG(pessoas_impactadas) as media')
             ->whereNotNull('pessoas_impactadas')
+            ->groupBy('visita_id');
+    }
+
+    private function relatorios(): Builder
+    {
+        return DB::table('visitas_relatorios')
+            ->selectRaw('visita_id, COUNT(*) as quantidade')
             ->groupBy('visita_id');
     }
 }
