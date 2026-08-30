@@ -60,6 +60,42 @@ class VisitaStoreTest extends TestCase
         ]);
     }
 
+    public function test_rejeita_criacao_direta_de_visita_em_mes_bloqueado(): void
+    {
+        $user     = $this->criarVoluntario();
+        $hospital = $this->criarHospital();
+        $lider    = $this->criarVoluntario();
+
+        AgendaLiberacaoCidade::query()
+            ->where('cidade_id', $hospital->cidade_id)
+            ->where('ano', 2026)
+            ->where('mes', 6)
+            ->update([
+                'liberado'        => false,
+                'liberado_por_id' => null,
+            ]);
+
+        $payload = [
+            'hospital_id' => $hospital->id,
+            'data'        => '2026-06-20',
+            'hora_inicio' => '10:00',
+            'hora_fim'    => '12:00',
+            'tipo'        => VisitaTipo::Hospital->value,
+            'lider_id'    => $lider->id,
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertSessionHasErrors([
+                'geral' => 'A agenda desta cidade não está liberada para o mês selecionado.',
+            ]);
+
+        $this->assertDatabaseMissing('visitas', [
+            'hospital_id' => $hospital->id,
+            'inicio_em'   => '2026-06-20 10:00:00',
+        ]);
+    }
+
     public function test_rejeita_fim_antes_de_inicio(): void
     {
         $user     = $this->criarVoluntario();
