@@ -5,15 +5,12 @@ import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
 
 import DeleteUser from '@/components/delete-user';
+import BotaoSalvar from '@/components/Painel/Forms/BotaoSalvar/Show';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
+import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses';
 import PainelLayout from '@/layouts/PainelLayout';
 import SettingsLayout from '@/layouts/Settings/Layout';
-import {
-    painelInputClass,
-    painelLabelClass,
-} from '@/lib/painelFormFieldClasses';
-import { Check } from 'lucide-react';
 
 export default function Profile({
     mustVerifyEmail,
@@ -106,9 +103,8 @@ export default function Profile({
                                                         as="button"
                                                         className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                                     >
-                                                        Clique aqui para
-                                                        reenviar o e-mail de
-                                                        verificação.
+                                                        Clique aqui para reenviar
+                                                        o e-mail de verificação.
                                                     </Link>
                                                 </p>
 
@@ -124,20 +120,12 @@ export default function Profile({
                                         )}
 
                                     <div className="flex flex-wrap items-center gap-4">
-                                        <button
+                                        <BotaoSalvar
                                             type="submit"
                                             disabled={processing}
+                                            salvando={processing}
                                             data-test="update-profile-button"
-                                            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
-                                        >
-                                            <Check
-                                                className="size-4"
-                                                aria-hidden
-                                            />
-                                            {processing
-                                                ? 'Salvando...'
-                                                : 'Salvar'}
-                                        </button>
+                                        />
 
                                         <Transition
                                             show={recentlySuccessful}

@@ -76,6 +76,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
 
     const user = props.auth?.user;
     const ehAdministrador = props.eh_administrador === true;
+    const ehGestor = props.eh_gestor === true;
     const dashboardsVisiveis = itensDashboards.filter(
         (item) =>
             item.permissao === null ||
@@ -102,7 +103,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const isHospitaisCreate = pathname === '/hospitais/create';
     const isHospitaisNav =
         pathname === '/hospitais' ||
-        /^\/hospitais\/[^/]+\/edit$/.test(pathname);
+        /^\/hospitais\/[^/]+\/(edit|metas)$/.test(pathname);
 
     const isVoluntariosCreate = pathname === '/voluntarios/create';
     const isVoluntariosNav =
@@ -130,13 +131,19 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
             ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground shadow-[inset_3px_0_0_0_var(--primary)]'
             : '';
 
+    const chevronSubmenuClass = (aberto: boolean) =>
+        cn(
+            'size-4 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+            aberto && 'rotate-90',
+        );
+
     const itensNavegacao: ItemNavegacaoPainel[] = [
         {
             titulo: 'Hospitais',
             href: index(),
             icone: Building2,
             ativo: isHospitaisNav && !isHospitaisCreate,
-            visivel: ehAdministrador,
+            visivel: ehGestor,
         },
         {
             titulo: 'Eventos',
@@ -177,7 +184,6 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     ];
 
     const itensVisiveis = itensNavegacao.filter((item) => item.visivel);
-
     const menuConta = user ? (
         <DropdownMenu>
             <DropdownMenuTrigger
@@ -301,13 +307,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                     Dashboards
                                 </span>
                                 <ChevronRight
-                                    className={`size-4 transition-transform ${
-                                        dashboardsOpen ? 'rotate-90' : ''
-                                    }`}
+                                    className={chevronSubmenuClass(dashboardsOpen)}
                                     aria-hidden
                                 />
                             </CollapsibleTrigger>
-                            <CollapsibleContent className="mt-0.5 space-y-0.5 pl-5">
+                            <CollapsibleContent className="mt-0.5 pl-5">
+                                <div className="space-y-0.5 py-0.5">
                                 {dashboardsVisiveis.map((item) => {
                                     const Icone = item.icone;
                                     const ativo =
@@ -333,6 +338,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                         </Link>
                                     );
                                 })}
+                                </div>
                             </CollapsibleContent>
                         </Collapsible>
                     )}
@@ -404,15 +410,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                                 Dashboards
                                             </span>
                                             <ChevronRight
-                                                className={`size-4 transition-transform ${
-                                                    dashboardsOpen
-                                                        ? 'rotate-90'
-                                                        : ''
-                                                }`}
+                                                className={chevronSubmenuClass(dashboardsOpen)}
                                                 aria-hidden
                                             />
                                         </CollapsibleTrigger>
-                                        <CollapsibleContent className="space-y-0.5 pl-5">
+                                        <CollapsibleContent className="pl-5">
+                                            <div className="space-y-0.5 py-0.5">
                                             {dashboardsVisiveis.map((item) => {
                                                 const Icone = item.icone;
                                                 const ativo =
@@ -439,6 +442,7 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                                                     </Link>
                                                 );
                                             })}
+                                            </div>
                                         </CollapsibleContent>
                                     </Collapsible>
                                 )}

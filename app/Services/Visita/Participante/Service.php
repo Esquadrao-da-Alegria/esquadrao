@@ -11,7 +11,6 @@ use App\Models\Visita;
 use App\Models\VisitaParticipante;
 use App\Queries\Visita\Participante\Queries;
 use App\Services\Visita\Service as VisitaService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class Service
@@ -30,8 +29,11 @@ class Service
                 return $this->erro('Tipo de participação inválido.');
             }
 
-            /** @var User $usuario */
-            $usuario = Auth::user();
+            $usuario = usuarioAutenticado();
+
+            if (! $usuario) {
+                return $this->erro('Usuário não autenticado.');
+            }
 
             $solicitadoVoluntarioId = isset($dados['voluntario_id']) ? (int) $dados['voluntario_id'] : null;
             $ehGestorEditando = $solicitadoVoluntarioId !== null && $this->visitaService->podeEditarVisita($usuario, $visita);
@@ -119,8 +121,11 @@ class Service
                 return $this->erro('Participante não pertence a esta visita.');
             }
 
-            /** @var User $usuario */
-            $usuario = Auth::user();
+            $usuario = usuarioAutenticado();
+
+            if (! $usuario) {
+                return $this->erro('Usuário não autenticado.');
+            }
 
             $ehProprioParticipante = $participante->voluntario_id === $usuario->id;
             $ehLiderDaVisita       = $visita->lider_id !== null && $visita->lider_id === $usuario->id;

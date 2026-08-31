@@ -1,5 +1,40 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
+if (!function_exists('relacionamentosUsuario')) {
+    /**
+     * @return list<string>
+     */
+    function relacionamentosUsuario(): array
+    {
+        return ['cargos', 'voluntario', 'voluntario.cidadeBase'];
+    }
+}
+
+if (!function_exists('resolverUsuario')) {
+    function resolverUsuario(User $user): User
+    {
+        $user->loadMissing(relacionamentosUsuario());
+
+        return $user;
+    }
+}
+
+if (!function_exists('usuarioAutenticado')) {
+    function usuarioAutenticado(?string $guard = null): ?User
+    {
+        $user = Auth::guard($guard)->user();
+
+        if (! $user instanceof User) {
+            return null;
+        }
+
+        return resolverUsuario($user);
+    }
+}
+
 if (!function_exists('formatarMensagemErro')) {
     function formatarMensagemErro(\Throwable $th): string
     {

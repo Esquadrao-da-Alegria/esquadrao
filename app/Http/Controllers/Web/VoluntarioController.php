@@ -11,7 +11,6 @@ use App\Models\Voluntario;
 use App\Services\Voluntario\Form\Service as FormService;
 use App\Services\Voluntario\Service;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class VoluntarioController extends Controller
@@ -25,8 +24,7 @@ class VoluntarioController extends Controller
 
     public function index(Request $request)
     {
-        $user = Auth::user();
-        $user?->loadMissing('voluntario');
+        $user = usuarioAutenticado();
         $cidadeUsuarioId = $user?->voluntario?->cidade_base_id;
 
         if ($request->has('cidade_id')) {

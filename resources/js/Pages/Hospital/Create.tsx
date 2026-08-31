@@ -1,97 +1,97 @@
-import PainelLayout from '@/layouts/PainelLayout';
-import { index, store } from '@/routes/hospitais';
-import { AlaHospital, Cidade } from '@/types';
-import { Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Check } from 'lucide-react';
-import React from 'react';
-import { toast } from 'react-toastify';
+import PainelLayout from '@/layouts/PainelLayout'
+import BotaoSalvar from '@/components/Painel/Forms/BotaoSalvar/Show'
+import FormularioRodape from '@/components/Painel/Forms/FormularioRodape/Show'
+import { index, store } from '@/routes/hospitais'
+import { toast } from 'react-toastify'
+import React from 'react'
+import { useForm } from '@inertiajs/react'
+import { AlaHospital, Cidade } from '@/types'
 
 const inputClass =
-    'w-full rounded-xl border bg-white px-4 py-3 focus:outline-none focus:ring-2';
+    'w-full rounded-xl border bg-white px-4 py-3 focus:outline-none focus:ring-2'
 
-const labelClass = 'mb-2 block text-sm font-medium text-amber-900';
+const labelClass = 'mb-2 block text-sm font-medium text-amber-900'
 
 interface Props {
-    cidades: Cidade[];
+    cidades: Cidade[]
 }
 
 interface CamposFormulario {
-    cidade_id: number | string;
-    nome: string;
-    cnpj: string;
-    endereco: string;
-    telefone: string;
-    email: string;
-    ativo: boolean;
-    foto: File | null;
-    alas: AlaHospital[];
-    observacoes?: string;
+    cidade_id: number | string
+    nome: string
+    cnpj: string
+    endereco: string
+    telefone: string
+    email: string
+    ativo: boolean
+    foto: File | null
+    alas: AlaHospital[]
+    observacoes?: string
 }
 
 const Create: React.FC<Props> = ({ cidades }) => {
-    const [novaAla, setNovaAla] = React.useState('');
+    const [novaAla, setNovaAla] = React.useState('')
 
-    const { data, setData, post, processing, errors } =
-        useForm<CamposFormulario>({
-            cidade_id: '',
-            nome: 'Teste',
-            cnpj: '12312312312333',
-            endereco: 'teste endereço',
-            telefone: '5499439439',
-            email: 'teste@gmail.com',
-            ativo: true,
-            foto: null,
-            alas: [],
-            observacoes: 'uauauauua',
-        });
+    const { data, setData, post, processing, errors } = useForm<CamposFormulario>({
+        cidade_id: '',
+        nome: 'Teste',
+        cnpj: '12312312312333',
+        endereco: 'teste endereço',
+        telefone: '5499439439',
+        email: 'teste@gmail.com',
+        ativo: true,
+        foto: null,
+        alas: [],
+        observacoes: 'uauauauua',
+    });
 
     const handleDataChange = (campo: keyof CamposFormulario, valor: any) => {
+
         setData((prevData) => ({
             ...prevData,
-            [campo]: valor,
-        }));
-    };
+            [campo]: valor
+        }))
+    }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0] || null;
+        const file = e.target.files?.[0] || null
 
-        handleDataChange('foto', file);
-    };
+        handleDataChange('foto', file)
+    }
 
     const adicionarAla = () => {
-        const ala = novaAla.trim();
+        const ala = novaAla.trim()
 
-        if (!ala) return;
+        if (!ala) return
 
         if (data.alas.some((a) => a.nome === ala)) {
-            toast.warning('Essa ala ja foi adicionada.');
-            return;
+            toast.warning('Essa ala ja foi adicionada.')
+            return
         }
 
-        handleDataChange('alas', [...data.alas, { nome: ala }]);
+        handleDataChange('alas', [...data.alas, { nome: ala }])
 
-        setNovaAla('');
-    };
+        setNovaAla('')
+    }
 
     const removerAla = (nome: string) => {
-        handleDataChange(
-            'alas',
-            data.alas.filter((ala) => ala.nome !== nome),
-        );
-    };
+
+        handleDataChange('alas', data.alas.filter((ala) => ala.nome !== nome))
+    }
 
     const handleSubmit = async () => {
         if (!data.nome || !data.cnpj || !data.email || !data.telefone) {
-            toast.error('Preencha todos os campos obrigatórios!');
-            return;
+
+            toast.error('Preencha todos os campos obrigatórios!')
+            return
         }
 
-        post(store().url);
-    };
+        post(store().url)
+    }
 
     return (
         <PainelLayout>
-            <section className="max-w-8xl mx-auto w-full px-4 py-16">
+            <section className="mx-auto w-full max-w-8xl px-4 py-16">
                 <div className="flex justify-center">
                     <div className="w-full max-w-7xl">
                         <div className="overflow-hidden rounded-3xl border bg-white">
@@ -103,13 +103,9 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                 {errors && Object.keys(errors).length > 0 && (
                                     <div className="mb-4 rounded-lg border border-amber-200 bg-white p-4 text-amber-800">
                                         <ul>
-                                            {Object.entries(errors).map(
-                                                ([campo, mensagem]) => (
-                                                    <li key={campo}>
-                                                        {mensagem}
-                                                    </li>
-                                                ),
-                                            )}
+                                            {Object.entries(errors).map(([campo, mensagem]) => (
+                                                <li key={campo}>{mensagem}</li>
+                                            ))}
                                         </ul>
                                     </div>
                                 )}
@@ -123,10 +119,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                     className="space-y-6"
                                 >
                                     <div>
-                                        <label
-                                            htmlFor="nome"
-                                            className={labelClass}
-                                        >
+                                        <label htmlFor="nome" className={labelClass}>
                                             Nome *
                                         </label>
                                         <input
@@ -136,21 +129,13 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             required
                                             placeholder="Digite o nome do hospital"
                                             value={data.nome}
-                                            onChange={(e) =>
-                                                handleDataChange(
-                                                    'nome',
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => handleDataChange('nome', e.target.value)}
                                             className={inputClass}
                                         />
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="cnpj"
-                                            className={labelClass}
-                                        >
+                                        <label htmlFor="cnpj" className={labelClass}>
                                             CNPJ *
                                         </label>
                                         <input
@@ -160,22 +145,14 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             required
                                             placeholder="Digite o CNPJ (apenas números)"
                                             value={data.cnpj}
-                                            onChange={(e) =>
-                                                handleDataChange(
-                                                    'cnpj',
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => handleDataChange('cnpj', e.target.value)}
                                             maxLength={14}
                                             className={inputClass}
                                         />
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="email"
-                                            className={labelClass}
-                                        >
+                                        <label htmlFor="email" className={labelClass}>
                                             Email *
                                         </label>
                                         <input
@@ -185,21 +162,13 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             required
                                             placeholder="Digite o email"
                                             value={data.email}
-                                            onChange={(e) =>
-                                                handleDataChange(
-                                                    'email',
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => handleDataChange('email', e.target.value)}
                                             className={inputClass}
                                         />
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="telefone"
-                                            className={labelClass}
-                                        >
+                                        <label htmlFor="telefone" className={labelClass}>
                                             Telefone *
                                         </label>
                                         <input
@@ -209,21 +178,13 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             required
                                             placeholder="Digite o telefone"
                                             value={data.telefone}
-                                            onChange={(e) =>
-                                                handleDataChange(
-                                                    'telefone',
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => handleDataChange('telefone', e.target.value)}
                                             className={inputClass}
                                         />
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="endereco"
-                                            className={labelClass}
-                                        >
+                                        <label htmlFor="endereco" className={labelClass}>
                                             Endereço *
                                         </label>
                                         <input
@@ -233,12 +194,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             required
                                             placeholder="Ex: R. Prof. Dr. Araújo, 538 - Centro, Pelotas - RS"
                                             value={data.endereco}
-                                            onChange={(e) =>
-                                                handleDataChange(
-                                                    'endereco',
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => handleDataChange('endereco', e.target.value)}
                                             className={inputClass}
                                         />
                                     </div>
@@ -256,23 +212,13 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             id="cidade_id"
                                             required
                                             value={data.cidade_id}
-                                            onChange={(e) =>
-                                                handleDataChange(
-                                                    'cidade_id',
-                                                    Number(e.target.value),
-                                                )
-                                            }
+                                            onChange={(e) => handleDataChange('cidade_id', Number(e.target.value))}
                                             className={inputClass}
                                         >
-                                            <option value="">
-                                                Selecione uma cidade...
-                                            </option>
+                                            <option value="">Selecione uma cidade...</option>
 
                                             {cidades.map((cidade: Cidade) => (
-                                                <option
-                                                    key={cidade.id}
-                                                    value={cidade.id}
-                                                >
+                                                <option key={cidade.id} value={cidade.id}>
                                                     {cidade.nome}
                                                 </option>
                                             ))}
@@ -280,10 +226,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="nova_ala"
-                                            className={labelClass}
-                                        >
+                                        <label htmlFor="nova_ala" className={labelClass}>
                                             Alas do hospital
                                         </label>
 
@@ -294,13 +237,11 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                                 id="nova_ala"
                                                 placeholder="Digite o nome da ala"
                                                 value={novaAla}
-                                                onChange={(e) =>
-                                                    setNovaAla(e.target.value)
-                                                }
+                                                onChange={(e) => setNovaAla(e.target.value)}
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
-                                                        e.preventDefault();
-                                                        adicionarAla();
+                                                        e.preventDefault()
+                                                        adicionarAla()
                                                     }
                                                 }}
                                                 className={inputClass}
@@ -325,9 +266,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
 
                                                     <button
                                                         type="button"
-                                                        onClick={() =>
-                                                            removerAla(ala.nome)
-                                                        }
+                                                        onClick={() => removerAla(ala.nome)}
                                                         className="rounded-full px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-50 hover:text-amber-900"
                                                     >
                                                         Remover
@@ -338,10 +277,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="foto"
-                                            className={labelClass}
-                                        >
+                                        <label htmlFor="foto" className={labelClass}>
                                             Foto
                                         </label>
                                         <input
@@ -355,10 +291,7 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                     </div>
 
                                     <div>
-                                        <label
-                                            htmlFor="observacoes"
-                                            className={labelClass}
-                                        >
+                                        <label htmlFor="observacoes" className={labelClass}>
                                             Observações
                                         </label>
                                         <textarea
@@ -367,13 +300,9 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             rows={4}
                                             placeholder="Digite observações adicionais"
                                             value={data.observacoes}
-                                            onChange={(e) =>
-                                                handleDataChange(
-                                                    'observacoes',
-                                                    e.target.value,
-                                                )
-                                            }
+                                            onChange={(e) => handleDataChange('observacoes', e.target.value)}
                                             className={`${inputClass} resize-none`}
+
                                         />
                                     </div>
 
@@ -383,49 +312,34 @@ const Create: React.FC<Props> = ({ cidades }) => {
                                             name="ativo"
                                             id="ativo"
                                             checked={data.ativo}
-                                            onChange={(e) =>
-                                                handleDataChange(
-                                                    'ativo',
-                                                    e.target.checked,
-                                                )
-                                            }
+                                            onChange={(e) => handleDataChange('ativo', e.target.checked)}
                                             className="h-4 w-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
                                         />
-                                        <label
-                                            htmlFor="ativo"
-                                            className="text-sm font-medium text-amber-900"
-                                        >
+                                        <label htmlFor="ativo" className="text-sm font-medium text-amber-900">
                                             Ativo
                                         </label>
                                     </div>
+
                                 </form>
                             </div>
 
-                            <div className="flex flex-col gap-3 border-t bg-white px-8 py-6 sm:flex-row sm:items-center sm:justify-between md:px-12">
-                                <Link
-                                    href={index().url}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
-                                >
-                                    <ArrowLeft className="size-4" aria-hidden />
-                                    Voltar
-                                </Link>
-
-                                <button
-                                    type="submit"
-                                    form="hospital-form"
-                                    disabled={processing}
-                                    className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
-                                >
-                                    <Check className="size-4" aria-hidden />
-                                    {processing ? 'Salvando...' : 'Salvar'}
-                                </button>
-                            </div>
+                            <FormularioRodape
+                                voltarHref={index().url}
+                                salvar={(
+                                    <BotaoSalvar
+                                        type="submit"
+                                        form="hospital-form"
+                                        disabled={processing}
+                                        salvando={processing}
+                                    />
+                                )}
+                            />
                         </div>
                     </div>
                 </div>
             </section>
         </PainelLayout>
-    );
-};
+    )
+}
 
-export default Create;
+export default Create

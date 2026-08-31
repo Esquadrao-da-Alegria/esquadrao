@@ -1,20 +1,20 @@
 import PainelLayout from '@/layouts/PainelLayout';
 import { visitasPorHospital } from '@/routes/dashboards';
+import { show as hospitalShow } from '@/routes/dashboards/visitas-por-hospital';
 import type {
-    AlaDashboardHospital,
     EvolucaoDashboardHospital,
     FiltrosDashboardHospital,
     IndicadoresDashboardHospital,
     OpcaoDashboard,
-    PaginacaoDashboard,
     ResumoDashboardHospital,
-    VisitaDashboardHospital,
+    SituacaoMetaHospital,
 } from '@/types/dashboard';
 import { Head, Link, router } from '@inertiajs/react';
 import {
     BarChart3,
     Building2,
     CalendarRange,
+    Eye,
     MapPin,
     Sparkles,
     UsersRound,
@@ -26,11 +26,6 @@ interface Props {
     indicadores: IndicadoresDashboardHospital;
     evolucao: EvolucaoDashboardHospital[];
     hospitais: ResumoDashboardHospital[];
-    detalhes: {
-        possui_alas: boolean;
-        alas: AlaDashboardHospital[];
-        visitas: PaginacaoDashboard<VisitaDashboardHospital>;
-    } | null;
     opcoes: {
         cidades: OpcaoDashboard[];
         hospitais: OpcaoDashboard[];
@@ -45,19 +40,11 @@ const formatarNumero = (valor: number, casas = 0) =>
         maximumFractionDigits: casas,
     });
 
-const formatarData = (valor: string) =>
-    new Date(valor).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-    });
-
 export default function Index({
     filtros,
     indicadores,
     evolucao,
     hospitais,
-    detalhes,
     opcoes,
     escopo_global,
 }: Props) {
@@ -88,6 +75,16 @@ export default function Index({
         router.get(visitasPorHospital().url, {}, { preserveScroll: true });
 
     const maiorEvolucao = Math.max(...evolucao.map((item) => item.total), 1);
+
+    const linkDetalhes = (hospitalId: number) =>
+        hospitalShow(hospitalId, {
+            query: {
+                mes_inicio: filtros.mes_inicio,
+                mes_fim: filtros.mes_fim,
+                cidade_id: filtros.cidade_id ?? undefined,
+                visao_global: filtros.visao_global ? 1 : undefined,
+            },
+        });
 
     return (
         <PainelLayout>
@@ -267,7 +264,7 @@ export default function Index({
                         Evolução mensal
                     </h2>
                     <p className="mt-1 text-sm text-amber-900/50">
-                        Quantidade de visitas não canceladas por mês.
+                        Quantidade de visitas realizadas por mês.
                     </p>
                     <div className="mt-6 flex min-h-48 items-end gap-3 overflow-x-auto pb-2">
                         {evolucao.map((item) => (
@@ -308,17 +305,14 @@ export default function Index({
                         <EstadoVazio />
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="w-full min-w-[760px] text-left text-sm">
+                            <table className="w-full min-w-[640px] text-left text-sm">
                                 <thead className="bg-amber-50/70 text-xs tracking-wide text-amber-900/60 uppercase">
                                     <tr>
                                         <th className="px-5 py-3">Hospital</th>
+                                        <th className="px-4 py-3">Meta</th>
                                         <th className="px-4 py-3">Visitas</th>
-                                        <th className="px-4 py-3">
-                                            Participações
-                                        </th>
-                                        <th className="px-4 py-3">Média</th>
-                                        <th className="px-4 py-3">
-                                            Impacto estimado
+                                        <th className="px-5 py-3 text-right">
+                                            Detalhes
                                         </th>
                                     </tr>
                                 </thead>
@@ -330,14 +324,9 @@ export default function Index({
                                         >
                                             <td className="px-5 py-4">
                                                 <Link
-                                                    href={visitasPorHospital({
-                                                        query: {
-                                                            ...filtros,
-                                                            hospital_id:
-                                                                hospital.id,
-                                                            ala_id: undefined,
-                                                        },
-                                                    })}
+                                                    href={linkDetalhes(
+                                                        hospital.id,
+                                                    )}
                                                     className="font-semibold text-amber-800 hover:text-amber-950 hover:underline"
                                                 >
                                                     {hospital.nome}
@@ -349,22 +338,41 @@ export default function Index({
                                                         : ''}
                                                 </span>
                                             </td>
+                                            <td className="px-4 py-4">
+                                                <SituacaoMeta
+                                                    situacao={
+                                                        hospital.situacao_meta
+                                                    }
+                                                />
+                                                {hospital.percentual_meta !==
+                                                    null && (
+                                                    <span className="mt-1 block text-xs text-gray-500">
+                                                        {
+                                                            hospital.realizadas_com_meta
+                                                        }
+                                                        /{hospital.meta_total} ·{' '}
+                                                        {
+                                                            hospital.percentual_meta
+                                                        }
+                                                        %
+                                                    </span>
+                                                )}
+                                            </td>
                                             <td className="px-4 py-4 font-semibold">
                                                 {hospital.total_visitas}
                                             </td>
-                                            <td className="px-4 py-4">
-                                                {hospital.total_participacoes}
-                                            </td>
-                                            <td className="px-4 py-4">
-                                                {formatarNumero(
-                                                    hospital.media_participantes,
-                                                    1,
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-4">
-                                                {formatarNumero(
-                                                    hospital.impacto_estimado,
-                                                )}
+                                            <td className="px-5 py-4 text-right">
+                                                <Link
+                                                    href={linkDetalhes(
+                                                        hospital.id,
+                                                    )}
+                                                    aria-label={`Ver acompanhamento de ${hospital.nome}`}
+                                                    title="Ver acompanhamento"
+                                                    className="inline-flex items-center gap-2 rounded-full border border-amber-200 px-3 py-2 text-xs font-semibold text-amber-800 transition hover:bg-amber-50"
+                                                >
+                                                    <Eye className="size-4" />
+                                                    Ver detalhes
+                                                </Link>
                                             </td>
                                         </tr>
                                     ))}
@@ -374,127 +382,6 @@ export default function Index({
                     )}
                 </section>
 
-                {detalhes && (
-                    <section className="grid gap-6 xl:grid-cols-[0.8fr_2fr]">
-                        <div className="rounded-2xl border border-amber-100 bg-white p-5 shadow-sm">
-                            <h2 className="font-semibold text-amber-950">
-                                Distribuição por ala
-                            </h2>
-                            <div className="mt-4 space-y-3">
-                                {!detalhes.possui_alas && (
-                                    <p className="rounded-xl bg-amber-50/70 px-4 py-3 text-sm text-amber-900/60">
-                                        Este hospital não possui alas
-                                        cadastradas.
-                                    </p>
-                                )}
-                                {detalhes.alas.map((ala) => (
-                                    <div
-                                        key={ala.id ?? 'sem-ala'}
-                                        className="flex items-center justify-between rounded-xl bg-amber-50/70 px-4 py-3"
-                                    >
-                                        <span className="text-sm font-medium text-amber-950">
-                                            {ala.nome}
-                                        </span>
-                                        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-amber-800">
-                                            {ala.total_visitas}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
-                            <div className="border-b border-amber-100 p-5">
-                                <h2 className="font-semibold text-amber-950">
-                                    Visitas consideradas
-                                </h2>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full min-w-[680px] text-left text-sm">
-                                    <thead className="bg-amber-50/70 text-xs text-amber-900/60 uppercase">
-                                        <tr>
-                                            <th className="px-5 py-3">Data</th>
-                                            <th className="px-4 py-3">Ala</th>
-                                            <th className="px-4 py-3">
-                                                Status
-                                            </th>
-                                            <th className="px-4 py-3">
-                                                Participantes
-                                            </th>
-                                            <th className="px-4 py-3">
-                                                Impacto
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-amber-50">
-                                        {detalhes.visitas.data.map((visita) => (
-                                            <tr key={visita.id}>
-                                                <td className="px-5 py-4 font-medium">
-                                                    {formatarData(
-                                                        visita.inicio_em,
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-4">
-                                                    {visita.ala}
-                                                </td>
-                                                <td className="px-4 py-4 capitalize">
-                                                    {visita.status.replaceAll(
-                                                        '_',
-                                                        ' ',
-                                                    )}
-                                                </td>
-                                                <td className="px-4 py-4">
-                                                    {visita.participantes}
-                                                </td>
-                                                <td className="px-4 py-4">
-                                                    {visita.impacto_estimado ===
-                                                    null ? (
-                                                        <span className="text-gray-400">
-                                                            Não informado
-                                                        </span>
-                                                    ) : (
-                                                        formatarNumero(
-                                                            visita.impacto_estimado,
-                                                        )
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="flex items-center justify-between border-t border-amber-100 p-4 text-sm text-gray-500">
-                                <span>
-                                    Página {detalhes.visitas.current_page} de{' '}
-                                    {detalhes.visitas.last_page}
-                                </span>
-                                <div className="flex gap-2">
-                                    {detalhes.visitas.prev_page_url && (
-                                        <Link
-                                            href={
-                                                detalhes.visitas.prev_page_url
-                                            }
-                                            preserveScroll
-                                            className="rounded-full border border-amber-200 px-3 py-1.5 text-amber-800 hover:bg-amber-50"
-                                        >
-                                            Anterior
-                                        </Link>
-                                    )}
-                                    {detalhes.visitas.next_page_url && (
-                                        <Link
-                                            href={
-                                                detalhes.visitas.next_page_url
-                                            }
-                                            preserveScroll
-                                            className="rounded-full border border-amber-200 px-3 py-1.5 text-amber-800 hover:bg-amber-50"
-                                        >
-                                            Próxima
-                                        </Link>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                )}
             </div>
         </PainelLayout>
     );
@@ -539,6 +426,44 @@ function Indicador({
             </p>
             {detalhe && <p className="mt-1 text-xs text-gray-400">{detalhe}</p>}
         </article>
+    );
+}
+
+const situacoesMeta: Record<
+    SituacaoMetaHospital,
+    { texto: string; classe: string }
+> = {
+    dentro_meta: {
+        texto: 'Dentro da meta',
+        classe: 'bg-emerald-50 text-emerald-700',
+    },
+    atencao: {
+        texto: 'Atenção',
+        classe: 'bg-red-50 text-red-700',
+    },
+    em_andamento: {
+        texto: 'Em andamento',
+        classe: 'bg-blue-50 text-blue-700',
+    },
+    sem_meta_definida: {
+        texto: 'Sem meta definida',
+        classe: 'bg-gray-100 text-gray-600',
+    },
+    futuro: {
+        texto: 'Período futuro',
+        classe: 'bg-violet-50 text-violet-700',
+    },
+};
+
+function SituacaoMeta({ situacao }: { situacao: SituacaoMetaHospital }) {
+    const configuracao = situacoesMeta[situacao];
+
+    return (
+        <span
+            className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${configuracao.classe}`}
+        >
+            {configuracao.texto}
+        </span>
     );
 }
 

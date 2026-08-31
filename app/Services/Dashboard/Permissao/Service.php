@@ -34,7 +34,7 @@ class Service
             return false;
         }
 
-        $user->loadMissing(['cargos', 'voluntario']);
+        resolverUsuario($user);
 
         if ($permissao === self::VISITAS_POR_PARTICIPANTE) {
             return $user->cargos->contains(fn ($cargo) => $cargo->slug === 'administrador');

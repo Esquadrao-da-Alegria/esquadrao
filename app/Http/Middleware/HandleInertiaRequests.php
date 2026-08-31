@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\User as UserHelper;
 use App\Services\Dashboard\Permissao\Service as DashboardPermissaoService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -39,11 +40,7 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        $user = $request->user();
-
-        if ($user) {
-            $user->loadMissing(['cargos', 'voluntario:id,cidade_base_id,nome_completo,foto_perfil']);
-        }
+        $user = usuarioAutenticado();
 
         return [
             ...parent::share($request),
@@ -58,6 +55,9 @@ class HandleInertiaRequests extends Middleware
             'permissoes_dashboards' => $user
                 ? app(DashboardPermissaoService::class)->permissoes($user)
                 : [],
+            'eh_gestor' => $user
+                ? UserHelper::ehGestor($user)
+                : false,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'mensagem_sucesso' => session('mensagem_sucesso'),
             'mensagem_erro' => session('mensagem_erro'),

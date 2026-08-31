@@ -10,13 +10,11 @@ class UserAdministrador
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
+        $user = usuarioAutenticado();
 
         if (! $user) {
             abort(403);
         }
-
-        $user->loadMissing('cargos');
 
         $ehAdministrador = $user->cargos->contains(fn ($cargo) => $cargo->slug === 'administrador');
 

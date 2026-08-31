@@ -114,7 +114,7 @@ class Queries
                     break;
 
                 case 'mes':
-                    $inicio = Carbon::createFromFormat('Y-m', $valor)->startOfMonth();
+                    $inicio = Carbon::createFromFormat('!Y-m', $valor)->startOfMonth();
                     $fim    = $inicio->copy()->endOfMonth();
                     $query->whereBetween('inicio_em', [$inicio, $fim]);
                     break;

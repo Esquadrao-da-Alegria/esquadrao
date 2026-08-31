@@ -12,9 +12,10 @@ use App\Models\Visita;
 use App\Services\Visita\Ajuste\Service as AjusteService;
 use App\Services\Visita\Form\Service as FormService;
 use App\Services\Visita\Service;
+use App\Services\Visita\Agenda\Liberacao\Service as LiberacaoAgendaService;
+use App\Helpers\User as UserHelper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class VisitaController extends Controller
@@ -28,8 +29,7 @@ class VisitaController extends Controller
     {
         $mes = $this->normalizarMes($request->query('mes'));
 
-        $user = Auth::user();
-        $user?->loadMissing('voluntario');
+        $user = usuarioAutenticado();
         $cidadeUsuarioId = $user?->voluntario?->cidade_base_id;
 
         if ($request->has('cidade_id')) {
@@ -52,7 +52,7 @@ class VisitaController extends Controller
         $retorno = $this->service->index($filtrosBusca);
         $cidades = Cidade::query()->orderBy('nome')->get(['id', 'nome']);
 
-        $inicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
+        $inicio = Carbon::createFromFormat('!Y-m', $mes)->startOfMonth();
         $fim = $inicio->copy()->endOfMonth();
 
         $eventos = Evento::with(['responsavel', 'cidade'])
@@ -63,6 +63,22 @@ class VisitaController extends Controller
             ->orderBy('data_inicio')
             ->get();
 
+        $agendaLiberacao = null;
+        $podeGerenciarAgenda = false;
+
+        if ($cidadeId !== 'todas') {
+            $referencia = Carbon::createFromFormat('!Y-m', $mes);
+            $liberacaoAgendaService = app(LiberacaoAgendaService::class);
+            $agendaLiberacao = $liberacaoAgendaService->situacaoConsulta(
+                (int) $cidadeId,
+                (int) $referencia->year,
+                (int) $referencia->month,
+            );
+            $podeGerenciarAgenda = $user
+                ? $liberacaoAgendaService->podeGerenciarCidade($user, (int) $cidadeId)
+                : false;
+        }
+
         return Inertia::render('Visita/Index', [
             'visitas'         => $retorno['dados'],
             'eventos'         => $eventos,
@@ -71,12 +87,40 @@ class VisitaController extends Controller
             'cidadeId'        => $cidadeId,
             'cidadeUsuarioId' => $cidadeUsuarioId ? (int) $cidadeUsuarioId : null,
             'visitaId'        => $request->integer('visita_id') ?: null,
+            'ehGestor'         => $user ? UserHelper::ehGestor($user) : false,
+            'agendaLiberacao'  => $agendaLiberacao,
+            'podeGerenciarAgenda' => $podeGerenciarAgenda,
         ]);
     }
 
-    public function create(): \Inertia\Response
+    public function create(Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-        $dadosView = $this->formService->buscarDados(null);
+        $mes = $this->normalizarMes($request->query('mes'));
+        $cidadeId = $request->integer('cidade_id') ?: usuarioAutenticado()?->voluntario?->cidade_base_id;
+
+        if (! $cidadeId) {
+            return redirect()->route('visitas.index', ['mes' => $mes])
+                ->with('mensagem_alerta', 'Selecione uma cidade antes de cadastrar uma nova visita.');
+        }
+
+        $referencia = Carbon::createFromFormat('!Y-m', $mes);
+        $liberado = app(LiberacaoAgendaService::class)->mesEstaLiberado(
+            (int) $cidadeId,
+            (int) $referencia->year,
+            (int) $referencia->month,
+        );
+
+        if (! $liberado) {
+            return redirect()->route('visitas.index', ['mes' => $mes, 'cidade_id' => $cidadeId])
+                ->with('mensagem_alerta', 'O agendamento de novas visitas está bloqueado para o mês selecionado.');
+        }
+
+        $dadosView = [
+            ...$this->formService->buscarDados(null, (int) $cidadeId),
+            'mes_selecionado' => $mes,
+            'cidade_selecionada_id' => (int) $cidadeId,
+        ];
+
         return Inertia::render('Visita/Create', $dadosView);
     }
 
@@ -93,15 +137,16 @@ class VisitaController extends Controller
 
     public function edit(Visita $visita, AjusteService $ajusteService): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-        if (! $this->service->podeEditarVisita(Auth::user(), $visita)) {
+        $user = usuarioAutenticado();
+
+        if (! $user || ! $this->service->podeEditarVisita($user, $visita)) {
             return redirect()->route('visitas.index')
                 ->with('mensagem_erro', 'Você não tem permissão para editar esta visita.');
         }
 
         $dados = $this->formService->buscarDados($visita);
-        $user = Auth::user();
 
-        if ($user?->temCargo('administrador') && $visita->status === VisitaStatus::Realizada) {
+        if ($user->temCargo('administrador') && $visita->status === VisitaStatus::Realizada) {
             $dados['ajustes_contabilizacao'] = $ajusteService->index($visita);
         }
 
@@ -110,7 +155,9 @@ class VisitaController extends Controller
 
     public function update(UpdateRequest $request, Visita $visita): \Illuminate\Http\RedirectResponse
     {
-        if (! $this->service->podeEditarVisita(Auth::user(), $visita)) {
+        $user = usuarioAutenticado();
+
+        if (! $user || ! $this->service->podeEditarVisita($user, $visita)) {
             return redirect()->route('visitas.index')
                 ->with('mensagem_erro', 'Você não tem permissão para editar esta visita.');
         }
@@ -126,8 +173,7 @@ class VisitaController extends Controller
 
     public function cancelar(Visita $visita): \Illuminate\Http\RedirectResponse
     {
-        $user = Auth::user();
-        $user?->loadMissing('cargos');
+        $user = usuarioAutenticado();
 
         $ehAdministrador = $user?->cargos->contains('slug', 'administrador') ?? false;
         $ehLider = $user !== null && $visita->lider_id !== null && $user->id === $visita->lider_id;
@@ -153,7 +199,7 @@ class VisitaController extends Controller
         }
 
         try {
-            Carbon::createFromFormat('Y-m', $mes);
+            Carbon::createFromFormat('!Y-m', $mes);
             return $mes;
         } catch (\Throwable) {
             return now()->format('Y-m');

@@ -9,9 +9,11 @@ use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
 use App\Models\User;
+use App\Models\Hospital;
 use App\Models\Visita;
 use App\Models\VisitaParticipante;
 use App\Queries\Visita\Queries;
+use App\Services\Visita\Agenda\Liberacao\Service as LiberacaoAgendaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +21,10 @@ use Illuminate\Support\Facades\Log;
 
 class Service
 {
-    public function __construct(private Queries $queries) {}
+    public function __construct(
+        private Queries $queries,
+        private LiberacaoAgendaService $liberacaoAgendaService,
+    ) {}
 
     public function index(array $filtros): array
     {
@@ -58,7 +63,7 @@ class Service
             return true;
         }
 
-        $user->loadMissing(['cargos', 'voluntario']);
+        resolverUsuario($user);
         $visita->loadMissing('hospital');
 
         foreach ($user->cargos as $cargo) {
@@ -90,6 +95,14 @@ class Service
                 DB::rollBack();
 
                 return $this->erroEnvelope('O horário de fim deve ser posterior ao início.');
+            }
+
+            $erroAgenda = $this->validarAgendaHospitalarSeNecessario($payload);
+
+            if ($erroAgenda !== null) {
+                DB::rollBack();
+
+                return $this->erroEnvelope($erroAgenda);
             }
 
             $retornoDatabase = $this->queries->store($payload);
@@ -156,6 +169,18 @@ class Service
                 return $this->erroEnvelope('O horário de fim deve ser posterior ao início.');
             }
 
+            $inicioAlterado = Carbon::parse($payload['inicio_em'])->ne(Carbon::parse($visita->inicio_em));
+
+            if ($inicioAlterado) {
+                $erroAgenda = $this->validarAgendaHospitalarSeNecessario($payload);
+
+                if ($erroAgenda !== null) {
+                    DB::rollBack();
+
+                    return $this->erroEnvelope($erroAgenda);
+                }
+            }
+
             $retornoDatabase = $this->queries->update($visita->id, $payload);
 
             if (! $retornoDatabase['sucesso']) {
@@ -188,6 +213,43 @@ class Service
 
             return $this->erroEnvelope(formatarMensagemErro($th));
         }
+    }
+
+    private function validarAgendaHospitalarSeNecessario(array $payload): ?string
+    {
+        if (! $this->exigeValidacaoAgenda($payload)) {
+            return null;
+        }
+
+        return $this->validarAgendaHospitalar((int) $payload['hospital_id'], $payload['inicio_em']);
+    }
+
+    private function exigeValidacaoAgenda(array $payload): bool
+    {
+        $tipo = $payload['tipo'] instanceof VisitaTipo ? $payload['tipo']->value : $payload['tipo'];
+
+        return $tipo === VisitaTipo::Hospital->value && ! empty($payload['hospital_id']);
+    }
+
+    private function validarAgendaHospitalar(int $hospitalId, string $inicioEm): ?string
+    {
+        $hospital = Hospital::query()->find($hospitalId, ['id', 'cidade_id']);
+
+        if (! $hospital?->cidade_id) {
+            return 'Hospital inválido.';
+        }
+
+        $data = Carbon::parse($inicioEm);
+
+        if (! $this->liberacaoAgendaService->mesEstaLiberado(
+            (int) $hospital->cidade_id,
+            (int) $data->year,
+            (int) $data->month,
+        )) {
+            return 'A agenda desta cidade não está liberada para o mês selecionado.';
+        }
+
+        return null;
     }
 
     private function garantirParticipacaoDoLider(int $visitaId, int $liderId): void

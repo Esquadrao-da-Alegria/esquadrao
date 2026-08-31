@@ -10,6 +10,8 @@ use App\Models\Estado;
 use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
+use App\Models\Voluntario;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -46,6 +48,45 @@ class VisitaIndexTest extends TestCase
                 ->has('visitas', 1)
                 ->where('visitas.0.id', $visitaJunho->id)
             );
+    }
+
+    public function test_exibe_agendamentos_do_proximo_mes_no_dia_trinta_e_um(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 8, 31, 12));
+
+        try {
+            $user = $this->criarUsuario();
+            $hospital = $this->criarHospital();
+            $visitaSetembro = $this->criarVisita($hospital, $user, '2026-09-10 10:00:00');
+
+            $eventoSetembro = \App\Models\Evento::query()->create([
+                'titulo' => 'Oficina de setembro',
+                'tipo' => 'oficina',
+                'descricao' => 'Oficina',
+                'local' => 'Sede',
+                'data_inicio' => '2026-09-12 14:00:00',
+                'status' => 'agendado',
+                'criado_por_id' => $user->id,
+            ]);
+
+            $this->criarVisita($hospital, $user, '2026-10-10 10:00:00');
+
+            $this->actingAs($user)
+                ->get(route('visitas.index', [
+                    'mes' => '2026-09',
+                    'cidade_id' => 'todas',
+                ]))
+                ->assertOk()
+                ->assertInertia(fn (Assert $page) => $page
+                    ->component('Visita/Index')
+                    ->where('mes', '2026-09')
+                    ->has('visitas', 1)
+                    ->where('visitas.0.id', $visitaSetembro->id)
+                    ->has('eventos', 1)
+                    ->where('eventos.0.id', $eventoSetembro->id));
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function test_usa_mes_corrente_quando_mes_nao_informado(): void
@@ -208,13 +249,7 @@ class VisitaIndexTest extends TestCase
         $cidadePOA = Cidade::query()->forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
         $cidadeSM  = Cidade::query()->forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
 
-        $voluntario = \App\Models\Voluntario::query()->create([
-            'nome_completo'   => 'Voluntario Teste',
-            'email'           => 'voluntario@teste.com',
-            'cidade_base_id'  => $cidadePOA->id,
-            'status'          => 'ativo',
-        ]);
-        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+        $user = $this->criarUsuario($cidadePOA->id, 'voluntario@teste.com');
 
         $hospitalPOA = Hospital::query()->create([
             'cidade_id' => $cidadePOA->id,
@@ -258,13 +293,7 @@ class VisitaIndexTest extends TestCase
         $cidadePOA = Cidade::query()->forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
         $cidadeSM  = Cidade::query()->forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
 
-        $voluntario = \App\Models\Voluntario::query()->create([
-            'nome_completo'   => 'Voluntario Teste',
-            'email'           => 'voluntario2@teste.com',
-            'cidade_base_id'  => $cidadePOA->id,
-            'status'          => 'ativo',
-        ]);
-        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+        $user = $this->criarUsuario($cidadePOA->id, 'voluntario2@teste.com');
 
         $hospitalPOA = Hospital::query()->create([
             'cidade_id' => $cidadePOA->id,
@@ -307,13 +336,7 @@ class VisitaIndexTest extends TestCase
         $cidadePOA = Cidade::query()->forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
         $cidadeSM  = Cidade::query()->forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
 
-        $voluntario = \App\Models\Voluntario::query()->create([
-            'nome_completo'   => 'Voluntario Teste',
-            'email'           => 'voluntario3@teste.com',
-            'cidade_base_id'  => $cidadePOA->id,
-            'status'          => 'ativo',
-        ]);
-        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+        $user = $this->criarUsuario($cidadePOA->id, 'voluntario3@teste.com');
 
         $hospitalPOA = Hospital::query()->create([
             'cidade_id' => $cidadePOA->id,
@@ -355,13 +378,7 @@ class VisitaIndexTest extends TestCase
         $cidadePOA = Cidade::query()->forceCreate(['nome' => 'Porto Alegre', 'estado_id' => $estado->id]);
         $cidadeSM  = Cidade::query()->forceCreate(['nome' => 'Santa Maria', 'estado_id' => $estado->id]);
 
-        $voluntario = \App\Models\Voluntario::query()->create([
-            'nome_completo'   => 'Voluntario Teste Visita Eventos',
-            'email'           => 'vol_vis_evt@teste.com',
-            'cidade_base_id'  => $cidadePOA->id,
-            'status'          => 'ativo',
-        ]);
-        $user = User::factory()->createOne(['voluntario_id' => $voluntario->id]);
+        $user = $this->criarUsuario($cidadePOA->id, 'vol_vis_evt@teste.com');
 
         $eventoPOA = \App\Models\Evento::create([
             'titulo'        => 'Oficina de Palhaço POA',
@@ -395,9 +412,20 @@ class VisitaIndexTest extends TestCase
             );
     }
 
-    private function criarUsuario(): User
+    private function criarUsuario(?int $cidadeBaseId = null, ?string $emailVoluntario = null): User
     {
-        return User::factory()->createOne();
+        if ($cidadeBaseId === null) {
+            return User::factory()->createOne();
+        }
+
+        $voluntario = Voluntario::query()->create([
+            'nome_completo'  => 'Voluntario Teste',
+            'email'          => $emailVoluntario ?? uniqid('voluntario_') . '@teste.com',
+            'cidade_base_id' => $cidadeBaseId,
+            'status'         => 'ativo',
+        ]);
+
+        return User::factory()->createOne(['voluntario_id' => $voluntario->id]);
     }
 
     private function criarHospital(): Hospital

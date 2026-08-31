@@ -11,7 +11,6 @@ use App\Models\Evento;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class EventoController extends Controller
@@ -20,11 +19,10 @@ class EventoController extends Controller
     {
         $mes = $this->normalizarMes($request->query('mes'));
 
-        $inicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
+        $inicio = Carbon::createFromFormat('!Y-m', $mes)->startOfMonth();
         $fim = $inicio->copy()->endOfMonth();
 
-        $user = Auth::user();
-        $user?->loadMissing('voluntario');
+        $user = usuarioAutenticado();
         $cidadeUsuarioId = $user?->voluntario?->cidade_base_id;
 
         if ($request->has('cidade_id')) {
@@ -158,7 +156,7 @@ class EventoController extends Controller
         }
 
         try {
-            Carbon::createFromFormat('Y-m', $mes);
+            Carbon::createFromFormat('!Y-m', $mes);
 
             return $mes;
         } catch (\Throwable) {

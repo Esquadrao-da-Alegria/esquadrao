@@ -20,6 +20,23 @@ export interface IndicadoresDashboardHospital {
     impacto_estimado: number;
     visitas_com_impacto: number;
     visitas_sem_impacto: number;
+    visitas_sem_relatorio: number;
+}
+
+export type SituacaoMetaHospital =
+    | 'dentro_meta'
+    | 'atencao'
+    | 'em_andamento'
+    | 'sem_meta_definida'
+    | 'futuro';
+
+export interface AcompanhamentoMensalHospital {
+    mes: string;
+    meta: number | null;
+    realizadas: number;
+    diferenca: number | null;
+    percentual: number | null;
+    situacao: SituacaoMetaHospital;
 }
 
 export interface EvolucaoDashboardHospital {
@@ -37,6 +54,11 @@ export interface ResumoDashboardHospital {
     media_participantes: number;
     impacto_estimado: number;
     possui_alas: boolean;
+    situacao_meta: SituacaoMetaHospital;
+    meta_total: number;
+    realizadas_com_meta: number;
+    percentual_meta: number | null;
+    meses: AcompanhamentoMensalHospital[];
 }
 
 export interface AlaDashboardHospital {
@@ -52,6 +74,17 @@ export interface VisitaDashboardHospital {
     ala: string;
     participantes: number;
     impacto_estimado: number | null;
+    possui_relatorio: boolean;
+}
+
+export interface AcompanhamentoSemanalHospital {
+    mes: string;
+    semana: number;
+    periodo: string;
+    ala: string | null;
+    meta: number;
+    realizadas: number;
+    situacao: SituacaoMetaHospital;
 }
 
 export interface PaginacaoDashboard<T> {

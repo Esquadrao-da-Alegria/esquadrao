@@ -8,6 +8,7 @@ use App\Enums\TipoParticipacao;
 use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
+use App\Models\AgendaLiberacaoCidade;
 use App\Models\Ala;
 use App\Models\Cargo;
 use App\Models\Cidade;
@@ -56,6 +57,42 @@ class VisitaStoreTest extends TestCase
             'status'        => VisitaStatus::Agendada->value,
             'origem'        => VisitaOrigem::Sistema->value,
             'observacoes'   => 'Teste',
+        ]);
+    }
+
+    public function test_rejeita_criacao_direta_de_visita_em_mes_bloqueado(): void
+    {
+        $user     = $this->criarVoluntario();
+        $hospital = $this->criarHospital();
+        $lider    = $this->criarVoluntario();
+
+        AgendaLiberacaoCidade::query()
+            ->where('cidade_id', $hospital->cidade_id)
+            ->where('ano', 2026)
+            ->where('mes', 6)
+            ->update([
+                'liberado'        => false,
+                'liberado_por_id' => null,
+            ]);
+
+        $payload = [
+            'hospital_id' => $hospital->id,
+            'data'        => '2026-06-20',
+            'hora_inicio' => '10:00',
+            'hora_fim'    => '12:00',
+            'tipo'        => VisitaTipo::Hospital->value,
+            'lider_id'    => $lider->id,
+        ];
+
+        $this->actingAs($user)
+            ->post(route('visitas.store'), $payload)
+            ->assertSessionHasErrors([
+                'geral' => 'A agenda desta cidade não está liberada para o mês selecionado.',
+            ]);
+
+        $this->assertDatabaseMissing('visitas', [
+            'hospital_id' => $hospital->id,
+            'inicio_em'   => '2026-06-20 10:00:00',
         ]);
     }
 
@@ -315,7 +352,7 @@ class VisitaStoreTest extends TestCase
             ->first()
             ?? Cidade::query()->forceCreate(['nome' => 'POA', 'estado_id' => $estado->id]);
 
-        return Hospital::query()->create([
+        $hospital = Hospital::query()->create([
             'cidade_id' => $cidade->id,
             'nome'      => 'Hospital Teste ' . uniqid(),
             'cnpj'      => (string) random_int(10000000000000, 99999999999999),
@@ -324,5 +361,24 @@ class VisitaStoreTest extends TestCase
             'email'     => 'a@b.com',
             'ativo'     => $ativo,
         ]);
+
+        $this->liberarAgenda($cidade->id, 2026, 6);
+
+        return $hospital;
+    }
+
+    private function liberarAgenda(int $cidadeId, int $ano, int $mes): void
+    {
+        AgendaLiberacaoCidade::query()->updateOrCreate(
+            [
+                'cidade_id' => $cidadeId,
+                'ano'       => $ano,
+                'mes'       => $mes,
+            ],
+            [
+                'liberado'        => true,
+                'liberado_por_id' => null,
+            ],
+        );
     }
 }
