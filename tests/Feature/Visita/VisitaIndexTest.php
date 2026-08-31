@@ -11,6 +11,7 @@ use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
 use App\Models\Voluntario;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -47,6 +48,45 @@ class VisitaIndexTest extends TestCase
                 ->has('visitas', 1)
                 ->where('visitas.0.id', $visitaJunho->id)
             );
+    }
+
+    public function test_exibe_agendamentos_do_proximo_mes_no_dia_trinta_e_um(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 8, 31, 12));
+
+        try {
+            $user = $this->criarUsuario();
+            $hospital = $this->criarHospital();
+            $visitaSetembro = $this->criarVisita($hospital, $user, '2026-09-10 10:00:00');
+
+            $eventoSetembro = \App\Models\Evento::query()->create([
+                'titulo' => 'Oficina de setembro',
+                'tipo' => 'oficina',
+                'descricao' => 'Oficina',
+                'local' => 'Sede',
+                'data_inicio' => '2026-09-12 14:00:00',
+                'status' => 'agendado',
+                'criado_por_id' => $user->id,
+            ]);
+
+            $this->criarVisita($hospital, $user, '2026-10-10 10:00:00');
+
+            $this->actingAs($user)
+                ->get(route('visitas.index', [
+                    'mes' => '2026-09',
+                    'cidade_id' => 'todas',
+                ]))
+                ->assertOk()
+                ->assertInertia(fn (Assert $page) => $page
+                    ->component('Visita/Index')
+                    ->where('mes', '2026-09')
+                    ->has('visitas', 1)
+                    ->where('visitas.0.id', $visitaSetembro->id)
+                    ->has('eventos', 1)
+                    ->where('eventos.0.id', $eventoSetembro->id));
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function test_usa_mes_corrente_quando_mes_nao_informado(): void

@@ -38,6 +38,7 @@ interface Props {
     cidades?: Cidade[]
     lideres: User[]
     meses_liberados?: string[]
+    cidadeInicialId?: number
     onCampoChange: <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => void
 }
 
@@ -52,6 +53,7 @@ const Form: FC<Props> = ({
     cidades = [],
     lideres,
     meses_liberados = [],
+    cidadeInicialId,
     onCampoChange,
 }) => {
     const { auth } = usePage<SharedData>().props
@@ -63,7 +65,7 @@ const Form: FC<Props> = ({
     }, [data.hospital_id, hospitais])
 
     const [cidadeFiltroId, setCidadeFiltroId] = useState<number | ''>(
-        hospitalSelecionado?.cidade_id ?? userCidadeId ?? '',
+        hospitalSelecionado?.cidade_id ?? cidadeInicialId ?? userCidadeId ?? '',
     )
 
     const hospitaisFiltrados = useMemo(() => {
@@ -90,8 +92,13 @@ const Form: FC<Props> = ({
     const restringeAgendaHospital = data.tipo === 'hospital'
 
     const mesesParaSelecao = useMemo(
-        () => (restringeAgendaHospital ? mesesLiberadosParaSelecao(meses_liberados, data.data) : []),
-        [data.data, meses_liberados, restringeAgendaHospital],
+        () => (restringeAgendaHospital
+            ? mesesLiberadosParaSelecao(
+                meses_liberados,
+                mode === 'edit' ? data.data : undefined,
+            )
+            : []),
+        [data.data, meses_liberados, mode, restringeAgendaHospital],
     )
 
     const mesSelecionado = data.data ? mesDaData(data.data) : ''

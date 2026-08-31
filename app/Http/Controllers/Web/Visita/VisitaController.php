@@ -52,7 +52,7 @@ class VisitaController extends Controller
         $retorno = $this->service->index($filtrosBusca);
         $cidades = Cidade::query()->orderBy('nome')->get(['id', 'nome']);
 
-        $inicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
+        $inicio = Carbon::createFromFormat('!Y-m', $mes)->startOfMonth();
         $fim = $inicio->copy()->endOfMonth();
 
         $eventos = Evento::with(['responsavel', 'cidade'])
@@ -67,7 +67,7 @@ class VisitaController extends Controller
         $podeGerenciarAgenda = false;
 
         if ($cidadeId !== 'todas') {
-            $referencia = Carbon::createFromFormat('Y-m', $mes);
+            $referencia = Carbon::createFromFormat('!Y-m', $mes);
             $liberacaoAgendaService = app(LiberacaoAgendaService::class);
             $agendaLiberacao = $liberacaoAgendaService->situacaoConsulta(
                 (int) $cidadeId,
@@ -103,7 +103,7 @@ class VisitaController extends Controller
                 ->with('mensagem_alerta', 'Selecione uma cidade antes de cadastrar uma nova visita.');
         }
 
-        $referencia = Carbon::createFromFormat('Y-m', $mes);
+        $referencia = Carbon::createFromFormat('!Y-m', $mes);
         $liberado = app(LiberacaoAgendaService::class)->mesEstaLiberado(
             (int) $cidadeId,
             (int) $referencia->year,
@@ -115,7 +115,12 @@ class VisitaController extends Controller
                 ->with('mensagem_alerta', 'O agendamento de novas visitas está bloqueado para o mês selecionado.');
         }
 
-        $dadosView = $this->formService->buscarDados(null);
+        $dadosView = [
+            ...$this->formService->buscarDados(null, (int) $cidadeId),
+            'mes_selecionado' => $mes,
+            'cidade_selecionada_id' => (int) $cidadeId,
+        ];
+
         return Inertia::render('Visita/Create', $dadosView);
     }
 
@@ -194,7 +199,7 @@ class VisitaController extends Controller
         }
 
         try {
-            Carbon::createFromFormat('Y-m', $mes);
+            Carbon::createFromFormat('!Y-m', $mes);
             return $mes;
         } catch (\Throwable) {
             return now()->format('Y-m');

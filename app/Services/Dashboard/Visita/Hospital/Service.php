@@ -43,9 +43,9 @@ class Service
 
         $totaisPorMes = $dados['evolucao']->pluck('total', 'mes');
         $dados['evolucao'] = collect(CarbonPeriod::create(
-            Carbon::createFromFormat('Y-m', $filtros['mes_inicio'])->startOfMonth(),
+            Carbon::createFromFormat('!Y-m', $filtros['mes_inicio'])->startOfMonth(),
             '1 month',
-            Carbon::createFromFormat('Y-m', $filtros['mes_fim'])->startOfMonth(),
+            Carbon::createFromFormat('!Y-m', $filtros['mes_fim'])->startOfMonth(),
         ))->map(fn (Carbon $mes) => [
             'mes' => $mes->format('Y-m'),
             'rotulo' => $mes->translatedFormat('M/Y'),
@@ -140,8 +140,8 @@ class Service
 
     private function incluirHospitaisComMeta(Collection $hospitais, array $filtros): Collection
     {
-        $inicio = Carbon::createFromFormat('Y-m', $filtros['mes_inicio']);
-        $fim = Carbon::createFromFormat('Y-m', $filtros['mes_fim']);
+        $inicio = Carbon::createFromFormat('!Y-m', $filtros['mes_inicio']);
+        $fim = Carbon::createFromFormat('!Y-m', $filtros['mes_fim']);
 
         $hospitalIds = MetaMensalHospital::query()
             ->whereRaw('(ano * 100 + mes) between ? and ?', [
@@ -186,8 +186,8 @@ class Service
             return collect();
         }
 
-        $inicio = Carbon::createFromFormat('Y-m', $filtros['mes_inicio']);
-        $fim = Carbon::createFromFormat('Y-m', $filtros['mes_fim']);
+        $inicio = Carbon::createFromFormat('!Y-m', $filtros['mes_inicio']);
+        $fim = Carbon::createFromFormat('!Y-m', $filtros['mes_fim']);
 
         return MetaMensalHospital::query()
             ->whereIn('hospital_id', $hospitalIds)
@@ -207,9 +207,9 @@ class Service
     ): array {
         $realizadas = $realizadasMensais->get($hospitalId, collect())->keyBy('mes');
         $meses = collect(CarbonPeriod::create(
-            Carbon::createFromFormat('Y-m', $filtros['mes_inicio'])->startOfMonth(),
+            Carbon::createFromFormat('!Y-m', $filtros['mes_inicio'])->startOfMonth(),
             '1 month',
-            Carbon::createFromFormat('Y-m', $filtros['mes_fim'])->startOfMonth(),
+            Carbon::createFromFormat('!Y-m', $filtros['mes_fim'])->startOfMonth(),
         ))->map(function (Carbon $mes) use ($hospitalId, $metas, $realizadas) {
             $chave = $mes->format('Y-m');
             $meta = $metas->get($hospitalId.'-'.$chave);
@@ -279,8 +279,8 @@ class Service
 
     private function acompanhamentoSemanal(Hospital $hospital, array $filtros): array
     {
-        $inicio = Carbon::createFromFormat('Y-m', $filtros['mes_inicio'])->startOfMonth();
-        $fim = Carbon::createFromFormat('Y-m', $filtros['mes_fim'])->endOfMonth();
+        $inicio = Carbon::createFromFormat('!Y-m', $filtros['mes_inicio'])->startOfMonth();
+        $fim = Carbon::createFromFormat('!Y-m', $filtros['mes_fim'])->endOfMonth();
         $metas = MetaSemanalHospital::query()
             ->where('hospital_id', $hospital->id)
             ->whereRaw('(ano * 100 + mes) between ? and ?', [

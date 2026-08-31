@@ -39,12 +39,18 @@ class Controller extends BaseController
 
     public function update(UpdateRequest $request): RedirectResponse
     {
-        $retorno = $this->service->update($request->user(), $request->validated());
+        $dados = $request->validated();
+        $retorno = $this->service->update($request->user(), $dados);
+        $destino = route('visitas.index', [
+            'mes' => sprintf('%04d-%02d', $dados['ano'], $dados['mes']),
+            'cidade_id' => $dados['cidade_id'],
+        ]);
 
         if (! $retorno['sucesso']) {
-            return back()->withErrors(['geral' => $retorno['erros'][0] ?? 'Erro ao atualizar liberação da agenda.']);
+            return redirect($destino)
+                ->withErrors(['geral' => $retorno['erros'][0] ?? 'Erro ao atualizar liberação da agenda.']);
         }
 
-        return back();
+        return redirect($destino);
     }
 }
