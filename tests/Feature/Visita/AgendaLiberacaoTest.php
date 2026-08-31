@@ -21,6 +21,15 @@ class AgendaLiberacaoTest extends TestCase
         $this->get(route('visitas.agenda-liberacao.index'))->assertRedirect(route('login'));
     }
 
+    public function test_redirecionamento_legado_nao_intercepta_atualizacao(): void
+    {
+        $rotaIndex = app('router')->getRoutes()->getByName('visitas.agenda-liberacao.index');
+        $rotaUpdate = app('router')->getRoutes()->getByName('visitas.agenda-liberacao.update');
+
+        $this->assertSame(['GET', 'HEAD'], $rotaIndex->methods());
+        $this->assertSame(['PUT'], $rotaUpdate->methods());
+    }
+
     public function test_voluntario_sem_permissao_recebe_403(): void
     {
         $user = $this->criarUsuarioComCargo('voluntario');

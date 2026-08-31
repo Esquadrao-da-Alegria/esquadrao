@@ -142,7 +142,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('hospitais/{hospital}/metas', [HospitalMetaController::class, 'update'])->name('hospitais.metas.update');
 
     // VISITAS — LIBERAÇÃO DE AGENDA
-    Route::redirect('visitas/agenda-liberacao', '/visitas')->name('visitas.agenda-liberacao.index');
+    Route::get('visitas/agenda-liberacao', fn () => redirect('/visitas'))->name('visitas.agenda-liberacao.index');
     Route::put('visitas/agenda-liberacao', [VisitaAgendaLiberacaoController::class, 'update'])->name('visitas.agenda-liberacao.update');
 
     // VISITAS
