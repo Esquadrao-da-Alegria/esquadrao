@@ -25,15 +25,21 @@ interface Props {
     cidades?: Cidade[]
     lideres: User[]
     meses_liberados?: string[]
+    mes_selecionado: string
+    cidade_selecionada_id: number
 }
 
-const Create: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [] }) => {
+const Create: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [], mes_selecionado, cidade_selecionada_id }) => {
     const { auth } = usePage<SharedData>().props
+    const hoje = hojeLocal()
+    const dataInicial = hoje.slice(0, 7) === mes_selecionado
+        ? hoje
+        : `${mes_selecionado}-01`
 
     const { data, setData, transform, post, processing, errors } = useForm<DadosFormulario>({
         hospital_id: '',
         ala_unidade_id: null,
-        data: hojeLocal(),
+        data: dataInicial,
         hora_inicio: '',
         hora_fim: '',
         tipo: 'hospital',
@@ -94,6 +100,7 @@ const Create: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados =
                                         cidades={cidades}
                                         lideres={lideres}
                                         meses_liberados={meses_liberados}
+                                        cidadeInicialId={cidade_selecionada_id}
                                         onCampoChange={handleCampoChange}
                                     />
                                 </form>

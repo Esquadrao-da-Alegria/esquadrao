@@ -8,6 +8,7 @@ use App\Models\Cidade;
 use App\Models\Estado;
 use App\Models\User;
 use App\Models\Voluntario;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -86,7 +87,10 @@ class AgendaLiberacaoTest extends TestCase
                 'mes'      => $mes,
                 'liberado' => true,
             ])
-            ->assertRedirect(route('visitas.index'))
+            ->assertRedirect(route('visitas.index', [
+                'mes' => $referencia->format('Y-m'),
+                'cidade_id' => $cidade->id,
+            ]))
             ->assertSessionHas('mensagem_sucesso');
 
         $this->assertDatabaseHas('agenda_liberacoes_cidades', [
@@ -96,6 +100,17 @@ class AgendaLiberacaoTest extends TestCase
             'liberado'        => true,
             'liberado_por_id' => $user->id,
         ]);
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('visitas.index', [
+                'mes' => $referencia->format('Y-m'),
+                'cidade_id' => $cidade->id,
+            ]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('mes', $referencia->format('Y-m'))
+                ->where('cidadeId', $cidade->id)
+                ->where('agendaLiberacao.liberado', true));
     }
 
     public function test_rejeita_alterar_mes_passado(): void
@@ -190,6 +205,18 @@ class AgendaLiberacaoTest extends TestCase
             'mes' => $referencia->month,
             'liberado' => true,
         ]);
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('visitas.create', [
+                'mes' => $referencia->format('Y-m'),
+                'cidade_id' => $cidade->id,
+            ]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Create')
+                ->where('mes_selecionado', $referencia->format('Y-m'))
+                ->where('cidade_selecionada_id', $cidade->id)
+                ->where('meses_liberados', [$referencia->format('Y-m')]));
     }
 
     public function test_voluntario_visualiza_bloqueio_e_nao_abre_formulario_por_url(): void
@@ -239,7 +266,67 @@ class AgendaLiberacaoTest extends TestCase
                 'cidade_id' => $cidade->id,
             ]))
             ->assertOk()
-            ->assertInertia(fn (Assert $page) => $page->component('Visita/Create'));
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Create')
+                ->where('mes_selecionado', $referencia->format('Y-m'))
+                ->where('cidade_selecionada_id', $cidade->id)
+                ->where('meses_liberados', [$referencia->format('Y-m')]));
+    }
+
+    public function test_abre_mes_liberado_no_ultimo_dia_de_mes_com_mais_dias(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 8, 31, 12));
+
+        try {
+            $cidade = $this->criarCidade('Santa Maria');
+            $user = $this->criarUsuarioComCargoCidade('voluntario', $cidade->id);
+
+            AgendaLiberacaoCidade::query()->create([
+                'cidade_id' => $cidade->id,
+                'ano' => 2026,
+                'mes' => 9,
+                'liberado' => true,
+            ]);
+
+            $this->actingAs($user)
+                ->withoutVite()
+                ->get(route('visitas.create', [
+                    'mes' => '2026-09',
+                    'cidade_id' => $cidade->id,
+                ]))
+                ->assertOk()
+                ->assertInertia(fn (Assert $page) => $page
+                    ->component('Visita/Create')
+                    ->where('mes_selecionado', '2026-09'));
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_formulario_preserva_mes_atual_liberado(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('voluntario', $cidade->id);
+        $referencia = now()->startOfMonth();
+
+        AgendaLiberacaoCidade::query()->create([
+            'cidade_id' => $cidade->id,
+            'ano' => $referencia->year,
+            'mes' => $referencia->month,
+            'liberado' => true,
+        ]);
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('visitas.create', [
+                'mes' => $referencia->format('Y-m'),
+                'cidade_id' => $cidade->id,
+            ]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Visita/Create')
+                ->where('mes_selecionado', $referencia->format('Y-m'))
+                ->where('cidade_selecionada_id', $cidade->id)
+                ->where('meses_liberados', [$referencia->format('Y-m')]));
     }
 
     public function test_gestor_bloqueia_novamente_mes_liberado(): void

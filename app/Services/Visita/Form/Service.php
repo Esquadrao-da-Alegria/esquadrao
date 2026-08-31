@@ -13,7 +13,7 @@ class Service
 {
     public function __construct(private LiberacaoAgendaService $liberacaoAgendaService) {}
 
-    public function buscarDados(?Visita $visita): array
+    public function buscarDados(?Visita $visita, ?int $cidadeId = null): array
     {
         $hospitais = Hospital::query()
             ->where('ativo', true)
@@ -60,7 +60,7 @@ class Service
             'hospitais'        => $hospitais,
             'cidades'          => $cidades,
             'lideres'          => $lideres,
-            'meses_liberados'  => $this->buscarMesesLiberados(),
+            'meses_liberados'  => $this->buscarMesesLiberados($cidadeId),
         ];
 
         if ($visita) {
@@ -76,7 +76,7 @@ class Service
     /**
      * @return array<int, string>
      */
-    private function buscarMesesLiberados(): array
+    private function buscarMesesLiberados(?int $cidadeId = null): array
     {
         $userId = Auth::id();
 
@@ -90,12 +90,12 @@ class Service
             return [];
         }
 
-        $cidadeBaseId = $user->voluntario?->cidade_base_id;
+        $cidadeConsultaId = $cidadeId ?: $user->voluntario?->cidade_base_id;
 
-        if (! $cidadeBaseId) {
+        if (! $cidadeConsultaId) {
             return [];
         }
 
-        return $this->liberacaoAgendaService->listarMesesLiberados((int) $cidadeBaseId);
+        return $this->liberacaoAgendaService->listarMesesLiberados((int) $cidadeConsultaId);
     }
 }

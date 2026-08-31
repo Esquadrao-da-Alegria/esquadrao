@@ -19,7 +19,7 @@ class EventoController extends Controller
     {
         $mes = $this->normalizarMes($request->query('mes'));
 
-        $inicio = Carbon::createFromFormat('Y-m', $mes)->startOfMonth();
+        $inicio = Carbon::createFromFormat('!Y-m', $mes)->startOfMonth();
         $fim = $inicio->copy()->endOfMonth();
 
         $user = usuarioAutenticado();
@@ -156,7 +156,7 @@ class EventoController extends Controller
         }
 
         try {
-            Carbon::createFromFormat('Y-m', $mes);
+            Carbon::createFromFormat('!Y-m', $mes);
 
             return $mes;
         } catch (\Throwable) {

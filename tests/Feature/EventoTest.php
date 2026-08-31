@@ -776,7 +776,7 @@ class EventoTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->get(route('eventos.index'))
+            ->get(route('eventos.index', ['mes' => $eventoPOA->data_inicio->format('Y-m')]))
             ->assertOk()
             ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
                 ->component('Evento/Index')
@@ -786,7 +786,10 @@ class EventoTest extends TestCase
             );
 
         $this->actingAs($user)
-            ->get(route('eventos.index', ['cidade_id' => $cidadeSM->id]))
+            ->get(route('eventos.index', [
+                'mes' => $eventoSM->data_inicio->format('Y-m'),
+                'cidade_id' => $cidadeSM->id,
+            ]))
             ->assertOk()
             ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
                 ->component('Evento/Index')
@@ -796,7 +799,10 @@ class EventoTest extends TestCase
             );
 
         $this->actingAs($user)
-            ->get(route('eventos.index', ['cidade_id' => 'todas']))
+            ->get(route('eventos.index', [
+                'mes' => $eventoPOA->data_inicio->format('Y-m'),
+                'cidade_id' => 'todas',
+            ]))
             ->assertOk()
             ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page
                 ->component('Evento/Index')

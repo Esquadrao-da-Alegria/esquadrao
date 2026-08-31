@@ -1,6 +1,6 @@
 // REACT/INERTIA
 import { Link, router, usePage } from '@inertiajs/react';
-import { type FC, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 
 // UI
 import PainelLayout from '@/layouts/PainelLayout';
@@ -87,6 +87,13 @@ const Index: FC<Props> = ({
     const [visitasOverflow, setVisitasOverflow] = useState<Visita[]>([]);
     const [eventosOverflow, setEventosOverflow] = useState<Evento[]>([]);
     const [alterandoAgenda, setAlterandoAgenda] = useState(false);
+    const [agendaLiberada, setAgendaLiberada] = useState(
+        agendaLiberacao?.liberado ?? false,
+    );
+
+    useEffect(() => {
+        setAgendaLiberada(agendaLiberacao?.liberado ?? false);
+    }, [mes, cidadeId, agendaLiberacao?.liberado]);
 
     const navegar = (novoMes: string, novaCidade: number | 'todas') => {
         const query: Record<string, string | number> = { mes: novoMes };
@@ -122,7 +129,7 @@ const Index: FC<Props> = ({
     const alterarAgenda = async () => {
         if (cidadeId === 'todas' || !agendaLiberacao || alterandoAgenda) return;
 
-        const liberar = !agendaLiberacao.liberado;
+        const liberar = !agendaLiberada;
         const cidade = cidades.find((item) => item.id === Number(cidadeId));
         const confirmado = await toastConfirmacao(
             liberar
@@ -141,6 +148,7 @@ const Index: FC<Props> = ({
             liberado: liberar,
         }, {
             preserveScroll: true,
+            onSuccess: () => setAgendaLiberada(liberar),
             onFinish: () => setAlterandoAgenda(false),
         });
     };
@@ -222,7 +230,7 @@ const Index: FC<Props> = ({
                         </div>
 
                         {/* Botão nova visita */}
-                        {cidadeId !== 'todas' && agendaLiberacao?.liberado ? (
+                        {cidadeId !== 'todas' && agendaLiberada ? (
                             <Link
                                 href={create({ query: { mes, cidade_id: cidadeId } }).url}
                                 className={`${controleToolbarClass} w-full shrink-0 justify-center gap-2 border-amber-600 px-4 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:outline-none sm:w-auto`}
@@ -242,15 +250,15 @@ const Index: FC<Props> = ({
                 {ehGestor && (
                     <section className="mb-6 flex flex-col gap-4 rounded-2xl border border-amber-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-start gap-3">
-                            <span className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full ${agendaLiberacao?.liberado ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
-                                {agendaLiberacao?.liberado ? <Unlock className="size-4" aria-hidden /> : <Lock className="size-4" aria-hidden />}
+                            <span className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full ${agendaLiberada ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                                {agendaLiberada ? <Unlock className="size-4" aria-hidden /> : <Lock className="size-4" aria-hidden />}
                             </span>
                             <div>
                                 <h2 className="text-sm font-semibold text-amber-950">
                                     {cidadeId === 'todas'
                                         ? 'Selecione uma cidade para controlar o agendamento'
                                         : agendaLiberacao
-                                            ? `Agendamento ${agendaLiberacao.liberado ? 'liberado' : 'bloqueado'}`
+                                            ? `Agendamento ${agendaLiberada ? 'liberado' : 'bloqueado'}`
                                             : 'Agendamento sem permissão de alteração'}
                                 </h2>
                                 <p className="mt-1 text-xs leading-relaxed text-amber-900/55">
@@ -259,11 +267,11 @@ const Index: FC<Props> = ({
                             </div>
                         </div>
                         {cidadeId !== 'todas' && podeGerenciarAgenda && agendaLiberacao?.editavel && (
-                            <button type="button" onClick={alterarAgenda} disabled={alterandoAgenda} className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 px-4 py-2.5 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60 sm:w-auto ${agendaLiberacao.liberado ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700'}`}>
-                                {agendaLiberacao.liberado ? <Lock className="size-4" aria-hidden /> : <Unlock className="size-4" aria-hidden />}
+                            <button type="button" onClick={alterarAgenda} disabled={alterandoAgenda} className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full border-2 px-4 py-2.5 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60 sm:w-auto ${agendaLiberada ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700'}`}>
+                                {agendaLiberada ? <Lock className="size-4" aria-hidden /> : <Unlock className="size-4" aria-hidden />}
                                 {alterandoAgenda
-                                    ? agendaLiberacao.liberado ? 'Bloqueando...' : 'Liberando...'
-                                    : agendaLiberacao.liberado ? 'Bloquear agendamento' : 'Liberar agendamento'}
+                                    ? agendaLiberada ? 'Bloqueando...' : 'Liberando...'
+                                    : agendaLiberada ? 'Bloquear agendamento' : 'Liberar agendamento'}
                             </button>
                         )}
                         {cidadeId !== 'todas' && agendaLiberacao && !agendaLiberacao.editavel && <span className="text-xs font-medium text-amber-900/50">Mês passado — somente leitura</span>}

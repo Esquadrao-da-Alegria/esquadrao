@@ -104,8 +104,8 @@ class Queries
 
     private function base(array $filtros): Builder
     {
-        $inicio = Carbon::createFromFormat('Y-m', $filtros['mes_inicio'])->startOfMonth();
-        $fim = Carbon::createFromFormat('Y-m', $filtros['mes_fim'])->endOfMonth();
+        $inicio = Carbon::createFromFormat('!Y-m', $filtros['mes_inicio'])->startOfMonth();
+        $fim = Carbon::createFromFormat('!Y-m', $filtros['mes_fim'])->endOfMonth();
 
         return DB::table('visitas as v')
             ->join('hospitais as h', 'h.id', '=', 'v.hospital_id')
