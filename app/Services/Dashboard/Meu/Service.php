@@ -23,7 +23,7 @@ class Service
 
     public function index(User $user, array $filtros): array
     {
-        $user->loadMissing(['cargos', 'voluntario.cidadeBase']);
+        resolverUsuario($user);
 
         $filtros = $this->normalizarFiltros($user, $filtros);
         $dados = $this->queries->index($user->id, $filtros);

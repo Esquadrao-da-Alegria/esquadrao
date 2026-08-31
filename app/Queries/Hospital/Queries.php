@@ -67,6 +67,12 @@ class Queries
                     $query->where('ativo', $valor);
 
                     break;
+
+                case 'cidade_id':
+
+                    $query->where('cidade_id', $valor);
+
+                    break;
             }
         }
 

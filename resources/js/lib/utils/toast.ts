@@ -1,5 +1,8 @@
 import Swal from 'sweetalert2';
 
+const corConfirmacaoApp = '#d97706';
+const corCancelamentoApp = '#6b7280';
+
 export const toastSucesso = (mensagem: string) => {
     Swal.fire({
         title: 'Sucesso!',
@@ -37,10 +40,11 @@ export const toastConfirmacao = async (mensagem: string) => {
         text: mensagem,
         icon: 'warning',
         showCancelButton: true,
-        cancelButtonText: 'Não',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sim',
+        reverseButtons: true,
+        cancelButtonText: "Não",
+        confirmButtonText: "Sim",
+        confirmButtonColor: corConfirmacaoApp,
+        cancelButtonColor: corCancelamentoApp,
     });
 
     return retorno.isConfirmed;

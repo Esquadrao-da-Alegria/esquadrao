@@ -14,11 +14,14 @@ use App\Models\Cargo;
 use App\Models\Cidade;
 use App\Models\Estado;
 use App\Models\Hospital;
+use App\Models\MetaMensalHospital;
+use App\Models\MetaSemanalHospital;
 use App\Models\User;
 use App\Models\Visita;
 use App\Models\VisitaParticipante;
 use App\Models\VisitaRelatorio;
 use App\Models\Voluntario;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -66,10 +69,92 @@ class IndicadoresTest extends TestCase
                 ->where('indicadores.impacto_estimado', 20)
                 ->where('indicadores.visitas_com_impacto', 1)
                 ->where('indicadores.visitas_sem_impacto', 1)
+                ->where('indicadores.visitas_sem_relatorio', 1)
                 ->where('evolucao.0.total', 1)
                 ->where('evolucao.1.total', 1)
                 ->has('detalhes.visitas.data', 2)
                 ->where('detalhes.alas.1.nome', 'Sem ala informada'));
+
+        $this->actingAs($administrador)
+            ->get(route('dashboards.visitas-por-hospital.show', [
+                'hospital' => $hospital,
+                'mes_inicio' => '2026-03',
+                'mes_fim' => '2026-04',
+                'cidade_id' => $cidade->id,
+            ]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Dashboard/Visita/Hospital/Show')
+                ->where('hospital.id', $hospital->id)
+                ->has('detalhes.visitas.data', 2)
+                ->where('detalhes.visitas.data.0.possui_relatorio', false)
+                ->where('detalhes.visitas.data.1.possui_relatorio', true));
+    }
+
+    public function test_exibe_situacao_mensal_e_semanal_das_metas_do_hospital(): void
+    {
+        Carbon::setTestNow('2026-08-15 10:00:00');
+
+        try {
+            $cidade = $this->criarCidade('Porto Alegre');
+            $hospital = $this->criarHospital($cidade, 'Hospital com metas');
+            $hospitalSemVisita = $this->criarHospital($cidade, 'Hospital abaixo da meta');
+            $administrador = $this->criarUsuario('administrador');
+
+            MetaMensalHospital::query()->create([
+                'hospital_id' => $hospital->id,
+                'ano' => 2026,
+                'mes' => 8,
+                'quantidade' => 2,
+            ]);
+            MetaMensalHospital::query()->create([
+                'hospital_id' => $hospitalSemVisita->id,
+                'ano' => 2026,
+                'mes' => 7,
+                'quantidade' => 1,
+            ]);
+            MetaSemanalHospital::query()->create([
+                'hospital_id' => $hospital->id,
+                'ala_unidade_id' => null,
+                'ano' => 2026,
+                'mes' => 8,
+                'semana' => 3,
+                'quantidade' => 2,
+            ]);
+            $this->criarVisita($hospital, $administrador, VisitaStatus::Realizada, null, '2026-08-10 10:00:00');
+
+            $this->actingAs($administrador)
+                ->get(route('dashboards.visitas-por-hospital', [
+                    'mes_inicio' => '2026-07',
+                    'mes_fim' => '2026-08',
+                    'cidade_id' => $cidade->id,
+                ]))
+                ->assertOk()
+                ->assertInertia(fn (Assert $page) => $page
+                    ->has('hospitais', 2)
+                    ->where('hospitais.0.id', $hospital->id)
+                    ->where('hospitais.0.situacao_meta', 'em_andamento')
+                    ->where('hospitais.1.id', $hospitalSemVisita->id)
+                    ->where('hospitais.1.total_visitas', 0)
+                    ->where('hospitais.1.situacao_meta', 'atencao'));
+
+            $this->actingAs($administrador)
+                ->get(route('dashboards.visitas-por-hospital.show', [
+                    'hospital' => $hospital,
+                    'mes_inicio' => '2026-07',
+                    'mes_fim' => '2026-08',
+                    'cidade_id' => $cidade->id,
+                ]))
+                ->assertOk()
+                ->assertInertia(fn (Assert $page) => $page
+                    ->where('resumo.meses.0.situacao', 'sem_meta_definida')
+                    ->where('resumo.meses.1.situacao', 'em_andamento')
+                    ->where('resumo.meses.1.realizadas', 1)
+                    ->where('metas_semanais.0.realizadas', 1)
+                    ->where('metas_semanais.0.situacao', 'em_andamento'));
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function test_filtros_de_cidade_hospital_e_ala_restringem_os_dados(): void
@@ -101,6 +186,38 @@ class IndicadoresTest extends TestCase
                 ->has('opcoes.alas', 2));
     }
 
+    public function test_mantem_todo_o_historico_do_hospital_paginado(): void
+    {
+        $cidade = $this->criarCidade('Porto Alegre');
+        $hospital = $this->criarHospital($cidade, 'Hospital Histórico');
+        $administrador = $this->criarUsuario('administrador');
+
+        foreach (range(1, 16) as $dia) {
+            $this->criarVisita(
+                $hospital,
+                $administrador,
+                VisitaStatus::Realizada,
+                null,
+                sprintf('2026-03-%02d 10:00:00', $dia),
+            );
+        }
+
+        $this->actingAs($administrador)
+            ->get(route('dashboards.visitas-por-hospital.show', [
+                'hospital' => $hospital,
+                'mes_inicio' => '2026-03',
+                'mes_fim' => '2026-03',
+                'cidade_id' => $cidade->id,
+                'page' => 2,
+            ]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('indicadores.total_visitas', 16)
+                ->where('detalhes.visitas.current_page', 2)
+                ->where('detalhes.visitas.last_page', 2)
+                ->has('detalhes.visitas.data', 1));
+    }
+
     public function test_coordenador_local_nao_consulta_outra_cidade(): void
     {
         $cidadeA = $this->criarCidade('Porto Alegre');
@@ -123,6 +240,16 @@ class IndicadoresTest extends TestCase
                 'mes_inicio' => '2026-03',
                 'mes_fim' => '2026-03',
                 'cidade_id' => $cidadeB->id,
+            ]))
+            ->assertForbidden();
+
+        $hospitalOutraCidade = $this->criarHospital($cidadeB, 'Hospital de outra cidade');
+
+        $this->actingAs($coordenador)
+            ->get(route('dashboards.visitas-por-hospital.show', [
+                'hospital' => $hospitalOutraCidade,
+                'mes_inicio' => '2026-03',
+                'mes_fim' => '2026-03',
             ]))
             ->assertForbidden();
     }

@@ -7,11 +7,8 @@ import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
-import {
-    painelInputClass,
-    painelLabelClass,
-} from '@/lib/painelFormFieldClasses';
-import { Check } from 'lucide-react';
+import BotaoSalvar from '@/components/Painel/Forms/BotaoSalvar/Show';
+import { painelInputClass, painelLabelClass } from '@/lib/painelFormFieldClasses';
 
 export default function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -127,20 +124,13 @@ export default function Password() {
                                     </div>
 
                                     <div className="flex flex-wrap items-center gap-4">
-                                        <button
+                                        <BotaoSalvar
                                             type="submit"
                                             disabled={processing}
+                                            salvando={processing}
+                                            rotulo="Salvar senha"
                                             data-test="update-password-button"
-                                            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-600 bg-white px-6 py-3 font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-70"
-                                        >
-                                            <Check
-                                                className="size-4"
-                                                aria-hidden
-                                            />
-                                            {processing
-                                                ? 'Salvando...'
-                                                : 'Salvar senha'}
-                                        </button>
+                                        />
 
                                         <Transition
                                             show={recentlySuccessful}
