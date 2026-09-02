@@ -39,6 +39,7 @@ interface Props {
     cidades?: Cidade[]
     lideres: User[]
     meses_liberados?: string[]
+    meses_liberados_por_cidade?: Record<number, string[]>
     visita: Visita
     ajustes_contabilizacao?: {
         ajustes: Array<{ id: number; tipo: string; justificativa: string; created_at: string; voluntario: { id: number; name: string }; administrador: { id: number; name: string } }>
@@ -60,7 +61,7 @@ const labelStatusParticipacao = (status: VisitaParticipante['status_participacao
     return labels[status] ?? status
 }
 
-const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [], visita, ajustes_contabilizacao }) => {
+const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [], meses_liberados_por_cidade = {}, visita, ajustes_contabilizacao }) => {
     const { auth, eh_administrador } = usePage<SharedData>().props
     const { data, setData, transform, put, processing, errors } = useForm<DadosFormulario>({
         hospital_id: visita.hospital_id ?? '',
@@ -206,6 +207,8 @@ const Edit: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [
                                         cidades={cidades}
                                         lideres={lideres}
                                         meses_liberados={meses_liberados}
+                                        meses_liberados_por_cidade={meses_liberados_por_cidade}
+                                        statusOriginal={visita.status}
                                         onCampoChange={handleCampoChange}
                                     />
 

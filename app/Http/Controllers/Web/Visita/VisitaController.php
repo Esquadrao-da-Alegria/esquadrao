@@ -11,6 +11,7 @@ use App\Models\Evento;
 use App\Models\Visita;
 use App\Services\Visita\Ajuste\Service as AjusteService;
 use App\Services\Visita\Form\Service as FormService;
+use App\Services\Visita\Meta\Service as MetaService;
 use App\Services\Visita\Service;
 use App\Services\Visita\Agenda\Liberacao\Service as LiberacaoAgendaService;
 use App\Helpers\User as UserHelper;
@@ -23,6 +24,7 @@ class VisitaController extends Controller
     public function __construct(
         private Service $service,
         private FormService $formService,
+        private MetaService $metaService,
     ) {}
 
     public function index(Request $request): \Inertia\Response
@@ -65,6 +67,7 @@ class VisitaController extends Controller
 
         $agendaLiberacao = null;
         $podeGerenciarAgenda = false;
+        $acompanhamentoMetas = [];
 
         if ($cidadeId !== 'todas') {
             $referencia = Carbon::createFromFormat('!Y-m', $mes);
@@ -77,6 +80,7 @@ class VisitaController extends Controller
             $podeGerenciarAgenda = $user
                 ? $liberacaoAgendaService->podeGerenciarCidade($user, (int) $cidadeId)
                 : false;
+            $acompanhamentoMetas = $this->metaService->index((int) $cidadeId, $mes);
         }
 
         return Inertia::render('Visita/Index', [
@@ -90,6 +94,7 @@ class VisitaController extends Controller
             'ehGestor'         => $user ? UserHelper::ehGestor($user) : false,
             'agendaLiberacao'  => $agendaLiberacao,
             'podeGerenciarAgenda' => $podeGerenciarAgenda,
+            'acompanhamentoMetas' => $acompanhamentoMetas,
         ]);
     }
 

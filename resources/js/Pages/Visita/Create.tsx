@@ -25,11 +25,12 @@ interface Props {
     cidades?: Cidade[]
     lideres: User[]
     meses_liberados?: string[]
+    meses_liberados_por_cidade?: Record<number, string[]>
     mes_selecionado: string
     cidade_selecionada_id: number
 }
 
-const Create: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [], mes_selecionado, cidade_selecionada_id }) => {
+const Create: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados = [], meses_liberados_por_cidade = {}, mes_selecionado, cidade_selecionada_id }) => {
     const { auth } = usePage<SharedData>().props
     const hoje = hojeLocal()
     const dataInicial = hoje.slice(0, 7) === mes_selecionado
@@ -100,6 +101,7 @@ const Create: FC<Props> = ({ hospitais, cidades = [], lideres, meses_liberados =
                                         cidades={cidades}
                                         lideres={lideres}
                                         meses_liberados={meses_liberados}
+                                        meses_liberados_por_cidade={meses_liberados_por_cidade}
                                         cidadeInicialId={cidade_selecionada_id}
                                         onCampoChange={handleCampoChange}
                                     />

@@ -2,7 +2,7 @@ import { type FC } from 'react';
 
 import Modal from '@/components/Modal/Show';
 import { labelStatus as labelStatusEvento } from '@/lib/evento';
-import { classeCardPorStatus, labelStatus, tituloVisita } from '@/lib/visita';
+import { classeCardPorOcupacao, labelStatus, tituloVisita } from '@/lib/visita';
 import type { Evento } from '@/types';
 import type { Visita } from '@/types/visita';
 import { Calendar } from 'lucide-react';
@@ -81,7 +81,7 @@ const Show: FC<Props> = ({
                                             onClick={() =>
                                                 onSelecionarVisita(visita)
                                             }
-                                            className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition hover:opacity-80 ${classeCardPorStatus(visita)}`}
+                                            className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition hover:opacity-80 ${classeCardPorOcupacao(visita)}`}
                                         >
                                             <span className="block font-medium">
                                                 {hora} · {tituloVisita(visita)}

@@ -9,6 +9,7 @@ use App\Enums\VisitaOrigem;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
 use App\Models\AgendaLiberacaoCidade;
+use App\Models\Ala;
 use App\Models\Cargo;
 use App\Models\Cidade;
 use App\Models\Estado;
@@ -140,21 +141,27 @@ class VisitaUpdateTest extends TestCase
             ->assertSessionHas('mensagem_erro', 'Você não tem permissão para editar esta visita.');
     }
 
-    public function test_atualiza_visita_sem_alterar_hospital(): void
+    public function test_altera_hospital_e_ala_de_visita_agendada(): void
     {
-        $lider              = $this->criarVoluntario();
-        $visita             = $this->criarVisita($lider, liderId: $lider->id);
-        $hospitalIdOriginal = $visita->hospital_id;
+        $lider        = $this->criarVoluntario();
+        $novoLider    = $this->criarVoluntario();
+        $visita       = $this->criarVisita($lider, liderId: $lider->id);
+        $novoHospital = $this->criarHospital();
+        $novaAla      = Ala::query()->create([
+            'hospital_id' => $novoHospital->id,
+            'nome'        => 'Ala do novo hospital',
+        ]);
 
         $payload = [
-            'data'        => '2026-06-25',
-            'hora_inicio' => '09:00',
-            'hora_fim'    => '11:00',
-            'tipo'        => VisitaTipo::AcaoEspecial->value,
-            'lider_id'    => $lider->id,
-            'status'      => VisitaStatus::Realizada->value,
-            'observacoes' => 'Atualizado',
-            'hospital_id' => 99999,
+            ...$this->payloadAtualizacao($novoLider),
+            'data'                  => '2026-06-26',
+            'hora_inicio'           => '14:00',
+            'hora_fim'              => '17:00',
+            'tipo'                  => VisitaTipo::Residencia->value,
+            'hospital_id'           => $novoHospital->id,
+            'ala_unidade_id'        => $novaAla->id,
+            'limite_participantes'  => 8,
+            'observacoes'           => 'Visita reorganizada',
         ];
 
         $this->actingAs($lider)
@@ -163,9 +170,159 @@ class VisitaUpdateTest extends TestCase
 
         $visita->refresh();
 
-        $this->assertSame($hospitalIdOriginal, $visita->hospital_id);
-        $this->assertSame(VisitaStatus::Realizada, $visita->status);
-        $this->assertSame(VisitaTipo::AcaoEspecial, $visita->tipo);
+        $this->assertSame($novoHospital->id, $visita->hospital_id);
+        $this->assertSame($novaAla->id, $visita->ala_unidade_id);
+        $this->assertSame($novoLider->id, $visita->lider_id);
+        $this->assertSame(VisitaTipo::Residencia, $visita->tipo);
+        $this->assertSame('2026-06-26 14:00:00', $visita->inicio_em->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-06-26 17:00:00', $visita->fim_em->format('Y-m-d H:i:s'));
+        $this->assertSame(8, $visita->limite_participantes);
+        $this->assertSame('Visita reorganizada', $visita->observacoes);
+    }
+
+    public function test_altera_ala_de_visita_agendada(): void
+    {
+        $lider = $this->criarVoluntario();
+        $visita = $this->criarVisita($lider, liderId: $lider->id);
+        $ala = Ala::query()->create([
+            'hospital_id' => $visita->hospital_id,
+            'nome'        => 'Ala prioritária',
+        ]);
+
+        $payload = [
+            ...$this->payloadAtualizacao($lider),
+            'hospital_id'    => $visita->hospital_id,
+            'ala_unidade_id' => $ala->id,
+        ];
+
+        $this->actingAs($lider)
+            ->put(route('visitas.update', $visita), $payload)
+            ->assertRedirect(route('visitas.index'));
+
+        $this->assertSame($ala->id, $visita->fresh()->ala_unidade_id);
+    }
+
+    public function test_visita_hospitalar_agendada_continua_exigindo_hospital(): void
+    {
+        $lider = $this->criarVoluntario();
+        $visita = $this->criarVisita($lider, liderId: $lider->id);
+
+        $payload = [
+            ...$this->payloadAtualizacao($lider),
+            'hospital_id' => null,
+        ];
+
+        $this->actingAs($lider)
+            ->from(route('visitas.edit', $visita))
+            ->put(route('visitas.update', $visita), $payload)
+            ->assertRedirect(route('visitas.edit', $visita))
+            ->assertSessionHasErrors('hospital_id');
+
+        $this->assertNotNull($visita->fresh()->hospital_id);
+    }
+
+    public function test_nao_altera_ala_de_visita_que_nao_esta_agendada(): void
+    {
+        $lider = $this->criarVoluntario();
+        $visita = $this->criarVisita($lider, liderId: $lider->id);
+        $alaOriginal = Ala::query()->create([
+            'hospital_id' => $visita->hospital_id,
+            'nome'        => 'Ala original',
+        ]);
+        $novaAla = Ala::query()->create([
+            'hospital_id' => $visita->hospital_id,
+            'nome'        => 'Nova ala',
+        ]);
+        $visita->update([
+            'ala_unidade_id' => $alaOriginal->id,
+            'status'         => VisitaStatus::Realizada->value,
+        ]);
+
+        $payload = [
+            ...$this->payloadAtualizacao($lider),
+            'hospital_id'    => $visita->hospital_id,
+            'ala_unidade_id' => $novaAla->id,
+            'status'         => VisitaStatus::Realizada->value,
+        ];
+
+        $this->actingAs($lider)
+            ->from(route('visitas.edit', $visita))
+            ->put(route('visitas.update', $visita), $payload)
+            ->assertRedirect(route('visitas.edit', $visita))
+            ->assertSessionHasErrors('geral');
+
+        $this->assertSame($alaOriginal->id, $visita->fresh()->ala_unidade_id);
+    }
+
+    public function test_nao_altera_hospital_de_visita_que_nao_esta_agendada(): void
+    {
+        $lider = $this->criarVoluntario();
+        $visita = $this->criarVisita($lider, liderId: $lider->id);
+        $outroHospital = $this->criarHospital();
+        $visita->update(['status' => VisitaStatus::Realizada->value]);
+
+        $payload = [
+            ...$this->payloadAtualizacao($lider),
+            'hospital_id' => $outroHospital->id,
+            'status'      => VisitaStatus::Realizada->value,
+        ];
+
+        $this->actingAs($lider)
+            ->from(route('visitas.edit', $visita))
+            ->put(route('visitas.update', $visita), $payload)
+            ->assertRedirect(route('visitas.edit', $visita))
+            ->assertSessionHasErrors('geral');
+
+        $this->assertNotSame($outroHospital->id, $visita->fresh()->hospital_id);
+    }
+
+    public function test_valida_agenda_do_destino_ao_trocar_hospital(): void
+    {
+        $lider = $this->criarVoluntario();
+        $visita = $this->criarVisita($lider, liderId: $lider->id);
+        $outroHospital = $this->criarHospital();
+
+        AgendaLiberacaoCidade::query()
+            ->where('cidade_id', $outroHospital->cidade_id)
+            ->where('ano', 2026)
+            ->where('mes', 6)
+            ->update(['liberado' => false]);
+
+        $payload = [
+            ...$this->payloadAtualizacao($lider),
+            'hospital_id' => $outroHospital->id,
+        ];
+
+        $this->actingAs($lider)
+            ->from(route('visitas.edit', $visita))
+            ->put(route('visitas.update', $visita), $payload)
+            ->assertRedirect(route('visitas.edit', $visita))
+            ->assertSessionHasErrors('geral');
+
+        $this->assertNotSame($outroHospital->id, $visita->fresh()->hospital_id);
+    }
+
+    public function test_coordenador_local_nao_transfere_visita_para_outra_cidade(): void
+    {
+        $cidadeA = $this->criarCidade('Cidade A');
+        $cidadeB = $this->criarCidade('Cidade B');
+        $coordenador = $this->criarUsuarioComCargoCidade('coordenador_local', $cidadeA->id);
+        $lider = $this->criarVoluntario();
+        $visita = $this->criarVisita($lider, liderId: $lider->id, cidadeId: $cidadeA->id);
+        $outroHospital = $this->criarHospital(cidadeId: $cidadeB->id);
+
+        $payload = [
+            ...$this->payloadAtualizacao($lider),
+            'hospital_id' => $outroHospital->id,
+        ];
+
+        $this->actingAs($coordenador)
+            ->from(route('visitas.edit', $visita))
+            ->put(route('visitas.update', $visita), $payload)
+            ->assertRedirect(route('visitas.edit', $visita))
+            ->assertSessionHasErrors('hospital_id');
+
+        $this->assertNotSame($outroHospital->id, $visita->fresh()->hospital_id);
     }
 
     public function test_troca_lider_e_preserva_participacao_do_lider_anterior(): void

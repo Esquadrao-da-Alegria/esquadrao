@@ -17,6 +17,10 @@ import type { Visita } from '@/types/visita';
 import EventoDetalhesModalShow from '@/components/Painel/Evento/Calendario/Detalhes/Modal/Show';
 import DetalhesModalShow from '@/components/Painel/Visita/Calendario/Detalhes/Modal/Show';
 import ListaCompletaModalShow from '@/components/Painel/Visita/Calendario/ListaCompleta/Modal/Show';
+import LegendaCalendarioShow from '@/components/Painel/Visita/Calendario/Legenda/Show';
+import MetasCalendarioShow, {
+    type AcompanhamentoMeta,
+} from '@/components/Painel/Visita/Calendario/Metas/Show';
 import CalendarioShow from '@/components/Painel/Visita/Calendario/Show';
 
 // ICONS
@@ -38,6 +42,7 @@ interface Props {
     ehGestor?: boolean;
     agendaLiberacao?: { liberado: boolean; editavel: boolean } | null;
     podeGerenciarAgenda?: boolean;
+    acompanhamentoMetas?: AcompanhamentoMeta[];
 }
 
 function nomeMes(mes: string): string {
@@ -72,6 +77,7 @@ const Index: FC<Props> = ({
     ehGestor = false,
     agendaLiberacao = null,
     podeGerenciarAgenda = false,
+    acompanhamentoMetas = [],
 }) => {
     const { auth } = usePage<SharedData>().props;
     const cidadeBaseUsuario =
@@ -287,6 +293,8 @@ const Index: FC<Props> = ({
                     onSelecionarEvento={setEventoSelecionado}
                     onAbrirListaCompleta={abrirListaCompleta}
                 />
+                <LegendaCalendarioShow />
+                <MetasCalendarioShow metas={acompanhamentoMetas} />
             </div>
 
             {/* Modal detalhes visita */}

@@ -36,7 +36,7 @@ const Modal: FC<Props> = ({ isOpen, onClose, children, className }) => {
     const exiting = !isOpen && present;
 
     return ReactDOM.createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
             <div
                 className={cn(
                     'absolute inset-0 bg-black/50 backdrop-blur-sm duration-300',
@@ -47,7 +47,7 @@ const Modal: FC<Props> = ({ isOpen, onClose, children, className }) => {
 
             <div
                 className={cn(
-                    'relative w-full max-w-4xl origin-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl duration-300 ease-out',
+                    'relative max-h-[calc(100dvh-1rem)] w-full max-w-4xl origin-center overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xl duration-300 ease-out sm:max-h-[calc(100dvh-2rem)]',
                     exiting
                         ? 'animate-out fade-out-0 zoom-out-95'
                         : 'animate-in fade-in zoom-in-95',

@@ -57,10 +57,15 @@ class Service
         $lideres = $lideres->sortBy('name')->values();
 
         $retorno = [
-            'hospitais'        => $hospitais,
-            'cidades'          => $cidades,
-            'lideres'          => $lideres,
-            'meses_liberados'  => $this->buscarMesesLiberados($cidadeId),
+            'hospitais'                   => $hospitais,
+            'cidades'                     => $cidades,
+            'lideres'                     => $lideres,
+            'meses_liberados'             => $this->buscarMesesLiberados($cidadeId ?: $visita?->hospital?->cidade_id),
+            'meses_liberados_por_cidade'  => $cidades
+                ->mapWithKeys(fn (Cidade $cidade) => [
+                    $cidade->id => $this->buscarMesesLiberados((int) $cidade->id),
+                ])
+                ->all(),
         ];
 
         if ($visita) {

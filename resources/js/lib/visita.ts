@@ -85,41 +85,49 @@ export function tituloVisita(visita: Visita): string {
     return visita.hospital?.nome ?? 'Visita';
 }
 
-export function classeCardPorStatus(visita: Visita | VisitaStatus): string {
-    const status = typeof visita === 'object' ? visita.status : visita;
-    const tipo = typeof visita === 'object' ? visita.tipo : null;
+export function classeCardPorOcupacao(visita: Visita): string {
+    const participantes = contarParticipantesAtivos(visita);
+    const limite = visita.limite_participantes;
 
-    if (tipo === 'acao_especial') {
-        switch (status) {
-            case 'agendada':
-                return 'bg-purple-600 text-white border-purple-700';
-            case 'realizada':
-            case 'contabilizada':
-                return 'bg-purple-100 text-purple-800 border-purple-200';
-            case 'pendente_relatorio':
-            case 'nao_contabilizada':
-                return 'bg-purple-100 text-purple-900 border-purple-300';
-            case 'cancelada':
-                return 'bg-gray-100 text-gray-500 border-gray-200';
-            default:
-                return 'bg-purple-600 text-white border-purple-700';
-        }
+    if (visita.status === 'cancelada') {
+        return 'border-gray-300 bg-gray-100 text-gray-600';
     }
 
-    switch (status) {
-        case 'agendada':
-            return 'bg-amber-500 text-white border-amber-600';
-        case 'realizada':
-        case 'contabilizada':
-            return 'bg-green-100 text-green-800 border-green-200';
-        case 'pendente_relatorio':
-        case 'nao_contabilizada':
-            return 'bg-orange-100 text-orange-800 border-orange-200';
-        case 'cancelada':
-            return 'bg-gray-100 text-gray-500 border-gray-200';
-        default:
-            return 'bg-gray-100 text-gray-500 border-gray-200';
+    if (visita.tipo === 'acao_especial') {
+        return visita.status === 'agendada'
+            ? 'border-purple-700 bg-purple-600 text-white'
+            : 'border-purple-200 bg-purple-100 text-purple-800';
     }
+
+    if (limite === null || limite === undefined) {
+        return 'border-sky-500 bg-sky-500 text-white';
+    }
+
+    if (participantes >= limite) {
+        return 'border-red-600 bg-red-600 text-white';
+    }
+
+    if (participantes === 1) {
+        return 'border-sky-500 bg-sky-500 text-white';
+    }
+
+    if (participantes >= 2) {
+        return 'border-orange-500 bg-orange-500 text-white';
+    }
+
+    return 'border-sky-500 bg-sky-500 text-white';
+}
+
+export function classeIndicadorPorOcupacao(visita: Visita): string {
+    const classe = classeCardPorOcupacao(visita);
+
+    if (classe.includes('sky')) return 'bg-sky-500';
+    if (classe.includes('red')) return 'bg-red-600';
+    if (classe.includes('orange')) return 'bg-orange-500';
+    if (classe.includes('purple-100')) return 'bg-purple-300';
+    if (classe.includes('purple')) return 'bg-purple-600';
+
+    return 'bg-gray-400';
 }
 
 export function labelStatus(status: VisitaStatus): string {
