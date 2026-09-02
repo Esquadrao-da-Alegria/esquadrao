@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers\Web\Dashboard\Visita\Participante;
 
+// CONTROLLERS
 use App\Http\Controllers\Controller as BaseController;
+
+// REQUESTS
 use App\Http\Requests\Web\Dashboard\Visita\Participante\IndexRequest;
+
+// SERVICES
 use App\Services\Dashboard\Visita\Participante\Service;
+
+// LIBS EXTERNAS
 use Carbon\Carbon;
-use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelPdf\Facades\Pdf;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -40,7 +47,9 @@ class ExportController extends BaseController
             ->format('a4')
             ->landscape()
             ->withBrowsershot(function (Browsershot $browsershot): void {
-                $browsershot->setChromePath((string) env('CHROME_PATH', '/usr/bin/google-chrome-stable'))->noSandbox();
+                $browsershot
+                    ->setChromePath(config('services.browsershot.chrome_path'))
+                    ->noSandbox();
             })
             ->name($nomeArquivo . '.pdf')
             ->download()
