@@ -40,7 +40,7 @@ class ExportController extends BaseController
             ->format('a4')
             ->landscape()
             ->withBrowsershot(function (Browsershot $browsershot): void {
-                $browsershot->setChromePath('/usr/bin/google-chrome-stable')->noSandbox();
+                $browsershot->setChromePath((string) env('CHROME_PATH', '/usr/bin/google-chrome-stable'))->noSandbox();
             })
             ->name($nomeArquivo . '.pdf')
             ->download()

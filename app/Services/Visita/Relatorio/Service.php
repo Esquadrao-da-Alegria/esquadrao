@@ -265,7 +265,7 @@ class Service
             ->format('a4')
             ->withBrowsershot(function (Browsershot $browsershot): void {
                 $browsershot
-                    ->setChromePath('/usr/bin/google-chrome-stable')
+                    ->setChromePath((string) env('CHROME_PATH', '/usr/bin/google-chrome-stable'))
                     ->noSandbox();
             })
             ->name('relatorio-visita-'.$relatorio->id.'.pdf')
