@@ -154,10 +154,27 @@ class Service
         $contextoLog = [];
 
         try {
+            $hospitalInformado = array_key_exists('hospital_id', $dados)
+                ? ($dados['hospital_id'] !== null ? (int) $dados['hospital_id'] : null)
+                : $visita->hospital_id;
+            $alaInformada = array_key_exists('ala_unidade_id', $dados)
+                ? ($dados['ala_unidade_id'] !== null ? (int) $dados['ala_unidade_id'] : null)
+                : $visita->ala_unidade_id;
+
+            if (($hospitalInformado !== $visita->hospital_id || $alaInformada !== $visita->ala_unidade_id)
+                && $visita->status !== VisitaStatus::Agendada) {
+                DB::rollBack();
+
+                return $this->erroEnvelope('O hospital e a ala só podem ser alterados enquanto a visita estiver agendada.');
+            }
+
             $payload     = $this->formatarDatabase($dados, 'update');
 
             if (! array_key_exists('hospital_id', $dados)) {
                 $payload['hospital_id'] = $visita->hospital_id;
+            }
+
+            if (! array_key_exists('ala_unidade_id', $dados)) {
                 $payload['ala_unidade_id'] = $visita->ala_unidade_id;
             }
 
@@ -169,9 +186,11 @@ class Service
                 return $this->erroEnvelope('O horário de fim deve ser posterior ao início.');
             }
 
-            $inicioAlterado = Carbon::parse($payload['inicio_em'])->ne(Carbon::parse($visita->inicio_em));
+            $dadosAgendaAlterados = Carbon::parse($payload['inicio_em'])->ne(Carbon::parse($visita->inicio_em))
+                || $payload['hospital_id'] !== $visita->hospital_id
+                || $payload['tipo'] !== $visita->tipo->value;
 
-            if ($inicioAlterado) {
+            if ($dadosAgendaAlterados) {
                 $erroAgenda = $this->validarAgendaHospitalarSeNecessario($payload);
 
                 if ($erroAgenda !== null) {

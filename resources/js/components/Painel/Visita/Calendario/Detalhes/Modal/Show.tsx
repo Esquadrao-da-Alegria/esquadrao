@@ -36,9 +36,9 @@ interface Props {
 type Passo = 'detalhes' | 'inscricao';
 
 const botaoAcaoClass =
-    'inline-flex w-full items-center justify-center gap-2 rounded-lg border border-amber-600 bg-white px-3.5 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-50';
+    'inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-amber-600 bg-white px-2.5 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-50 sm:text-sm';
 const botaoPerigoClass =
-    'inline-flex w-full items-center justify-center gap-2 rounded-lg border border-red-600 bg-white px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50';
+    'inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-red-600 bg-white px-2.5 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50 sm:text-sm';
 
 const Show: FC<Props> = ({ visita, onFechar }) => {
     const { auth, eh_administrador } = usePage<SharedData>().props;
@@ -145,7 +145,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
             className="max-w-md"
         >
             {visita && passo === 'detalhes' && (
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                     <div className="mb-4 flex items-start justify-between gap-4">
                         <h2 className="text-lg font-semibold text-gray-900">
                             Detalhes da visita
@@ -275,7 +275,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                             <FileText className="size-4" aria-hidden />
                             Relatórios
                         </h3>
-                        <div className="flex flex-col gap-2">
+                        <div className="grid grid-cols-2 gap-2">
                             <Link
                                 href={relatoriosIndex.url({
                                     visita: visita.id!,
@@ -304,7 +304,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
                             <Zap className="size-4" aria-hidden />
                             Ações
                         </h3>
-                        <div className="flex flex-col gap-2">
+                        <div className="grid grid-cols-2 gap-2">
                             {podeEditarVisita(auth.user, visita) && (
                                 <Link
                                     href={edit({ visita: visita.id! }).url}
@@ -368,7 +368,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
             )}
 
             {visita && passo === 'inscricao' && (
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                     <div className="mb-4 flex items-start justify-between gap-4">
                         <h2 className="text-lg font-semibold text-gray-900">
                             Escolha o tipo de participação

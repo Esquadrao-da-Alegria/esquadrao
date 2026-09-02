@@ -38,7 +38,9 @@ interface Props {
     cidades?: Cidade[]
     lideres: User[]
     meses_liberados?: string[]
+    meses_liberados_por_cidade?: Record<number, string[]>
     cidadeInicialId?: number
+    statusOriginal?: VisitaStatus
     onCampoChange: <K extends keyof DadosFormulario>(campo: K, valor: DadosFormulario[K]) => void
 }
 
@@ -53,7 +55,9 @@ const Form: FC<Props> = ({
     cidades = [],
     lideres,
     meses_liberados = [],
+    meses_liberados_por_cidade = {},
     cidadeInicialId,
+    statusOriginal,
     onCampoChange,
 }) => {
     const { auth } = usePage<SharedData>().props
@@ -90,15 +94,19 @@ const Form: FC<Props> = ({
 
     const exigeHospital = data.tipo === 'hospital' || data.tipo === 'residencia'
     const restringeAgendaHospital = data.tipo === 'hospital'
+    const podeAlterarEstrutura = mode === 'create' || statusOriginal === 'agendada'
+    const mesesLiberadosCidade = cidadeFiltroId
+        ? (meses_liberados_por_cidade[Number(cidadeFiltroId)] ?? meses_liberados)
+        : meses_liberados
 
     const mesesParaSelecao = useMemo(
         () => (restringeAgendaHospital
             ? mesesLiberadosParaSelecao(
-                meses_liberados,
+                mesesLiberadosCidade,
                 mode === 'edit' ? data.data : undefined,
             )
             : []),
-        [data.data, meses_liberados, mode, restringeAgendaHospital],
+        [data.data, mesesLiberadosCidade, mode, restringeAgendaHospital],
     )
 
     const mesSelecionado = data.data ? mesDaData(data.data) : ''
@@ -119,7 +127,7 @@ const Form: FC<Props> = ({
     }, [data.data, mesesParaSelecao, onCampoChange, restringeAgendaHospital])
 
     const handleDataChange = (valor: string) => {
-        if (restringeAgendaHospital && valor && !dataPermitidaVisitaHospital(valor, meses_liberados)) {
+        if (restringeAgendaHospital && valor && !dataPermitidaVisitaHospital(valor, mesesLiberadosCidade)) {
             toast.error('Este mês não está liberado para visitas hospitalares.')
             return
         }
@@ -175,7 +183,7 @@ const Form: FC<Props> = ({
                 <div>
                     <label htmlFor="cidade_filtro_id" className={painelLabelClass}>Filtrar por Cidade</label>
                     <Select
-                        disabled={mode === 'edit'}
+                        disabled={!podeAlterarEstrutura}
                         value={cidadeFiltroId === '' ? CIDADE_TODAS : String(cidadeFiltroId)}
                         onValueChange={(valor) =>
                             handleCidadeChange(valor === CIDADE_TODAS ? '' : Number(valor))
@@ -201,7 +209,7 @@ const Form: FC<Props> = ({
                     {exigeHospital ? 'Hospital *' : 'Hospital (Opcional)'}
                 </label>
                 <Select
-                    disabled={mode === 'edit' && exigeHospital}
+                    disabled={!podeAlterarEstrutura}
                     value={data.hospital_id === '' ? VALOR_VAZIO : String(data.hospital_id)}
                     onValueChange={(valor) =>
                         handleHospitalChange(valor === VALOR_VAZIO ? '' : Number(valor))
@@ -239,7 +247,7 @@ const Form: FC<Props> = ({
             <div>
                 <label htmlFor="ala_unidade_id" className={painelLabelClass}>Ala / Unidade</label>
                 <Select
-                    disabled={mode === 'edit' || !data.hospital_id}
+                    disabled={!data.hospital_id || !podeAlterarEstrutura}
                     value={data.ala_unidade_id ? String(data.ala_unidade_id) : VALOR_VAZIO}
                     onValueChange={(valor) =>
                         onCampoChange('ala_unidade_id', valor === VALOR_VAZIO ? null : Number(valor))
@@ -295,7 +303,7 @@ const Form: FC<Props> = ({
                                     )}
                                 </SelectContent>
                             </Select>
-                            {meses_liberados.length === 0 ? (
+                            {mesesLiberadosCidade.length === 0 ? (
                                 <p className="mt-1 text-xs text-gray-500">
                                     Nenhum mês liberado para visitas hospitalares.
                                 </p>

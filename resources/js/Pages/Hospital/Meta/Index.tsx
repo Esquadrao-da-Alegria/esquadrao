@@ -13,10 +13,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import PainelLayout from '@/layouts/PainelLayout'
 import AbasHospital from '@/components/Painel/Hospital/Abas/Show'
 import {
-    painelInputClass,
     painelSelectTriggerClass,
     painelSurfaceClass,
     painelSurfaceHeaderClass,
@@ -29,7 +33,7 @@ import {
     painelTableWrapperClass,
 } from '@/lib/painelFormFieldClasses'
 import { toastAviso, toastConfirmacao, toastSucesso } from '@/lib/utils/toast'
-import { Building2, Calendar, CalendarDays } from 'lucide-react'
+import { Building2, Calendar, CalendarDays, ChevronDown, Minus, Plus } from 'lucide-react'
 
 // TIPOS
 import type { SharedData } from '@/types'
@@ -141,6 +145,55 @@ const CelulaSemana: FC<{ semana: number; semanas: SemanaMes[] }> = ({ semana, se
         </div>
     )
 }
+
+interface ControleQuantidadeProps {
+    valor: number | null
+    maximo: number
+    desabilitado?: boolean
+    rotulo: string
+    onChange: (valor: string) => void
+}
+
+const ControleQuantidade: FC<ControleQuantidadeProps> = ({
+    valor,
+    maximo,
+    desabilitado = false,
+    rotulo,
+    onChange,
+}) => (
+    <div className="flex w-full max-w-40 items-center overflow-hidden rounded-lg border border-input bg-background shadow-xs">
+        <button
+            type="button"
+            disabled={desabilitado || valor === null || valor <= 0}
+            onClick={() => onChange(String(Math.max(0, (valor ?? 0) - 1)))}
+            className="flex size-10 shrink-0 items-center justify-center border-r border-input text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-35"
+            aria-label={`Diminuir ${rotulo}`}
+        >
+            <Minus className="size-4" aria-hidden />
+        </button>
+        <input
+            type="number"
+            min={0}
+            max={maximo}
+            disabled={desabilitado}
+            value={valor ?? ''}
+            onFocus={selecionarTextoInputMeta}
+            onChange={(e) => onChange(e.target.value)}
+            className="h-10 min-w-0 flex-1 appearance-none bg-transparent px-1 text-center text-sm font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            placeholder="—"
+            aria-label={rotulo}
+        />
+        <button
+            type="button"
+            disabled={desabilitado || (valor ?? 0) >= maximo}
+            onClick={() => onChange(String(Math.min(maximo, (valor ?? 0) + 1)))}
+            className="flex size-10 shrink-0 items-center justify-center border-l border-input text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-35"
+            aria-label={`Aumentar ${rotulo}`}
+        >
+            <Plus className="size-4" aria-hidden />
+        </button>
+    </div>
+)
 
 const numerosSemanas = (semanas: SemanaMes[]): number[] => semanas.map((item) => item.semana)
 
@@ -431,36 +484,24 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                                 <CalendarDays className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                                                 Meta mensal
                                             </h3>
-                                            <div className={painelTableWrapperClass}>
-                                            <table className={`${painelTableClass} min-w-[360px]`}>
-                                                <thead className={painelTableHeadClass}>
-                                                    <tr>
-                                                        <th className={painelTableThClass}>Meta</th>
-                                                        <th className={painelTableThClass}>Realizadas no mês</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className={painelTableBodyClass}>
-                                                    <tr className={painelTableRowClass}>
-                                                        <td className={painelTableTdClass}>
-                                                            <input
-                                                                type="number"
-                                                                min={0}
-                                                                max={META_MENSAL_MAXIMA}
-                                                                value={hospital.meta_mensal ?? ''}
-                                                                onFocus={selecionarTextoInputMeta}
-                                                                onChange={(e) =>
-                                                                    handleMetaMensalChange(hospital.id, e.target.value)
-                                                                }
-                                                                className={`${painelInputClass} max-w-[7rem] py-1.5 px-3`}
-                                                                placeholder="Opcional"
-                                                            />
-                                                        </td>
-                                                        <td className={`${painelTableTdClass} font-medium text-foreground`}>
-                                                            {hospital.realizadas_mensal}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 rounded-xl border border-border bg-muted/15 p-3 sm:max-w-md sm:gap-5 sm:p-4">
+                                                <div className="min-w-0">
+                                                    <span className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                                                        Meta do mês
+                                                    </span>
+                                                    <ControleQuantidade
+                                                        valor={hospital.meta_mensal}
+                                                        maximo={META_MENSAL_MAXIMA}
+                                                        rotulo="meta mensal"
+                                                        onChange={(valor) => handleMetaMensalChange(hospital.id, valor)}
+                                                    />
+                                                </div>
+                                                <div className="pb-1 text-right">
+                                                    <span className="block text-xs text-muted-foreground">Realizadas</span>
+                                                    <span className="text-lg font-semibold text-foreground">
+                                                        {hospital.realizadas_mensal}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -483,69 +524,186 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                             </label>
                                             </div>
 
-                                            <div className={painelTableWrapperClass}>
-                                            <table className={`${painelTableClass} min-w-[520px]`}>
-                                                <thead className={painelTableHeadClass}>
-                                                    <tr>
-                                                        {hospital.metas_por_ala ? (
-                                                            <th className={painelTableThClass}>Ala</th>
-                                                        ) : null}
-                                                        <th className={painelTableThClass}>Semana</th>
-                                                        <th className={painelTableThClass}>Meta</th>
-                                                        <th className={painelTableThClass}>Realizadas</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className={painelTableBodyClass}>
-                                                    {hospital.metas_semanais.map((item) => {
-                                                        const chave = hospital.metas_por_ala
-                                                            ? `${item.semana}-${item.ala_unidade_id}`
-                                                            : String(item.semana)
-                                                        const alaNome = hospital.alas.find(
-                                                            (ala) => ala.id === item.ala_unidade_id,
-                                                        )?.nome
+                                            {hospital.metas_por_ala ? (
+                                                <div className="space-y-2">
+                                                    {hospital.alas.map((ala, indiceAla) => {
+                                                        const metasDaAla = hospital.metas_semanais.filter(
+                                                            (item) => item.ala_unidade_id === ala.id,
+                                                        )
+                                                        const totalDistribuido = metasDaAla.reduce(
+                                                            (total, item) => total + (item.meta ?? 0),
+                                                            0,
+                                                        )
 
                                                         return (
-                                                            <tr key={chave} className={painelTableRowClass}>
-                                                                {hospital.metas_por_ala ? (
-                                                                    <td className={`${painelTableTdClass} font-medium text-foreground`}>
-                                                                        {alaNome ?? '—'}
-                                                                    </td>
-                                                                ) : null}
-                                                                <td className={painelTableTdClass}>
+                                                            <Collapsible key={ala.id} defaultOpen={indiceAla === 0} className="overflow-hidden rounded-xl border border-border bg-muted/15">
+                                                                <CollapsibleTrigger className="group flex w-full min-w-0 items-center justify-between gap-3 px-3 py-3 text-left transition hover:bg-muted/40 sm:px-4">
+                                                                    <span className="min-w-0">
+                                                                        <span className="block truncate text-sm font-semibold text-foreground">
+                                                                            {ala.nome}
+                                                                        </span>
+                                                                        <span className="block text-xs text-muted-foreground">
+                                                                            {totalDistribuido} {totalDistribuido === 1 ? 'visita distribuída' : 'visitas distribuídas'}
+                                                                        </span>
+                                                                    </span>
+                                                                    <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" aria-hidden />
+                                                                </CollapsibleTrigger>
+                                                                <CollapsibleContent className="border-t border-border px-3 py-3 sm:px-4">
+                                                                    <div className="space-y-2 sm:hidden">
+                                                                        {metasDaAla.map((item) => (
+                                                                            <div key={`${item.semana}-${ala.id}`} className="rounded-lg border border-border bg-background p-3">
+                                                                                <div className="mb-3 flex min-w-0 items-start justify-between gap-3">
+                                                                                    <CelulaSemana
+                                                                                        semana={item.semana}
+                                                                                        semanas={semanasMes}
+                                                                                    />
+                                                                                    <div className="shrink-0 text-right">
+                                                                                        <span className="block text-[11px] text-muted-foreground">Realizadas</span>
+                                                                                        <span className="text-base font-semibold text-foreground">{item.realizadas}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Meta</span>
+                                                                                <ControleQuantidade
+                                                                                    valor={item.meta}
+                                                                                    maximo={META_SEMANAL_MAXIMA}
+                                                                                    desabilitado={!metaMensalPreenchida}
+                                                                                    rotulo={`meta da semana ${item.semana} para ${ala.nome}`}
+                                                                                    onChange={(valor) =>
+                                                                                        handleMetaSemanalChange(
+                                                                                            hospital.id,
+                                                                                            item.semana,
+                                                                                            valor,
+                                                                                            item.ala_unidade_id,
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+
+                                                                    <div className={`hidden sm:block ${painelTableWrapperClass}`}>
+                                                                        <table className={painelTableClass}>
+                                                                            <thead className={painelTableHeadClass}>
+                                                                                <tr>
+                                                                                    <th className={painelTableThClass}>Semana</th>
+                                                                                    <th className={painelTableThClass}>Meta</th>
+                                                                                    <th className={painelTableThClass}>Realizadas</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody className={painelTableBodyClass}>
+                                                                                {metasDaAla.map((item) => (
+                                                                                    <tr key={`${item.semana}-${ala.id}`} className={painelTableRowClass}>
+                                                                                        <td className={painelTableTdClass}>
+                                                                                            <CelulaSemana
+                                                                                                semana={item.semana}
+                                                                                                semanas={semanasMes}
+                                                                                            />
+                                                                                        </td>
+                                                                                        <td className={painelTableTdClass}>
+                                                                                            <ControleQuantidade
+                                                                                                valor={item.meta}
+                                                                                                maximo={META_SEMANAL_MAXIMA}
+                                                                                                desabilitado={!metaMensalPreenchida}
+                                                                                                rotulo={`meta da semana ${item.semana} para ${ala.nome}`}
+                                                                                                onChange={(valor) =>
+                                                                                                    handleMetaSemanalChange(
+                                                                                                        hospital.id,
+                                                                                                        item.semana,
+                                                                                                        valor,
+                                                                                                        item.ala_unidade_id,
+                                                                                                    )
+                                                                                                }
+                                                                                            />
+                                                                                        </td>
+                                                                                        <td className={`${painelTableTdClass} font-medium text-foreground`}>
+                                                                                            {item.realizadas}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                ))}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </CollapsibleContent>
+                                                            </Collapsible>
+                                                        )
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="space-y-2 sm:hidden">
+                                                        {hospital.metas_semanais.map((item) => (
+                                                            <div key={item.semana} className="rounded-xl border border-border bg-muted/15 p-3">
+                                                                <div className="mb-3 flex min-w-0 items-start justify-between gap-3">
                                                                     <CelulaSemana
                                                                         semana={item.semana}
                                                                         semanas={semanasMes}
                                                                     />
-                                                                </td>
-                                                                <td className={painelTableTdClass}>
-                                                                    <input
-                                                                        type="number"
-                                                                        min={0}
-                                                                        max={META_SEMANAL_MAXIMA}
-                                                                        disabled={!metaMensalPreenchida}
-                                                                        value={item.meta ?? ''}
-                                                                        onFocus={selecionarTextoInputMeta}
-                                                                        onChange={(e) =>
-                                                                            handleMetaSemanalChange(
-                                                                                hospital.id,
-                                                                                item.semana,
-                                                                                e.target.value,
-                                                                                item.ala_unidade_id,
-                                                                            )
-                                                                        }
-                                                                        className={`${painelInputClass} max-w-[5.5rem] py-1.5 px-3 disabled:cursor-not-allowed disabled:opacity-50`}
-                                                                        placeholder="—"
-                                                                    />
-                                                                </td>
-                                                                <td className={`${painelTableTdClass} font-medium text-foreground`}>
-                                                                    {item.realizadas}
-                                                                </td>
-                                                            </tr>
-                                                        )
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                            </div>
+                                                                    <div className="shrink-0 text-right">
+                                                                        <span className="block text-[11px] text-muted-foreground">Realizadas</span>
+                                                                        <span className="text-base font-semibold text-foreground">{item.realizadas}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Meta</span>
+                                                                <ControleQuantidade
+                                                                    valor={item.meta}
+                                                                    maximo={META_SEMANAL_MAXIMA}
+                                                                    desabilitado={!metaMensalPreenchida}
+                                                                    rotulo={`meta da semana ${item.semana}`}
+                                                                    onChange={(valor) =>
+                                                                        handleMetaSemanalChange(
+                                                                            hospital.id,
+                                                                            item.semana,
+                                                                            valor,
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    <div className={`hidden sm:block ${painelTableWrapperClass}`}>
+                                                        <table className={painelTableClass}>
+                                                            <thead className={painelTableHeadClass}>
+                                                                <tr>
+                                                                    <th className={painelTableThClass}>Semana</th>
+                                                                    <th className={painelTableThClass}>Meta</th>
+                                                                    <th className={painelTableThClass}>Realizadas</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className={painelTableBodyClass}>
+                                                                {hospital.metas_semanais.map((item) => (
+                                                                    <tr key={item.semana} className={painelTableRowClass}>
+                                                                        <td className={painelTableTdClass}>
+                                                                            <CelulaSemana
+                                                                                semana={item.semana}
+                                                                                semanas={semanasMes}
+                                                                            />
+                                                                        </td>
+                                                                        <td className={painelTableTdClass}>
+                                                                            <ControleQuantidade
+                                                                                valor={item.meta}
+                                                                                maximo={META_SEMANAL_MAXIMA}
+                                                                                desabilitado={!metaMensalPreenchida}
+                                                                                rotulo={`meta da semana ${item.semana}`}
+                                                                                onChange={(valor) =>
+                                                                                    handleMetaSemanalChange(
+                                                                                        hospital.id,
+                                                                                        item.semana,
+                                                                                        valor,
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                        </td>
+                                                                        <td className={`${painelTableTdClass} font-medium text-foreground`}>
+                                                                            {item.realizadas}
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </>
+                                            )}
 
                                             {!metaMensalPreenchida ? (
                                                 <p className="text-xs text-muted-foreground">
