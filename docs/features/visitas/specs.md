@@ -81,6 +81,18 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 14. **Erro seguro ao validar vagas**  
     Falha ao consultar participantes ativos retorna: `Não foi possível validar as vagas desta visita. Tente novamente.` — nunca assume zero vagas ocupadas.
 
+15. **Cores do calendário por ocupação**
+
+    Visitas comuns usam azul-claro quando possuem até uma inscrição ativa ou não possuem limite definido, laranja quando possuem duas ou mais inscrições e ainda há vagas e vermelho quando atingem o limite. O azul-claro mantém contraste visual com o índigo reservado aos eventos. Cinza fica reservado a visitas canceladas, caso ainda estejam presentes na interface durante uma atualização. Ações especiais preservam roxo/lilás. Somente participações `confirmado` e `pendente` entram nessa classificação. No mobile, a grade mensal usa indicadores compactos e abre a lista completa ao selecionar o dia, sem rolagem horizontal da página.
+
+16. **Alteração completa enquanto agendada**
+
+    Líderes e gestores que já possuem autorização para editar a visita podem alterar todos os seus dados enquanto o status original for `agendada`, incluindo tipo, cidade, hospital, ala, data, horários, limite, líder e observações. A ala deve pertencer ao hospital selecionado, coordenadores locais não podem transferir a visita para fora da cidade-base e mudanças de hospital, tipo ou data repetem a validação da agenda do destino. Após a visita deixar o status `agendada`, hospital e ala permanecem bloqueados também no backend para preservar relatórios e métricas históricas.
+
+17. **Acompanhamento de metas na agenda**
+
+    Quando uma cidade específica está selecionada, a tela apresenta de forma compacta somente hospitais com metas ainda não contempladas. O progresso soma visitas `agendada`, `realizada`, `pendente_relatorio` e `contabilizada`, sem duplicação, e exclui canceladas e não contabilizadas. A linha informa hospital, ala, progresso semanal e progresso mensal. Apenas uma semana é exibida: a semana de hoje no mês atual, a primeira semana ainda não contemplada em mês futuro e a última semana em mês passado.
+
 ---
 
 ## Modelo de dados

@@ -5,6 +5,7 @@ namespace App\Http\Requests\Web\Visita;
 use App\Enums\VisitaStatus;
 use App\Enums\VisitaTipo;
 use App\Models\Ala;
+use App\Models\Hospital;
 use App\Models\User;
 use App\Models\Visita;
 use App\Services\Visita\Service;
@@ -29,8 +30,10 @@ class UpdateRequest extends FormRequest
 
         return [
             'hospital_id'    => [
-                Rule::excludeIf(fn () => ! in_array($this->input('tipo'), [VisitaTipo::Hospital->value, VisitaTipo::Residencia->value, 'hospital', 'residencia'], true)),
-                Rule::requiredIf(fn () => in_array($this->input('tipo'), [VisitaTipo::Hospital->value, VisitaTipo::Residencia->value, 'hospital', 'residencia'], true) && ! $this->route('visita')->hospital_id),
+                Rule::requiredIf(fn () => in_array($this->input('tipo'), [VisitaTipo::Hospital->value, VisitaTipo::Residencia->value, 'hospital', 'residencia'], true)
+                    && ($this->has('hospital_id')
+                        ? ! $this->filled('hospital_id')
+                        : ! $this->route('visita')->hospital_id)),
                 'nullable',
                 'integer',
                 Rule::exists('hospitais', 'id')->where(fn ($q) => $q->where('ativo', true)),
@@ -71,8 +74,31 @@ class UpdateRequest extends FormRequest
                 }
             }
 
-            $hospitalId = $this->input('hospital_id');
+            /** @var Visita $visita */
+            $visita = $this->route('visita');
+            $hospitalId = $this->has('hospital_id')
+                ? $this->input('hospital_id')
+                : $visita->hospital_id;
             $alaId      = $this->input('ala_unidade_id');
+
+            $user = $this->user();
+            resolverUsuario($user);
+
+            $ehCoordenadorLocal = $user->cargos->contains('slug', 'coordenador_local');
+            $possuiEscopoAmplo = $user->cargos->contains(
+                fn ($cargo) => in_array($cargo->slug, ['administrador', 'diretor', 'coordenador_geral'], true)
+            );
+
+            if ($hospitalId && $ehCoordenadorLocal && ! $possuiEscopoAmplo) {
+                $cidadeHospital = Hospital::query()
+                    ->whereKey($hospitalId)
+                    ->value('cidade_id');
+
+                if (! $user->voluntario?->cidade_base_id
+                    || (int) $user->voluntario->cidade_base_id !== (int) $cidadeHospital) {
+                    $validator->errors()->add('hospital_id', 'O hospital deve pertencer à sua cidade-base.');
+                }
+            }
 
             if ($alaId && ! $hospitalId) {
                 $validator->errors()->add('ala_unidade_id', 'A ala não pode ser vinculada a uma visita sem hospital.');

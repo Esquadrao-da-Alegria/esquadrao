@@ -27,6 +27,8 @@ Documento de referência sobre **metas mensais/semanais por hospital** e **liber
 6. **Ala da meta** — meta por ala só aceita alas do próprio hospital. Visita **sem** ala conta no resumo hospitalar, não na meta da ala.
 7. **Semanas do mês** — semanas completas de **domingo a sábado** (fecham no sábado). A **primeira** semana é quebrada quando o mês não começa no domingo (ex.: quarta → sábado). A **última** é quebrada quando o mês não termina no sábado. Demais semanas começam no domingo. Helper: `App\Helpers\MetaHospital::semanasDoMes()`.
 8. **Escopo geográfico** — coordenadores locais e diretores configuram apenas hospitais **ativos** da cidade-base. Administradores e coordenadores gerais podem acessar hospitais de outras cidades.
+9. **Apoio ao agendamento** — na agenda de visitas, o progresso das metas soma visitas já realizadas e visitas agendadas para evitar planejamento acima da meta. A meta mensal considera todas as alas do hospital. Quando a meta semanal é por ala, somente visitas vinculadas à respectiva ala entram no progresso semanal; visitas sem ala não cumprem uma meta específica de ala.
+10. **Semana de referência na agenda** — o acompanhamento compacto apresenta somente uma semana. Para o mês atual usa a semana que contém o dia de hoje; para mês futuro usa a primeira semana com meta ainda não contemplada; para mês passado usa a última semana do mês.
 
 ---
 
@@ -129,6 +131,8 @@ Helpers auxiliares:
 | Liberar ou bloquear agendamento | `resources/js/Pages/Visita/Index.tsx` |
 
 A configuração do hospital usa as abas **Dados do hospital** e **Metas de visitas**, com rotas independentes. Gestores sem permissão cadastral veem somente a aba de metas.
+
+Em telas pequenas, a configuração de metas não usa tabelas com rolagem horizontal. A meta mensal é apresentada em um resumo compacto, e cada semana ocupa um bloco vertical com período, quantidade realizada e meta. Metas mensais e semanais possuem controles **−** e **+**, com incremento unitário e respeito aos limites da validação, sem impedir a digitação direta. Quando **Metas por ala** está ativo, cada ala é apresentada em um acordeão independente no mobile e no desktop; a primeira inicia aberta, outras podem ser abertas simultaneamente e o cabeçalho informa a soma das metas semanais distribuídas naquela ala. No desktop, as semanas abertas permanecem organizadas em tabela.
 
 Na página de Visitas, gestores veem a situação do mês selecionado e ações explícitas **Liberar agendamento** ou **Bloquear agendamento**. A ação exige uma cidade específica; em **Todas as cidades**, a interface orienta selecionar uma cidade. Meses passados são somente leitura e um mês sem registro é considerado bloqueado.
 

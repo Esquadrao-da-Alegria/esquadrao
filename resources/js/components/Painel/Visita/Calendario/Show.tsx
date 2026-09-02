@@ -1,5 +1,6 @@
 import EventoCardShow from '@/components/Painel/Visita/Card/EventoCardShow';
 import CardShow from '@/components/Painel/Visita/Card/Show';
+import { classeIndicadorPorOcupacao } from '@/lib/visita';
 import type { Evento } from '@/types';
 import type { Visita } from '@/types/visita';
 import { type FC } from 'react';
@@ -82,16 +83,17 @@ const Show: FC<Props> = ({
     const hoje = new Date();
 
     return (
-        <div className="overflow-x-auto rounded-2xl border border-amber-100 bg-white shadow-sm">
-            <div className="min-w-[650px]">
+        <div className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
+            <div>
                 {/* Cabeçalho dias da semana */}
                 <div className="grid grid-cols-7 border-b border-amber-100">
                     {DIAS_SEMANA.map((dia) => (
                         <div
                             key={dia}
-                            className="py-2 text-center text-xs font-semibold tracking-wide text-amber-700/70 uppercase"
+                            className="py-2 text-center text-[10px] font-semibold tracking-wide text-amber-700/70 uppercase sm:text-xs"
                         >
-                            {dia}
+                            <span className="sm:hidden">{dia.charAt(0)}</span>
+                            <span className="hidden sm:inline">{dia}</span>
                         </div>
                     ))}
                 </div>
@@ -133,12 +135,12 @@ const Show: FC<Props> = ({
                         return (
                             <div
                                 key={idx}
-                                className={`min-h-[6rem] border-r border-b border-gray-100 p-1.5 ${
+                                className={`min-h-16 min-w-0 border-r border-b border-gray-100 p-1 sm:min-h-24 sm:p-1.5 ${
                                     !ehMesAtual ? 'bg-gray-50/50' : ''
                                 }`}
                             >
                                 <span
-                                    className={`mb-1 flex size-6 items-center justify-center rounded-full text-xs font-medium ${
+                                    className={`mb-1 flex size-5 items-center justify-center rounded-full text-[11px] font-medium sm:size-6 sm:text-xs ${
                                         ehHoje
                                             ? 'bg-amber-500 text-white'
                                             : ehMesAtual
@@ -149,7 +151,35 @@ const Show: FC<Props> = ({
                                     {dia.getDate()}
                                 </span>
 
-                                <div className="space-y-0.5">
+                                {itensDoDia.length > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            onAbrirListaCompleta(
+                                                dia,
+                                                visitasDoDia,
+                                                eventosDoDia,
+                                            )
+                                        }
+                                        className="flex min-h-8 w-full flex-wrap content-start items-start gap-1 rounded p-0.5 text-left sm:hidden"
+                                        aria-label={`Ver ${itensDoDia.length} ${itensDoDia.length === 1 ? 'atividade' : 'atividades'} do dia ${dia.getDate()}`}
+                                    >
+                                        {itensDoDia.slice(0, 4).map((item) => (
+                                            <span
+                                                key={`${item.tipo}-${item.data.id}`}
+                                                className={`size-2 rounded-full ${item.tipo === 'visita' ? classeIndicadorPorOcupacao(item.data) : 'bg-indigo-600'}`}
+                                                aria-hidden
+                                            />
+                                        ))}
+                                        {itensDoDia.length > 4 && (
+                                            <span className="text-[9px] font-medium leading-2 text-amber-800">
+                                                +{itensDoDia.length - 4}
+                                            </span>
+                                        )}
+                                    </button>
+                                )}
+
+                                <div className="hidden space-y-0.5 sm:block">
                                     {itensVisiveis.map((item) =>
                                         item.tipo === 'visita' ? (
                                             <CardShow

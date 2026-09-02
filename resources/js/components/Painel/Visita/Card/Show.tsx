@@ -1,4 +1,4 @@
-import { classeCardPorStatus, tituloVisita } from '@/lib/visita';
+import { classeCardPorOcupacao, tituloVisita } from '@/lib/visita';
 import type { Visita } from '@/types/visita';
 import { type FC } from 'react';
 
@@ -17,7 +17,7 @@ const Show: FC<Props> = ({ visita, onClick }) => {
         <button
             type="button"
             onClick={onClick}
-            className={`w-full rounded border px-1.5 py-0.5 text-left text-xs font-medium transition hover:opacity-80 ${classeCardPorStatus(visita)}`}
+            className={`w-full rounded border px-1.5 py-0.5 text-left text-xs font-medium transition hover:opacity-80 ${classeCardPorOcupacao(visita)}`}
         >
             <span className="block truncate">
                 {hora} · {tituloVisita(visita)}
