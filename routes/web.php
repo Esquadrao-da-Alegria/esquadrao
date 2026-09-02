@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\Dashboard\Controller as DashboardController;
 use App\Http\Controllers\Web\Dashboard\Meu\Controller as MeuDashboardController;
 use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVisitaHospitalController;
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
+use App\Http\Controllers\Web\Dashboard\Visita\Participante\ExportController as DashboardVisitaParticipanteExportController;
 use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
 use App\Http\Controllers\Web\EventoController;
 use App\Http\Controllers\Web\EventoFinalizacaoController;
@@ -99,6 +100,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('visitas-por-participante', [DashboardVisitaParticipanteController::class, 'index'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
             ->name('visitas-por-participante');
+        Route::get('visitas-por-participante/exportar/{formato}', DashboardVisitaParticipanteExportController::class)
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
+            ->name('visitas-por-participante.exportar');
         Route::get('visitas-por-participante/{voluntario}', [DashboardVisitaParticipanteController::class, 'show'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
             ->name('visitas-por-participante.show');
