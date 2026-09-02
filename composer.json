@@ -19,6 +19,7 @@
         "laravel/wayfinder": "^0.1.9",
         "spatie/browsershot": "^5.4",
         "spatie/laravel-pdf": "^2.12",
+        "spatie/simple-excel": "^3.10",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
