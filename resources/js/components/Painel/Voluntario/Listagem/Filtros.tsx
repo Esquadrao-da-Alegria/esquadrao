@@ -98,6 +98,9 @@ const Filtros: React.FC<Props> = ({
                             <SelectItem value="ativos">
                                 Apenas Ativos (Sem Afastamento)
                             </SelectItem>
+                            <SelectItem value="inativos">
+                                Apenas Inativos
+                            </SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

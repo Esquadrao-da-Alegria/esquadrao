@@ -115,6 +115,13 @@ class VoluntarioController extends Controller
         return redirect()->route('voluntarios.index', ['aba' => 'voluntarios']);
     }
 
+    public function reativar(Voluntario $voluntario)
+    {
+        $this->service->reativar($voluntario);
+
+        return redirect()->route('voluntarios.index', ['aba' => 'voluntarios', 'status' => 'inativos']);
+    }
+
     public function reenviarConvite(Voluntario $voluntario)
     {
         $this->service->reenviarConvite($voluntario);

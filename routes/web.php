@@ -192,6 +192,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/voluntarios/{voluntario}/convite', [VoluntarioController::class, 'cancelarConvite'])
             ->name('voluntarios.convite.cancelar');
 
+        Route::patch('/voluntarios/{voluntario}/reativar', [VoluntarioController::class, 'reativar'])
+            ->name('voluntarios.reativar');
+
         Route::prefix('voluntarios/{voluntario}/afastamentos')->scopeBindings()->name('voluntarios.afastamentos.')->group(function () {
             Route::post('/', [VoluntarioAfastamentoController::class, 'store'])->name('store');
             Route::put('{afastamento}', [VoluntarioAfastamentoController::class, 'update'])->name('update');

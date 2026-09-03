@@ -163,6 +163,17 @@ Na conclusão, uma transação atualiza o voluntário, define a data de entrada 
 
 A exclusão administrativa é lógica no fluxo de serviço: o voluntário e sua conta recebem status inativo, e a conta registra `inativado_em`. O administrador não pode inativar o próprio voluntário pela tela.
 
+### Reativação
+
+1. A listagem administrativa oculta voluntários inativos por padrão e oferece o filtro **Apenas inativos**.
+2. Um cadastro é tratado como inativo quando `voluntarios.status` ou o `users.status` da conta vinculada estiver inativo. Isso permite localizar e corrigir estados inconsistentes com segurança.
+3. Somente administradores podem acionar **Reativar**. A rota também é protegida pelo middleware administrativo, independentemente da interface.
+4. A reativação atualiza, na mesma transação, o voluntário e sua conta para o status ativo e limpa `users.inativado_em`.
+5. Senha, cargos, cidade-base, convites e históricos de participação permanecem inalterados. Depois da reativação, a pessoa volta a aparecer nas listas operacionais e pode autenticar novamente.
+6. Voluntários sem uma conta vinculada não podem ser reativados por esse fluxo; o sistema preserva o estado existente e informa o problema ao administrador.
+
+Na aba de convidados, um convite utilizado permanece com o estado **Aceito**. Quando o voluntário correspondente estiver inativo, a interface acrescenta o indicador **Voluntário inativo**, sem alterar o histórico do convite.
+
 ### Gerenciamento de Afastamentos e Atestados
 
 1. **Cadastro de Afastamento / Atestado**:
@@ -190,6 +201,7 @@ A exclusão administrativa é lógica no fluxo de serviço: o voluntário e sua 
 - Login, logout, senha e dois fatores permanecem sob Laravel Fortify e o model `User`.
 - `/dashboard` exige apenas `auth` e `verified`, portanto usuários comuns autenticados podem acessá-lo.
 - `/voluntarios`, `/hospitais` e `/patrocinadores` exigem o middleware `administrador`.
+- A reativação em `PATCH /voluntarios/{voluntario}/reativar` também exige o middleware `administrador`.
 - O middleware considera administrador quem possui cargo com slug `administrador`.
 - `HandleInertiaRequests` compartilha `eh_administrador` com o frontend.
 - Ao compartilhar o usuário autenticado, `HandleInertiaRequests` carrega `id`, `cidade_base_id` e `nome_completo` do voluntário. O `nome_completo` é necessário para serializar o accessor de compatibilidade `Voluntario::name`.
