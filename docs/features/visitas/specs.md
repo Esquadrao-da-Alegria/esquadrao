@@ -83,7 +83,7 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 
 15. **Cores do calendário por ocupação**
 
-    As cores de ocupação são aplicadas somente a visitas `agendada`: azul-claro quando possuem até uma inscrição ativa ou não possuem limite definido, laranja quando possuem duas ou mais inscrições e ainda há vagas e vermelho quando atingem o limite. Visitas `realizada` ou `contabilizada` usam verde; `pendente_relatorio` ou `nao_contabilizada` usam laranja claro; e canceladas usam cinza. Ações especiais preservam roxo/lilás e eventos usam índigo. Somente participações `confirmado` e `pendente` entram no cálculo de ocupação. No mobile, a grade mensal usa indicadores compactos com a mesma prioridade de cores e abre a lista completa ao selecionar o dia, sem rolagem horizontal da página.
+    As cores de ocupação são aplicadas somente a visitas `agendada`: azul-claro, contrastando com o índigo dos eventos, quando possuem até uma inscrição ativa ou não possuem limite definido; laranja quando possuem duas ou mais inscrições e ainda há vagas; e vermelho quando atingem o limite. Visitas `realizada` ou `contabilizada` usam verde; `pendente_relatorio` ou `nao_contabilizada` usam laranja claro; e canceladas usam cinza. Ações especiais preservam roxo/lilás. Somente participações `confirmado` e `pendente` entram no cálculo de ocupação. No mobile, a grade mensal usa indicadores compactos com a mesma prioridade de cores e abre a lista completa ao selecionar o dia, sem rolagem horizontal da página.
 
 16. **Alteração completa enquanto agendada**
 

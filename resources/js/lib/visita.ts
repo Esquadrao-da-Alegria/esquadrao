@@ -109,7 +109,6 @@ export function classeCardPorOcupacao(visita: Visita): string {
     ) {
         return 'border-orange-200 bg-orange-100 text-orange-800';
     }
-
     if (limite === null || limite === undefined) {
         return 'border-sky-500 bg-sky-500 text-white';
     }

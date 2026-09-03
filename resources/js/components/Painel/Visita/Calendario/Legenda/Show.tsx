@@ -9,7 +9,6 @@ const itens = [
     { cor: 'bg-purple-600', texto: 'Ação especial' },
     { cor: 'bg-indigo-600', texto: 'Evento' },
     { cor: 'bg-gray-400', texto: 'Cancelada' },
-    { cor: 'bg-green-200', texto: 'Concluída/contabilizada' },
 ];
 
 const Show: FC = () => (
