@@ -158,6 +158,22 @@ const Index: React.FC<Props> = ({
         });
     };
 
+    const handleReativar = (voluntario: VoluntarioListagem) => {
+        if (
+            !window.confirm(
+                `Reativar ${voluntario.name}? O acesso ao sistema e a participação em novas atividades serão restaurados.`,
+            )
+        ) {
+            return;
+        }
+
+        router.patch(
+            `/voluntarios/${voluntario.id}/reativar`,
+            {},
+            { preserveScroll: true },
+        );
+    };
+
     const handleReenviarConvite = (voluntario: VoluntarioListagem) => {
         router.post(
             `/voluntarios/${voluntario.id}/reenviar-convite`,
@@ -231,9 +247,11 @@ const Index: React.FC<Props> = ({
                     voluntarios={voluntariosComStatus}
                     ehAdministrador={ehAdministrador}
                     onInativar={handleInativar}
+                    onReativar={handleReativar}
                     onReenviarConvite={handleReenviarConvite}
                     onCancelarConvite={handleCancelarConvite}
                     onGerenciarAfastamento={handleGerenciarAfastamento}
+                    exibindoInativos={statusFiltro === 'inativos'}
                 />
                 <Paginacao paginacao={voluntarios} />
             </div>
