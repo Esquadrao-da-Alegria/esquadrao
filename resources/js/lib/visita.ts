@@ -99,6 +99,17 @@ export function classeCardPorOcupacao(visita: Visita): string {
             : 'border-purple-200 bg-purple-100 text-purple-800';
     }
 
+    if (visita.status === 'realizada' || visita.status === 'contabilizada') {
+        return 'border-green-200 bg-green-100 text-green-800';
+    }
+
+    if (
+        visita.status === 'pendente_relatorio' ||
+        visita.status === 'nao_contabilizada'
+    ) {
+        return 'border-orange-200 bg-orange-100 text-orange-800';
+    }
+
     if (limite === null || limite === undefined) {
         return 'border-sky-500 bg-sky-500 text-white';
     }
@@ -122,7 +133,9 @@ export function classeIndicadorPorOcupacao(visita: Visita): string {
     const classe = classeCardPorOcupacao(visita);
 
     if (classe.includes('sky')) return 'bg-sky-500';
+    if (classe.includes('green')) return 'bg-green-400';
     if (classe.includes('red')) return 'bg-red-600';
+    if (classe.includes('orange-100')) return 'bg-orange-300';
     if (classe.includes('orange')) return 'bg-orange-500';
     if (classe.includes('purple-100')) return 'bg-purple-300';
     if (classe.includes('purple')) return 'bg-purple-600';
