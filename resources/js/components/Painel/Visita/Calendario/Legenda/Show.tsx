@@ -4,10 +4,11 @@ const itens = [
     { cor: 'bg-sky-500', texto: '1 inscrito ou sem limite' },
     { cor: 'bg-orange-500', texto: 'Ainda há vagas' },
     { cor: 'bg-red-600', texto: 'Visita cheia' },
+    { cor: 'bg-green-400', texto: 'Realizada ou contabilizada' },
+    { cor: 'bg-orange-300', texto: 'Pendente ou não contabilizada' },
     { cor: 'bg-purple-600', texto: 'Ação especial' },
     { cor: 'bg-indigo-600', texto: 'Evento' },
     { cor: 'bg-gray-400', texto: 'Cancelada' },
-    { cor: 'bg-green-200', texto: 'Concluída/contabilizada' },
 ];
 
 const Show: FC = () => (
