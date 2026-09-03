@@ -2,10 +2,6 @@
 
 namespace App\Services\Evento\PresencaQr;
 
-use App\Models\Evento;
-use App\Models\EventoConfirmacaoPresenca;
-use App\Models\EventoSessaoPresenca;
-use App\Models\User;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
@@ -13,6 +9,11 @@ use BaconQrCode\Writer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
+
+use App\Models\Evento;
+use App\Models\EventoConfirmacaoPresenca;
+use App\Models\EventoSessaoPresenca;
+use App\Models\User;
 
 class Service
 {
