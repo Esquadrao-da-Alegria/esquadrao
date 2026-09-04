@@ -18,6 +18,7 @@ use App\Http\Controllers\Web\Hospital\Meta\Controller as HospitalMetaController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\MeuEventoController;
+use App\Http\Controllers\Web\CalendarioExportController;
 use App\Http\Controllers\Web\MeuPerfilController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -114,6 +115,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('ajuda', function () {
         return Inertia::render('Ajuda/Index');
     })->name('ajuda.index');
+
+    // CALENDÁRIO — EXPORTAR
+    Route::prefix('calendario/exportar')->name('calendario.exportar.')->group(function () {
+        Route::get('visitas', [CalendarioExportController::class, 'visitas'])->name('visitas');
+        Route::get('eventos', [CalendarioExportController::class, 'eventos'])->name('eventos');
+    });
 
     // JSON
     ROUTE::prefix('json')->name('json.')->group(function () {
