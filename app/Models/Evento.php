@@ -65,4 +65,9 @@ class Evento extends Model
     {
         return $this->hasMany(EventoAjusteParticipacao::class);
     }
+
+    public function sessoesPresenca(): HasMany
+    {
+        return $this->hasMany(EventoSessaoPresenca::class);
+    }
 }
