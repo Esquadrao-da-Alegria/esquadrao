@@ -25,6 +25,9 @@ use App\Http\Controllers\Web\Visita\Relatorio\VisitaRelatorioController;
 use App\Http\Controllers\Web\Visita\VisitaController;
 use App\Http\Controllers\Web\Voluntario\Afastamento\Controller as VoluntarioAfastamentoController;
 use App\Http\Controllers\Web\VoluntarioController;
+use App\Http\Controllers\PushSubscriptionController;
+
+
 
 // MODELS
 use App\Models\Patrocinador;
@@ -212,6 +215,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('/hospitais', [HospitalController::class, 'index'])->name('hospitais.index');
+
+
+    Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store'])
+        ->middleware('auth');
+
 });
 
 // ROTAS AUXILIARES

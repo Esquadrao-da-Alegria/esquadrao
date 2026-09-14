@@ -19,6 +19,8 @@ interface Props {
     patrocinadores?: Patrocinador[];
 }
 
+
+
 //finalizar o conserto do carrosel, falta os botoes e os elementos decorativos
 const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
     const carrosselRef = useRef<HTMLDivElement>(null);
@@ -40,6 +42,7 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
         mensagem: '',
         honeypot: '',
     });
+    
 
     const accessKey = '53b7a3e3-b32f-4b85-9be7-d8f176bed235';
 
@@ -96,7 +99,24 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
                 'Ocorreu um erro ao enviar a mensagem. Tente novamente mais tarde.',
             );
         }
-    };
+
+
+    } 
+
+    const enableNotification = () => {
+        Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+            navigator.serviceWorker.ready.then((sw) => {
+                sw.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: import.meta.env.VITE_PUSH_PUBLIC_KEY,
+                }).then((subscription) => { 
+                    console.log(JSON.stringify(subscription));
+                })
+            })  
+        }
+    });
+};
 
     return (
         <MarketingLayout>

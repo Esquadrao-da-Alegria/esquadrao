@@ -29,6 +29,54 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+    
 });
+
+console.log("APP.TSX FOI EXECUTADO");
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+        try {
+            const registration =
+                await navigator.serviceWorker.register("/sw.js");
+
+            console.log("Service Worker registrado:", registration);
+        } catch (error) {
+            console.error("Erro ao registrar Service Worker:", error);
+        }
+    });
+}
+
+async function registrarPushSubscription() {
+    try {
+        const registration = await navigator.serviceWorker.ready;
+
+        const subscription =
+            await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey:
+                    import.meta.env.VITE_VAPID_PUBLIC_KEY,
+            });
+
+        console.log("Push Subscription criada:", subscription);
+
+        const response = await fetch("/push-subscriptions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN":
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute("content") ?? "",
+            },
+            body: JSON.stringify(subscription.toJSON()),
+        });
+
+        console.log("Resposta do Laravel:", response.status);
+    } catch (error) {
+        console.error("Erro ao registrar Push Subscription:", error);
+    }
+}
+
 
 initializeTheme();
