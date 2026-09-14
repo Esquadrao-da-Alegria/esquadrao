@@ -8,6 +8,9 @@ use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVi
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\ExportController as DashboardVisitaParticipanteExportController;
 use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
+use App\Http\Controllers\Web\Evento\PresencaQr\Acesso\Controller as EventoPresencaQrAcessoController;
+use App\Http\Controllers\Web\Evento\PresencaQr\Confirmacao\Controller as EventoPresencaQrConfirmacaoController;
+use App\Http\Controllers\Web\Evento\PresencaQr\Controller as EventoPresencaQrController;
 use App\Http\Controllers\Web\EventoController;
 use App\Http\Controllers\Web\EventoFinalizacaoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
@@ -72,6 +75,9 @@ Route::get('/convites/{token}', [ConviteCadastroController::class, 'show'])
 Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'concluir'])
     ->name('convites.concluir');
 
+Route::get('/eventos/{evento}/presencas-qr/{sessao}', [EventoPresencaQrAcessoController::class, 'show'])
+    ->middleware('signed')->name('eventos.presencas-qr.acesso');
+
 // AUTENTICADAS
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -129,6 +135,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
 
+    Route::get('/eventos/presencas-qr/confirmar', [EventoPresencaQrConfirmacaoController::class, 'show'])->name('eventos.presencas-qr.confirmacao.show');
+    Route::post('/eventos/presencas-qr/confirmar', [EventoPresencaQrConfirmacaoController::class, 'store'])->name('eventos.presencas-qr.confirmacao.store');
+
     Route::get('/meu-perfil', [MeuPerfilController::class, 'edit'])->name('meu-perfil.edit');
     Route::patch('/meu-perfil', [MeuPerfilController::class, 'update'])->name('meu-perfil.update');
     Route::post('/meu-perfil/foto', [MeuPerfilController::class, 'updateFoto'])->name('meu-perfil.foto.update');
@@ -140,6 +149,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/eventos/{evento}/finalizar', [EventoFinalizacaoController::class, 'store'])->name('eventos.finalizar');
     Route::put('/eventos/{evento}/presencas', [EventoPresencaController::class, 'update'])->name('eventos.presencas.update');
+    Route::post('/eventos/{evento}/presencas-qr/sessoes', [EventoPresencaQrController::class, 'store'])->name('eventos.presencas-qr.sessoes.store');
+    Route::delete('/eventos/{evento}/presencas-qr/sessoes/{sessao}', [EventoPresencaQrController::class, 'destroy'])->name('eventos.presencas-qr.sessoes.destroy');
 
     // HOSPITAIS — METAS
     Route::get('hospitais/{hospital}/metas', [HospitalMetaController::class, 'index'])->name('hospitais.metas.index');
@@ -195,6 +206,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::delete('/voluntarios/{voluntario}/convite', [VoluntarioController::class, 'cancelarConvite'])
             ->name('voluntarios.convite.cancelar');
+
+        Route::patch('/voluntarios/{voluntario}/reativar', [VoluntarioController::class, 'reativar'])
+            ->name('voluntarios.reativar');
 
         Route::prefix('voluntarios/{voluntario}/afastamentos')->scopeBindings()->name('voluntarios.afastamentos.')->group(function () {
             Route::post('/', [VoluntarioAfastamentoController::class, 'store'])->name('store');

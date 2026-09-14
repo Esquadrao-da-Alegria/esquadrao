@@ -13,7 +13,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'titulo' => ['required', 'string', 'max:255'],
-            'tipo' => ['required', Rule::in(['oficina', 'reuniao'])],
+            'tipo' => ['required', Rule::in(['oficina', 'reuniao', 'evento'])],
             'descricao' => ['nullable', 'string'],
             'local' => ['nullable', 'string', 'max:255'],
             'cidade_id' => ['required', 'exists:cidades,id'],

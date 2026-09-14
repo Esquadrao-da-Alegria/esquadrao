@@ -18,7 +18,7 @@ class Queries
             $query = $this->queryBase();
 
             $this->aplicarFiltros($query, $filtros);
-            $this->aplicarFiltroAba($query, $filtros['aba'] ?? 'voluntarios');
+            $this->aplicarFiltroAba($query, $filtros['aba'] ?? 'voluntarios', $filtros['status'] ?? 'todos');
 
             $query->orderBy('nome_completo');
 
@@ -188,7 +188,7 @@ class Queries
         return $query->count();
     }
 
-    private function aplicarFiltroAba(Builder $query, string $aba): Builder
+    private function aplicarFiltroAba(Builder $query, string $aba, string $status = 'todos'): Builder
     {
         if ($aba === 'convidados') {
             $query->where(function (Builder $query) {
@@ -196,6 +196,16 @@ class Queries
                     ->whereHas('convitesCadastro')
                     ->orWhereNull('status')
                     ->orWhere('status', User::STATUS_CONVITE_ENVIADO);
+            });
+
+            return $query;
+        }
+
+        if ($status === 'inativos') {
+            $query->where(function (Builder $query) {
+                $query
+                    ->where('status', User::STATUS_INATIVO)
+                    ->orWhereHas('user', fn (Builder $query) => $query->where('status', User::STATUS_INATIVO));
             });
 
             return $query;
@@ -211,7 +221,8 @@ class Queries
                 $query
                     ->whereNull('status')
                     ->orWhere('status', '!=', User::STATUS_INATIVO);
-            });
+            })
+            ->whereDoesntHave('user', fn (Builder $query) => $query->where('status', User::STATUS_INATIVO));
 
         return $query;
     }

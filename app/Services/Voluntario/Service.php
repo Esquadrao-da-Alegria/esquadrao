@@ -203,6 +203,52 @@ class Service
         }
     }
 
+    public function reativar(Voluntario $voluntario): array
+    {
+        try {
+
+            DB::beginTransaction();
+
+            $usuario = $voluntario->user;
+
+            if (! $usuario) {
+                session()->flash('mensagem_erro', 'Não foi possível reativar: este voluntário não possui uma conta vinculada.');
+                DB::rollBack();
+
+                return [
+                    'sucesso' => false,
+                    'dados' => [],
+                    'erros' => ['Este voluntário não possui uma conta vinculada.'],
+                ];
+            }
+
+            $voluntario->update(['status' => User::STATUS_ATIVO]);
+            $usuario->update([
+                'status' => User::STATUS_ATIVO,
+                'inativado_em' => null,
+            ]);
+
+            DB::commit();
+            session()->flash('mensagem_sucesso', 'Voluntário reativado com sucesso!');
+
+            return [
+                'sucesso' => true,
+                'dados' => ['model' => $voluntario],
+                'erros' => [],
+            ];
+        } catch (\Throwable $th) {
+
+            DB::rollBack();
+            session()->flash('mensagem_erro', 'Erro ao reativar voluntário!');
+
+            return [
+                'sucesso' => false,
+                'dados' => [],
+                'erros' => [formatarMensagemErro($th)],
+            ];
+        }
+    }
+
     public function storeConvite(array $dados): array
     {
         try {

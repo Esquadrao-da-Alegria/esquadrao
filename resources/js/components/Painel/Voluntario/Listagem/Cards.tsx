@@ -16,6 +16,7 @@ import {
     MapPin,
     MoreHorizontal,
     Pencil,
+    RotateCcw,
 } from 'lucide-react';
 import {
     formatarData,
@@ -34,9 +35,11 @@ interface Props {
     voluntarios: VoluntarioListagem[];
     ehAdministrador: boolean;
     onInativar: (voluntario: VoluntarioListagem) => void;
+    onReativar: (voluntario: VoluntarioListagem) => void;
     onReenviarConvite: (voluntario: VoluntarioListagem) => void;
     onCancelarConvite: (voluntario: VoluntarioListagem) => void;
     onGerenciarAfastamento?: (voluntario: VoluntarioListagem) => void;
+    exibindoInativos?: boolean;
 }
 
 const Cards: React.FC<Props> = ({
@@ -44,9 +47,11 @@ const Cards: React.FC<Props> = ({
     voluntarios,
     ehAdministrador,
     onInativar,
+    onReativar,
     onReenviarConvite,
     onCancelarConvite,
     onGerenciarAfastamento,
+    exibindoInativos = false,
 }) => {
     const convidados = aba === 'convidados';
 
@@ -131,12 +136,20 @@ const Cards: React.FC<Props> = ({
 
                                     <div className="mt-3 flex flex-wrap gap-1.5">
                                         {convidados ? (
-                                            <span
-                                                className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase ${statusConvite?.className ?? 'border-transparent bg-amber-50 text-amber-700'}`}
-                                            >
-                                                {statusConvite?.label ??
-                                                    'Pendente'}
-                                            </span>
+                                            <>
+                                                <span
+                                                    className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium tracking-wide uppercase ${statusConvite?.className ?? 'border-transparent bg-amber-50 text-amber-700'}`}
+                                                >
+                                                    {statusConvite?.label ??
+                                                        'Pendente'}
+                                                </span>
+                                                {voluntario.status ===
+                                                    'inativo' && (
+                                                    <span className="inline-flex rounded-full border border-gray-200 bg-gray-100 px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-gray-500 uppercase">
+                                                        Voluntário inativo
+                                                    </span>
+                                                )}
+                                            </>
                                         ) : (
                                             <>
                                                 <span
@@ -170,6 +183,19 @@ const Cards: React.FC<Props> = ({
 
                                 {ehAdministrador ? (
                                     <div className="flex shrink-0 items-center justify-between gap-4 border-t border-amber-50 pt-4 sm:w-auto sm:justify-end sm:border-t-0 sm:border-l sm:border-amber-50 sm:pt-0 sm:pl-6">
+                                        {!convidados && exibindoInativos ? (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    onReativar(voluntario)
+                                                }
+                                                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                                            >
+                                                <RotateCcw className="size-4" />
+                                                Reativar
+                                            </button>
+                                        ) : null}
+
                                         {convidados &&
                                         podeReenviarConvite(
                                             voluntario.statusKey,
@@ -192,7 +218,7 @@ const Cards: React.FC<Props> = ({
                                             </button>
                                         ) : null}
 
-                                        {!convidados ? (
+                                        {!convidados && !exibindoInativos ? (
                                             <Link
                                                 href={edit.url(voluntario.id)}
                                                 prefetch
@@ -209,7 +235,8 @@ const Cards: React.FC<Props> = ({
                                         {(!convidados ||
                                             podeCancelarConvite(
                                                 voluntario.statusKey,
-                                            )) && (
+                                            )) &&
+                                            !exibindoInativos && (
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger className="inline-flex size-9 items-center justify-center rounded-full text-amber-700 opacity-80 transition hover:bg-amber-50 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
                                                     <MoreHorizontal

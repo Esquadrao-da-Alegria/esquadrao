@@ -165,13 +165,64 @@ class EventoTest extends TestCase
 
     // ─── Validações de criação ────────────────────────────────────────────────
 
-    public function test_tipo_evento_e_rejeitado(): void
+    public function test_admin_consegue_criar_evento_do_tipo_evento(): void
     {
         $admin = $this->usuarioAdmin();
 
         $this->actingAs($admin)
             ->post(route('eventos.store'), $this->dadosEvento(['tipo' => 'evento']))
+            ->assertRedirect(route('eventos.index'))
+            ->assertSessionDoesntHaveErrors('tipo');
+
+        $this->assertDatabaseHas('eventos', [
+            'titulo' => 'Oficina de alegria',
+            'tipo'   => 'evento',
+        ]);
+    }
+
+    public function test_admin_consegue_alterar_tipo_para_evento(): void
+    {
+        $admin  = $this->usuarioAdmin();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
+
+        $this->actingAs($admin)
+            ->put(route('eventos.update', $evento), $this->dadosEvento(['tipo' => 'evento']))
+            ->assertRedirect(route('eventos.show', $evento))
+            ->assertSessionDoesntHaveErrors('tipo');
+
+        $this->assertDatabaseHas('eventos', [
+            'id'   => $evento->id,
+            'tipo' => 'evento',
+        ]);
+    }
+
+    public function test_tipo_de_evento_desconhecido_e_rejeitado(): void
+    {
+        $admin = $this->usuarioAdmin();
+
+        $this->actingAs($admin)
+            ->post(route('eventos.store'), $this->dadosEvento(['tipo' => 'outro']))
             ->assertSessionHasErrors('tipo');
+    }
+
+    public function test_tipos_oficina_e_reuniao_continuam_aceitos(): void
+    {
+        $admin = $this->usuarioAdmin();
+
+        foreach (['oficina', 'reuniao'] as $tipo) {
+            $this->actingAs($admin)
+                ->post(route('eventos.store'), $this->dadosEvento([
+                    'titulo' => "Atividade {$tipo}",
+                    'tipo'   => $tipo,
+                ]))
+                ->assertRedirect(route('eventos.index'))
+                ->assertSessionDoesntHaveErrors('tipo');
+
+            $this->assertDatabaseHas('eventos', [
+                'titulo' => "Atividade {$tipo}",
+                'tipo'   => $tipo,
+            ]);
+        }
     }
 
     public function test_data_fim_e_obrigatoria_ao_criar_evento(): void
