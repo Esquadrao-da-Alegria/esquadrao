@@ -21,6 +21,7 @@ import {
     CalendarDays,
     ChevronLeft,
     ChevronRight,
+    Download,
     MapPin,
     Plus,
 } from 'lucide-react';
@@ -178,6 +179,15 @@ const Index: FC<Props> = ({
                                 <ChevronRight className="size-4" />
                             </button>
                         </div>
+
+                        {/* Exportar para calendário */}
+                        <a
+                            href="/calendario/exportar/eventos"
+                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-full border border-amber-300 bg-white px-4 py-2.5 text-sm font-medium text-amber-700 shadow-sm transition hover:bg-amber-50 focus:outline-none sm:w-auto"
+                        >
+                            <Download className="size-4" aria-hidden />
+                            Exportar para calendário
+                        </a>
 
                         {props.eh_administrador ? (
                             <Link
