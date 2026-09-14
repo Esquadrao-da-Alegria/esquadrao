@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'browsershot' => [
+        'chrome_path' => env('CHROME_PATH', '/usr/bin/google-chrome-stable'),
+    ],
+
 ];
