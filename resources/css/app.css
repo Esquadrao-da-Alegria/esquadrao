@@ -178,3 +178,32 @@ body {
     background: #fff !important;
     background-image: none !important;
 }
+
+@keyframes entrar-pagina {
+    from {
+        opacity: 0;
+        transform: translateX(1.5rem);
+    }
+}
+
+@keyframes sair-pagina {
+    to {
+        opacity: 0;
+        transform: translateX(-1.5rem);
+    }
+}
+
+::view-transition-old(root) {
+    animation: 220ms ease-out both sair-pagina;
+}
+
+::view-transition-new(root) {
+    animation: 260ms ease-out both entrar-pagina;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation: none;
+    }
+}

@@ -1,4 +1,4 @@
-import MarketingLayout from '@/layouts/MarketingLayout';
+import SiteLayout from '@/layouts/SiteLayout';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -87,7 +87,7 @@ const Index: React.FC = () => {
     };
 
     return (
-        <MarketingLayout>
+        <SiteLayout>
             <section
                 id="fale-conosco"
                 className="mx-auto w-full max-w-6xl px-4 py-16 md:py-24"
@@ -218,7 +218,7 @@ const Index: React.FC = () => {
                     </div>
                 </div>
             </section>
-        </MarketingLayout>
+        </SiteLayout>
     );
 };
 

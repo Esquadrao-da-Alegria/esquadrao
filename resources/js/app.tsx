@@ -1,6 +1,6 @@
 import '../css/app.css';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
@@ -32,3 +32,34 @@ createInertiaApp({
 });
 
 initializeTheme();
+
+function habilitarTransicaoPagina(): void {
+    if (typeof document.startViewTransition !== 'function') {
+        return;
+    }
+
+    let concluir: (() => void) | null = null;
+
+    const liberar = (): void => {
+        concluir?.();
+        concluir = null;
+    };
+
+    router.on('start', (evento) => {
+        if (evento.detail.visit.prefetch || concluir) {
+            return;
+        }
+
+        document.startViewTransition(() => {
+            return new Promise<void>((resolver) => {
+                concluir = resolver;
+            });
+        });
+    });
+
+    router.on('finish', liberar);
+    router.on('invalid', liberar);
+    router.on('exception', liberar);
+}
+
+habilitarTransicaoPagina();
