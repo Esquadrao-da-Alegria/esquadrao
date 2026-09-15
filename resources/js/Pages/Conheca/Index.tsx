@@ -1,4 +1,4 @@
-import MarketingLayout from '@/layouts/MarketingLayout';
+import SiteLayout from '@/layouts/SiteLayout';
 import fale_conosco from '@/routes/fale_conosco';
 import { Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -106,7 +106,7 @@ const Index: React.FC = () => {
         return () => clearInterval(interval);
     }, []);
     return (
-        <MarketingLayout>
+        <SiteLayout>
             {/* Caroussel FOTOS */}
             <div className="relative mx-auto w-[90%] overflow-hidden rounded-2xl p-2 shadow-xl">
                 {/* Fundo animado simples */}
@@ -543,7 +543,7 @@ const Index: React.FC = () => {
                     ></div>
                 </div>
             </section>
-        </MarketingLayout>
+        </SiteLayout>
     );
 };
 
