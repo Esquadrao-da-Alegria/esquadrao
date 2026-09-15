@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 class Hospital extends Model
@@ -29,6 +30,11 @@ class Hospital extends Model
     protected $with = ['alas'];
 
     protected $table = 'hospitais';
+
+    public function cidade(): BelongsTo
+    {
+        return $this->belongsTo(Cidade::class);
+    }
 
     public function alas()
     {

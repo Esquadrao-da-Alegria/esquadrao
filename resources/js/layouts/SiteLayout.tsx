@@ -12,7 +12,7 @@ interface Props {
     children: React.ReactNode;
 }
 
-const MarketingLayout: React.FC<Props> = ({ children }) => {
+const SiteLayout: React.FC<Props> = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const { props } = usePage<SharedData>();
     const isAuthenticated = Boolean(props.auth?.user);
@@ -28,7 +28,7 @@ const MarketingLayout: React.FC<Props> = ({ children }) => {
     return (
         <div className="flex min-h-screen flex-col bg-white text-gray-900">
             {/* Navbar */}
-            <header className="fixed top-0 z-50 w-full bg-white shadow">
+            <header className="sticky top-0 z-50 w-full bg-white shadow">
                 <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
                     {/* Logo */}
                     <Link href={home()} className="flex items-center">
@@ -111,10 +111,10 @@ const MarketingLayout: React.FC<Props> = ({ children }) => {
             </header>
 
             {/* Conteúdo */}
-            <main className="flex-1 pt-24">{children}</main>
+            <main className="flex-1">{children}</main>
 
             {/* Footer */}
-            <footer className="mt-24 bg-[#ED1B24] py-10 text-white">
+            <footer className="bg-[#ED1B24] py-10 text-white">
                 <div className="mx-auto max-w-7xl px-6">
                     <div className="flex flex-col items-center justify-between gap-10 md:flex-row md:items-start">
                         {/* Logo */}
@@ -203,4 +203,4 @@ const MarketingLayout: React.FC<Props> = ({ children }) => {
     );
 };
 
-export default MarketingLayout;
+export default SiteLayout;

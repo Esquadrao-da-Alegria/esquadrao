@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\Dashboard\Controller as DashboardController;
 use App\Http\Controllers\Web\Dashboard\Meu\Controller as MeuDashboardController;
 use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVisitaHospitalController;
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
+use App\Http\Controllers\Web\Dashboard\Visita\Participante\ExportController as DashboardVisitaParticipanteExportController;
 use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
 use App\Http\Controllers\Web\Evento\PresencaQr\Acesso\Controller as EventoPresencaQrAcessoController;
 use App\Http\Controllers\Web\Evento\PresencaQr\Confirmacao\Controller as EventoPresencaQrConfirmacaoController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Web\Hospital\Meta\Controller as HospitalMetaController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\MeuEventoController;
+use App\Http\Controllers\Web\CalendarioExportController;
 use App\Http\Controllers\Web\MeuPerfilController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -105,6 +107,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('visitas-por-participante', [DashboardVisitaParticipanteController::class, 'index'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
             ->name('visitas-por-participante');
+        Route::get('visitas-por-participante/exportar/{formato}', DashboardVisitaParticipanteExportController::class)
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
+            ->name('visitas-por-participante.exportar');
         Route::get('visitas-por-participante/{voluntario}', [DashboardVisitaParticipanteController::class, 'show'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
             ->name('visitas-por-participante.show');
@@ -114,6 +119,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('ajuda', function () {
         return Inertia::render('Ajuda/Index');
     })->name('ajuda.index');
+
+    // CALENDÁRIO — EXPORTAR
+    Route::prefix('calendario/exportar')->name('calendario.exportar.')->group(function () {
+        Route::get('visitas', [CalendarioExportController::class, 'visitas'])->name('visitas');
+        Route::get('eventos', [CalendarioExportController::class, 'eventos'])->name('eventos');
+    });
 
     // JSON
     ROUTE::prefix('json')->name('json.')->group(function () {

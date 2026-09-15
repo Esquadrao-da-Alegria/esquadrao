@@ -24,11 +24,39 @@ class Service
     public function index(User $gestor, array $filtros): array
     {
         $filtros = $this->normalizarFiltros($gestor, $filtros);
+        $linhas = $this->montarLinhas($filtros);
+
+        $pagina = (int) ($filtros['page'] ?? LengthAwarePaginator::resolveCurrentPage());
+        $paginacao = new LengthAwarePaginator(
+            $linhas->forPage($pagina, 15)->values(),
+            $linhas->count(),
+            15,
+            $pagina,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return [
+            'participantes' => $paginacao,
+            'indicadores' => $this->indicadores($linhas),
+            'filtros' => $this->filtrosView($filtros),
+            'opcoes' => $this->opcoes($gestor, $filtros),
+            'escopo_global' => $this->possuiEscopoGlobal($gestor),
+        ];
+    }
+
+    public function exportar(User $gestor, array $filtros): \Illuminate\Support\Collection
+    {
+        $filtros = $this->normalizarFiltros($gestor, $filtros);
+        return $this->montarLinhas($filtros);
+    }
+
+    private function montarLinhas(array $filtros): \Illuminate\Support\Collection
+    {
         $dados = $this->queries->index($filtros);
         $mesesCalculo = $this->meses($filtros['inicio']->copy()->subMonth(), $filtros['fim']);
         $mesesExibidos = array_slice($mesesCalculo, 1);
 
-        $linhas = $dados['usuarios']->map(function (User $user) use ($dados, $mesesCalculo, $mesesExibidos, $filtros) {
+        return $dados['usuarios']->map(function (User $user) use ($dados, $mesesCalculo, $mesesExibidos, $filtros) {
             $tipo = $this->metaService->tipo($user);
             $validas = $dados['visitasValidas']->where('voluntario_id', $user->id);
             $porMes = $validas->groupBy(fn ($visita) => substr($visita->inicio_em, 0, 7))->map->count()->all();
@@ -81,23 +109,6 @@ class Service
             ->when($filtros['atividade'] === 'reunioes', fn ($itens) => $itens->filter(fn ($item) => $item['reunioes']['presencas'] > 0))
             ->when($filtros['atividade'] === 'oficinas', fn ($itens) => $itens->filter(fn ($item) => $item['oficinas']['presencas'] > 0))
             ->values();
-
-        $pagina = (int) ($filtros['page'] ?? LengthAwarePaginator::resolveCurrentPage());
-        $paginacao = new LengthAwarePaginator(
-            $linhas->forPage($pagina, 15)->values(),
-            $linhas->count(),
-            15,
-            $pagina,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        return [
-            'participantes' => $paginacao,
-            'indicadores' => $this->indicadores($linhas),
-            'filtros' => $this->filtrosView($filtros),
-            'opcoes' => $this->opcoes($gestor, $filtros),
-            'escopo_global' => $this->possuiEscopoGlobal($gestor),
-        ];
     }
 
     public function show(User $gestor, User $voluntario, array $filtros): array

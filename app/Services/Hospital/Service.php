@@ -234,7 +234,15 @@ class Service
         $agrupado = [];
 
         foreach ($lista as $hospital) {
-            $slugCidade = $mapaCidades[$hospital->cidade_id] ?? null;
+            $endereco = mb_strtolower((string) $hospital->endereco);
+
+            if (str_contains($endereco, 'são leopoldo') || str_contains($endereco, 'sao leopoldo')) {
+                $slugCidade = 'sao_leopoldo';
+            } elseif (str_contains($endereco, 'canoas')) {
+                $slugCidade = 'canoas';
+            } else {
+                $slugCidade = $mapaCidades[$hospital->cidade_id] ?? null;
+            }
 
             if (!$slugCidade) {
                 continue; // ignora cidades não mapeadas
