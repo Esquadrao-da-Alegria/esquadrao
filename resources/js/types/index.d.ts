@@ -41,7 +41,8 @@ export type PermissaoDashboard =
     | 'dashboard.meu'
     | 'dashboard.visao_geral'
     | 'dashboard.visitas_por_hospital'
-    | 'dashboard.visitas_por_participante';
+    | 'dashboard.visitas_por_participante'
+    | 'dashboard.participacao_semestral';
 
 export type MotivoAfastamento =
     'atestado_medico' | 'licenca_pessoal' | 'estudos' | 'outro';

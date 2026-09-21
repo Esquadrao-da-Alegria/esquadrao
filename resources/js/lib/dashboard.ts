@@ -1,6 +1,7 @@
 import { dashboard } from '@/routes';
 import {
     meu,
+    participacaoSemestral,
     visitasPorHospital,
     visitasPorParticipante,
 } from '@/routes/dashboards';
@@ -41,6 +42,13 @@ export const itensDashboards = [
         caminho: '/dashboards/visitas-por-participante',
         icone: ChartNoAxesCombined,
         permissao: 'dashboard.visitas_por_participante',
+    },
+    {
+        titulo: 'Participação semestral',
+        href: participacaoSemestral(),
+        caminho: '/dashboards/participacao-semestral',
+        icone: ChartNoAxesCombined,
+        permissao: 'dashboard.participacao_semestral',
     },
 ] satisfies Array<{
     titulo: string;
