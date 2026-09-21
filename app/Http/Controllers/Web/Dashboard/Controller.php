@@ -14,6 +14,9 @@ class Controller extends BaseController
 
     public function index(Request $request): Response
     {
-        return Inertia::render('Dashboard', $this->service->index($request->user()));
+        return Inertia::render('Dashboard', $this->service->index(
+            $request->user(),
+            $request->query('cidade_aniversariantes_id'),
+        ));
     }
 }
