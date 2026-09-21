@@ -34,6 +34,10 @@ export interface SharedData {
     mensagem_erro?: string | null;
     mensagem_alerta?: string | null;
     link_convite?: string | null;
+    aniversariante_atual?: {
+        nome: string;
+        data: string;
+    } | null;
     [key: string]: unknown;
 }
 
