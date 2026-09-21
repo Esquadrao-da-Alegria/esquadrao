@@ -10,18 +10,21 @@ class Service
     public const VISAO_GERAL = 'dashboard.visao_geral';
     public const VISITAS_POR_HOSPITAL = 'dashboard.visitas_por_hospital';
     public const VISITAS_POR_PARTICIPANTE = 'dashboard.visitas_por_participante';
+    public const PARTICIPACAO_SEMESTRAL = 'dashboard.participacao_semestral';
 
     public const PERMISSOES = [
         self::MEU_DASHBOARD,
         self::VISAO_GERAL,
         self::VISITAS_POR_HOSPITAL,
         self::VISITAS_POR_PARTICIPANTE,
+        self::PARTICIPACAO_SEMESTRAL,
     ];
 
     private const PERMISSOES_GERENCIAIS = [
         self::VISAO_GERAL,
         self::VISITAS_POR_HOSPITAL,
         self::VISITAS_POR_PARTICIPANTE,
+        self::PARTICIPACAO_SEMESTRAL,
     ];
 
     public function permite(User $user, string $permissao): bool
@@ -38,6 +41,15 @@ class Service
 
         if ($permissao === self::VISITAS_POR_PARTICIPANTE) {
             return $user->cargos->contains(fn ($cargo) => $cargo->slug === 'administrador');
+        }
+
+        if ($permissao === self::PARTICIPACAO_SEMESTRAL) {
+            if ($user->cargos->contains(fn ($cargo) => in_array($cargo->slug, ['administrador', 'coordenador_geral'], true))) {
+                return true;
+            }
+
+            return $user->cargos->contains(fn ($cargo) => $cargo->slug === 'coordenador_local')
+                && $user->voluntario?->cidade_base_id !== null;
         }
 
         if ($permissao === self::VISITAS_POR_HOSPITAL) {
@@ -63,6 +75,7 @@ class Service
             self::VISAO_GERAL => $this->permite($user, self::VISAO_GERAL),
             self::VISITAS_POR_HOSPITAL => $this->permite($user, self::VISITAS_POR_HOSPITAL),
             self::VISITAS_POR_PARTICIPANTE => $this->permite($user, self::VISITAS_POR_PARTICIPANTE),
+            self::PARTICIPACAO_SEMESTRAL => $this->permite($user, self::PARTICIPACAO_SEMESTRAL),
         ];
     }
 }

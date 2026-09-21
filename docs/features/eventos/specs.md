@@ -20,6 +20,21 @@ O frontend e o backend devem manter a mesma lista de tipos. Valores diferentes d
 
 ---
 
+## Participação semestral
+
+O dashboard gerencial **Participação semestral** apresenta uma relação de integrantes com os totais separados de presenças em reuniões e oficinas no semestre selecionado. É uma consulta informativa: não altera cadastro, não aplica advertência e não bloqueia voluntários.
+
+- Rota: `dashboards.participacao-semestral` (`/dashboards/participacao-semestral`).
+- Acesso: administradores e coordenadores gerais têm escopo global; coordenadores locais têm acesso apenas à própria cidade-base; diretores e voluntários sem esses cargos recebem HTTP 403. Coordenador local sem cidade-base não acessa a consulta.
+- Por padrão, a tela abre no semestre atual e mostra integrantes ativos. A situação é o status atual do cadastro, inclusive ao consultar períodos anteriores; não há histórico de status nesta modelagem.
+- Filtros: ano, semestre, nome ou e-mail, situação atual e cidade para escopo global. Perfis globais com cidade-base iniciam nela e podem escolher outra cidade ou todas; contas globais sem cidade-base iniciam em todas.
+- A relação mantém integrantes sem presença, com `0` em reuniões e oficinas.
+- Uma presença é contabilizada somente quando `evento_participantes.presenca = presente`, o evento é `finalizado` e seu tipo é `reuniao` ou `oficina`. Inscrição, ausência, presença pendente, evento cancelado e o tipo `evento` não entram.
+- Nesta versão, a presença entra somente quando o evento pertence à cidade-base do integrante. Participações em intercâmbio permanecem registradas no histórico, mas não elevam o consolidado, para manter coerência com o indicador individual atual. Caso a regra mude, alterar as duas consultas de `Dashboard\\Evento\\ParticipacaoSemestral\\Queries` e seus testes.
+- Os detalhes expansíveis mostram os eventos que compõem os totais da página atual. A listagem e os detalhes usam consultas agregadas em lote, sem consulta por integrante.
+
+---
+
 ## Cadastro e edição
 
 - Somente administradores podem acessar as rotas de criação e edição.
