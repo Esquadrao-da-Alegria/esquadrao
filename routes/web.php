@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\Dashboard\Meu\Controller as MeuDashboardController;
 use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVisitaHospitalController;
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\ExportController as DashboardVisitaParticipanteExportController;
+use App\Http\Controllers\Web\Dashboard\Evento\ParticipacaoSemestral\Controller as DashboardParticipacaoSemestralController;
 use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
 use App\Http\Controllers\Web\Evento\PresencaQr\Acesso\Controller as EventoPresencaQrAcessoController;
 use App\Http\Controllers\Web\Evento\PresencaQr\Confirmacao\Controller as EventoPresencaQrConfirmacaoController;
@@ -113,6 +114,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('visitas-por-participante/{voluntario}', [DashboardVisitaParticipanteController::class, 'show'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
             ->name('visitas-por-participante.show');
+
+        Route::get('participacao-semestral', DashboardParticipacaoSemestralController::class)
+            ->middleware('can:'.DashboardPermissaoService::PARTICIPACAO_SEMESTRAL)
+            ->name('participacao-semestral');
     });
 
     // AJUDA

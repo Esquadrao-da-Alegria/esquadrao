@@ -73,6 +73,21 @@ Os avisos da primeira versão são administrados por deploy em `config/dashboard
 
 O Service entrega avisos gerais e avisos da cidade-base, respeita o período e limita o bloco a três itens. Uma falha de leitura gera lista vazia e log sem dados pessoais; os demais blocos continuam disponíveis.
 
+## Aniversariantes
+
+O bloco **Aniversariantes** apresenta voluntários ativos que fazem aniversário no mês atual. Cada item envia somente nome, foto já permitida, dia, mês e indicação de aniversário no dia atual. Ano de nascimento, idade, e-mail, telefone e outros dados pessoais não são enviados ao frontend.
+
+- Voluntários sem `data_nascimento`, com `voluntarios.status` inativo ou com a conta vinculada inativa não aparecem.
+- Voluntários em afastamento continuam aparecendo enquanto estiverem ativos.
+- A lista é ordenada pelo dia e, em empate, pelo nome.
+- Usuários com escopo restrito veem somente a cidade-base; sem cidade-base, o bloco fica vazio.
+- Usuários com escopo global iniciam na cidade-base quando ela existe e podem selecionar outra cidade ou todas; contas globais sem cidade-base iniciam em todas as cidades.
+- A cidade escolhida afeta somente o bloco de aniversariantes e é sempre validada no servidor.
+- O destaque de hoje é derivado da lista mensal e fica oculto quando não há aniversariantes no dia.
+- Pessoas nascidas em 29/02 permanecem listadas em fevereiro; em anos não bissextos, recebem o destaque e os parabéns em 28/02.
+
+O `HandleInertiaRequests` compartilha `aniversariante_atual` com todas as páginas autenticadas somente quando o usuário autenticado, ativo e vinculado a um voluntário ativo faz aniversário. O payload contém apenas primeiro nome e data corrente. O layout exibe uma mensagem dispensável e registra o fechamento no navegador por usuário e data, sem persistência no banco e sem usar a lista de colegas. Dois aniversariantes no mesmo dia recebem mensagens pessoais independentes.
+
 ## Resumo pessoal
 
 - visitas válidas no mês atual consideram visitas com status `contabilizada` diretamente, e visitas com status `realizada` seguindo a mesma regra coletiva para palhaços e pessoal para paisanas, incluindo aceite administrativo de relatório atrasado;
@@ -99,6 +114,7 @@ A interface não usa linguagem disciplinar, comparação entre voluntários, car
 - Estados de prazo possuem texto e cor.
 - Datas chegam em ISO 8601 e são formatadas em português na interface.
 - Não existe biblioteca visual adicional.
+- O card de aniversariantes usa avatar existente ou iniciais, limita a relação inicial a seis pessoas e permite expansão sem rolagem horizontal.
 
 ## Garantias
 

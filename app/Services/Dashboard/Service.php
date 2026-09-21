@@ -4,6 +4,7 @@ namespace App\Services\Dashboard;
 
 use App\Models\User;
 use App\Queries\Dashboard\Queries;
+use App\Services\Dashboard\Aniversariante\Service as AniversarianteService;
 use App\Services\Dashboard\Visita\Participante\Meta\Service as MetaService;
 use App\Services\Visita\Relatorio\Prazo\Service as PrazoService;
 use Carbon\Carbon;
@@ -15,9 +16,10 @@ class Service
     public function __construct(
         private Queries $queries,
         private MetaService $metaService,
+        private AniversarianteService $aniversarianteService,
     ) {}
 
-    public function index(User $user): array
+    public function index(User $user, ?string $cidadeAniversariantesId = null): array
     {
         resolverUsuario($user);
         $agora = now();
@@ -40,6 +42,7 @@ class Service
             'proximas_atividades' => $atividades,
             'pendencias' => $pendencias,
             'avisos' => $this->avisos($user->voluntario?->cidade_base_id),
+            'aniversariantes' => $this->aniversarianteService->index($user, $cidadeAniversariantesId),
             'resumo' => [
                 'visitas_validas_mes' => $user->voluntario ? $visitasValidas : null,
                 'oficinas_semestre' => $user->voluntario ? $dados['eventosSemestre']->where('tipo', 'oficina')->count() : null,
@@ -47,6 +50,11 @@ class Service
                 'meta' => $this->meta($tipoAtuacao, $visitasValidas),
             ],
         ];
+    }
+
+    public function aniversarianteAtual(User $user): ?array
+    {
+        return $this->aniversarianteService->atual($user);
     }
 
     private function atividades(object $visitas, object $eventos): array
