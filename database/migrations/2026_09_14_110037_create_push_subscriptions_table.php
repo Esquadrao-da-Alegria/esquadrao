@@ -18,13 +18,12 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->text('endpoint');
+            $table->string('endpoint', 500)->unique();
             $table->text('p256dh');
             $table->text('auth');
+            $table->timestamp('invalidado_em')->nullable();
 
             $table->timestamps();
-
-            $table->unique(['user_id', 'endpoint']);
         });
     }
 

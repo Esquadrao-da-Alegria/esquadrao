@@ -16,6 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import PushNotificationBanner from '@/components/push-notification-banner';
 import { itensDashboards } from '@/lib/dashboard';
 import { cn } from '@/lib/utils';
 import { toastAviso, toastErro, toastSucesso } from '@/lib/utils/toast';
@@ -522,7 +523,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                     </nav>
                 </header>
 
-                <main className="flex-1">{children}</main>
+                <main className="flex-1">
+                    <div className="mx-auto max-w-7xl px-6 pt-4">
+                        <PushNotificationBanner />
+                    </div>
+                    {children}
+                </main>
 
                 <footer className="border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
                     <p>

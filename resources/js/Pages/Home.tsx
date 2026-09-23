@@ -103,21 +103,6 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
 
     } 
 
-    const enableNotification = () => {
-        Notification.requestPermission().then((permission) => {
-        if (permission === "granted") {
-            navigator.serviceWorker.ready.then((sw) => {
-                sw.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: import.meta.env.VITE_PUSH_PUBLIC_KEY,
-                }).then((subscription) => { 
-                    console.log(JSON.stringify(subscription));
-                })
-            })  
-        }
-    });
-};
-
     return (
         <MarketingLayout>
             {/* Banner Principal */}

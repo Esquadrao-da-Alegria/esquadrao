@@ -218,7 +218,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store'])
-        ->middleware('auth');
+        ->middleware('auth')
+        ->name('push-subscriptions.store');
+    Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy'])
+        ->middleware('auth')
+        ->name('push-subscriptions.destroy');
 
 });
 
