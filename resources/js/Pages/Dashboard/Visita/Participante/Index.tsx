@@ -10,6 +10,7 @@ import {
     AlertTriangle,
     CheckCircle2,
     ChevronDown,
+    Download,
     Eye,
     MapPin,
     Search,
@@ -91,6 +92,23 @@ export default function Index({
     const [consultando, setConsultando] = useState(false);
     const [participanteSelecionado, setParticipanteSelecionado] =
         useState<AcompanhamentoParticipante | null>(null);
+    const [mostrarExport, setMostrarExport] = useState(false);
+
+    const urlExportar = (formato: string) => {
+        const params = new URLSearchParams();
+        params.set('periodo_tipo', filtros.periodo_tipo);
+        params.set('ano', String(filtros.ano));
+        if (filtros.mes) params.set('mes', String(filtros.mes));
+        if (filtros.semestre) params.set('semestre', String(filtros.semestre));
+        if (filtros.cidade_id) params.set('cidade_id', String(filtros.cidade_id));
+        if (filtros.visao_global) params.set('visao_global', '1');
+        if (filtros.cargo_id) params.set('cargo_id', String(filtros.cargo_id));
+        if (filtros.tipo_atuacao) params.set('tipo_atuacao', filtros.tipo_atuacao);
+        if (filtros.situacao) params.set('situacao', filtros.situacao);
+        if (filtros.atividade) params.set('atividade', filtros.atividade);
+        if (filtros.busca) params.set('busca', filtros.busca);
+        return `/dashboards/visitas-por-participante/exportar/${formato}?${params.toString()}`;
+    };
 
     const consultar = (
         alteracoes: Record<string, string | number | undefined | null>,
@@ -175,18 +193,56 @@ export default function Index({
         <PainelLayout>
             <Head title="Visitas por participante" />
             <div className="mx-auto max-w-7xl space-y-6 px-5 py-8 sm:px-6 lg:px-8">
-                <header>
-                    <p className="text-sm font-semibold text-amber-700">
-                        Apoio à decisão
-                    </p>
-                    <h1 className="mt-1 text-2xl font-semibold text-amber-950 sm:text-3xl">
-                        Participação dos voluntários
-                    </h1>
-                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-amber-900/60">
-                        Indicadores organizam os dados para análise humana.
-                        Nenhuma sinalização aplica advertência, afastamento ou
-                        altera o cadastro.
-                    </p>
+                <header className="flex items-start justify-between gap-4">
+                    <div>
+                        <p className="text-sm font-semibold text-amber-700">
+                            Apoio à decisão
+                        </p>
+                        <h1 className="mt-1 text-2xl font-semibold text-amber-950 sm:text-3xl">
+                            Participação dos voluntários
+                        </h1>
+                        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-amber-900/60">
+                            Indicadores organizam os dados para análise humana.
+                            Nenhuma sinalização aplica advertência, afastamento ou
+                            altera o cadastro.
+                        </p>
+                    </div>
+                    <div className="relative shrink-0">
+                        <button
+                            type="button"
+                            onClick={() => setMostrarExport((v) => !v)}
+                            className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-white px-4 py-2.5 text-sm font-medium text-amber-700 shadow-sm transition hover:bg-amber-50 focus:outline-none"
+                        >
+                            <Download className="size-4" aria-hidden />
+                            Exportar
+                            <ChevronDown className={`size-3.5 transition ${mostrarExport ? 'rotate-180' : ''}`} aria-hidden />
+                        </button>
+                        {mostrarExport && (
+                            <div className="absolute right-0 z-10 mt-2 w-44 rounded-xl border border-amber-100 bg-white shadow-lg">
+                                <a
+                                    href={urlExportar('pdf')}
+                                    className="flex rounded-t-xl px-4 py-2.5 text-sm text-amber-900 hover:bg-amber-50"
+                                    onClick={() => setMostrarExport(false)}
+                                >
+                                    PDF
+                                </a>
+                                <a
+                                    href={urlExportar('csv')}
+                                    className="flex px-4 py-2.5 text-sm text-amber-900 hover:bg-amber-50"
+                                    onClick={() => setMostrarExport(false)}
+                                >
+                                    CSV
+                                </a>
+                                <a
+                                    href={urlExportar('xlsx')}
+                                    className="flex rounded-b-xl px-4 py-2.5 text-sm text-amber-900 hover:bg-amber-50"
+                                    onClick={() => setMostrarExport(false)}
+                                >
+                                    Excel (.xlsx)
+                                </a>
+                            </div>
+                        )}
+                    </div>
                 </header>
 
                 <form

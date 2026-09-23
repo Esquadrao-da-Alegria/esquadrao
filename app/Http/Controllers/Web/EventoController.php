@@ -9,6 +9,7 @@ use App\Http\Requests\Web\Evento\UpdateRequest;
 use App\Models\Cidade;
 use App\Models\Evento;
 use App\Models\User;
+use App\Services\Evento\PresencaQr\Service as PresencaQrService;
 use App\Services\Lembrete\Agendamento\Service as LembreteAgendamentoService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -82,7 +83,7 @@ class EventoController extends Controller
         return redirect()->route('eventos.index')->with('mensagem_sucesso', 'Evento criado com sucesso.');
     }
 
-    public function show(Request $request, Evento $evento)
+    public function show(Request $request, Evento $evento, PresencaQrService $presencaQrService)
     {
         $evento->load(['responsavel:id,name,email', 'participantesAtivos:id,name,email', 'cidade'])->loadCount('participantesAtivos');
         $user = $request->user();
@@ -90,12 +91,20 @@ class EventoController extends Controller
         $inscrito = $participacao?->pivot->status === 'inscrito';
         $presencaMarcada = $participacao?->pivot->presenca !== null;
         $podeGerenciar = $user->temCargo('administrador') || $evento->responsavel_id === $user->id || $evento->criado_por_id === $user->id;
+        $sessaoPresenca = $podeGerenciar
+            ? $evento->sessoesPresenca()->whereNull('encerrada_em')->first()
+            : null;
 
         return Inertia::render('Evento/Show', [
             'evento' => $evento,
             'inscrito' => $inscrito,
             'presenca_marcada' => $presencaMarcada,
             'pode_gerenciar' => $podeGerenciar,
+            'pode_abrir_presenca_qr' => $podeGerenciar && in_array($evento->tipo, ['oficina', 'reuniao'], true)
+                && $evento->estaAgendado()
+                && $evento->data_inicio->isToday()
+                && now()->gte($evento->data_inicio->copy()->subHour()),
+            'sessao_presenca' => $sessaoPresenca ? $presencaQrService->dados($sessaoPresenca) : null,
             'ajustes_participacao' => $podeGerenciar ? $evento->ajustesParticipacao()->with(['voluntario:id,name', 'administrador:id,name'])->latest()->get() : [],
             'voluntarios_ajuste' => $podeGerenciar ? User::query()->whereNotNull('voluntario_id')->whereHas('voluntario', fn ($query) => $query->where('status', 'ativo'))->orderBy('name')->get(['id', 'name']) : [],
         ]);
@@ -141,7 +150,7 @@ class EventoController extends Controller
         return redirect()->route('eventos.index')->with('mensagem_sucesso', 'Evento excluído com sucesso.');
     }
 
-    public function cancelar(CancelarRequest $request, Evento $evento)
+    public function cancelar(CancelarRequest $request, Evento $evento, PresencaQrService $presencaQrService)
     {
         if ($evento->estaFinalizado()) {
             return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Evento finalizado não pode ser cancelado.');
@@ -151,6 +160,7 @@ class EventoController extends Controller
         }
         $evento->update(['status' => 'cancelado', 'motivo_cancelamento' => $request->validated('motivo_cancelamento'), 'cancelado_em' => now(), 'cancelado_por_id' => $request->user()->id]);
         app(LembreteAgendamentoService::class)->cancelar('evento', $evento->id);
+        $presencaQrService->encerrarAtivas($evento, $request->user());
 
         return redirect()->route('eventos.show', $evento)->with('mensagem_sucesso', 'Evento cancelado com sucesso.');
     }

@@ -7,19 +7,122 @@ import {
     ArrowLeft,
     Settings,
     Trash2,
+    QrCode,
     UserCheck,
     UserX,
     Users,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
     evento: Evento;
     inscrito: boolean;
     presenca_marcada: boolean;
     pode_gerenciar: boolean;
+    pode_abrir_presenca_qr: boolean;
+    sessao_presenca: {
+        id: number;
+        aberta_em: string;
+        expira_em: string;
+        qr_svg: string;
+        confirmacoes: Array<{ id: number; nome: string; confirmada_em: string }>;
+    } | null;
     ajustes_participacao: any[];
     voluntarios_ajuste: Array<{ id: number; name: string }>;
+}
+
+function PresencaQr({
+    evento,
+    podeAbrir,
+    sessao,
+}: {
+    evento: Evento;
+    podeAbrir: boolean;
+    sessao: Props['sessao_presenca'];
+}) {
+    useEffect(() => {
+        if (!sessao) return;
+
+        const intervalo = window.setInterval(() => {
+            router.reload({ only: ['sessao_presenca'] });
+        }, 90000);
+
+        return () => window.clearInterval(intervalo);
+    }, [sessao?.id]);
+
+    return (
+        <section className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-amber-50 px-5 py-4 sm:px-6">
+                <QrCode className="size-4 text-amber-700/70" aria-hidden />
+                <div>
+                    <h2 className="font-semibold text-amber-950">Presença por QR Code</h2>
+                    <p className="text-xs text-amber-900/50">Para participantes presentes no local</p>
+                </div>
+            </div>
+
+            <div className="p-5 sm:p-6">
+                {!sessao ? (
+                    <div className="space-y-3">
+                        <p className="text-sm text-amber-900/60">
+                            A confirmação pode ser aberta no dia do evento, a partir de uma hora antes do início.
+                        </p>
+                        <button
+                            type="button"
+                            disabled={!podeAbrir}
+                            onClick={() => router.post(`/eventos/${evento.id}/presencas-qr/sessoes`)}
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-amber-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-45"
+                        >
+                            <QrCode className="size-4" aria-hidden />
+                            Abrir confirmação
+                        </button>
+                    </div>
+                ) : (
+                    <div className="grid gap-6 md:grid-cols-[minmax(240px,360px)_1fr]">
+                        <div className="text-center">
+                            <div
+                                className="mx-auto aspect-square w-full max-w-[360px] overflow-hidden rounded-xl border border-amber-100 bg-white p-2 [&>svg]:h-full [&>svg]:w-full"
+                                dangerouslySetInnerHTML={{ __html: sessao.qr_svg }}
+                            />
+                            <p className="mt-2 text-xs text-amber-900/50">
+                                O código é renovado automaticamente a cada 2 minutos.
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (window.confirm('Encerrar a confirmação de presença? O QR atual deixará de funcionar.')) {
+                                        router.delete(`/eventos/${evento.id}/presencas-qr/sessoes/${sessao.id}`);
+                                    }
+                                }}
+                                className="mt-4 inline-flex cursor-pointer items-center rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                            >
+                                Encerrar confirmação
+                            </button>
+                        </div>
+
+                        <div>
+                            <p className="text-sm font-semibold text-amber-950">
+                                {sessao.confirmacoes.length} {sessao.confirmacoes.length === 1 ? 'presença confirmada' : 'presenças confirmadas'}
+                            </p>
+                            <ul className="mt-3 max-h-80 divide-y divide-amber-50 overflow-y-auto rounded-xl border border-amber-100">
+                                {sessao.confirmacoes.length === 0 ? (
+                                    <li className="px-4 py-5 text-center text-sm text-amber-900/45">Aguardando confirmações.</li>
+                                ) : (
+                                    sessao.confirmacoes.map((confirmacao) => (
+                                        <li key={confirmacao.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                                            <span className="font-medium text-amber-950">{confirmacao.nome}</span>
+                                            <span className="shrink-0 text-xs text-amber-900/45">
+                                                {new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date(confirmacao.confirmada_em))}
+                                            </span>
+                                        </li>
+                                    ))
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </section>
+    );
 }
 
 const fmt = (v?: string | null) =>
@@ -210,6 +313,8 @@ export default function Show({
     inscrito,
     presenca_marcada,
     pode_gerenciar,
+    pode_abrir_presenca_qr,
+    sessao_presenca,
     ajustes_participacao,
     voluntarios_ajuste,
 }: Props) {
@@ -492,6 +597,14 @@ export default function Show({
 
                 {/* Finalizar evento */}
                 {podeFinalizar && <FinalizacaoForm evento={evento} />}
+
+                {pode_gerenciar && ['oficina', 'reuniao'].includes(evento.tipo) && (
+                    <PresencaQr
+                        evento={evento}
+                        podeAbrir={pode_abrir_presenca_qr}
+                        sessao={sessao_presenca}
+                    />
+                )}
 
                 {/* Registrar presença */}
                 {podeRegistrarPresenca && (

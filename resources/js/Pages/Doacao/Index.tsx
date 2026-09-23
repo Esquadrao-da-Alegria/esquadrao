@@ -1,16 +1,29 @@
-import MarketingLayout from '@/layouts/MarketingLayout';
+import SiteLayout from '@/layouts/SiteLayout';
 import { toastSucesso } from '@/lib/utils/toast';
 
 const Index: React.FC = () => {
-    const pixCode = 'SEU_CODIGO_PIX_AQUI'; // Substitua pelo código PIX real
+    const pixCode = '29151748000177';
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(pixCode);
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(pixCode);
+        } catch {
+            const textarea = document.createElement('textarea');
+            textarea.value = pixCode;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+
         toastSucesso('Código PIX copiado para a área de transferência');
     };
 
     return (
-        <MarketingLayout>
+        <SiteLayout>
             <section className="w-full bg-gradient-to-br from-pink-50 to-red-50 py-16 md:py-24">
                 <div className="mx-auto max-w-6xl px-4">
                     <div className="flex flex-col items-center gap-12 lg:flex-row">
@@ -48,13 +61,11 @@ const Index: React.FC = () => {
                             {/* QR Code e PIX */}
                             <div className="flex flex-col items-center justify-center gap-6 md:flex-row lg:justify-start">
                                 {/* QR Code */}
-                                <div className="rounded-2xl bg-white p-4 shadow-lg">
-                                    <img
-                                        src="../assets/images/QRcode.png"
-                                        alt="QR Code para doação"
-                                        className="h-48 w-48 rounded-lg"
-                                    />
-                                </div>
+                                <img
+                                    src="../assets/images/QRcode.png"
+                                    alt="QR Code para doação"
+                                    className="h-48 w-48 rounded-lg"
+                                />
 
                                 {/* Informações PIX */}
                                 <div className="text-center md:text-left">
@@ -91,7 +102,7 @@ const Index: React.FC = () => {
                     ></div>
                 </div>
             </section>
-        </MarketingLayout>
+        </SiteLayout>
     );
 };
 

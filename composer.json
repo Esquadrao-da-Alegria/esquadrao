@@ -10,6 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "bacon/bacon-qr-code": "^3.0",
         "inertiajs/inertia-laravel": "^2.0",
         "intervention/image": "^4.2",
         "intervention/image-laravel": "^4.1",
@@ -20,6 +21,7 @@
         "minishlink/web-push": "^11.0",
         "spatie/browsershot": "^5.4",
         "spatie/laravel-pdf": "^2.12",
+        "spatie/simple-excel": "^3.10",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {

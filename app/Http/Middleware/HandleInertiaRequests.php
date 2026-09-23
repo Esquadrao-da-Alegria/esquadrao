@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Helpers\User as UserHelper;
 use App\Services\Dashboard\Permissao\Service as DashboardPermissaoService;
+use App\Services\Dashboard\Service as DashboardService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -63,6 +64,9 @@ class HandleInertiaRequests extends Middleware
             'mensagem_erro' => session('mensagem_erro'),
             'mensagem_alerta' => session('mensagem_alerta'),
             'link_convite' => session('link_convite'),
+            'aniversariante_atual' => $user
+                ? app(DashboardService::class)->aniversarianteAtual($user)
+                : null,
         ];
     }
 }

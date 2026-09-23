@@ -1,4 +1,5 @@
 import PainelLayout from '@/layouts/PainelLayout';
+import Aniversariantes from '@/components/Painel/Dashboard/Aniversariantes/Show';
 import type {
     AtividadeVisaoGeral,
     AvisoVisaoGeral,
@@ -28,6 +29,20 @@ interface Props {
     proximas_atividades: AtividadeVisaoGeral[];
     pendencias: PendenciaVisaoGeral[];
     avisos: AvisoVisaoGeral[];
+    aniversariantes: {
+        itens: Array<{
+            id: number;
+            nome: string;
+            foto_url: string | null;
+            dia: number;
+            mes: number;
+            eh_hoje: boolean;
+        }>;
+        mes: number;
+        cidade_id: number | null;
+        possui_escopo_global: boolean;
+        cidades: Array<{ id: number; nome: string }>;
+    };
     resumo: {
         visitas_validas_mes: number | null;
         oficinas_semestre: number | null;
@@ -61,6 +76,7 @@ export default function Dashboard({
     proximas_atividades,
     pendencias,
     avisos,
+    aniversariantes,
     resumo,
 }: Props) {
     const primeiroNome = contexto.nome.trim().split(' ')[0] || contexto.nome;
@@ -291,6 +307,8 @@ export default function Dashboard({
                         />
                     </div>
                 </section>
+
+                <Aniversariantes aniversariantes={aniversariantes} />
 
                 <section className="rounded-2xl border border-amber-100 bg-gradient-to-r from-amber-50 to-yellow-50/50 p-5">
                     <div className="flex items-center gap-2">

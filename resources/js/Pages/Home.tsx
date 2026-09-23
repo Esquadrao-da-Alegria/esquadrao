@@ -1,4 +1,4 @@
-import MarketingLayout from '@/layouts/MarketingLayout';
+import SiteLayout from '@/layouts/SiteLayout';
 import conheca from '@/routes/conheca';
 import doacoes from '@/routes/doacoes';
 import onde_atuamos from '@/routes/onde_atuamos';
@@ -104,7 +104,7 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
     } 
 
     return (
-        <MarketingLayout>
+        <SiteLayout>
             {/* Banner Principal */}
             <div className="relative w-full overflow-hidden bg-gradient-to-br from-yellow-100 via-pink-100 to-purple-100 py-12 md:py-20">
                 <div className="mx-auto max-w-6xl px-4">
@@ -571,7 +571,7 @@ const Home: React.FC<Props> = ({ patrocinadores = [] }) => {
                     </div>
                 </div>
             </section>
-        </MarketingLayout>
+        </SiteLayout>
     );
 };
 

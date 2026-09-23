@@ -1,7 +1,6 @@
-import MarketingLayout from '@/layouts/MarketingLayout';
+import SiteLayout from '@/layouts/SiteLayout';
 import { Hospital } from '@/types';
 import { useState } from 'react';
-import '../../../css/pages/hospitais.css';
 
 interface ListaHospitais {
     porto_alegre: Hospital[];
@@ -19,13 +18,13 @@ const Index: React.FC<Props> = ({ hospitais }) => {
     console.log(hospitais);
 
     const [cidadeSelecionada, setCidadeSelecionada] =
-        useState<string>('porto_alegre');
+        useState<keyof ListaHospitais>('porto_alegre');
 
-    const handleExibriConteudo = (city: string) => {
+    const handleExibriConteudo = (city: keyof ListaHospitais) => {
         setCidadeSelecionada(city);
     };
 
-    const cidades = [
+    const cidades: { id: keyof ListaHospitais; name: string }[] = [
         { id: 'porto_alegre', name: 'PORTO ALEGRE' },
         { id: 'canoas', name: 'CANOAS' },
         { id: 'sao_leopoldo', name: 'SÃO LEOPOLDO' },
@@ -33,20 +32,14 @@ const Index: React.FC<Props> = ({ hospitais }) => {
         { id: 'pelotas', name: 'PELOTAS' },
     ];
 
-    const HospitalCard = ({ hospital }: { hospital: any }) => (
+    const HospitalCard = ({ hospital }: { hospital: Hospital }) => (
         <div className="mb-16 last:mb-0">
             <div
-                className={`flex flex-col items-center gap-8 lg:flex-row ${
-                    hospital.layout === 'reverse' ? 'lg:flex-row-reverse' : ''
-                }`}
+                className="flex flex-col items-center gap-8 lg:flex-row"
             >
                 {/* Informações do Hospital */}
                 <div
-                    className={`flex-1 ${
-                        hospital.layout === 'reverse'
-                            ? 'lg:pl-8 lg:text-right'
-                            : 'lg:pr-8'
-                    }`}
+                    className="flex-1 lg:pr-8"
                 >
                     <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-purple-50 p-8 shadow-lg transition-all duration-300 hover:shadow-xl">
                         <h3 className="mb-4 text-2xl leading-tight font-bold text-gray-800 md:text-3xl">
@@ -67,8 +60,8 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                 {/* Imagem do Hospital */}
                 <div className="flex-1">
                     <img
-                        src={hospital.url_foto}
-                        alt={hospital.name}
+                        src={hospital.url_foto ?? undefined}
+                        alt={hospital.nome}
                         className="h-64 w-full object-contain md:h-90"
                     />
                 </div>
@@ -77,7 +70,7 @@ const Index: React.FC<Props> = ({ hospitais }) => {
     );
 
     return (
-        <MarketingLayout>
+        <SiteLayout>
             {/* Banner Principal */}
             <section className="animate-fadeIn relative w-full overflow-hidden bg-gradient-to-b from-pink-50 via-purple-50 to-blue-50 py-20 md:py-12">
                 {/* Elemento decorativo animado no topo */}
@@ -132,92 +125,60 @@ const Index: React.FC<Props> = ({ hospitais }) => {
                 </div>
             </section>
 
-            {/* Cidades */}
-            <div className="flex flex-col items-center justify-center gap-6 rounded-3xl bg-gradient-to-br from-purple-50 to-cyan-50 p-8 shadow-2xl md:flex-row">
-                {cidades.map((cidade) => (
-                    <div
-                        key={cidade.id}
-                        className={`group relative flex min-w-[220px] cursor-pointer items-center justify-between rounded-2xl border-2 border-transparent px-8 py-4 transition-all duration-500 ${
-                            cidadeSelecionada === cidade.id
-                                ? '-translate-y-2 scale-105 transform border-white/30 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl'
-                                : 'bg-white/80 text-gray-800 shadow-lg backdrop-blur-sm hover:scale-105 hover:border-purple-300 hover:bg-gradient-to-r hover:from-white hover:to-purple-50 hover:shadow-xl'
-                        } `}
-                        onClick={() => handleExibriConteudo(cidade.id)}
-                    >
-                        {/* Efeito de brilho para o estado ativo */}
-                        {cidadeSelecionada === cidade.id && (
-                            <div className="absolute -inset-1 animate-pulse rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 opacity-30 blur"></div>
-                        )}
-
-                        <span
-                            className={`relative z-10 text-lg font-bold tracking-wider uppercase ${cidadeSelecionada === cidade.id ? 'text-white drop-shadow-md' : 'text-gray-800 group-hover:text-purple-700'} `}
+            <nav
+                aria-label="Cidades"
+                className="border-b border-gray-200 bg-white"
+            >
+                <div className="mx-auto flex max-w-7xl flex-wrap justify-center gap-x-8 gap-y-1 px-4">
+                    {cidades.map((cidade) => (
+                        <button
+                            key={cidade.id}
+                            type="button"
+                            onClick={() => handleExibriConteudo(cidade.id)}
+                            className={`border-b-2 py-4 text-sm font-medium tracking-wide transition-colors ${
+                                cidadeSelecionada === cidade.id
+                                    ? 'border-purple-600 text-purple-700'
+                                    : 'border-transparent text-gray-500 hover:text-gray-800'
+                            }`}
                         >
                             {cidade.name}
-                        </span>
-
-                        <div
-                            className={`relative ml-5 text-xl transition-all duration-500 ${
-                                cidadeSelecionada === cidade.id
-                                    ? 'rotate-180 text-purple-600'
-                                    : 'text-purple-500 group-hover:text-pink-500'
-                            } `}
-                        >
-                            ▾
-                        </div>
-
-                        {/* Efeito de partículas no hover */}
-                        <div className="absolute inset-0 -skew-x-12 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
-                    </div>
-                ))}
-            </div>
+                        </button>
+                    ))}
+                </div>
+            </nav>
 
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    {/* Conteúdo das Cidades */}
-                    <div className="space-y-12">
-                        {Object.entries(hospitais).map(
-                            ([cidadeLoop, listaAgrupada]) => (
-                                <div
-                                    key={cidadeLoop}
-                                    className={`rounded-3xl p-8 transition-all duration-500 ${
-                                        cidadeSelecionada === cidadeLoop
-                                            ? 'block scale-100 opacity-100'
-                                            : 'hidden scale-95 opacity-0'
-                                    }`}
-                                >
-                                    <div className="mb-12 text-center">
-                                        <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-4xl font-black text-transparent md:text-5xl">
-                                            {cidadeLoop === 'porto_alegre' &&
-                                                'PORTO ALEGRE'}
-                                            {cidadeLoop === 'santa_maria' &&
-                                                'SANTA MARIA'}
-                                            {cidadeLoop === 'pelotas' &&
-                                                'PELOTAS'}
-                                            {cidadeLoop === 'canoas' &&
-                                                'CANOAS'}
-                                            {cidadeLoop === 'sao_leopoldo' &&
-                                                'SÃO LEOPOLDO'}
-                                        </h2>
-                                        <div className="mx-auto h-1 w-24 rounded-full bg-gradient-to-r from-purple-400 to-blue-400"></div>
-                                    </div>
+                    <div
+                        key={cidadeSelecionada}
+                        className="animate-in fade-in slide-in-from-bottom-3 duration-500 rounded-3xl p-8"
+                    >
+                        <div className="mb-12 text-center">
+                            <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-4xl font-black text-transparent md:text-5xl">
+                                {
+                                    cidades.find(
+                                        (cidade) =>
+                                            cidade.id === cidadeSelecionada,
+                                    )?.name
+                                }
+                            </h2>
+                            <div className="mx-auto h-1 w-24 rounded-full bg-gradient-to-r from-purple-400 to-blue-400"></div>
+                        </div>
 
-                                    <div className="space-y-8">
-                                        {listaAgrupada.map(
-                                            (hospital: Hospital) => (
-                                                <HospitalCard
-                                                    key={hospital.id}
-                                                    hospital={hospital}
-                                                />
-                                            ),
-                                        )}
-                                    </div>
-                                </div>
-                            ),
-                        )}
+                        <div className="space-y-8">
+                            {(hospitais[cidadeSelecionada] ?? []).map(
+                                (hospital) => (
+                                    <HospitalCard
+                                        key={hospital.id}
+                                        hospital={hospital}
+                                    />
+                                ),
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </MarketingLayout>
+        </SiteLayout>
     );
 };
 

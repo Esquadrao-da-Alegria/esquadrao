@@ -39,11 +39,13 @@ import {
     ChevronDown,
     ChevronRight,
     CircleHelp,
+    PartyPopper,
     Handshake,
     LayoutDashboard,
     LogOut,
     User,
     UsersRound,
+    X,
     type LucideIcon,
 } from 'lucide-react';
 
@@ -74,6 +76,10 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     const rotaDashboardAtiva =
         pathname === '/dashboard' || pathname.startsWith('/dashboards/');
     const [dashboardsOpen, setDashboardsOpen] = useState(rotaDashboardAtiva);
+    const [aniversarioVisivel, setAniversarioVisivel] = useState(false);
+    const [aniversarioDispensado, setAniversarioDispensado] = useState<
+        string | null
+    >(null);
 
     const user = props.auth?.user;
     const ehAdministrador = props.eh_administrador === true;
@@ -97,6 +103,47 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
     useEffect(() => {
         if (rotaDashboardAtiva) setDashboardsOpen(true);
     }, [rotaDashboardAtiva]);
+
+    useEffect(() => {
+        const aniversariante = props.aniversariante_atual;
+        const chave = aniversariante && user
+            ? `aniversario-dispensado-${user.id}-${aniversariante.data}`
+            : null;
+
+        if (! aniversariante || ! chave) {
+            setAniversarioVisivel(false);
+            return;
+        }
+
+        if (aniversarioDispensado === chave) {
+            setAniversarioVisivel(false);
+            return;
+        }
+
+        try {
+            setAniversarioVisivel(localStorage.getItem(chave) !== 'true');
+        } catch {
+            setAniversarioVisivel(true);
+        }
+    }, [aniversarioDispensado, props.aniversariante_atual, user?.id]);
+
+    const dispensarAniversario = () => {
+        const aniversariante = props.aniversariante_atual;
+
+        if (user && aniversariante) {
+            const chave = `aniversario-dispensado-${user.id}-${aniversariante.data}`;
+
+            setAniversarioDispensado(chave);
+
+            try {
+                localStorage.setItem(chave, 'true');
+            } catch {
+                // O banner permanece dispensado durante a navegação atual.
+            }
+        }
+
+        setAniversarioVisivel(false);
+    };
 
     const closeMobile = () => setMobileOpen(false);
 
@@ -529,6 +576,33 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                     </div>
                     {children}
                 </main>
+
+                {aniversarioVisivel && props.aniversariante_atual && (
+                    <div className="fixed right-4 bottom-4 left-4 z-50 mx-auto max-w-md rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-lg sm:top-6 sm:right-auto sm:bottom-auto sm:left-1/2 sm:-translate-x-1/2">
+                        <div className="flex items-start gap-3">
+                            <PartyPopper
+                                className="mt-0.5 size-5 shrink-0 text-amber-700"
+                                aria-hidden
+                            />
+                            <div className="min-w-0 flex-1">
+                                <p className="font-semibold text-amber-950">
+                                    Feliz aniversário, {props.aniversariante_atual.nome}!
+                                </p>
+                                <p className="mt-1 text-sm leading-relaxed text-amber-900/70">
+                                    Que seu novo ciclo seja cheio de alegria — do jeitinho do Esquadrão.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={dispensarAniversario}
+                                className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-amber-800 hover:bg-amber-100 focus:ring-2 focus:ring-amber-500/20 focus:outline-none"
+                                aria-label="Fechar mensagem de aniversário"
+                            >
+                                <X className="size-4" aria-hidden />
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <footer className="border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-500">
                     <p>

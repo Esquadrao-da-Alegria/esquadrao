@@ -6,7 +6,12 @@ use App\Http\Controllers\Web\Dashboard\Controller as DashboardController;
 use App\Http\Controllers\Web\Dashboard\Meu\Controller as MeuDashboardController;
 use App\Http\Controllers\Web\Dashboard\Visita\Hospital\Controller as DashboardVisitaHospitalController;
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as DashboardVisitaParticipanteController;
+use App\Http\Controllers\Web\Dashboard\Visita\Participante\ExportController as DashboardVisitaParticipanteExportController;
+use App\Http\Controllers\Web\Dashboard\Evento\ParticipacaoSemestral\Controller as DashboardParticipacaoSemestralController;
 use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
+use App\Http\Controllers\Web\Evento\PresencaQr\Acesso\Controller as EventoPresencaQrAcessoController;
+use App\Http\Controllers\Web\Evento\PresencaQr\Confirmacao\Controller as EventoPresencaQrConfirmacaoController;
+use App\Http\Controllers\Web\Evento\PresencaQr\Controller as EventoPresencaQrController;
 use App\Http\Controllers\Web\EventoController;
 use App\Http\Controllers\Web\EventoFinalizacaoController;
 use App\Http\Controllers\Web\EventoInscricaoController;
@@ -15,6 +20,7 @@ use App\Http\Controllers\Web\Hospital\Meta\Controller as HospitalMetaController;
 use App\Http\Controllers\Web\HospitalController;
 use App\Http\Controllers\Web\Json\CidadeController;
 use App\Http\Controllers\Web\MeuEventoController;
+use App\Http\Controllers\Web\CalendarioExportController;
 use App\Http\Controllers\Web\MeuPerfilController;
 use App\Http\Controllers\Web\OndeAtuamosController;
 use App\Http\Controllers\Web\PatrocinadorController;
@@ -74,6 +80,9 @@ Route::get('/convites/{token}', [ConviteCadastroController::class, 'show'])
 Route::post('/convites/{token}/concluir', [ConviteCadastroController::class, 'concluir'])
     ->name('convites.concluir');
 
+Route::get('/eventos/{evento}/presencas-qr/{sessao}', [EventoPresencaQrAcessoController::class, 'show'])
+    ->middleware('signed')->name('eventos.presencas-qr.acesso');
+
 // AUTENTICADAS
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -102,15 +111,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('visitas-por-participante', [DashboardVisitaParticipanteController::class, 'index'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
             ->name('visitas-por-participante');
+        Route::get('visitas-por-participante/exportar/{formato}', DashboardVisitaParticipanteExportController::class)
+            ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
+            ->name('visitas-por-participante.exportar');
         Route::get('visitas-por-participante/{voluntario}', [DashboardVisitaParticipanteController::class, 'show'])
             ->middleware('can:'.DashboardPermissaoService::VISITAS_POR_PARTICIPANTE)
             ->name('visitas-por-participante.show');
+
+        Route::get('participacao-semestral', DashboardParticipacaoSemestralController::class)
+            ->middleware('can:'.DashboardPermissaoService::PARTICIPACAO_SEMESTRAL)
+            ->name('participacao-semestral');
     });
 
     // AJUDA
     Route::get('ajuda', function () {
         return Inertia::render('Ajuda/Index');
     })->name('ajuda.index');
+
+    // CALENDÁRIO — EXPORTAR
+    Route::prefix('calendario/exportar')->name('calendario.exportar.')->group(function () {
+        Route::get('visitas', [CalendarioExportController::class, 'visitas'])->name('visitas');
+        Route::get('eventos', [CalendarioExportController::class, 'eventos'])->name('eventos');
+    });
 
     // JSON
     ROUTE::prefix('json')->name('json.')->group(function () {
@@ -128,6 +150,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/meus-eventos', [MeuEventoController::class, 'index'])->name('meus-eventos.index');
 
+    Route::get('/eventos/presencas-qr/confirmar', [EventoPresencaQrConfirmacaoController::class, 'show'])->name('eventos.presencas-qr.confirmacao.show');
+    Route::post('/eventos/presencas-qr/confirmar', [EventoPresencaQrConfirmacaoController::class, 'store'])->name('eventos.presencas-qr.confirmacao.store');
+
     Route::get('/meu-perfil', [MeuPerfilController::class, 'edit'])->name('meu-perfil.edit');
     Route::patch('/meu-perfil', [MeuPerfilController::class, 'update'])->name('meu-perfil.update');
     Route::post('/meu-perfil/foto', [MeuPerfilController::class, 'updateFoto'])->name('meu-perfil.foto.update');
@@ -139,6 +164,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/eventos/{evento}/finalizar', [EventoFinalizacaoController::class, 'store'])->name('eventos.finalizar');
     Route::put('/eventos/{evento}/presencas', [EventoPresencaController::class, 'update'])->name('eventos.presencas.update');
+    Route::post('/eventos/{evento}/presencas-qr/sessoes', [EventoPresencaQrController::class, 'store'])->name('eventos.presencas-qr.sessoes.store');
+    Route::delete('/eventos/{evento}/presencas-qr/sessoes/{sessao}', [EventoPresencaQrController::class, 'destroy'])->name('eventos.presencas-qr.sessoes.destroy');
 
     // HOSPITAIS — METAS
     Route::get('hospitais/{hospital}/metas', [HospitalMetaController::class, 'index'])->name('hospitais.metas.index');
