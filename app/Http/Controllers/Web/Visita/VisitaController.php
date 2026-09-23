@@ -14,6 +14,7 @@ use App\Services\Visita\Form\Service as FormService;
 use App\Services\Visita\Meta\Service as MetaService;
 use App\Services\Visita\Service;
 use App\Services\Visita\Agenda\Liberacao\Service as LiberacaoAgendaService;
+use App\Services\Lembrete\Agendamento\Service as LembreteAgendamentoService;
 use App\Helpers\User as UserHelper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -192,6 +193,7 @@ class VisitaController extends Controller
         }
 
         $visita->update(['status' => VisitaStatus::Cancelada->value]);
+        app(LembreteAgendamentoService::class)->cancelar('visita', $visita->id);
 
         return redirect()->route('visitas.index')
             ->with('mensagem_sucesso', 'Visita cancelada com sucesso!');

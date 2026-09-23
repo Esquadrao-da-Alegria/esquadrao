@@ -29,7 +29,18 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+    
 });
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+        try {
+            await navigator.serviceWorker.register('/sw.js');
+        } catch (error) {
+            console.error('Erro ao registrar Service Worker:', error);
+        }
+    });
+}
 
 initializeTheme();
 
