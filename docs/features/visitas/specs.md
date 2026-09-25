@@ -91,7 +91,7 @@ Documento de referência sobre o modelo de **visitas** e **participantes** (insc
 
 17. **Acompanhamento de metas na agenda**
 
-    Quando uma cidade específica está selecionada, a tela apresenta de forma compacta somente hospitais com metas ainda não contempladas. O progresso soma visitas `agendada`, `realizada`, `pendente_relatorio` e `contabilizada`, sem duplicação, e exclui canceladas e não contabilizadas. A linha informa hospital, ala, progresso semanal e progresso mensal. Apenas uma semana é exibida: a semana de hoje no mês atual, a primeira semana ainda não contemplada em mês futuro e a última semana em mês passado.
+    Quando uma cidade específica está selecionada, a tela apresenta de forma compacta somente hospitais com metas ainda não contempladas. O progresso soma visitas `agendada`, `realizada`, `pendente_relatorio` e `contabilizada`, sem duplicação, e exclui canceladas e não contabilizadas. A linha informa hospital, ala, progresso do período configurado e progresso mensal. A periodicidade pode ser semanal (`S`) ou quinzenal (`Q`); `M` representa o mês. Os valores são sempre visitas cobertas/meta. Apenas o período de referência é exibido: o atual no mês corrente, o primeiro com déficit em mês futuro e o último em mês passado.
 
 ---
 

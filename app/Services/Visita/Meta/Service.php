@@ -11,6 +11,8 @@ use App\Helpers\Visita as VisitaHelper;
 
 // MODELS
 use App\Models\MetaMensalHospital;
+use App\Models\MetaPeriodoHospital;
+use App\Models\MetaPadraoHospital;
 use App\Models\MetaSemanalHospital;
 use App\Models\Visita;
 
@@ -41,30 +43,82 @@ class Service
                 ->where('ativo', true))
             ->get();
 
+        $metasPadrao = MetaPadraoHospital::query()
+            ->with(['hospital:id,nome,cidade_id,ativo', 'hospital.alas:id,hospital_id,nome', 'periodos'])
+            ->whereHas('hospital', fn ($query) => $query
+                ->where('cidade_id', $cidadeId)
+                ->where('ativo', true))
+            ->whereNotIn('hospital_id', $metasMensais->pluck('hospital_id'))
+            ->get()
+            ->map(function (MetaPadraoHospital $metaPadrao) use ($ano, $numeroMes) {
+                $metaMensal = new MetaMensalHospital([
+                    'hospital_id' => $metaPadrao->hospital_id,
+                    'ano' => $ano,
+                    'mes' => $numeroMes,
+                    'quantidade' => $metaPadrao->quantidade,
+                    'periodicidade' => $metaPadrao->periodicidade,
+                ]);
+                $metaMensal->setRelation('hospital', $metaPadrao->hospital);
+                $metaMensal->setRelation('periodos_padrao', $metaPadrao->periodos);
+
+                return $metaMensal;
+            });
+
+        $metasMensais = $metasMensais->concat($metasPadrao);
+
         if ($metasMensais->isEmpty()) {
             return [];
         }
 
         $hospitalIds = $metasMensais->pluck('hospital_id')->all();
-        $metasSemanais = MetaSemanalHospital::query()
-            ->whereIn('hospital_id', $hospitalIds)
-            ->where('ano', $ano)
-            ->where('mes', $numeroMes)
-            ->get();
+        $metasPeriodos = $this->buscarMetasPeriodos($hospitalIds, $ano, $numeroMes)
+            ->concat($metasPadrao->flatMap(function (MetaMensalHospital $meta) {
+                return $meta->periodos_padrao->map(function ($periodo) use ($meta) {
+                    $periodo->hospital_id = $meta->hospital_id;
+
+                    return $periodo;
+                });
+            }));
         $planejadas = $this->buscarPlanejadas($hospitalIds, $ano, $numeroMes);
-        $semana = $this->semanaReferencia($referencia, $metasSemanais, $planejadas);
 
         return $metasMensais
             ->flatMap(fn ($metaMensal) => $this->montarLinhas(
                 $metaMensal,
-                $metasSemanais->where('hospital_id', $metaMensal->hospital_id),
+                $metasPeriodos->where('hospital_id', $metaMensal->hospital_id),
                 $planejadas,
-                $semana,
+                $referencia,
             ))
-            ->filter(fn (array $linha) => $linha['faltam_semana'] > 0 || $linha['faltam_mes'] > 0)
+            ->filter(fn (array $linha) => $linha['faltam_periodo'] > 0 || $linha['faltam_mes'] > 0)
             ->sortBy(fn (array $linha) => "{$linha['hospital']}|{$linha['ala']}")
             ->values()
             ->all();
+    }
+
+    /**
+     * @param  array<int, int|string>  $hospitalIds
+     */
+    private function buscarMetasPeriodos(array $hospitalIds, int $ano, int $mes): Collection
+    {
+        $metas = MetaPeriodoHospital::query()
+            ->whereIn('hospital_id', $hospitalIds)
+            ->where('ano', $ano)
+            ->where('mes', $mes)
+            ->get();
+
+        if ($metas->isNotEmpty()) {
+            return $metas;
+        }
+
+        return MetaSemanalHospital::query()
+            ->whereIn('hospital_id', $hospitalIds)
+            ->where('ano', $ano)
+            ->where('mes', $mes)
+            ->get()
+            ->map(function (MetaSemanalHospital $meta) {
+                $meta->periodo = $meta->semana;
+
+                return $meta;
+            });
     }
 
     /**
@@ -75,7 +129,6 @@ class Service
         $expressaoDia = DB::connection()->getDriverName() === 'sqlite'
             ? "CAST(strftime('%d', inicio_em) AS INTEGER)"
             : 'DAY(inicio_em)';
-        $sqlSemana = MetaHospitalHelper::sqlSemanaVisita($ano, $mes, $expressaoDia);
         $status = [
             VisitaStatus::Agendada->value,
             ...VisitaHelper::statusRealizadasValores(),
@@ -85,7 +138,7 @@ class Service
             ->select([
                 'hospital_id',
                 'ala_unidade_id',
-                DB::raw("{$sqlSemana} as semana"),
+                DB::raw("{$expressaoDia} as dia"),
                 DB::raw('COUNT(*) as total'),
             ])
             ->whereIn('hospital_id', $hospitalIds)
@@ -93,88 +146,107 @@ class Service
             ->whereMonth('inicio_em', $mes)
             ->whereIn('status', $status)
             ->groupBy('hospital_id', 'ala_unidade_id')
-            ->groupByRaw($sqlSemana)
+            ->groupByRaw($expressaoDia)
             ->get();
     }
 
-    private function semanaReferencia(
+    private function periodoReferencia(
         Carbon $referencia,
-        Collection $metasSemanais,
+        string $periodicidade,
+        Collection $metasPeriodos,
         Collection $planejadas,
+        int $hospitalId,
     ): int {
         $mesSelecionado = $referencia->copy()->startOfMonth();
         $mesAtual = now()->copy()->startOfMonth();
-        $semanas = MetaHospitalHelper::semanasDoMes(
+        $periodos = MetaHospitalHelper::periodosDoMes(
             (int) $referencia->year,
             (int) $referencia->month,
+            $periodicidade,
         );
 
         if ($mesSelecionado->equalTo($mesAtual)) {
-            foreach ($semanas as $semana) {
-                if (now()->day >= $semana['dia_inicio'] && now()->day <= $semana['dia_fim']) {
-                    return $semana['semana'];
+            foreach ($periodos as $periodo) {
+                if (now()->day >= $periodo['dia_inicio'] && now()->day <= $periodo['dia_fim']) {
+                    return $periodo['periodo'];
                 }
             }
         }
 
         if ($mesSelecionado->lessThan($mesAtual)) {
-            return (int) end($semanas)['semana'];
+            return (int) end($periodos)['periodo'];
         }
 
-        foreach ($semanas as $semana) {
-            $possuiDeficit = $metasSemanais
-                ->where('semana', $semana['semana'])
+        foreach ($periodos as $periodo) {
+            $possuiDeficit = $metasPeriodos
+                ->where('periodo', $periodo['periodo'])
                 ->contains(fn ($meta) => $this->totalPlanejado(
                     $planejadas,
-                    (int) $meta->hospital_id,
-                    (int) $meta->semana,
+                    $hospitalId,
+                    $periodo,
                     $meta->ala_unidade_id !== null ? (int) $meta->ala_unidade_id : null,
                 ) < (int) $meta->quantidade);
 
             if ($possuiDeficit) {
-                return (int) $semana['semana'];
+                return (int) $periodo['periodo'];
             }
         }
 
-        return (int) $semanas[0]['semana'];
+        return (int) $periodos[0]['periodo'];
     }
 
     private function montarLinhas(
         MetaMensalHospital $metaMensal,
-        Collection $metasSemanais,
+        Collection $metasPeriodos,
         Collection $planejadas,
-        int $semana,
+        Carbon $referencia,
     ): Collection {
         $hospital = $metaMensal->hospital;
-        $metasDaSemana = $metasSemanais->where('semana', $semana)->values();
+        $periodicidade = $metaMensal->periodicidade ?? 'semanal';
+        $periodos = MetaHospitalHelper::periodosDoMes(
+            (int) $referencia->year,
+            (int) $referencia->month,
+            $periodicidade,
+        );
+        $periodoReferencia = $this->periodoReferencia(
+            $referencia,
+            $periodicidade,
+            $metasPeriodos,
+            $planejadas,
+            (int) $metaMensal->hospital_id,
+        );
+        $periodo = collect($periodos)->firstWhere('periodo', $periodoReferencia);
+        $metasDoPeriodo = $metasPeriodos->where('periodo', $periodoReferencia)->values();
         $planejadasMes = (int) $planejadas
             ->where('hospital_id', $metaMensal->hospital_id)
             ->sum('total');
 
-        if ($metasDaSemana->isEmpty()) {
-            $metasDaSemana = collect([(object) [
+        if ($metasDoPeriodo->isEmpty()) {
+            $metasDoPeriodo = collect([(object) [
                 'ala_unidade_id' => null,
                 'quantidade'     => null,
             ]]);
         }
 
-        return $metasDaSemana->map(function ($metaSemanal) use (
+        return $metasDoPeriodo->map(function ($metaPeriodo) use (
             $hospital,
             $metaMensal,
             $planejadas,
             $planejadasMes,
-            $semana,
+            $periodicidade,
+            $periodo,
+            $periodoReferencia,
         ) {
-            $alaId = $metaSemanal->ala_unidade_id !== null
-                ? (int) $metaSemanal->ala_unidade_id
+            $alaId = $metaPeriodo->ala_unidade_id !== null
+                ? (int) $metaPeriodo->ala_unidade_id
                 : null;
-            $metaSemana = $metaSemanal->quantidade !== null
-                ? (int) $metaSemanal->quantidade
+            $metaDoPeriodo = $metaPeriodo->quantidade !== null
+                ? (int) $metaPeriodo->quantidade
                 : null;
-            $planejadasSemana = $this->totalPlanejado(
+            $planejadasDoPeriodo = $this->totalPlanejado(
                 $planejadas,
                 (int) $metaMensal->hospital_id,
-                $semana,
+                $periodo,
                 $alaId,
             );
 
@@ -185,10 +257,13 @@ class Service
                 'ala'                => $alaId
                     ? ($hospital->alas->firstWhere('id', $alaId)?->nome ?? 'Ala não encontrada')
                     : 'Todas as alas',
-                'semana'             => $semana,
-                'meta_semanal'       => $metaSemana,
-                'planejadas_semana'  => $metaSemana !== null ? $planejadasSemana : null,
-                'faltam_semana'      => $metaSemana !== null ? max(0, $metaSemana - $planejadasSemana) : 0,
+                'periodicidade'      => $periodicidade,
+                'periodo'            => $periodoReferencia,
+                'titulo_periodo'     => $periodo['titulo'],
+                'sigla_periodo'      => $periodo['sigla'],
+                'meta_periodo'       => $metaDoPeriodo,
+                'planejadas_periodo' => $metaDoPeriodo !== null ? $planejadasDoPeriodo : null,
+                'faltam_periodo'     => $metaDoPeriodo !== null ? max(0, $metaDoPeriodo - $planejadasDoPeriodo) : 0,
                 'meta_mensal'        => (int) $metaMensal->quantidade,
                 'planejadas_mes'     => $planejadasMes,
                 'faltam_mes'         => max(0, (int) $metaMensal->quantidade - $planejadasMes),
@@ -199,12 +274,13 @@ class Service
     private function totalPlanejado(
         Collection $planejadas,
         int $hospitalId,
-        int $semana,
+        array $periodo,
         ?int $alaId,
     ): int {
         $registros = $planejadas
             ->where('hospital_id', $hospitalId)
-            ->where('semana', $semana);
+            ->filter(fn ($registro) => (int) $registro->dia >= $periodo['dia_inicio']
+                && (int) $registro->dia <= $periodo['dia_fim']);
 
         if ($alaId !== null) {
             $registros = $registros->where('ala_unidade_id', $alaId);

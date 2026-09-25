@@ -56,6 +56,7 @@ interface HospitalMeta {
     alas: AlaMeta[]
     meta_mensal: number | null
     realizadas_mensal: number
+    periodicidade: 'semanal' | 'quinzenal'
     metas_por_ala: boolean
     metas_semanais: MetaSemanal[]
 }
@@ -83,6 +84,7 @@ const NOMES_MESES = [
 
 const META_MENSAL_MAXIMA = 10
 const META_SEMANAL_MAXIMA = 5
+const META_QUINZENAL_MAXIMA = 10
 
 const limitarMetaMensal = (valor: string): number | null => {
     if (valor === '') {
@@ -129,15 +131,20 @@ const formatarPeriodoSemana = (faixa: SemanaMes): string => {
     return `${faixa.dia_inicio}–${faixa.dia_fim} · ${diaInicio}–${diaFim}`
 }
 
-const CelulaSemana: FC<{ semana: number; semanas: SemanaMes[] }> = ({ semana, semanas }) => {
+const CelulaSemana: FC<{
+    semana: number
+    semanas: SemanaMes[]
+    periodicidade: HospitalMeta['periodicidade']
+}> = ({ semana, semanas, periodicidade }) => {
     const faixa = semanas.find((item) => item.semana === semana)
+    const titulo = periodicidade === 'quinzenal' ? `${semana}ª quinzena` : `Semana ${semana}`
 
     return (
         <div>
             <span className="block text-sm font-medium text-foreground">
-                Semana {semana}
+                {titulo}
             </span>
-            {faixa ? (
+            {faixa && periodicidade === 'semanal' ? (
                 <span className="block text-xs text-muted-foreground">
                     {formatarPeriodoSemana(faixa)}
                 </span>
@@ -220,11 +227,15 @@ const montarMetasSemanaisVazias = (
     }))
 }
 
+const numerosPeriodos = (periodicidade: HospitalMeta['periodicidade'], semanas: number[]): number[] =>
+    periodicidade === 'quinzenal' ? [1, 2] : semanas
+
 const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisIniciais, pode_editar_dados }) => {
     const { errors } = usePage<SharedData>().props
     const errosRef = useRef<HTMLDivElement>(null)
     const [hospitais, setHospitais] = useState<HospitalMeta[]>(hospitaisIniciais)
     const [salvando, setSalvando] = useState(false)
+    const [salvarComoPadrao, setSalvarComoPadrao] = useState(false)
 
     const semanas = useMemo(() => numerosSemanas(semanasMes), [semanasMes])
 
@@ -264,7 +275,11 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
 
                 const metasSemanais = hospital.metas_semanais.length > 0
                     ? hospital.metas_semanais
-                    : montarMetasSemanaisVazias(hospital, hospital.metas_por_ala, semanas)
+                    : montarMetasSemanaisVazias(
+                        hospital,
+                        hospital.metas_por_ala,
+                        numerosPeriodos(hospital.periodicidade, semanas),
+                    )
 
                 return { ...hospital, meta_mensal: metaMensal, metas_semanais: metasSemanais }
             }),
@@ -286,7 +301,37 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
 
         atualizarHospital(hospital.id, {
             metas_por_ala: metasPorAla,
-            metas_semanais: montarMetasSemanaisVazias(hospital, metasPorAla, semanas),
+            metas_semanais: montarMetasSemanaisVazias(
+                hospital,
+                metasPorAla,
+                numerosPeriodos(hospital.periodicidade, semanas),
+            ),
+        })
+    }
+
+    const handlePeriodicidadeChange = async (
+        hospital: HospitalMeta,
+        periodicidade: HospitalMeta['periodicidade'],
+    ) => {
+        if (hospital.periodicidade === periodicidade) return
+
+        const possuiMetas = hospital.metas_semanais.some((item) => item.meta !== null && item.meta > 0)
+
+        if (possuiMetas) {
+            const confirmado = await toastConfirmacao(
+                'Trocar a periodicidade remove a distribuição atual. Deseja continuar?',
+            )
+
+            if (!confirmado) return
+        }
+
+        atualizarHospital(hospital.id, {
+            periodicidade,
+            metas_semanais: montarMetasSemanaisVazias(
+                hospital,
+                hospital.metas_por_ala,
+                numerosPeriodos(periodicidade, semanas),
+            ),
         })
     }
 
@@ -324,11 +369,13 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
 
     const montarPayload = (hospital: HospitalMeta) => ({
             meta_mensal: hospital.meta_mensal,
+            periodicidade: hospital.periodicidade,
             metas_por_ala: hospital.metas_por_ala,
-            metas_semanais: hospital.metas_semanais
+            salvar_como_padrao: salvarComoPadrao,
+            metas_periodos: hospital.metas_semanais
                 .filter((item) => item.meta !== null && item.meta !== undefined)
                 .map((item) => ({
-                    semana: item.semana,
+                    periodo: item.semana,
                     quantidade: Number(item.meta),
                     ...(hospital.metas_por_ala && item.ala_unidade_id
                         ? { ala_unidade_id: item.ala_unidade_id }
@@ -347,7 +394,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
             }
 
             if (hospital.meta_mensal === null) {
-                toastAviso(`Informe a meta mensal de ${hospital.nome} antes das metas semanais.`)
+                toastAviso(`Informe a meta mensal de ${hospital.nome} antes das metas por período.`)
                 return
             }
 
@@ -355,7 +402,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
 
             if (soma !== hospital.meta_mensal) {
                 toastAviso(
-                    `A soma das metas semanais de ${hospital.nome} (${soma}) deve ser igual à meta mensal (${hospital.meta_mensal}).`,
+                    `A soma das metas por período de ${hospital.nome} (${soma}) deve ser igual à meta mensal (${hospital.meta_mensal}).`,
                 )
                 return
             }
@@ -390,7 +437,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                             Metas hospitalares
                         </h1>
                         <p className="mt-1 text-sm text-amber-900/55">
-                            Configure metas mensais e semanais do hospital selecionado.
+                            Configure a meta mensal e a distribuição semanal ou quinzenal.
                         </p>
                     </div>
                     <div className="w-full sm:w-auto [&>button]:w-full">
@@ -465,6 +512,9 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                     <div className="space-y-5">
                         {hospitais.map((hospital) => {
                             const metaMensalPreenchida = hospital.meta_mensal !== null
+                            const metaPeriodoMaxima = hospital.periodicidade === 'quinzenal'
+                                ? META_QUINZENAL_MAXIMA
+                                : META_SEMANAL_MAXIMA
 
                             return (
                                 <section
@@ -505,12 +555,37 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                             </div>
                                         </div>
 
+                                        <label className="flex items-start gap-2 rounded-xl border border-border bg-muted/15 p-3 text-sm text-muted-foreground">
+                                            <input
+                                                type="checkbox"
+                                                checked={salvarComoPadrao}
+                                                onChange={(event) => setSalvarComoPadrao(event.target.checked)}
+                                                className="mt-0.5 size-4 rounded border-input text-primary focus:ring-ring"
+                                            />
+                                            <span>
+                                                <span className="block font-medium text-foreground">Usar como padrão nos próximos meses</span>
+                                                <span className="block text-xs">Meses personalizados manualmente não serão alterados.</span>
+                                            </span>
+                                        </label>
+
                                         <div className="space-y-2">
                                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                                                 <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
                                                     <Calendar className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-                                                    Metas semanais
+                                                    {hospital.periodicidade === 'quinzenal' ? 'Metas quinzenais' : 'Metas semanais'}
                                                 </h3>
+                                            <Select
+                                                value={hospital.periodicidade}
+                                                onValueChange={(valor: HospitalMeta['periodicidade']) => handlePeriodicidadeChange(hospital, valor)}
+                                            >
+                                                <SelectTrigger className="h-10 w-full sm:w-44">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="semanal">Semanal</SelectItem>
+                                                    <SelectItem value="quinzenal">Quinzenal</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                             <label className="flex min-h-10 items-center gap-2 rounded-xl bg-muted/40 px-3 text-sm text-muted-foreground sm:min-h-0 sm:bg-transparent sm:px-0">
                                                 <input
                                                     type="checkbox"
@@ -556,6 +631,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                                                                     <CelulaSemana
                                                                                         semana={item.semana}
                                                                                         semanas={semanasMes}
+                                                                                        periodicidade={hospital.periodicidade}
                                                                                     />
                                                                                     <div className="shrink-0 text-right">
                                                                                         <span className="block text-[11px] text-muted-foreground">Realizadas</span>
@@ -565,7 +641,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                                                                 <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Meta</span>
                                                                                 <ControleQuantidade
                                                                                     valor={item.meta}
-                                                                                    maximo={META_SEMANAL_MAXIMA}
+                                                                                    maximo={metaPeriodoMaxima}
                                                                                     desabilitado={!metaMensalPreenchida}
                                                                                     rotulo={`meta da semana ${item.semana} para ${ala.nome}`}
                                                                                     onChange={(valor) =>
@@ -597,12 +673,13 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                                                                             <CelulaSemana
                                                                                                 semana={item.semana}
                                                                                                 semanas={semanasMes}
+                                                                                                periodicidade={hospital.periodicidade}
                                                                                             />
                                                                                         </td>
                                                                                         <td className={painelTableTdClass}>
                                                                                             <ControleQuantidade
                                                                                                 valor={item.meta}
-                                                                                                maximo={META_SEMANAL_MAXIMA}
+                                                                                                maximo={metaPeriodoMaxima}
                                                                                                 desabilitado={!metaMensalPreenchida}
                                                                                                 rotulo={`meta da semana ${item.semana} para ${ala.nome}`}
                                                                                                 onChange={(valor) =>
@@ -637,6 +714,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                                                     <CelulaSemana
                                                                         semana={item.semana}
                                                                         semanas={semanasMes}
+                                                                        periodicidade={hospital.periodicidade}
                                                                     />
                                                                     <div className="shrink-0 text-right">
                                                                         <span className="block text-[11px] text-muted-foreground">Realizadas</span>
@@ -646,7 +724,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                                                 <span className="mb-1.5 block text-xs font-medium text-muted-foreground">Meta</span>
                                                                 <ControleQuantidade
                                                                     valor={item.meta}
-                                                                    maximo={META_SEMANAL_MAXIMA}
+                                                                    maximo={metaPeriodoMaxima}
                                                                     desabilitado={!metaMensalPreenchida}
                                                                     rotulo={`meta da semana ${item.semana}`}
                                                                     onChange={(valor) =>
@@ -677,12 +755,13 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                                                             <CelulaSemana
                                                                                 semana={item.semana}
                                                                                 semanas={semanasMes}
+                                                                                periodicidade={hospital.periodicidade}
                                                                             />
                                                                         </td>
                                                                         <td className={painelTableTdClass}>
                                                                             <ControleQuantidade
                                                                                 valor={item.meta}
-                                                                                maximo={META_SEMANAL_MAXIMA}
+                                                                                maximo={metaPeriodoMaxima}
                                                                                 desabilitado={!metaMensalPreenchida}
                                                                                 rotulo={`meta da semana ${item.semana}`}
                                                                                 onChange={(valor) =>
