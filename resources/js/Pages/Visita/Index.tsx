@@ -22,9 +22,11 @@ import MetasCalendarioShow, {
     type AcompanhamentoMeta,
 } from '@/components/Painel/Visita/Calendario/Metas/Show';
 import CalendarioShow from '@/components/Painel/Visita/Calendario/Show';
+import ListaAgendaShow from '@/components/Painel/Agenda/Lista/Show';
+import { Service as ParticipanteService } from '@/Services/Visita/Participante/Service';
 
 // ICONS
-import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Download, Lock, MapPin, Plus, Unlock } from 'lucide-react';
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Download, List, Lock, MapPin, Plus, Unlock } from 'lucide-react';
 
 interface CidadeOption {
     id: number;
@@ -86,6 +88,7 @@ const Index: FC<Props> = ({
     const [visitaSelecionada, setVisitaSelecionada] = useState<Visita | null>(
         visitas.find((visita) => visita.id === visitaId) ?? null,
     );
+    const [abrirInscricao, setAbrirInscricao] = useState(false);
     const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(
         null,
     );
@@ -96,6 +99,11 @@ const Index: FC<Props> = ({
     const [alterandoAgenda, setAlterandoAgenda] = useState(false);
     const [agendaLiberada, setAgendaLiberada] = useState(
         agendaLiberacao?.liberado ?? false,
+    );
+    const [visualizacao, setVisualizacao] = useState<'calendario' | 'lista'>(() =>
+        typeof window === 'undefined' || localStorage.getItem('agenda-visitas-visualizacao') !== 'lista'
+            ? 'calendario'
+            : 'lista',
     );
 
     useEffect(() => {
@@ -115,6 +123,11 @@ const Index: FC<Props> = ({
         });
     };
 
+    const alterarVisualizacao = (valor: 'calendario' | 'lista') => {
+        setVisualizacao(valor);
+        localStorage.setItem('agenda-visitas-visualizacao', valor);
+    };
+
     const abrirListaCompleta = (
         dia: Date,
         visitasDoDia: Visita[],
@@ -131,7 +144,20 @@ const Index: FC<Props> = ({
         setEventosOverflow([]);
     };
 
-    const fecharDetalhes = () => setVisitaSelecionada(null);
+    const fecharDetalhes = () => {
+        setVisitaSelecionada(null);
+        setAbrirInscricao(false);
+    };
+
+    const abrirInscricaoDaVisita = (visita: Visita) => {
+        setAbrirInscricao(true);
+        setVisitaSelecionada(visita);
+    };
+
+    const cancelarInscricaoDaVisita = async (
+        visita: Visita,
+        participanteId: number,
+    ): Promise<boolean> => ParticipanteService.cancelar(visita.id!, participanteId);
 
     const alterarAgenda = async () => {
         if (cidadeId === 'todas' || !agendaLiberacao || alterandoAgenda) return;
@@ -316,23 +342,28 @@ const Index: FC<Props> = ({
                     </section>
                 )}
 
+                <div className="mb-4 inline-flex rounded-xl border border-amber-200 bg-white p-1 shadow-sm">
+                    <button type="button" onClick={() => alterarVisualizacao('calendario')} className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium ${visualizacao === 'calendario' ? 'bg-amber-100 text-amber-950' : 'text-amber-800'}`}><CalendarDays className="size-4" />Calendário</button>
+                    <button type="button" onClick={() => alterarVisualizacao('lista')} className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium ${visualizacao === 'lista' ? 'bg-amber-100 text-amber-950' : 'text-amber-800'}`}><List className="size-4" />Lista</button>
+                </div>
+
                 {/* Calendário */}
-                <CalendarioShow
-                    visitas={visitas}
-                    eventos={eventos}
-                    mes={mes}
-                    onSelecionarVisita={setVisitaSelecionada}
-                    onSelecionarEvento={setEventoSelecionado}
-                    onAbrirListaCompleta={abrirListaCompleta}
-                />
-                <LegendaCalendarioShow />
-                <MetasCalendarioShow metas={acompanhamentoMetas} />
+                {visualizacao === 'calendario' ? <>
+                    <CalendarioShow visitas={visitas} eventos={eventos} mes={mes} onSelecionarVisita={setVisitaSelecionada} onSelecionarEvento={setEventoSelecionado} onAbrirListaCompleta={abrirListaCompleta} />
+                    <LegendaCalendarioShow />
+                    <MetasCalendarioShow metas={acompanhamentoMetas} />
+                </> : <>
+                    <ListaAgendaShow visitas={visitas} eventos={eventos} usuarioId={auth.user.id} onSelecionarVisita={setVisitaSelecionada} onSelecionarEvento={setEventoSelecionado} onParticiparVisita={abrirInscricaoDaVisita} onCancelarInscricao={cancelarInscricaoDaVisita} />
+                    <LegendaCalendarioShow />
+                    <MetasCalendarioShow metas={acompanhamentoMetas} />
+                </>}
             </div>
 
             {/* Modal detalhes visita */}
             <DetalhesModalShow
                 visita={visitaSelecionada}
                 onFechar={fecharDetalhes}
+                abrirInscricao={abrirInscricao}
             />
 
             {/* Modal detalhes evento */}

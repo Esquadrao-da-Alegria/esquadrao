@@ -95,6 +95,7 @@ class Queries
     {
         $query->with([
             'hospital:id,nome,cidade_id',
+            'hospital.cidade:id,nome',
             'alaUnidade:id,nome',
             'lider:id,name',
             'participantes.voluntario:id,name',
