@@ -89,4 +89,40 @@ class MetaHospital
     {
         return in_array($semana, self::numerosSemanasDoMes($ano, $mes), true);
     }
+
+    /**
+     * @return array<int, array{periodo: int, dia_inicio: int, dia_fim: int, titulo: string, sigla: string}>
+     */
+    public static function periodosDoMes(int $ano, int $mes, string $periodicidade): array
+    {
+        if ($periodicidade === 'quinzenal') {
+            $ultimoDia = Carbon::create($ano, $mes, 1)->daysInMonth;
+
+            return [
+                ['periodo' => 1, 'dia_inicio' => 1, 'dia_fim' => 15, 'titulo' => '1ª quinzena', 'sigla' => 'Q'],
+                ['periodo' => 2, 'dia_inicio' => 16, 'dia_fim' => $ultimoDia, 'titulo' => '2ª quinzena', 'sigla' => 'Q'],
+            ];
+        }
+
+        return collect(self::semanasDoMes($ano, $mes))
+            ->map(fn (array $semana) => [
+                'periodo' => $semana['semana'],
+                'dia_inicio' => $semana['dia_inicio'],
+                'dia_fim' => $semana['dia_fim'],
+                'titulo' => "Semana {$semana['semana']}",
+                'sigla' => 'S',
+            ])
+            ->all();
+    }
+
+    public static function periodoParaDia(int $ano, int $mes, int $dia, string $periodicidade): ?int
+    {
+        foreach (self::periodosDoMes($ano, $mes, $periodicidade) as $periodo) {
+            if ($dia >= $periodo['dia_inicio'] && $dia <= $periodo['dia_fim']) {
+                return $periodo['periodo'];
+            }
+        }
+
+        return null;
+    }
 }

@@ -2,33 +2,36 @@
 
 namespace App\Models;
 
-// ELOQUENT
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class MetaMensalHospital extends Model
+class MetaPadraoHospital extends Model
 {
-    protected $table = 'metas_mensais_hospitais';
+    protected $table = 'metas_padrao_hospitais';
 
     protected $fillable = [
         'hospital_id',
-        'ano',
-        'mes',
         'quantidade',
         'periodicidade',
+        'metas_por_ala',
     ];
 
     protected function casts(): array
     {
         return [
-            'ano' => 'integer',
-            'mes' => 'integer',
             'quantidade' => 'integer',
+            'metas_por_ala' => 'boolean',
         ];
     }
 
     public function hospital(): BelongsTo
     {
-        return $this->belongsTo(Hospital::class, 'hospital_id');
+        return $this->belongsTo(Hospital::class);
+    }
+
+    public function periodos(): HasMany
+    {
+        return $this->hasMany(MetaPeriodoPadraoHospital::class, 'meta_padrao_hospital_id');
     }
 }

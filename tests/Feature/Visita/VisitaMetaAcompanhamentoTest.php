@@ -10,6 +10,8 @@ use App\Models\Cidade;
 use App\Models\Estado;
 use App\Models\Hospital;
 use App\Models\MetaMensalHospital;
+use App\Models\MetaPeriodoHospital;
+use App\Models\MetaPadraoHospital;
 use App\Models\MetaSemanalHospital;
 use App\Models\User;
 use App\Models\Visita;
@@ -79,9 +81,11 @@ class VisitaMetaAcompanhamentoTest extends TestCase
                 ->has('acompanhamentoMetas', 1)
                 ->where('acompanhamentoMetas.0.hospital', 'Hospital Central')
                 ->where('acompanhamentoMetas.0.ala', 'Pediatria')
-                ->where('acompanhamentoMetas.0.semana', 1)
-                ->where('acompanhamentoMetas.0.meta_semanal', 3)
-                ->where('acompanhamentoMetas.0.planejadas_semana', 2)
+                ->where('acompanhamentoMetas.0.periodicidade', 'semanal')
+                ->where('acompanhamentoMetas.0.periodo', 1)
+                ->where('acompanhamentoMetas.0.sigla_periodo', 'S')
+                ->where('acompanhamentoMetas.0.meta_periodo', 3)
+                ->where('acompanhamentoMetas.0.planejadas_periodo', 2)
                 ->where('acompanhamentoMetas.0.meta_mensal', 4)
                 ->where('acompanhamentoMetas.0.planejadas_mes', 2)
             );
@@ -118,10 +122,84 @@ class VisitaMetaAcompanhamentoTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->has('acompanhamentoMetas', 1)
-                ->where('acompanhamentoMetas.0.semana', 2)
-                ->where('acompanhamentoMetas.0.meta_semanal', 2)
-                ->where('acompanhamentoMetas.0.planejadas_semana', 0)
+                ->where('acompanhamentoMetas.0.periodo', 2)
+                ->where('acompanhamentoMetas.0.meta_periodo', 2)
+                ->where('acompanhamentoMetas.0.planejadas_periodo', 0)
             );
+    }
+
+    public function test_exibe_meta_quinzenal_com_visitas_das_duas_quinzenas_separadas(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 9, 20, 12));
+
+        $cidade = $this->criarCidade('Porto Alegre');
+        $user = $this->criarUsuario($cidade->id);
+        $hospital = $this->criarHospital($cidade, 'Hospital Central');
+
+        MetaMensalHospital::query()->create([
+            'hospital_id'   => $hospital->id,
+            'ano'           => 2026,
+            'mes'           => 9,
+            'quantidade'    => 4,
+            'periodicidade' => 'quinzenal',
+        ]);
+        MetaPeriodoHospital::query()->create([
+            'hospital_id' => $hospital->id,
+            'ano'         => 2026,
+            'mes'         => 9,
+            'periodo'     => 1,
+            'quantidade'  => 2,
+        ]);
+        MetaPeriodoHospital::query()->create([
+            'hospital_id' => $hospital->id,
+            'ano'         => 2026,
+            'mes'         => 9,
+            'periodo'     => 2,
+            'quantidade'  => 2,
+        ]);
+        $this->criarVisita($hospital, $user, '2026-09-15 10:00:00', VisitaStatus::Agendada);
+        $this->criarVisita($hospital, $user, '2026-09-16 10:00:00', VisitaStatus::Realizada);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['mes' => '2026-09', 'cidade_id' => $cidade->id]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('acompanhamentoMetas', 1)
+                ->where('acompanhamentoMetas.0.periodicidade', 'quinzenal')
+                ->where('acompanhamentoMetas.0.periodo', 2)
+                ->where('acompanhamentoMetas.0.sigla_periodo', 'Q')
+                ->where('acompanhamentoMetas.0.meta_periodo', 2)
+                ->where('acompanhamentoMetas.0.planejadas_periodo', 1)
+                ->where('acompanhamentoMetas.0.planejadas_mes', 2)
+            );
+    }
+
+    public function test_calendario_usa_meta_padrao_quando_o_mes_nao_tem_configuracao_propria(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 9, 20, 12));
+
+        $cidade = $this->criarCidade('Porto Alegre');
+        $user = $this->criarUsuario($cidade->id);
+        $hospital = $this->criarHospital($cidade, 'Hospital Central');
+        $padrao = MetaPadraoHospital::query()->create([
+            'hospital_id' => $hospital->id,
+            'quantidade' => 2,
+            'periodicidade' => 'quinzenal',
+            'metas_por_ala' => false,
+        ]);
+        $padrao->periodos()->createMany([
+            ['periodo' => 1, 'quantidade' => 1],
+            ['periodo' => 2, 'quantidade' => 1],
+        ]);
+        $this->criarVisita($hospital, $user, '2026-09-16 10:00:00', VisitaStatus::Agendada);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['mes' => '2026-09', 'cidade_id' => $cidade->id]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('acompanhamentoMetas', 1)
+                ->where('acompanhamentoMetas.0.periodicidade', 'quinzenal')
+                ->where('acompanhamentoMetas.0.planejadas_mes', 1)
+                ->where('acompanhamentoMetas.0.meta_mensal', 2));
     }
 
     private function criarCidade(string $nome): Cidade

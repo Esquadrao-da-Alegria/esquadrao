@@ -1,6 +1,6 @@
 # Hospitais — metas e liberação de agendas
 
-Documento de referência sobre **metas mensais/semanais por hospital** e **liberação de agenda por cidade/mês** para cadastro de visitas hospitalares.
+Documento de referência sobre **metas mensais com distribuição semanal ou quinzenal por hospital** e **liberação de agenda por cidade/mês** para cadastro de visitas hospitalares.
 
 **Visitas (validação de agenda, formulário):** ver [`docs/features/visitas/specs.md`](../visitas/specs.md).
 
@@ -11,7 +11,7 @@ Documento de referência sobre **metas mensais/semanais por hospital** e **liber
 | Termo | Significado |
 |-------|-------------|
 | **Meta mensal** | Quantidade opcional de visitas previstas para um hospital em um mês (`metas_mensais_hospitais`). |
-| **Meta semanal** | Distribuição opcional da meta mensal por semana do mês (`metas_semanais_hospitais`). |
+| **Meta de período** | Distribuição opcional da meta mensal, semanal ou quinzenal (`metas_periodos_hospitais`). |
 | **Realizadas** | Visitas contabilizadas agregadas de `visitas` — status `realizada`, `pendente_relatorio` ou `contabilizada`. |
 | **Liberação de agenda** | Registro por cidade/ano/mês indicando se visitas **hospitalares** podem ser agendadas (`agenda_liberacoes_cidades.liberado`). |
 
@@ -20,15 +20,16 @@ Documento de referência sobre **metas mensais/semanais por hospital** e **liber
 ## Regras de negócio — Metas
 
 1. **Metas são opcionais** — hospital sem meta mensal no mês não exige configuração; não bloqueia nem libera agenda.
-2. **Limites de quantidade** — meta mensal: máximo **10** visitas; meta semanal (hospital ou por ala): máximo **5** visitas por semana.
-3. **Meta semanal exige meta mensal** — não persiste semanais sem quantidade mensal preenchida.
-4. **Soma semanal = meta mensal** — quando houver metas semanais, a soma de todas as semanas (e alas, se aplicável) deve ser **exatamente** igual à meta mensal.
-5. **Modo hospital ou por ala** — por hospital/mês, apenas um modo: semanas do hospital (`ala_unidade_id` nulo) **ou** semanas por ala (`ala_unidade_id` preenchido). Trocar o modo remove registros do modo anterior.
+2. **Periodicidade** — cada hospital/mês escolhe uma única distribuição: semanal ou quinzenal. A escolha vale igualmente para o hospital e suas alas.
+3. **Limites de quantidade** — meta mensal e quinzenal: máximo **10** visitas; meta semanal: máximo **5** visitas.
+4. **Meta de período exige meta mensal** — não persiste distribuição sem quantidade mensal preenchida.
+5. **Soma dos períodos = meta mensal** — quando houver distribuição, a soma de todos os períodos (e alas, se aplicável) deve ser **exatamente** igual à meta mensal.
+6. **Modo hospital ou por ala** — por hospital/mês, apenas um modo: períodos do hospital (`ala_unidade_id` nulo) ou períodos por ala (`ala_unidade_id` preenchido). Trocar o modo remove registros do modo anterior.
 6. **Ala da meta** — meta por ala só aceita alas do próprio hospital. Visita **sem** ala conta no resumo hospitalar, não na meta da ala.
-7. **Semanas do mês** — semanas completas de **domingo a sábado** (fecham no sábado). A **primeira** semana é quebrada quando o mês não começa no domingo (ex.: quarta → sábado). A **última** é quebrada quando o mês não termina no sábado. Demais semanas começam no domingo. Helper: `App\Helpers\MetaHospital::semanasDoMes()`.
+8. **Períodos do mês** — semanas completas vão de **domingo a sábado**, com primeira/última semana quebradas quando necessário. Quinzenas são sempre dias **1–15** e **16–último dia**. Helper: `App\Helpers\MetaHospital::periodosDoMes()`.
 8. **Escopo geográfico** — coordenadores locais e diretores configuram apenas hospitais **ativos** da cidade-base. Administradores e coordenadores gerais podem acessar hospitais de outras cidades.
-9. **Apoio ao agendamento** — na agenda de visitas, o progresso das metas soma visitas já realizadas e visitas agendadas para evitar planejamento acima da meta. A meta mensal considera todas as alas do hospital. Quando a meta semanal é por ala, somente visitas vinculadas à respectiva ala entram no progresso semanal; visitas sem ala não cumprem uma meta específica de ala.
-10. **Semana de referência na agenda** — o acompanhamento compacto apresenta somente uma semana. Para o mês atual usa a semana que contém o dia de hoje; para mês futuro usa a primeira semana com meta ainda não contemplada; para mês passado usa a última semana do mês.
+10. **Apoio ao agendamento** — na agenda, o progresso soma visitas realizadas e agendadas; a meta mensal considera todas as alas. Quando a meta de período é por ala, somente visitas da ala cumprem aquela meta.
+11. **Período de referência na agenda** — o acompanhamento compacto apresenta somente o período atual; para mês futuro, o primeiro com déficit; para mês passado, o último. A legenda explica `S` (semana), `Q` (quinzena) e `M` (mês), sempre como cobertas/meta.
 
 ---
 
@@ -88,6 +89,19 @@ Model: `App\Models\MetaSemanalHospital`
 | `ano`, `mes`, `semana` | Período; semana 1–5 |
 | `quantidade` | Meta da semana |
 
+Esta tabela permanece como compatibilidade dos dados semanais legados. As novas gravações também usam `metas_periodos_hospitais`.
+
+### `metas_periodos_hospitais`
+
+Migration: `2026_09_25_000001_create_metas_periodos_hospitais_table.php`
+Model: `App\Models\MetaPeriodoHospital`
+
+| Coluna | Descrição |
+|--------|-----------|
+| `hospital_id`, `ala_unidade_id` | Hospital e ala opcional da meta |
+| `ano`, `mes`, `periodo` | Referência mensal e número do período |
+| `quantidade` | Meta semanal ou quinzenal |
+
 ### `agenda_liberacoes_cidades`
 
 Migration: `2026_08_29_000002_create_agenda_liberacoes_cidades_table.php`  
@@ -117,7 +131,7 @@ Helpers auxiliares:
 - `App\Helpers\Visita::statusRealizadas()` / `statusRealizadasValores()` — status contabilizáveis nas realizadas
 
 **Metas — index:** carrega somente o hospital da rota e agrega realizadas em uma consulta SQL sobre `visitas` (por hospital, semana e opcionalmente ala).
-**Metas — update:** substitui metas do hospital/mês (delete + insert); valida soma semanal, alas e escopo geográfico.
+**Metas — update:** substitui metas do hospital/mês (delete + insert); valida periodicidade, soma dos períodos, alas e escopo geográfico.
 **Liberação — `mesEstaLiberado(cidadeId, ano, mes)`** e **`listarMesesLiberados(cidadeId)`** usados por `Visita\Service` e `Visita\Form\Service`.
 
 ---
