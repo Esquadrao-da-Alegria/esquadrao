@@ -75,7 +75,7 @@ Usa a mesma regra do dashboard por hospital: calcular `AVG(pessoas_impactadas)` 
 - Denominador: reuniões ou oficinas finalizadas da cidade-base no período.
 - Numerador: eventos em que o usuário possui `presenca = presente`.
 - Eventos com presença institucional ainda incompleta deixam o percentual indisponível.
-- A lista **Atividades consideradas** explica a inclusão ou a espera por dados.
+- A lista **Atividades consideradas** detalha os eventos da cidade-base e inclui participações confirmadas em outras cidades (intercâmbios).
 
 ### Companheiros
 

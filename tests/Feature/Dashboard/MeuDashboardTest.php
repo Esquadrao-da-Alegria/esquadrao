@@ -27,6 +27,12 @@ class MeuDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     public function test_administrador_de_suporte_sem_voluntario_acessa_estado_vazio(): void
     {
         $usuario = User::factory()->create();
@@ -241,6 +247,31 @@ class MeuDashboardTest extends TestCase
                 ->has('proximas_atividades', 2)
                 ->where('proximas_atividades.0.id', $confirmada->id)
                 ->where('proximas_atividades.1.id', $eventoAtivo->id));
+    }
+
+    public function test_presenca_em_evento_de_outra_cidade_contabiliza_no_meu_dashboard(): void
+    {
+        $cidadeBase = $this->criarCidade();
+        $cidadeOutra = $this->criarCidade();
+        $usuario = $this->criarUsuario($cidadeBase, ['voluntario']);
+        $oficinaOutraCidade = Evento::query()->create([
+            'titulo' => 'Oficina POA',
+            'tipo' => 'oficina',
+            'cidade_id' => $cidadeOutra->id,
+            'data_inicio' => now()->startOfMonth()->addDays(5)->format('Y-m-d H:i:s'),
+            'data_fim' => now()->startOfMonth()->addDays(5)->addHours(2)->format('Y-m-d H:i:s'),
+            'status' => 'finalizado',
+            'criado_por_id' => $usuario->id,
+        ]);
+        $oficinaOutraCidade->participantes()->attach($usuario->id, ['status' => 'inscrito', 'presenca' => 'presente']);
+
+        $this->actingAs($usuario)
+            ->get(route('dashboards.meu'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('indicadores.oficinas.presencas', 1)
+                ->where('presencas.0.titulo', 'Oficina POA')
+                ->where('presencas.0.motivo', 'Presença confirmada em outra cidade'));
     }
 
     private function criarUsuario(Cidade $cidade, array $cargos): User

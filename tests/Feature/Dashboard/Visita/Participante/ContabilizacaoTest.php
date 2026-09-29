@@ -29,6 +29,12 @@ class ContabilizacaoTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     public function test_busca_filtra_participantes_por_nome_ou_email(): void
     {
         $cidade = $this->criarCidade('Porto Alegre');
@@ -282,6 +288,25 @@ class ContabilizacaoTest extends TestCase
                 ->where('participantes.data.0.reunioes.presencas', 1)
                 ->where('participantes.data.0.reunioes.percentual', 50)
                 ->where('participantes.data.0.oficinas.percentual', 100));
+    }
+
+    public function test_presenca_em_evento_de_outra_cidade_contabiliza_no_dashboard_de_participante(): void
+    {
+        $cidadeOrigem = $this->criarCidade('Santa Maria');
+        $cidadeEvento = $this->criarCidade('Porto Alegre');
+        $gestor = $this->criarUsuario('administrador', $cidadeOrigem);
+        $voluntario = $this->criarUsuario('voluntario', $cidadeOrigem);
+        $oficinaPoa = $this->criarEvento($cidadeEvento, $gestor, 'oficina', '2026-05-10 10:00:00');
+        $oficinaPoa->participantes()->attach($voluntario->id, ['status' => 'inscrito', 'presenca' => 'presente']);
+
+        $this->actingAs($gestor)
+            ->get(route('dashboards.visitas-por-participante', [
+                'periodo_tipo' => 'semestre', 'ano' => 2026, 'semestre' => 1,
+                'participante_id' => $voluntario->id,
+            ]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('participantes.data.0.oficinas.oferecidos', 0)
+                ->where('participantes.data.0.oficinas.presencas', 1));
     }
 
     public function test_visitas_contabilizadas_e_nao_contabilizadas_no_dashboard_de_participante(): void
