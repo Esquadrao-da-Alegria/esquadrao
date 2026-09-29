@@ -174,6 +174,55 @@ class VisitaMetaAcompanhamentoTest extends TestCase
             );
     }
 
+    public function test_calendario_combina_metas_por_periodo_com_metas_semanais_legadas(): void
+    {
+        Carbon::setTestNow(Carbon::create(2026, 9, 2, 12));
+
+        $cidade = $this->criarCidade('Porto Alegre');
+        $user = $this->criarUsuario($cidade->id);
+        $hospitalNovo = $this->criarHospital($cidade, 'Hospital Novo');
+        $hospitalLegado = $this->criarHospital($cidade, 'Hospital Legado');
+
+        MetaMensalHospital::query()->create([
+            'hospital_id' => $hospitalNovo->id,
+            'ano' => 2026,
+            'mes' => 9,
+            'quantidade' => 1,
+            'periodicidade' => 'semanal',
+        ]);
+        MetaPeriodoHospital::query()->create([
+            'hospital_id' => $hospitalNovo->id,
+            'ano' => 2026,
+            'mes' => 9,
+            'periodo' => 1,
+            'quantidade' => 1,
+        ]);
+        MetaMensalHospital::query()->create([
+            'hospital_id' => $hospitalLegado->id,
+            'ano' => 2026,
+            'mes' => 9,
+            'quantidade' => 1,
+            'periodicidade' => 'semanal',
+        ]);
+        MetaSemanalHospital::query()->create([
+            'hospital_id' => $hospitalLegado->id,
+            'ano' => 2026,
+            'mes' => 9,
+            'semana' => 1,
+            'quantidade' => 1,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('visitas.index', ['mes' => '2026-09', 'cidade_id' => $cidade->id]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('acompanhamentoMetas', 2)
+                ->where('acompanhamentoMetas.0.hospital', 'Hospital Legado')
+                ->where('acompanhamentoMetas.0.meta_periodo', 1)
+                ->where('acompanhamentoMetas.1.hospital', 'Hospital Novo')
+            );
+    }
+
     public function test_calendario_usa_meta_padrao_quando_o_mes_nao_tem_configuracao_propria(): void
     {
         Carbon::setTestNow(Carbon::create(2026, 9, 20, 12));

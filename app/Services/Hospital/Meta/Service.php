@@ -243,7 +243,7 @@ class Service
             MetaPeriodoPadraoHospital::query()->create([
                 'meta_padrao_hospital_id' => $metaPadrao->id,
                 'ala_unidade_id' => $hospitalPayload['metas_por_ala']
-                    ? (int) $metaPeriodo['ala_unidade_id']
+                    ? ($metaPeriodo['ala_unidade_id'] ?? null)
                     : null,
                 'periodo' => (int) $metaPeriodo['semana'],
                 'quantidade' => (int) $metaPeriodo['quantidade'],
@@ -264,7 +264,7 @@ class Service
         foreach ($metasSemanais as $metaSemanal) {
             MetaSemanalHospital::create([
                 'hospital_id'    => $hospitalId,
-                'ala_unidade_id' => $metasPorAla ? (int) $metaSemanal['ala_unidade_id'] : null,
+                'ala_unidade_id' => $metasPorAla ? ($metaSemanal['ala_unidade_id'] ?? null) : null,
                 'ano'            => $ano,
                 'mes'            => $mes,
                 'semana'         => (int) $metaSemanal['semana'],

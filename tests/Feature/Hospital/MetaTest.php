@@ -287,6 +287,32 @@ class MetaTest extends TestCase
                 ->where('hospitais.0.metas_semanais.1.semana', 2));
     }
 
+    public function test_rejeita_meta_semanal_acima_do_limite(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+
+        $this->actingAs($user)
+            ->put(route('hospitais.metas.update', $hospital), [
+                'ano' => 2026,
+                'mes' => 6,
+                'meta_mensal' => 6,
+                'periodicidade' => 'semanal',
+                'metas_por_ala' => false,
+                'metas_periodos' => [
+                    ['periodo' => 1, 'quantidade' => 6],
+                ],
+            ])
+            ->assertSessionHasErrors('metas_periodos.0.quantidade');
+
+        $this->assertDatabaseMissing('metas_mensais_hospitais', [
+            'hospital_id' => $hospital->id,
+            'ano' => 2026,
+            'mes' => 6,
+        ]);
+    }
+
     public function test_carrega_duas_quinzenas_por_ala(): void
     {
         $cidade = $this->criarCidade('Santa Maria');

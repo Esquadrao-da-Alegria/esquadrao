@@ -105,12 +105,17 @@ class Service
             ->where('mes', $mes)
             ->get();
 
-        if ($metas->isNotEmpty()) {
+        $hospitalIdsLegados = array_values(array_diff(
+            $hospitalIds,
+            $metas->pluck('hospital_id')->all(),
+        ));
+
+        if ($hospitalIdsLegados === []) {
             return $metas;
         }
 
-        return MetaSemanalHospital::query()
-            ->whereIn('hospital_id', $hospitalIds)
+        return $metas->concat(MetaSemanalHospital::query()
+            ->whereIn('hospital_id', $hospitalIdsLegados)
             ->where('ano', $ano)
             ->where('mes', $mes)
             ->get()
@@ -118,7 +123,7 @@ class Service
                 $meta->periodo = $meta->semana;
 
                 return $meta;
-            });
+            }));
     }
 
     /**
