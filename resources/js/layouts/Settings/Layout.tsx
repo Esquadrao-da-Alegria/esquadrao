@@ -19,6 +19,11 @@ const sidebarNavItems: NavItem[] = [
         href: editPassword(),
         icon: null,
     },
+    {
+        title: 'Notificações',
+        href: '/configuracoes/notificacoes',
+        icon: null,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {

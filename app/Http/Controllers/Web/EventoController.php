@@ -10,6 +10,7 @@ use App\Models\Cidade;
 use App\Models\Evento;
 use App\Models\User;
 use App\Services\Evento\PresencaQr\Service as PresencaQrService;
+use App\Services\Lembrete\Agendamento\Service as LembreteAgendamentoService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -77,6 +78,8 @@ class EventoController extends Controller
             ]);
         }
 
+        app(LembreteAgendamentoService::class)->evento($evento);
+
         return redirect()->route('eventos.index')->with('mensagem_sucesso', 'Evento criado com sucesso.');
     }
 
@@ -131,6 +134,7 @@ class EventoController extends Controller
             return back()->withErrors(['limite_participantes' => 'O limite não pode ser menor que os participantes ativos.'])->withInput();
         }
         $evento->update($request->validated());
+        app(LembreteAgendamentoService::class)->evento($evento->fresh());
 
         return redirect()->route('eventos.show', $evento)->with('mensagem_sucesso', 'Evento atualizado com sucesso.');
     }
@@ -141,6 +145,7 @@ class EventoController extends Controller
             return back()->with('mensagem_erro', 'Não é possível excluir um evento que possui participantes. Cancele o evento em vez disso.');
         }
 
+        app(LembreteAgendamentoService::class)->cancelar('evento', $evento->id);
         $evento->delete();
         return redirect()->route('eventos.index')->with('mensagem_sucesso', 'Evento excluído com sucesso.');
     }
@@ -154,6 +159,7 @@ class EventoController extends Controller
             return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Este evento já foi cancelado.');
         }
         $evento->update(['status' => 'cancelado', 'motivo_cancelamento' => $request->validated('motivo_cancelamento'), 'cancelado_em' => now(), 'cancelado_por_id' => $request->user()->id]);
+        app(LembreteAgendamentoService::class)->cancelar('evento', $evento->id);
         $presencaQrService->encerrarAtivas($evento, $request->user());
 
         return redirect()->route('eventos.show', $evento)->with('mensagem_sucesso', 'Evento cancelado com sucesso.');

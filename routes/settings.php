@@ -25,4 +25,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('configuracoes/dois-fatores', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
+
+    Route::get('configuracoes/notificacoes', function () {
+        return Inertia::render('Preferencias/Notificacoes', [
+            'vapidPublicKey' => config('webpush.vapid.public_key'),
+        ]);
+    })->name('notifications.edit');
 });
