@@ -15,6 +15,7 @@ use App\Models\Cidade;
 use App\Models\Estado;
 use App\Models\Hospital;
 use App\Models\MetaMensalHospital;
+use App\Models\MetaPeriodoHospital;
 use App\Models\MetaSemanalHospital;
 use App\Models\User;
 use App\Models\Visita;
@@ -158,6 +159,51 @@ class IndicadoresTest extends TestCase
                     ->where('resumo.meses.1.realizadas', 1)
                     ->where('metas_semanais.0.realizadas', 1)
                     ->where('metas_semanais.0.situacao', 'em_andamento'));
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_dashboard_calcula_meta_quinzenal_pelo_periodo_correto(): void
+    {
+        Carbon::setTestNow('2026-08-20 10:00:00');
+
+        try {
+            $cidade = $this->criarCidade('Porto Alegre');
+            $hospital = $this->criarHospital($cidade, 'Hospital Quinzenal');
+            $administrador = $this->criarUsuario('administrador');
+
+            MetaMensalHospital::query()->create([
+                'hospital_id' => $hospital->id,
+                'ano' => 2026,
+                'mes' => 8,
+                'quantidade' => 2,
+                'periodicidade' => 'quinzenal',
+            ]);
+            MetaPeriodoHospital::query()->create([
+                'hospital_id' => $hospital->id,
+                'ano' => 2026,
+                'mes' => 8,
+                'periodo' => 2,
+                'quantidade' => 2,
+            ]);
+            $this->criarVisita($hospital, $administrador, VisitaStatus::Realizada, null, '2026-08-16 10:00:00');
+            $this->criarVisita($hospital, $administrador, VisitaStatus::Realizada, null, '2026-08-20 10:00:00');
+
+            $this->actingAs($administrador)
+                ->get(route('dashboards.visitas-por-hospital.show', [
+                    'hospital' => $hospital,
+                    'mes_inicio' => '2026-08',
+                    'mes_fim' => '2026-08',
+                    'cidade_id' => $cidade->id,
+                ]))
+                ->assertOk()
+                ->assertInertia(fn (Assert $page) => $page
+                    ->where('metas_semanais.0.periodo', '16–31')
+                    ->where('metas_semanais.0.meta', 2)
+                    ->where('metas_semanais.0.realizadas', 2)
+                    ->where('metas_semanais.0.situacao', 'dentro_meta')
+                );
         } finally {
             Carbon::setTestNow();
         }

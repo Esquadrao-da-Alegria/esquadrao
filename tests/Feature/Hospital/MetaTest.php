@@ -2,14 +2,20 @@
 
 namespace Tests\Feature\Hospital;
 
+use App\Enums\VisitaOrigem;
+use App\Enums\VisitaStatus;
+use App\Enums\VisitaTipo;
 use App\Models\Cargo;
 use App\Models\Ala;
 use App\Models\Cidade;
 use App\Models\Estado;
 use App\Models\Hospital;
 use App\Models\MetaMensalHospital;
+use App\Models\MetaPeriodoHospital;
+use App\Models\MetaPadraoHospital;
 use App\Models\MetaSemanalHospital;
 use App\Models\User;
+use App\Models\Visita;
 use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -242,6 +248,230 @@ class MetaTest extends TestCase
             'ano' => 2026,
             'mes' => 6,
         ]);
+    }
+
+    public function test_salva_metas_quinzenais_sem_perder_a_meta_mensal(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+
+        $this->actingAs($user)
+            ->put(route('hospitais.metas.update', $hospital), [
+                'ano' => 2026,
+                'mes' => 6,
+                'meta_mensal' => 4,
+                'periodicidade' => 'quinzenal',
+                'metas_por_ala' => false,
+                'metas_periodos' => [
+                    ['periodo' => 1, 'quantidade' => 2],
+                    ['periodo' => 2, 'quantidade' => 2],
+                ],
+            ])
+            ->assertSessionHas('mensagem_sucesso');
+
+        $this->assertDatabaseHas('metas_mensais_hospitais', [
+            'hospital_id' => $hospital->id,
+            'ano' => 2026,
+            'mes' => 6,
+            'quantidade' => 4,
+            'periodicidade' => 'quinzenal',
+        ]);
+        $this->assertSame(2, MetaPeriodoHospital::query()
+            ->where('hospital_id', $hospital->id)
+            ->count());
+        $this->assertDatabaseMissing('metas_semanais_hospitais', [
+            'hospital_id' => $hospital->id,
+            'ano' => 2026,
+            'mes' => 6,
+        ]);
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('hospitais.metas.index', ['hospital' => $hospital, 'ano' => 2026, 'mes' => 6]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('hospitais.0.periodicidade', 'quinzenal')
+                ->has('hospitais.0.metas_semanais', 2)
+                ->where('hospitais.0.metas_semanais.0.semana', 1)
+                ->where('hospitais.0.metas_semanais.1.semana', 2));
+    }
+
+    public function test_rejeita_meta_semanal_acima_do_limite(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+
+        $this->actingAs($user)
+            ->put(route('hospitais.metas.update', $hospital), [
+                'ano' => 2026,
+                'mes' => 6,
+                'meta_mensal' => 6,
+                'periodicidade' => 'semanal',
+                'metas_por_ala' => false,
+                'metas_periodos' => [
+                    ['periodo' => 1, 'quantidade' => 6],
+                ],
+            ])
+            ->assertSessionHasErrors('metas_periodos.0.quantidade');
+
+        $this->assertDatabaseMissing('metas_mensais_hospitais', [
+            'hospital_id' => $hospital->id,
+            'ano' => 2026,
+            'mes' => 6,
+        ]);
+    }
+
+    public function test_calcula_visita_da_segunda_quinzena_no_periodo_correto(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+
+        $this->actingAs($user)
+            ->put(route('hospitais.metas.update', $hospital), [
+                'ano' => 2026,
+                'mes' => 6,
+                'meta_mensal' => 2,
+                'periodicidade' => 'quinzenal',
+                'metas_por_ala' => false,
+                'metas_periodos' => [
+                    ['periodo' => 1, 'quantidade' => 1],
+                    ['periodo' => 2, 'quantidade' => 1],
+                ],
+            ])
+            ->assertSessionHas('mensagem_sucesso');
+
+        Visita::query()->create([
+            'hospital_id' => $hospital->id,
+            'criado_por_id' => $user->id,
+            'lider_id' => $user->id,
+            'inicio_em' => '2026-06-16 10:00:00',
+            'fim_em' => '2026-06-16 12:00:00',
+            'tipo' => VisitaTipo::Hospital,
+            'status' => VisitaStatus::Realizada,
+            'origem' => VisitaOrigem::Sistema,
+        ]);
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('hospitais.metas.index', ['hospital' => $hospital, 'ano' => 2026, 'mes' => 6]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('hospitais.0.metas_semanais.1.semana', 2)
+                ->where('hospitais.0.metas_semanais.1.realizadas', 1));
+    }
+
+    public function test_carrega_duas_quinzenas_por_ala(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+        $ala = Ala::query()->create(['hospital_id' => $hospital->id, 'nome' => 'Pediatria']);
+
+        $this->actingAs($user)
+            ->put(route('hospitais.metas.update', $hospital), [
+                'ano' => 2026,
+                'mes' => 6,
+                'meta_mensal' => 4,
+                'periodicidade' => 'quinzenal',
+                'metas_por_ala' => true,
+                'metas_periodos' => [
+                    ['periodo' => 1, 'quantidade' => 2, 'ala_unidade_id' => $ala->id],
+                    ['periodo' => 2, 'quantidade' => 2, 'ala_unidade_id' => $ala->id],
+                ],
+            ])
+            ->assertSessionHas('mensagem_sucesso');
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('hospitais.metas.index', ['hospital' => $hospital, 'ano' => 2026, 'mes' => 6]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('hospitais.0.metas_por_ala', true)
+                ->has('hospitais.0.metas_semanais', 2)
+                ->where('hospitais.0.metas_semanais.0.ala_unidade_id', $ala->id)
+                ->where('hospitais.0.metas_semanais.1.ala_unidade_id', $ala->id));
+    }
+
+    public function test_salva_meta_como_padrao_para_os_proximos_meses(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+
+        $this->actingAs($user)
+            ->put(route('hospitais.metas.update', $hospital), [
+                'ano' => 2026,
+                'mes' => 6,
+                'meta_mensal' => 4,
+                'periodicidade' => 'quinzenal',
+                'metas_por_ala' => false,
+                'salvar_como_padrao' => true,
+                'metas_periodos' => [
+                    ['periodo' => 1, 'quantidade' => 2],
+                    ['periodo' => 2, 'quantidade' => 2],
+                ],
+            ])
+            ->assertSessionHas('mensagem_sucesso');
+
+        $this->assertDatabaseHas('metas_padrao_hospitais', [
+            'hospital_id' => $hospital->id,
+            'quantidade' => 4,
+            'periodicidade' => 'quinzenal',
+            'metas_por_ala' => false,
+        ]);
+        $this->assertSame(2, MetaPadraoHospital::query()->firstOrFail()->periodos()->count());
+    }
+
+    public function test_mes_sem_configuracao_propria_exibe_meta_padrao(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+        $padrao = MetaPadraoHospital::query()->create([
+            'hospital_id' => $hospital->id,
+            'quantidade' => 4,
+            'periodicidade' => 'quinzenal',
+            'metas_por_ala' => false,
+        ]);
+        $padrao->periodos()->createMany([
+            ['periodo' => 1, 'quantidade' => 2],
+            ['periodo' => 2, 'quantidade' => 2],
+        ]);
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('hospitais.metas.index', ['hospital' => $hospital, 'ano' => 2026, 'mes' => 7]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('hospitais.0.meta_mensal', 4)
+                ->where('hospitais.0.periodicidade', 'quinzenal')
+                ->has('hospitais.0.metas_semanais', 2));
+    }
+
+    public function test_meta_mensal_especifica_prevalece_sobre_o_padrao(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+        MetaPadraoHospital::query()->create([
+            'hospital_id' => $hospital->id,
+            'quantidade' => 4,
+            'periodicidade' => 'quinzenal',
+            'metas_por_ala' => false,
+        ]);
+        MetaMensalHospital::query()->create([
+            'hospital_id' => $hospital->id,
+            'ano' => 2026,
+            'mes' => 7,
+            'quantidade' => 3,
+            'periodicidade' => 'semanal',
+        ]);
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('hospitais.metas.index', ['hospital' => $hospital, 'ano' => 2026, 'mes' => 7]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('hospitais.0.meta_mensal', 3)
+                ->where('hospitais.0.periodicidade', 'semanal'));
     }
 
     private function criarCidade(string $nome): Cidade

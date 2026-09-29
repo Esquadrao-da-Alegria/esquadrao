@@ -71,13 +71,13 @@ A tabela principal apresenta a situação consolidada das metas mensais configur
 - **Em andamento:** não existem meses encerrados abaixo da meta, mas o mês atual ainda está abaixo do previsto.
 - **Sem meta definida:** não existe meta aplicável no período consultado.
 
-Meses futuros e meses sem meta não geram pendência. O consolidado compara o total mensal do hospital; metas semanais e por ala são exibidas somente no detalhamento operacional. As visitas realizadas usadas nas metas seguem a mesma contabilização institucional do dashboard.
+Meses futuros e meses sem meta não geram pendência. O consolidado compara o total mensal do hospital; metas por período semanal ou quinzenal e por ala são exibidas somente no detalhamento operacional. As visitas realizadas usadas nas metas seguem a mesma contabilização institucional do dashboard. O detalhamento prioriza `metas_periodos_hospitais`; `metas_semanais_hospitais` é lida apenas como compatibilidade quando não existirem períodos novos para aquele hospital/mês, evitando interpretar uma quinzena como semana.
 
 ## Interface
 
 - Mantém a identidade visual âmbar do painel.
 - Usa filtros nativos e encadeados, cartões de indicadores, barras mensais e uma tabela compacta de hospitais com hospital, situação da meta, total de visitas e ação para o detalhamento.
-- O nome e a ação de cada hospital abrem uma página própria, mobile first, com resumo compacto, evolução das metas mensais, metas semanais/por ala, distribuição por ala e histórico paginado.
+- O nome e a ação de cada hospital abrem uma página própria, mobile first, com resumo compacto, evolução das metas mensais, metas por período/ala, distribuição por ala e histórico paginado.
 - Não adiciona biblioteca de gráficos.
 - Oferece estados vazios e textos explícitos para ausência de relatório, impacto ou alas.
 
