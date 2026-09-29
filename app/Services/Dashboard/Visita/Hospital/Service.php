@@ -9,6 +9,7 @@ use App\Models\Ala;
 use App\Models\Cidade;
 use App\Models\Hospital;
 use App\Models\MetaMensalHospital;
+use App\Models\MetaPeriodoHospital;
 use App\Models\MetaSemanalHospital;
 use App\Models\User;
 use App\Models\Visita;
@@ -281,7 +282,29 @@ class Service
     {
         $inicio = Carbon::createFromFormat('!Y-m', $filtros['mes_inicio'])->startOfMonth();
         $fim = Carbon::createFromFormat('!Y-m', $filtros['mes_fim'])->endOfMonth();
-        $metas = MetaSemanalHospital::query()
+        $metasMensais = MetaMensalHospital::query()
+            ->where('hospital_id', $hospital->id)
+            ->whereRaw('(ano * 100 + mes) between ? and ?', [
+                (int) $inicio->format('Ym'),
+                (int) $fim->format('Ym'),
+            ])
+            ->get()
+            ->keyBy(fn (MetaMensalHospital $meta) => "{$meta->ano}-{$meta->mes}");
+        $metas = MetaPeriodoHospital::query()
+            ->where('hospital_id', $hospital->id)
+            ->whereRaw('(ano * 100 + mes) between ? and ?', [
+                (int) $inicio->format('Ym'),
+                (int) $fim->format('Ym'),
+            ])
+            ->orderBy('ano')
+            ->orderBy('mes')
+            ->orderBy('periodo')
+            ->get();
+        $chavesPeriodos = $metas
+            ->map(fn (MetaPeriodoHospital $meta) => "{$meta->ano}-{$meta->mes}")
+            ->unique()
+            ->all();
+        $metasLegadas = MetaSemanalHospital::query()
             ->where('hospital_id', $hospital->id)
             ->whereRaw('(ano * 100 + mes) between ? and ?', [
                 (int) $inicio->format('Ym'),
@@ -290,7 +313,16 @@ class Service
             ->orderBy('ano')
             ->orderBy('mes')
             ->orderBy('semana')
-            ->get();
+            ->get()
+            ->reject(fn (MetaSemanalHospital $meta) => in_array("{$meta->ano}-{$meta->mes}", $chavesPeriodos, true))
+            ->map(function (MetaSemanalHospital $meta) {
+                $meta->periodo = $meta->semana;
+
+                return $meta;
+            });
+        $metas = $metas->concat($metasLegadas)
+            ->sortBy(fn ($meta) => sprintf('%04d-%02d-%02d', $meta->ano, $meta->mes, $meta->periodo))
+            ->values();
 
         if ($metas->isEmpty()) {
             return [];
@@ -306,9 +338,16 @@ class Service
             ->get();
         $alas = $hospital->alas->pluck('nome', 'id');
 
-        return $metas->map(function ($meta) use ($realizadas, $alas) {
-            $faixa = collect(MetaHospitalHelper::semanasDoMes($meta->ano, $meta->mes))
-                ->firstWhere('semana', $meta->semana);
+        return $metas->map(function ($meta) use ($realizadas, $alas, $metasMensais) {
+            $metaMensal = $metasMensais->get("{$meta->ano}-{$meta->mes}");
+            $periodicidade = $metaMensal?->periodicidade ?? 'semanal';
+            $faixa = collect(MetaHospitalHelper::periodosDoMes($meta->ano, $meta->mes, $periodicidade))
+                ->firstWhere('periodo', $meta->periodo);
+
+            if (! $faixa) {
+                return null;
+            }
+
             $total = $realizadas->filter(function ($item) use ($meta, $faixa) {
                 $data = Carbon::parse($item->data);
                 $mesmaAla = $meta->ala_unidade_id === null
@@ -323,7 +362,7 @@ class Service
 
             return [
                 'mes' => sprintf('%04d-%02d', $meta->ano, $meta->mes),
-                'semana' => (int) $meta->semana,
+                'semana' => (int) $meta->periodo,
                 'periodo' => $faixa['dia_inicio'].'–'.$faixa['dia_fim'],
                 'ala' => $meta->ala_unidade_id ? ($alas[$meta->ala_unidade_id] ?? 'Ala removida') : null,
                 'meta' => (int) $meta->quantidade,
@@ -334,7 +373,7 @@ class Service
                     (int) $total,
                 ),
             ];
-        })->all();
+        })->filter()->values()->all();
     }
 
     private function aplicarEscopo(User $user, array $filtros): array

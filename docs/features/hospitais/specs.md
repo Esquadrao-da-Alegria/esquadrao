@@ -89,7 +89,7 @@ Model: `App\Models\MetaSemanalHospital`
 | `ano`, `mes`, `semana` | Período; semana 1–5 |
 | `quantidade` | Meta da semana |
 
-Esta tabela permanece como compatibilidade dos dados semanais legados. As novas gravações também usam `metas_periodos_hospitais`.
+Esta tabela permanece como compatibilidade para consumidores semanais legados. Metas semanais novas também são espelhadas nela; metas quinzenais são gravadas exclusivamente em `metas_periodos_hospitais`. As consultas priorizam a tabela nova e só usam esta estrutura quando não há períodos novos para o hospital/mês.
 
 ### `metas_periodos_hospitais`
 

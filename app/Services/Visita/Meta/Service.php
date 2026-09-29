@@ -221,6 +221,11 @@ class Service
             (int) $metaMensal->hospital_id,
         );
         $periodo = collect($periodos)->firstWhere('periodo', $periodoReferencia);
+
+        if ($periodo === null) {
+            return collect();
+        }
+
         $metasDoPeriodo = $metasPeriodos->where('periodo', $periodoReferencia)->values();
         $planejadasMes = (int) $planejadas
             ->where('hospital_id', $metaMensal->hospital_id)

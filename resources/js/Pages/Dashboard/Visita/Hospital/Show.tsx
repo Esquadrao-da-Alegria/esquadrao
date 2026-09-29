@@ -250,12 +250,12 @@ export default function Show({
 
                     <div className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm">
                         <TituloSecao
-                            titulo="Metas semanais"
-                            descricao="Detalhamento operacional por semana e ala, quando configurado."
+                            titulo="Metas por período"
+                            descricao="Detalhamento operacional por semana ou quinzena e ala, quando configurado."
                         />
                         {metas_semanais.length === 0 ? (
                             <p className="p-5 text-sm text-gray-500">
-                                Nenhuma meta semanal foi definida neste período.
+                                Nenhuma meta por período foi definida neste período.
                             </p>
                         ) : (
                             <div className="overflow-x-auto">

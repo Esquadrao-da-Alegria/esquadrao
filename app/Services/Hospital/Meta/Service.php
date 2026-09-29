@@ -197,6 +197,7 @@ class Service
             $mes,
             $metasSemanais,
             (bool) $hospitalPayload['metas_por_ala'],
+            $hospitalPayload['periodicidade'] ?? 'semanal',
         );
 
         return null;
@@ -260,20 +261,23 @@ class Service
         int $mes,
         array $metasSemanais,
         bool $metasPorAla,
+        string $periodicidade,
     ): void {
         foreach ($metasSemanais as $metaSemanal) {
-            MetaSemanalHospital::create([
-                'hospital_id'    => $hospitalId,
-                'ala_unidade_id' => $metasPorAla ? ($metaSemanal['ala_unidade_id'] ?? null) : null,
-                'ano'            => $ano,
-                'mes'            => $mes,
-                'semana'         => (int) $metaSemanal['semana'],
-                'quantidade'     => (int) $metaSemanal['quantidade'],
-            ]);
+            if ($periodicidade === 'semanal') {
+                MetaSemanalHospital::create([
+                    'hospital_id'    => $hospitalId,
+                    'ala_unidade_id' => $metasPorAla ? ($metaSemanal['ala_unidade_id'] ?? null) : null,
+                    'ano'            => $ano,
+                    'mes'            => $mes,
+                    'semana'         => (int) $metaSemanal['semana'],
+                    'quantidade'     => (int) $metaSemanal['quantidade'],
+                ]);
+            }
 
             MetaPeriodoHospital::create([
                 'hospital_id' => $hospitalId,
-                'ala_unidade_id' => $metasPorAla ? (int) $metaSemanal['ala_unidade_id'] : null,
+                'ala_unidade_id' => $metasPorAla ? ($metaSemanal['ala_unidade_id'] ?? null) : null,
                 'ano' => $ano,
                 'mes' => $mes,
                 'periodo' => (int) $metaSemanal['semana'],
@@ -469,11 +473,28 @@ class Service
     {
         $hospitalIds = $hospitais->pluck('id')->all();
 
-        $metasSemanais = MetaSemanalHospital::query()
+        $metasSemanais = MetaPeriodoHospital::query()
             ->whereIn('hospital_id', $hospitalIds)
             ->where('ano', $ano)
             ->where('mes', $mes)
-            ->get();
+            ->get()
+            ->map(function (MetaPeriodoHospital $meta) {
+                $meta->semana = $meta->periodo;
+
+                return $meta;
+            });
+        $hospitalIdsLegados = array_values(array_diff(
+            $hospitalIds,
+            $metasSemanais->pluck('hospital_id')->all(),
+        ));
+
+        if ($hospitalIdsLegados !== []) {
+            $metasSemanais = $metasSemanais->concat(MetaSemanalHospital::query()
+                ->whereIn('hospital_id', $hospitalIdsLegados)
+                ->where('ano', $ano)
+                ->where('mes', $mes)
+                ->get());
+        }
 
         return [
             'ano'            => $ano,
@@ -537,7 +558,7 @@ class Service
                 $metasSemanaisHospital,
                 $contexto['realizadas'],
                 $metasPorAla,
-                array_column($periodos, 'periodo'),
+                $periodos,
             ),
         ];
     }
@@ -619,13 +640,11 @@ class Service
         $expressaoDia = DB::connection()->getDriverName() === 'sqlite'
             ? "CAST(strftime('%d', inicio_em) AS INTEGER)"
             : 'DAY(inicio_em)';
-        $sqlSemana = MetaHospitalHelper::sqlSemanaVisita($ano, $mes, $expressaoDia);
-
         return Visita::query()
             ->select([
                 'hospital_id',
                 'ala_unidade_id',
-                DB::raw("{$sqlSemana} as semana"),
+                DB::raw("{$expressaoDia} as dia"),
                 DB::raw('COUNT(*) as total'),
             ])
             ->whereIn('hospital_id', $hospitalIds)
@@ -633,7 +652,7 @@ class Service
             ->whereMonth('inicio_em', $mes)
             ->whereIn('status', VisitaHelper::statusRealizadasValores())
             ->groupBy('hospital_id', 'ala_unidade_id')
-            ->groupByRaw($sqlSemana)
+            ->groupByRaw($expressaoDia)
             ->get();
     }
 
@@ -652,7 +671,7 @@ class Service
 
     /**
      * @param  Collection<int, MetaSemanalHospital>  $metasSemanaisHospital
-     * @param  array<int, int>  $semanasDoMes
+     * @param  array<int, array{periodo: int, dia_inicio: int, dia_fim: int, titulo: string, sigla: string}>  $periodos
      * @return array<int, array<string, int|null>>
      */
     private function montarMetasSemanais(
@@ -660,14 +679,14 @@ class Service
         Collection $metasSemanaisHospital,
         Collection $realizadas,
         bool $metasPorAla,
-        array $semanasDoMes,
+        array $periodos,
     ): array {
         if ($metasPorAla) {
             return $this->montarMetasSemanaisPorAla(
                 $hospital,
                 $metasSemanaisHospital,
                 $realizadas,
-                $semanasDoMes,
+                $periodos,
             );
         }
 
@@ -675,30 +694,32 @@ class Service
             $hospital,
             $metasSemanaisHospital,
             $realizadas,
-            $semanasDoMes,
+            $periodos,
         );
     }
 
     /**
      * @param  Collection<int, MetaSemanalHospital>  $metasSemanaisHospital
-     * @param  array<int, int>  $semanasDoMes
+     * @param  array<int, array{periodo: int, dia_inicio: int, dia_fim: int, titulo: string, sigla: string}>  $periodos
      * @return array<int, array<string, int|null>>
      */
     private function montarMetasSemanaisPorAla(
         Hospital $hospital,
         Collection $metasSemanaisHospital,
         Collection $realizadas,
-        array $semanasDoMes,
+        array $periodos,
     ): array {
         $resultado = [];
 
         foreach ($hospital->alas as $ala) {
-            foreach ($semanasDoMes as $semana) {
+            foreach ($periodos as $periodo) {
+                $numeroPeriodo = (int) $periodo['periodo'];
+
                 $resultado[] = [
-                    'semana'         => $semana,
+                    'semana'         => $numeroPeriodo,
                     'ala_unidade_id' => (int) $ala->id,
-                    'meta'           => $this->quantidadeMetaSemanal($metasSemanaisHospital, $semana, (int) $ala->id),
-                    'realizadas'     => $this->realizadasSemanais($realizadas, (int) $hospital->id, $semana, (int) $ala->id),
+                    'meta'           => $this->quantidadeMetaSemanal($metasSemanaisHospital, $numeroPeriodo, (int) $ala->id),
+                    'realizadas'     => $this->realizadasNoPeriodo($realizadas, (int) $hospital->id, $periodo, (int) $ala->id),
                 ];
             }
         }
@@ -708,20 +729,20 @@ class Service
 
     /**
      * @param  Collection<int, MetaSemanalHospital>  $metasSemanaisHospital
-     * @param  array<int, int>  $semanasDoMes
+     * @param  array<int, array{periodo: int, dia_inicio: int, dia_fim: int, titulo: string, sigla: string}>  $periodos
      * @return array<int, array<string, int|null>>
      */
     private function montarMetasSemanaisPorHospital(
         Hospital $hospital,
         Collection $metasSemanaisHospital,
         Collection $realizadas,
-        array $semanasDoMes,
+        array $periodos,
     ): array {
-        return collect($semanasDoMes)
-            ->map(fn (int $semana) => [
-                'semana'     => $semana,
-                'meta'       => $this->quantidadeMetaSemanal($metasSemanaisHospital, $semana),
-                'realizadas' => $this->realizadasSemanais($realizadas, (int) $hospital->id, $semana),
+        return collect($periodos)
+            ->map(fn (array $periodo) => [
+                'semana'     => (int) $periodo['periodo'],
+                'meta'       => $this->quantidadeMetaSemanal($metasSemanaisHospital, (int) $periodo['periodo']),
+                'realizadas' => $this->realizadasNoPeriodo($realizadas, (int) $hospital->id, $periodo),
             ])
             ->values()
             ->all();
@@ -747,15 +768,16 @@ class Service
         return $meta ? (int) $meta->quantidade : null;
     }
 
-    private function realizadasSemanais(
+    private function realizadasNoPeriodo(
         Collection $realizadas,
         int $hospitalId,
-        int $semana,
+        array $periodo,
         ?int $alaId = null,
     ): int {
         $query = $realizadas
             ->where('hospital_id', $hospitalId)
-            ->where('semana', $semana);
+            ->filter(fn ($registro) => (int) $registro->dia >= $periodo['dia_inicio']
+                && (int) $registro->dia <= $periodo['dia_fim']);
 
         if ($alaId !== null) {
             $query = $query->where('ala_unidade_id', $alaId);

@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Hospital;
 
+use App\Enums\VisitaOrigem;
+use App\Enums\VisitaStatus;
+use App\Enums\VisitaTipo;
 use App\Models\Cargo;
 use App\Models\Ala;
 use App\Models\Cidade;
@@ -12,6 +15,7 @@ use App\Models\MetaPeriodoHospital;
 use App\Models\MetaPadraoHospital;
 use App\Models\MetaSemanalHospital;
 use App\Models\User;
+use App\Models\Visita;
 use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -276,6 +280,11 @@ class MetaTest extends TestCase
         $this->assertSame(2, MetaPeriodoHospital::query()
             ->where('hospital_id', $hospital->id)
             ->count());
+        $this->assertDatabaseMissing('metas_semanais_hospitais', [
+            'hospital_id' => $hospital->id,
+            'ano' => 2026,
+            'mes' => 6,
+        ]);
 
         $this->actingAs($user)
             ->withoutVite()
@@ -311,6 +320,45 @@ class MetaTest extends TestCase
             'ano' => 2026,
             'mes' => 6,
         ]);
+    }
+
+    public function test_calcula_visita_da_segunda_quinzena_no_periodo_correto(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+
+        $this->actingAs($user)
+            ->put(route('hospitais.metas.update', $hospital), [
+                'ano' => 2026,
+                'mes' => 6,
+                'meta_mensal' => 2,
+                'periodicidade' => 'quinzenal',
+                'metas_por_ala' => false,
+                'metas_periodos' => [
+                    ['periodo' => 1, 'quantidade' => 1],
+                    ['periodo' => 2, 'quantidade' => 1],
+                ],
+            ])
+            ->assertSessionHas('mensagem_sucesso');
+
+        Visita::query()->create([
+            'hospital_id' => $hospital->id,
+            'criado_por_id' => $user->id,
+            'lider_id' => $user->id,
+            'inicio_em' => '2026-06-16 10:00:00',
+            'fim_em' => '2026-06-16 12:00:00',
+            'tipo' => VisitaTipo::Hospital,
+            'status' => VisitaStatus::Realizada,
+            'origem' => VisitaOrigem::Sistema,
+        ]);
+
+        $this->actingAs($user)
+            ->withoutVite()
+            ->get(route('hospitais.metas.index', ['hospital' => $hospital, 'ano' => 2026, 'mes' => 6]))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('hospitais.0.metas_semanais.1.semana', 2)
+                ->where('hospitais.0.metas_semanais.1.realizadas', 1));
     }
 
     public function test_carrega_duas_quinzenas_por_ala(): void
