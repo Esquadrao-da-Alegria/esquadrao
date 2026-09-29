@@ -27,6 +27,8 @@ interface Props {
 const dataAtividade = (atividade: Atividade): string =>
     atividade.tipo_registro === 'visita' ? atividade.dado.inicio_em : atividade.dado.data_inicio;
 
+const criarData = (valor: string): Date => new Date(valor.replace(' ', 'T'));
+
 const inicioDoDiaAtual = (): Date => {
     const hoje = new Date();
 
@@ -35,12 +37,12 @@ const inicioDoDiaAtual = (): Date => {
     return hoje;
 };
 
-const formatarDia = (valor: string) => new Date(valor).toLocaleDateString('pt-BR', { day: '2-digit' });
+const formatarDia = (valor: string) => criarData(valor).toLocaleDateString('pt-BR', { day: '2-digit' });
 
-const formatarSemana = (valor: string) => new Date(valor).toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+const formatarSemana = (valor: string) => criarData(valor).toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
 
 const formatarHora = (valor: string | null | undefined) => valor
-    ? new Date(valor).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    ? criarData(valor).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
     : null;
 
 const nomesParticipantes = (atividade: Atividade): string[] => {
@@ -68,7 +70,7 @@ const Show: FC<Props> = ({ visitas = [], eventos = [], onSelecionarVisita, onSel
         ...visitas.map((dado) => ({ tipo_registro: 'visita' as const, dado })),
         ...eventos.map((dado) => ({ tipo_registro: 'evento' as const, dado })),
     ]
-        .filter((atividade) => new Date(dataAtividade(atividade)) >= inicioDoDiaAtual())
+        .filter((atividade) => criarData(dataAtividade(atividade)) >= inicioDoDiaAtual())
         .sort((a, b) => dataAtividade(a).localeCompare(dataAtividade(b)));
 
     if (atividades.length === 0) {
@@ -97,11 +99,11 @@ const Show: FC<Props> = ({ visitas = [], eventos = [], onSelecionarVisita, onSel
                         ? participacaoAtivaDoUsuario(visita, usuarioId)
                         : null;
                     const podeParticipar = visita?.status === 'agendada'
-                        && new Date(visita.inicio_em) >= new Date()
+                        && criarData(visita.inicio_em) >= new Date()
                         && !inscritosAtivos.some((item) => item.voluntario_id === usuarioId)
                         && (limite === null || inscritosAtivos.length < limite);
                     const podeCancelarInscricao = visita?.status === 'agendada'
-                        && new Date(visita.fim_em) >= new Date()
+                        && criarData(visita.fim_em) >= new Date()
                         && usuarioId !== undefined
                         && !usuarioEhLiderDaVisita(visita, usuarioId)
                         && participacaoAtiva?.id !== undefined;
