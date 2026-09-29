@@ -15,6 +15,7 @@ import type { Evento, SharedData } from '@/types';
 import DetalhesModalShow from '@/components/Painel/Evento/Calendario/Detalhes/Modal/Show';
 import ListaCompletaModalShow from '@/components/Painel/Evento/Calendario/ListaCompleta/Modal/Show';
 import CalendarioShow from '@/components/Painel/Evento/Calendario/Show';
+import ListaAgendaShow from '@/components/Painel/Agenda/Lista/Show';
 
 // ICONS
 import {
@@ -22,6 +23,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Download,
+    List,
     MapPin,
     Plus,
 } from 'lucide-react';
@@ -70,6 +72,16 @@ const Index: FC<Props> = ({
     );
     const [diaOverflow, setDiaOverflow] = useState<Date | null>(null);
     const [eventosOverflow, setEventosOverflow] = useState<Evento[]>([]);
+    const [visualizacao, setVisualizacao] = useState<'calendario' | 'lista'>(() =>
+        typeof window === 'undefined' || localStorage.getItem('agenda-eventos-visualizacao') !== 'lista'
+            ? 'calendario'
+            : 'lista',
+    );
+
+    const alterarVisualizacao = (valor: 'calendario' | 'lista') => {
+        setVisualizacao(valor);
+        localStorage.setItem('agenda-eventos-visualizacao', valor);
+    };
 
     const navegar = (novoMes: string, novaCidade: number | 'todas') => {
         const query: Record<string, string | number> = { mes: novoMes };
@@ -205,12 +217,12 @@ const Index: FC<Props> = ({
                     </div>
                 </header>
 
-                <CalendarioShow
-                    eventos={eventos}
-                    mes={mes}
-                    onSelecionarEvento={setEventoSelecionado}
-                    onAbrirListaCompleta={abrirListaCompleta}
-                />
+                <div className="mb-4 inline-flex rounded-xl border border-amber-200 bg-white p-1 shadow-sm">
+                    <button type="button" onClick={() => alterarVisualizacao('calendario')} className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium ${visualizacao === 'calendario' ? 'bg-amber-100 text-amber-950' : 'text-amber-800'}`}><CalendarDays className="size-4" />Calendário</button>
+                    <button type="button" onClick={() => alterarVisualizacao('lista')} className={`inline-flex min-h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium ${visualizacao === 'lista' ? 'bg-amber-100 text-amber-950' : 'text-amber-800'}`}><List className="size-4" />Lista</button>
+                </div>
+
+                {visualizacao === 'calendario' ? <CalendarioShow eventos={eventos} mes={mes} onSelecionarEvento={setEventoSelecionado} onAbrirListaCompleta={abrirListaCompleta} /> : <ListaAgendaShow eventos={eventos} onSelecionarEvento={setEventoSelecionado} />}
             </div>
 
             <DetalhesModalShow

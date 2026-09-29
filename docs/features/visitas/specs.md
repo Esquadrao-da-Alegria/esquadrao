@@ -505,6 +505,9 @@ Página `/visitas` com calendário mensal de visitas para usuários autenticados
 ### Regras
 
 - Sem rota `show` — dados de detalhes em memória (props Inertia)
+- A agenda oferece as visualizações **Calendário** e **Lista**. A lista usa os mesmos dados, mês, cidade e permissões do calendário, reúne visitas e eventos por data e abre os mesmos modais de detalhes.
+- A preferência entre calendário e lista fica somente no navegador. A lista mostra hospital/ala ou local, cidade, horário, responsáveis, vagas e participantes ativos sem carregar registros adicionais por atividade; as cores comunicam visualmente a situação. Em telas pequenas, a apresentação é em blocos sem rolagem horizontal.
+- Para visitas agendadas, a lista oferece **Participar** a quem possui vaga e ainda não está inscrito. Ao participante inscrito que não é líder, oferece **Cancelar inscrição**, reutilizando a mesma autorização e cancelamento lógico do modal de detalhes.
 - Overflow: máximo 2 cards por dia; "+X mais" abre modal de lista completa
 - Navegação de mês via `router.visit` com Inertia (sem reload de página)
 - Estado dos modais centralizado na Page

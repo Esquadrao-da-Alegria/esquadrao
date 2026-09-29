@@ -60,6 +60,10 @@ Os três tipos seguem o mesmo fluxo geral de agendamento, listagem, inscrição,
 - `resources/js/Pages/Evento/Edit.tsx`
 - `tests/Feature/EventoTest.php`
 
+## Agenda em lista
+
+A página de eventos oferece as visualizações **Calendário** e **Lista**, com a preferência armazenada no navegador. A lista respeita os filtros já aplicados e apresenta data, local, cidade, responsável, vagas e participantes ativos; as cores comunicam visualmente a situação. O botão de detalhes reutiliza o modal existente. A consulta carrega participantes ativos junto dos eventos para evitar consultas adicionais por linha.
+
 ---
 
 ## Validação de regressão

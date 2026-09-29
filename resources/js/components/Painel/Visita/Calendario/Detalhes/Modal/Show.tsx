@@ -32,6 +32,7 @@ import type { TipoParticipacao, Visita } from '@/types/visita';
 interface Props {
     visita: Visita | null;
     onFechar: () => void;
+    abrirInscricao?: boolean;
 }
 type Passo = 'detalhes' | 'inscricao';
 
@@ -40,7 +41,7 @@ const botaoAcaoClass =
 const botaoPerigoClass =
     'inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-red-600 bg-white px-2.5 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50 sm:text-sm';
 
-const Show: FC<Props> = ({ visita, onFechar }) => {
+const Show: FC<Props> = ({ visita, onFechar, abrirInscricao = false }) => {
     const { auth, eh_administrador } = usePage<SharedData>().props;
     const [passo, setPasso] = useState<Passo>('detalhes');
     const [tipo, setTipo] = useState<TipoParticipacao | null>(null);
@@ -62,6 +63,10 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
     const podeCancelarVisita = Boolean(eh_administrador || ehLider);
 
     useEffect(() => {
+        if (visita !== null && abrirInscricao) {
+            setPasso('inscricao');
+        }
+
         if (visita === null) {
             setPasso('detalhes');
             setTipo(null);
@@ -69,7 +74,7 @@ const Show: FC<Props> = ({ visita, onFechar }) => {
             setCancelando(false);
             setCancelandoVisita(false);
         }
-    }, [visita]);
+    }, [visita, abrirInscricao]);
 
     const fecharModal = () => {
         setPasso('detalhes');
