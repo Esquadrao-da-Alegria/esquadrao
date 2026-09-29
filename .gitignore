@@ -34,6 +34,7 @@ backup_*.sql
 scripts/import-db-prod.local.env
 
 # DOCS
+/docs/modelagem/
 docs/superpowers
 docs/plans
 docs/designs

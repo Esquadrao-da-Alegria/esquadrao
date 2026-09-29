@@ -183,6 +183,7 @@ export interface Hospital {
     ativo: boolean;
     url_foto: string | null;
     observacoes?: string;
+    cidade?: Cidade | null;
     alas?: AlaHospital[];
     created_at?: string;
     updated_at?: string;

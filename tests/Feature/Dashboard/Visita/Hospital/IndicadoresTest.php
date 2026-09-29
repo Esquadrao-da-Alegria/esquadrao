@@ -30,6 +30,12 @@ class IndicadoresTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     public function test_contabiliza_somente_visitas_realizadas_sem_exigir_relatorio(): void
     {
         $cidade = $this->criarCidade('Porto Alegre');

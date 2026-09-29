@@ -118,21 +118,17 @@
         <div class="campo-label">Participantes</div>
         <div class="campo-valor">
             @php
-                $participantes = $visita->participantes
-                    ?->filter(fn ($p) => $p->papel_na_visita->value === 'participante')
+                $listaParticipantes = $visita->participantes
+                    ?->filter(fn ($p) => $p->papel_na_visita->value === 'participante'
+                        && $p->status_participacao->value !== 'cancelado')
                     ?? collect();
-                $palhacos = $participantes->filter(fn ($p) => $p->tipo_participacao->value === 'palhaco')->count();
-                $paisanas = $participantes->filter(fn ($p) => $p->tipo_participacao->value === 'paisana')->count();
             @endphp
-            @if ($palhacos > 0)
-                Palhaço(s): {{ $palhacos }}
-            @endif
-            @if ($paisanas > 0)
-                @if ($palhacos > 0) · @endif
-                Paisana(s): {{ $paisanas }}
-            @endif
-            @if ($palhacos === 0 && $paisanas === 0)
+            @if ($listaParticipantes->isEmpty())
                 —
+            @else
+                @foreach ($listaParticipantes as $p)
+                    {{ $p->tipo_participacao->value === 'palhaco' ? '🎪' : '👔' }} {{ $p->voluntario?->name ?? '—' }}<br>
+                @endforeach
             @endif
         </div>
     </div>
