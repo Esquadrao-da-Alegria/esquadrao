@@ -58,25 +58,7 @@ class ExportController extends BaseController
 
     private function gerarPlanilha($participantes, string $nomeArquivo): Response
     {
-        $writer = SimpleExcelWriter::streamDownload($nomeArquivo);
-        $writer->addHeader([
-            'Voluntário',
-            'Cidade',
-            'Cargos',
-            'Tipo de atuação',
-            'Visitas válidas',
-            'Meta mensal',
-            'Saldo atual',
-            'Situação',
-            'Reuniões (%)',
-            'Oficinas (%)',
-            'Rel. pendentes',
-            'Rel. fora do prazo',
-            'Última atividade',
-            'Dias sem atividade',
-        ]);
-
-        $writer->addRows($participantes->map(fn ($p) => [
+        $linhas = $participantes->map(fn ($p) => [
             $p['nome'],
             $p['cidade'],
             implode(', ', $p['cargos']->toArray()),
@@ -91,9 +73,35 @@ class ExportController extends BaseController
             $p['relatorios_fora_prazo'],
             $p['ultima_atividade'] ? Carbon::parse($p['ultima_atividade'])->format('d/m/Y') : '',
             $p['dias_sem_atividade'] ?? '',
-        ])->toArray());
+        ])->toArray();
 
-        return $writer->toBrowser();
+        $tipo = str_ends_with($nomeArquivo, '.xlsx') ? 'xlsx' : 'csv';
+
+        $contentType = $tipo === 'xlsx'
+            ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            : 'text/csv; charset=UTF-8';
+
+        return response()->streamDownload(function () use ($linhas, $tipo): void {
+            $writer = SimpleExcelWriter::create('php://output', $tipo);
+            $writer->addHeader([
+                'Voluntário',
+                'Cidade',
+                'Cargos',
+                'Tipo de atuação',
+                'Visitas válidas',
+                'Meta mensal',
+                'Saldo atual',
+                'Situação',
+                'Reuniões (%)',
+                'Oficinas (%)',
+                'Rel. pendentes',
+                'Rel. fora do prazo',
+                'Última atividade',
+                'Dias sem atividade',
+            ]);
+            $writer->addRows($linhas);
+            $writer->close();
+        }, $nomeArquivo, ['Content-Type' => $contentType]);
     }
 
     private function nomeArquivo(array $filtros, string $formato): string
