@@ -73,9 +73,10 @@ Usa a mesma regra do dashboard por hospital: calcular `AVG(pessoas_impactadas)` 
 ### Presença
 
 - Denominador: reuniões ou oficinas finalizadas da cidade-base no período.
-- Numerador: eventos em que o usuário possui `presenca = presente`.
-- Eventos com presença institucional ainda incompleta deixam o percentual indisponível.
-- A lista **Atividades consideradas** detalha os eventos da cidade-base e inclui participações confirmadas em outras cidades (intercâmbios).
+- Numerador: reuniões ou oficinas finalizadas em que o usuário possui `presenca = presente`, incluindo intercâmbios.
+- Eventos com presença institucional ainda incompleta ou ausência de eventos oferecidos na cidade-base deixam o percentual indisponível. Presenças confirmadas em intercâmbios continuam visíveis mesmo sem oferta local.
+- O percentual pode superar 100% quando as presenças excedem a oferta da cidade-base; somente o preenchimento da barra é limitado a 100%. Os textos distinguem presenças, incluindo intercâmbios, de atividades oferecidas na cidade-base.
+- A lista **Atividades consideradas** detalha os eventos finalizados da cidade-base e inclui participações confirmadas em eventos finalizados de outras cidades (intercâmbios). Eventos agendados ou cancelados permanecem no histórico, sem somar presença nos indicadores ou entrar nessa lista.
 
 ### Companheiros
 

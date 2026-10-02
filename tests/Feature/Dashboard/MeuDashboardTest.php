@@ -269,9 +269,58 @@ class MeuDashboardTest extends TestCase
             ->get(route('dashboards.meu'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
+                ->where('indicadores.oficinas.oferecidos', 0)
                 ->where('indicadores.oficinas.presencas', 1)
+                ->where('indicadores.oficinas.percentual', null)
+                ->where('indicadores.oficinas.dados_incompletos', true)
                 ->where('presencas.0.titulo', 'Oficina POA')
                 ->where('presencas.0.motivo', 'Presença confirmada em outra cidade'));
+    }
+
+    public function test_presencas_em_eventos_nao_finalizados_permanecem_apenas_no_historico(): void
+    {
+        $cidadeBase = $this->criarCidade();
+        $cidadeOutra = $this->criarCidade();
+        $usuario = $this->criarUsuario($cidadeBase, ['voluntario']);
+
+        foreach ([$cidadeBase, $cidadeOutra] as $cidade) {
+            foreach (['agendado', 'cancelado'] as $status) {
+                $evento = $this->criarEvento($cidade, $usuario, '2026-08-05 10:00:00');
+                $evento->update(['status' => $status]);
+                $evento->participantes()->attach($usuario->id, ['status' => 'inscrito', 'presenca' => 'presente']);
+            }
+        }
+
+        $this->actingAs($usuario)
+            ->get(route('dashboards.meu', ['periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('indicadores.reunioes.presencas', 0)
+                ->has('presencas', 0)
+                ->has('historico.data', 4));
+    }
+
+    public function test_intercambio_pode_superar_total_oferecido_no_meu_dashboard(): void
+    {
+        $cidadeBase = $this->criarCidade();
+        $cidadeOutra = $this->criarCidade();
+        $usuario = $this->criarUsuario($cidadeBase, ['voluntario']);
+
+        foreach ([$cidadeBase, $cidadeOutra] as $cidade) {
+            $evento = $this->criarEvento($cidade, $usuario, '2026-08-05 10:00:00');
+            $evento->update(['status' => 'finalizado']);
+            $evento->participantes()->attach($usuario->id, ['status' => 'inscrito', 'presenca' => 'presente']);
+        }
+
+        $this->actingAs($usuario)
+            ->get(route('dashboards.meu', ['periodo_tipo' => 'mes', 'ano' => 2026, 'mes' => 8]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('indicadores.reunioes.oferecidos', 1)
+                ->where('indicadores.reunioes.presencas', 2)
+                ->where('indicadores.reunioes.percentual', 200)
+                ->where('indicadores.reunioes.dados_incompletos', false)
+                ->has('presencas', 2));
     }
 
     private function criarUsuario(Cidade $cidade, array $cargos): User

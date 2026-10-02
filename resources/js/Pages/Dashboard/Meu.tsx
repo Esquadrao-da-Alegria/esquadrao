@@ -903,11 +903,11 @@ function Presenca({
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
                 <div
                     className="h-full rounded-full bg-amber-500"
-                    style={{ width: `${medida.percentual ?? 0}%` }}
+                    style={{ width: `${Math.min(medida.percentual ?? 0, 100)}%` }}
                 />
             </div>
             <p className="mt-1 text-xs text-gray-500">
-                {medida.presencas} presenças em {medida.oferecidos} atividades
+                {medida.presencas} presenças, incluindo intercâmbios · {medida.oferecidos} atividades oferecidas na cidade-base
             </p>
         </div>
     );

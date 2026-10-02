@@ -150,7 +150,7 @@ class Service
         $resultado = [];
         foreach (['reuniao', 'oficina'] as $tipo) {
             $eventos = $oferecidos->where('tipo', $tipo);
-            $presentes = $participacoes->where('tipo', $tipo)->where('presenca', 'presente')->count();
+            $presentes = $participacoes->where('tipo', $tipo)->where('status', 'finalizado')->where('presenca', 'presente')->count();
             $incompleto = $eventos->contains(fn ($evento) => (bool) $evento->presencas_incompletas);
             $resultado[$tipo] = [
                 'oferecidos' => $eventos->count(),
@@ -188,6 +188,7 @@ class Service
         });
 
         $intercambios = $participacoes
+            ->where('status', 'finalizado')
             ->where('presenca', 'presente')
             ->whereNotIn('id', $oferecidos->pluck('id'))
             ->map(fn ($evento) => [
