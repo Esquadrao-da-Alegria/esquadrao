@@ -121,7 +121,7 @@ export default function Index({
                         Participação semestral
                     </h1>
                     <p className="mt-2 max-w-3xl text-sm leading-relaxed text-amber-900/60">
-                        Presenças confirmadas em reuniões e oficinas da cidade-base de cada integrante.
+                        Presenças confirmadas em reuniões e oficinas de cada integrante.
                     </p>
                 </header>
 
