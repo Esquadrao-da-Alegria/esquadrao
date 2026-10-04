@@ -16,6 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import PushNotificationBanner from '@/components/push-notification-banner';
 import { itensDashboards } from '@/lib/dashboard';
 import { cn } from '@/lib/utils';
 import { toastAviso, toastErro, toastSucesso } from '@/lib/utils/toast';
@@ -569,7 +570,12 @@ const PainelLayout: React.FC<Props> = ({ children }) => {
                     </nav>
                 </header>
 
-                <main className="flex-1">{children}</main>
+                <main className="flex-1">
+                    <div className="mx-auto max-w-7xl px-6 pt-4">
+                        <PushNotificationBanner />
+                    </div>
+                    {children}
+                </main>
 
                 {aniversarioVisivel && props.aniversariante_atual && (
                     <div className="fixed right-4 bottom-4 left-4 z-50 mx-auto max-w-md rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-lg sm:top-6 sm:right-auto sm:bottom-auto sm:left-1/2 sm:-translate-x-1/2">

@@ -14,6 +14,7 @@ use App\Models\Visita;
 use App\Models\VisitaParticipante;
 use App\Queries\Visita\Queries;
 use App\Services\Visita\Agenda\Liberacao\Service as LiberacaoAgendaService;
+use App\Services\Lembrete\Agendamento\Service as LembreteAgendamentoService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -129,6 +130,14 @@ class Service
                 'status_participacao' => StatusParticipacao::Confirmado->value,
             ]);
 
+            DB::afterCommit(function () use ($visita) {
+                try {
+                    app(LembreteAgendamentoService::class)->visita($visita);
+                } catch (\Throwable $th) {
+                    Log::error('Falha ao agendar lembrete de visita.', ['visita_id' => $visita->id]);
+                }
+            });
+
             DB::commit();
 
             session()->flash('mensagem_sucesso', 'Visita cadastrada com sucesso!');
@@ -215,6 +224,14 @@ class Service
             }
 
             $this->garantirParticipacaoDoLider($visita->id, $payload['lider_id']);
+
+            DB::afterCommit(function () use ($visita) {
+                try {
+                    app(LembreteAgendamentoService::class)->visita($visita->fresh());
+                } catch (\Throwable $th) {
+                    Log::error('Falha ao reagendar lembrete de visita.', ['visita_id' => $visita->id]);
+                }
+            });
 
             DB::commit();
 
