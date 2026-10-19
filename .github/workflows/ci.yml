@@ -1,0 +1,50 @@
+name: CI Pull Requests
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  ci:
+    name: Testes e build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Instalar dependências PHP
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Executar testes Laravel
+        run: php artisan test
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências JS
+        run: npm ci
+
+      - name: Gerar rotas Wayfinder
+        run: php artisan wayfinder:generate
+
+      - name: Verificar tipos TypeScript
+        run: npm run types
+
+      - name: Verificar formatação
+        run: npm run format:check
+
+      - name: Compilar frontend
+        run: npm run build

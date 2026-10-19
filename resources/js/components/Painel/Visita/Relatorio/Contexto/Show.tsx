@@ -1,8 +1,4 @@
-import {
-    contarParticipantes,
-    formatarDataHora,
-    labelStatus,
-} from '@/lib/visita';
+import { formatarDataHora, labelStatus } from '@/lib/visita';
 import type { Visita } from '@/types/visita';
 import { type FC } from 'react';
 
@@ -11,8 +7,6 @@ interface Props {
 }
 
 const ContextoVisita: FC<Props> = ({ visita }) => {
-    const participantes = contarParticipantes(visita);
-
     return (
         <div className="rounded-2xl border border-amber-100 bg-amber-50/40 p-5">
             <h3 className="mb-4 text-sm font-semibold tracking-wide text-amber-900/70 uppercase">
@@ -74,21 +68,26 @@ const ContextoVisita: FC<Props> = ({ visita }) => {
                         Participantes
                     </dt>
                     <dd className="mt-0.5 text-amber-900">
-                        {participantes.palhaco > 0 && (
-                            <span className="mr-3">
-                                🎪 {participantes.palhaco} palhaço
-                                {participantes.palhaco !== 1 ? 's' : ''}
-                            </span>
-                        )}
-                        {participantes.paisana > 0 && (
-                            <span>
-                                👔 {participantes.paisana} paisana
-                                {participantes.paisana !== 1 ? 's' : ''}
-                            </span>
-                        )}
-                        {participantes.palhaco === 0 &&
-                            participantes.paisana === 0 &&
-                            '—'}
+                        {(() => {
+                            const lista = (visita.participantes ?? []).filter(
+                                (p) =>
+                                    p.papel_na_visita === 'participante' &&
+                                    p.status_participacao !== 'cancelado',
+                            );
+                            if (lista.length === 0) return '—';
+                            return (
+                                <ul className="space-y-0.5">
+                                    {lista.map((p) => (
+                                        <li key={p.id ?? p.voluntario_id}>
+                                            {p.tipo_participacao === 'palhaco'
+                                                ? '🎪'
+                                                : '👔'}{' '}
+                                            {p.voluntario?.name ?? '—'}
+                                        </li>
+                                    ))}
+                                </ul>
+                            );
+                        })()}
                     </dd>
                 </div>
             </dl>

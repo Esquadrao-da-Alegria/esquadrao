@@ -37,7 +37,7 @@ class EventoController extends Controller
             $cidadeId = $cidadeUsuarioId ? (int) $cidadeUsuarioId : 'todas';
         }
 
-        $eventos = Evento::with(['responsavel', 'cidade'])->withCount('participantesAtivos')
+        $eventos = Evento::with(['responsavel', 'cidade', 'participantesAtivos:id,name,email'])->withCount('participantesAtivos')
             ->whereBetween('data_inicio', [$inicio, $fim])
             ->when($cidadeId !== 'todas', fn ($q) => $q->where('cidade_id', $cidadeId))
             ->when($request->filled('tipo'), fn ($q) => $q->where('tipo', $request->string('tipo')))

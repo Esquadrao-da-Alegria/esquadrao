@@ -68,12 +68,12 @@ export default function Show({ participante, filtros, onOpenChange }: Props) {
                     <Detalhe
                         titulo="Reuniões"
                         valor={percentual(participante.reunioes.percentual)}
-                        detalhe={`${participante.reunioes.presencas} presenças em ${participante.reunioes.oferecidos} eventos`}
+                        detalhe={`${participante.reunioes.presencas} presenças, incluindo intercâmbios · ${participante.reunioes.oferecidos} eventos oferecidos na cidade-base`}
                     />
                     <Detalhe
                         titulo="Oficinas"
                         valor={percentual(participante.oficinas.percentual)}
-                        detalhe={`${participante.oficinas.presencas} presenças em ${participante.oficinas.oferecidos} eventos`}
+                        detalhe={`${participante.oficinas.presencas} presenças, incluindo intercâmbios · ${participante.oficinas.oferecidos} eventos oferecidos na cidade-base`}
                     />
                     <Detalhe
                         titulo="Relatórios"

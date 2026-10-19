@@ -216,14 +216,15 @@ class Service
             ->where('cidade_id', $user->voluntario->cidade_base_id)
             ->when($mesInicio, fn ($coll) => $coll->filter(fn ($e) => Carbon::parse($e->data_inicio)->gte($mesInicio)));
 
-        $presentes = $dados['presencas']->where('user_id', $user->id);
+        $presentes = $dados['presencas']->where('user_id', $user->id)
+            ->when($mesInicio, fn ($coll) => $coll->filter(fn ($e) => Carbon::parse($e->data_inicio)->gte($mesInicio)));
         $resultado = [];
 
         foreach (['reuniao', 'oficina'] as $tipo) {
             $eventos = $eventosCidade->where('tipo', $tipo);
             $total = $eventos->count();
             $incompleto = $eventos->contains(fn ($evento) => (bool) $evento->presencas_incompletas);
-            $quantidade = $presentes->where('tipo', $tipo)->whereIn('evento_id', $eventos->pluck('id'))->count();
+            $quantidade = $presentes->where('tipo', $tipo)->count();
             $resultado[$tipo] = [
                 'oferecidos' => $total,
                 'presencas' => $quantidade,

@@ -150,7 +150,7 @@ class Service
         $resultado = [];
         foreach (['reuniao', 'oficina'] as $tipo) {
             $eventos = $oferecidos->where('tipo', $tipo);
-            $presentes = $participacoes->where('tipo', $tipo)->where('presenca', 'presente')->whereIn('id', $eventos->pluck('id'))->count();
+            $presentes = $participacoes->where('tipo', $tipo)->where('status', 'finalizado')->where('presenca', 'presente')->count();
             $incompleto = $eventos->contains(fn ($evento) => (bool) $evento->presencas_incompletas);
             $resultado[$tipo] = [
                 'oferecidos' => $eventos->count(),
@@ -173,10 +173,36 @@ class Service
 
     private function atividadesConsideradas(Collection $oferecidos, Collection $participacoes): Collection
     {
-        return $oferecidos->map(function ($evento) use ($participacoes) {
+        $eventosCidade = $oferecidos->map(function ($evento) use ($participacoes) {
             $participacao = $participacoes->firstWhere('id', $evento->id);
-            return ['id' => (int) $evento->id, 'tipo' => $evento->tipo, 'titulo' => $evento->titulo, 'local' => $evento->local, 'data' => $evento->data_inicio, 'presenca' => $participacao?->presenca, 'considerado' => ! (bool) $evento->presencas_incompletas, 'motivo' => (bool) $evento->presencas_incompletas ? 'Existem presenças ainda não registradas' : 'Evento finalizado da sua cidade-base'];
-        })->values();
+            return [
+                'id' => (int) $evento->id,
+                'tipo' => $evento->tipo,
+                'titulo' => $evento->titulo,
+                'local' => $evento->local,
+                'data' => $evento->data_inicio,
+                'presenca' => $participacao?->presenca,
+                'considerado' => ! (bool) $evento->presencas_incompletas,
+                'motivo' => (bool) $evento->presencas_incompletas ? 'Existem presenças ainda não registradas' : 'Evento finalizado da sua cidade-base',
+            ];
+        });
+
+        $intercambios = $participacoes
+            ->where('status', 'finalizado')
+            ->where('presenca', 'presente')
+            ->whereNotIn('id', $oferecidos->pluck('id'))
+            ->map(fn ($evento) => [
+                'id' => (int) $evento->id,
+                'tipo' => $evento->tipo,
+                'titulo' => $evento->titulo,
+                'local' => $evento->local,
+                'data' => $evento->data_inicio,
+                'presenca' => 'presente',
+                'considerado' => true,
+                'motivo' => 'Presença confirmada em outra cidade',
+            ]);
+
+        return $eventosCidade->concat($intercambios)->sortByDesc('data')->values();
     }
 
     private function historico(Collection $visitas, Collection $eventos, ?string $atividade): Collection

@@ -16,6 +16,12 @@ class ParticipacaoSemestralTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     public function test_abre_no_semestre_atual(): void
     {
         $this->travelTo(now()->setDate(2026, 9, 15)->setTime(10, 0));
@@ -103,7 +109,8 @@ class ParticipacaoSemestralTest extends TestCase
                 ->has('integrantes.data', 1)
                 ->where('integrantes.data.0.nome', 'Pessoa local')
                 ->where('integrantes.data.0.reunioes', 1)
-                ->where('integrantes.data.0.oficinas', 0));
+                ->where('integrantes.data.0.oficinas', 1)
+                ->has('integrantes.data.0.eventos', 2));
 
         $this->actingAs($administrador)
             ->get(route('dashboards.participacao-semestral', ['ano' => 2026, 'semestre' => 1, 'cidade_id' => $cidadeB->id]))

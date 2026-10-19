@@ -52,12 +52,13 @@ O cálculo e sua trilha explicável ficam em `Compensacao\Service`. Se o Regimen
 ## Reuniões e oficinas
 
 - Denominador: eventos finalizados do tipo na cidade-base durante o período/semestre consultado.
-- Numerador: eventos em que `evento_participantes.presenca = presente`.
+- Numerador: eventos finalizados em que `evento_participantes.presenca = presente`, incluindo intercâmbios.
 - Eventos cancelados não entram.
 - Ausência de eventos ou presenças ainda não registradas produz dados insuficientes.
 - Meta: 50% em cada tipo separadamente. Percentual abaixo de 50% gera atenção, sem produzir sozinho **Requer análise**.
 - Reuniões e oficinas não se compensam: em seis reuniões e seis oficinas, são necessárias ao menos três presenças em cada conjunto.
 - Presenças em outras cidades aparecem no detalhe, mas não aumentam o denominador da cidade-base.
+- Sem eventos oferecidos na cidade-base, o percentual fica indisponível mesmo quando há presenças em intercâmbios. Com oferta local, o percentual pode superar 100%; os textos distinguem presenças, incluindo intercâmbios, de eventos oferecidos na cidade-base.
 
 Se assembleias forem modeladas, sua inclusão deve ocorrer na seleção central de eventos da Query, não no React.
 

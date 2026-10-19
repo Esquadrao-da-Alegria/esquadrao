@@ -30,7 +30,7 @@ O dashboard gerencial **Participação semestral** apresenta uma relação de in
 - Filtros: ano, semestre, nome ou e-mail, situação atual e cidade para escopo global. Perfis globais com cidade-base iniciam nela e podem escolher outra cidade ou todas; contas globais sem cidade-base iniciam em todas.
 - A relação mantém integrantes sem presença, com `0` em reuniões e oficinas.
 - Uma presença é contabilizada somente quando `evento_participantes.presenca = presente`, o evento é `finalizado` e seu tipo é `reuniao` ou `oficina`. Inscrição, ausência, presença pendente, evento cancelado e o tipo `evento` não entram.
-- Nesta versão, a presença entra somente quando o evento pertence à cidade-base do integrante. Participações em intercâmbio permanecem registradas no histórico, mas não elevam o consolidado, para manter coerência com o indicador individual atual. Caso a regra mude, alterar as duas consultas de `Dashboard\\Evento\\ParticipacaoSemestral\\Queries` e seus testes.
+- A presença confirmada em reuniões e oficinas é contabilizada para o integrante independentemente da cidade onde o evento foi realizado (intercâmbios entre cidades somam presença normalmente).
 - Os detalhes expansíveis mostram os eventos que compõem os totais da página atual. A listagem e os detalhes usam consultas agregadas em lote, sem consulta por integrante.
 
 ---
@@ -59,6 +59,10 @@ Os três tipos seguem o mesmo fluxo geral de agendamento, listagem, inscrição,
 - `resources/js/Pages/Evento/Create.tsx`
 - `resources/js/Pages/Evento/Edit.tsx`
 - `tests/Feature/EventoTest.php`
+
+## Agenda em lista
+
+A página de eventos oferece as visualizações **Calendário** e **Lista**, com a preferência armazenada no navegador. A lista respeita os filtros já aplicados e apresenta data, local, cidade, responsável, vagas e participantes ativos; as cores comunicam visualmente a situação. O botão de detalhes reutiliza o modal existente. A consulta carrega participantes ativos junto dos eventos para evitar consultas adicionais por linha.
 
 ---
 
