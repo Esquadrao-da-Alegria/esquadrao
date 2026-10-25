@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Web\Evento;
 
+use App\Enums\TipoEvento;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -13,7 +14,8 @@ class UpdateRequest extends FormRequest
     {
         return [
             'titulo' => ['required', 'string', 'max:255'],
-            'tipo' => ['required', Rule::in(['oficina', 'reuniao', 'evento'])],
+            'tipo' => ['required', Rule::enum(TipoEvento::class)],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'descricao' => ['nullable', 'string'],
             'local' => ['nullable', 'string', 'max:255'],
             'cidade_id' => ['required', 'exists:cidades,id'],

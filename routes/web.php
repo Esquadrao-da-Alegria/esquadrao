@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\Dashboard\Visita\Participante\Controller as Dashboa
 use App\Http\Controllers\Web\Dashboard\Visita\Participante\ExportController as DashboardVisitaParticipanteExportController;
 use App\Http\Controllers\Web\Dashboard\Evento\ParticipacaoSemestral\Controller as DashboardParticipacaoSemestralController;
 use App\Http\Controllers\Web\Evento\Ajuste\Controller as EventoAjusteController;
+use App\Http\Controllers\Web\Evento\Foto\Controller as EventoFotoController;
 use App\Http\Controllers\Web\Evento\PresencaQr\Acesso\Controller as EventoPresencaQrAcessoController;
 use App\Http\Controllers\Web\Evento\PresencaQr\Confirmacao\Controller as EventoPresencaQrConfirmacaoController;
 use App\Http\Controllers\Web\Evento\PresencaQr\Controller as EventoPresencaQrController;
@@ -156,6 +157,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/meu-perfil/foto', [MeuPerfilController::class, 'destroyFoto'])->name('meu-perfil.foto.destroy');
 
     Route::get('/eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
+    Route::post('/eventos/{evento}/foto', [EventoFotoController::class, 'store'])->name('eventos.foto.store');
+    Route::delete('/eventos/{evento}/foto', [EventoFotoController::class, 'destroy'])->name('eventos.foto.destroy');
     Route::post('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'store'])->name('eventos.inscricao.store');
     Route::delete('/eventos/{evento}/inscricao', [EventoInscricaoController::class, 'destroy'])->name('eventos.inscricao.destroy');
 

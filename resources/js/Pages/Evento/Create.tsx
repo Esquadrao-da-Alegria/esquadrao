@@ -19,6 +19,7 @@ function montarPayload(data: EventoFormValues) {
     return {
         titulo: data.titulo,
         tipo: data.tipo,
+        foto: data.foto,
         descricao: data.descricao || null,
         local: data.local || null,
         cidade_id: data.cidade_id ? Number(data.cidade_id) : null,
@@ -52,6 +53,7 @@ const Create: FC<Props> = ({ responsaveis, cidades }) => {
         limite_inscricao_hora: '',
         limite_participantes: '',
         responsavel_id: '',
+        foto: null,
     })
 
     const handleFieldChange = <K extends keyof EventoFormValues>(campo: K, valor: EventoFormValues[K]) => {
@@ -75,7 +77,7 @@ const Create: FC<Props> = ({ responsaveis, cidades }) => {
         }
 
         transform(() => montarPayload(data))
-        post(store().url)
+        post(store().url, { forceFormData: true })
     }
 
     return (

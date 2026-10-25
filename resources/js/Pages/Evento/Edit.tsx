@@ -5,8 +5,8 @@ import PainelLayout from '@/layouts/PainelLayout'
 import { extrairData, extrairHora, montarDatetime } from '@/lib/evento'
 import { show, update } from '@/routes/eventos'
 import type { Cidade, Evento, User } from '@/types'
-import { useForm } from '@inertiajs/react'
-import { type FC } from 'react'
+import { router, useForm } from '@inertiajs/react'
+import { type FC, useState } from 'react'
 import { toast } from 'react-toastify'
 
 interface Props {
@@ -17,8 +17,10 @@ interface Props {
 
 function montarPayload(data: EventoFormValues) {
     return {
+        _method: 'put',
         titulo: data.titulo,
         tipo: data.tipo,
+        foto: data.foto,
         descricao: data.descricao || null,
         local: data.local || null,
         cidade_id: data.cidade_id ? Number(data.cidade_id) : null,
@@ -33,7 +35,8 @@ function montarPayload(data: EventoFormValues) {
 }
 
 const Edit: FC<Props> = ({ evento, responsaveis, cidades }) => {
-    const { data, setData, transform, put, processing, errors } = useForm<EventoFormValues>({
+    const [removendoFoto, setRemovendoFoto] = useState(false)
+    const { data, setData, transform, post, processing, errors } = useForm<EventoFormValues>({
         titulo: evento.titulo,
         tipo: evento.tipo,
         descricao: evento.descricao ?? '',
@@ -48,10 +51,18 @@ const Edit: FC<Props> = ({ evento, responsaveis, cidades }) => {
         limite_inscricao_hora: evento.limite_inscricao ? extrairHora(evento.limite_inscricao) : '',
         limite_participantes: evento.limite_participantes?.toString() ?? '',
         responsavel_id: evento.responsavel_id ?? '',
+        foto: null,
     })
 
     const handleFieldChange = <K extends keyof EventoFormValues>(campo: K, valor: EventoFormValues[K]) => {
         setData((prev) => ({ ...prev, [campo]: valor }))
+    }
+
+    const handleRemoverFoto = () => {
+        router.delete(`/eventos/${evento.id}/foto`, {
+            onStart: () => setRemovendoFoto(true),
+            onFinish: () => setRemovendoFoto(false),
+        })
     }
 
     const handleSubmit = () => {
@@ -71,7 +82,7 @@ const Edit: FC<Props> = ({ evento, responsaveis, cidades }) => {
         }
 
         transform(() => montarPayload(data))
-        put(update({ evento: evento.id }).url)
+        post(update({ evento: evento.id }).url, { forceFormData: true })
     }
 
     return (
@@ -108,6 +119,9 @@ const Edit: FC<Props> = ({ evento, responsaveis, cidades }) => {
                                         errors={errors}
                                         responsaveis={responsaveis}
                                         cidades={cidades}
+                                        imagemUrl={evento.imagem_url}
+                                        removendoFoto={removendoFoto}
+                                        onRemoverFoto={handleRemoverFoto}
                                         onFieldChange={handleFieldChange}
                                     />
                                 </form>

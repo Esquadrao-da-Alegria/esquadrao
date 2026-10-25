@@ -3,6 +3,7 @@ FROM ubuntu:24.04
 LABEL maintainer="Taylor Otwell"
 
 ARG WWWGROUP
+ARG WWWUSER
 ARG NODE_VERSION=22
 ARG MYSQL_CLIENT="mysql-client"
 ARG POSTGRES_VERSION=17
@@ -42,7 +43,7 @@ RUN apt-get update && apt-get upgrade -y \
     && apt-get update \
     && apt-get install -y nodejs \
     && npm install -g npm \
-    && npm install -g pnpm \
+    && npm install -g pnpm@10 \
     && npm install -g bun \
     && npx playwright install-deps \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /etc/apt/keyrings/yarn.gpg >/dev/null \
@@ -65,7 +66,8 @@ RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.4
 
 RUN userdel -r ubuntu
 RUN groupadd --force -g $WWWGROUP sail
-RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER sail
+RUN mkdir -p /var/www/html/node_modules && chown sail:sail /var/www/html/node_modules
 RUN git config --global --add safe.directory /var/www/html
 
 COPY start-container /usr/local/bin/start-container

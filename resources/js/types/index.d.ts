@@ -220,6 +220,8 @@ export interface Evento {
     id: number;
     titulo: string;
     tipo: EventoTipo;
+    imagem_caminho: string | null;
+    imagem_url: string | null;
     descricao: string | null;
     local: string | null;
     cidade_id: number | null;
