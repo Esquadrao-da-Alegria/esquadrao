@@ -8,11 +8,12 @@ import {
     Settings,
     Trash2,
     QrCode,
+    Upload,
     UserCheck,
     UserX,
     Users,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
     evento: Evento;
@@ -320,6 +321,9 @@ export default function Show({
 }: Props) {
     const { props } = usePage<SharedData>();
     const [motivo, setMotivo] = useState('');
+    const fotoInputRef = useRef<HTMLInputElement>(null);
+    const [fotoEnviando, setFotoEnviando] = useState(false);
+    const [fotoRemovendo, setFotoRemovendo] = useState(false);
 
     const participantes = evento.participantes_ativos ?? [];
     const agora = new Date();
@@ -407,6 +411,84 @@ export default function Show({
                         <p className="text-sm text-amber-900/70">
                             {evento.descricao ?? 'Sem descrição.'}
                         </p>
+
+                        {(evento.imagem_url || pode_gerenciar) && (
+                            <div className="space-y-3 border-t border-amber-50 pt-5">
+                                {evento.imagem_url && (
+                                    <img
+                                        src={evento.imagem_url}
+                                        alt={`Foto do evento ${evento.titulo}`}
+                                        className="max-h-[480px] w-full rounded-xl object-cover"
+                                    />
+                                )}
+                                {pode_gerenciar && (
+                                    <div className="flex flex-wrap gap-3">
+                                        <input
+                                            ref={fotoInputRef}
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const foto = e.target.files?.[0];
+                                                if (!foto) return;
+
+                                                router.post(
+                                                    `/eventos/${evento.id}/foto`,
+                                                    { foto },
+                                                    {
+                                                        forceFormData: true,
+                                                        onStart: () => setFotoEnviando(true),
+                                                        onFinish: () => {
+                                                            setFotoEnviando(false);
+                                                            if (fotoInputRef.current) {
+                                                                fotoInputRef.current.value = '';
+                                                            }
+                                                        },
+                                                    },
+                                                );
+                                            }}
+                                        />
+                                        <button
+                                            type="button"
+                                            disabled={fotoEnviando || fotoRemovendo}
+                                            onClick={() => fotoInputRef.current?.click()}
+                                            className="inline-flex cursor-pointer items-center gap-2 rounded-full border-2 border-amber-600 bg-white px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            <Upload className="size-4" aria-hidden />
+                                            {fotoEnviando
+                                                ? 'Enviando foto...'
+                                                : evento.imagem_url
+                                                  ? 'Substituir foto'
+                                                  : 'Adicionar foto'}
+                                        </button>
+                                        {evento.imagem_url && (
+                                            <button
+                                                type="button"
+                                                disabled={fotoEnviando || fotoRemovendo}
+                                                onClick={() =>
+                                                    router.delete(
+                                                        `/eventos/${evento.id}/foto`,
+                                                        {
+                                                            onStart: () => setFotoRemovendo(true),
+                                                            onFinish: () => setFotoRemovendo(false),
+                                                        },
+                                                    )
+                                                }
+                                                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
+                                                <Trash2 className="size-4" aria-hidden />
+                                                {fotoRemovendo ? 'Removendo foto...' : 'Remover foto'}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                                {pode_gerenciar && (
+                                    <p className="text-xs text-gray-500">
+                                        JPG, PNG ou WebP. Máximo 10 MB.
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         <dl className="grid gap-3 text-sm sm:grid-cols-2">
                             <div>

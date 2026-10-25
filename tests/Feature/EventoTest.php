@@ -9,7 +9,10 @@ use App\Models\Evento;
 use App\Models\User;
 use App\Models\Voluntario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class EventoTest extends TestCase
@@ -100,6 +103,131 @@ class EventoTest extends TestCase
             ->assertRedirect(route('eventos.show', $evento));
 
         $this->assertDatabaseHas('eventos', ['id' => $evento->id, 'titulo' => 'Reunião atualizada']);
+    }
+
+    public function test_admin_consegue_criar_evento_com_foto_jpeg_normalizada_e_url_visivel(): void
+    {
+        Storage::fake('public');
+        $admin = $this->usuarioAdmin();
+        $foto = UploadedFile::fake()->image('capa.png', 1600, 800);
+
+        $this->actingAs($admin)
+            ->post(route('eventos.store'), $this->dadosEvento(['foto' => $foto]))
+            ->assertRedirect(route('eventos.index'));
+
+        $evento = Evento::query()->firstOrFail();
+        $this->assertStringStartsWith("eventos/{$evento->id}/", $evento->imagem_caminho);
+        $this->assertStringEndsWith('.jpg', $evento->imagem_caminho);
+        Storage::disk('public')->assertExists($evento->imagem_caminho);
+
+        $imagem = getimagesizefromstring(Storage::disk('public')->get($evento->imagem_caminho));
+        $this->assertSame(IMAGETYPE_JPEG, $imagem[2]);
+        $this->assertSame(1200, $imagem[0]);
+        $this->assertSame(600, $imagem[1]);
+
+        $this->actingAs($admin)
+            ->get(route('eventos.show', $evento))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('evento.imagem_url', Storage::disk('public')->url($evento->imagem_caminho))
+            );
+    }
+
+    public function test_admin_consegue_enviar_foto_na_edicao_com_post_multipart(): void
+    {
+        Storage::fake('public');
+        $admin = $this->usuarioAdmin();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
+        $foto = UploadedFile::fake()->image('nova.jpg', 640, 480);
+
+        $this->actingAs($admin)
+            ->post(route('eventos.update', $evento), [
+                ...$this->dadosEvento(['titulo' => 'Evento com foto']),
+                '_method' => 'put',
+                'foto' => $foto,
+            ])
+            ->assertRedirect(route('eventos.show', $evento))
+            ->assertSessionDoesntHaveErrors('foto');
+
+        $evento->refresh();
+        $this->assertNotNull($evento->imagem_caminho);
+        Storage::disk('public')->assertExists($evento->imagem_caminho);
+    }
+
+    public function test_responsavel_pode_substituir_e_remover_foto_de_evento_finalizado(): void
+    {
+        Storage::fake('public');
+        $responsavel = $this->criarUsuario();
+        $admin = $this->usuarioAdmin();
+        $evento = Evento::create([...$this->dadosEvento([
+            'status' => 'finalizado',
+            'responsavel_id' => $responsavel->id,
+        ]), 'criado_por_id' => $admin->id]);
+        $caminhoAnterior = "eventos/{$evento->id}/antiga.jpg";
+        Storage::disk('public')->put($caminhoAnterior, 'imagem antiga');
+        $evento->update(['imagem_caminho' => $caminhoAnterior]);
+
+        $this->actingAs($responsavel)
+            ->post(route('eventos.foto.store', $evento), [
+                'foto' => UploadedFile::fake()->image('nova.webp', 320, 240),
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors('foto');
+
+        $evento->refresh();
+        $caminhoNovo = $evento->imagem_caminho;
+        $this->assertNotSame($caminhoAnterior, $caminhoNovo);
+        Storage::disk('public')->assertMissing($caminhoAnterior);
+        Storage::disk('public')->assertExists($caminhoNovo);
+
+        $this->actingAs($responsavel)
+            ->delete(route('eventos.foto.destroy', $evento))
+            ->assertRedirect();
+
+        $this->assertNull($evento->fresh()->imagem_caminho);
+        Storage::disk('public')->assertMissing($caminhoNovo);
+    }
+
+    public function test_foto_invalida_ou_usuario_sem_permissao_nao_altera_foto_atual(): void
+    {
+        Storage::fake('public');
+        $admin = $this->usuarioAdmin();
+        $usuario = $this->criarUsuario();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
+        $caminho = "eventos/{$evento->id}/atual.jpg";
+        Storage::disk('public')->put($caminho, 'foto atual');
+        $evento->update(['imagem_caminho' => $caminho]);
+
+        $this->actingAs($admin)
+            ->post(route('eventos.foto.store', $evento), [
+                'foto' => UploadedFile::fake()->create('documento.pdf', 100, 'application/pdf'),
+            ])
+            ->assertSessionHasErrors('foto');
+
+        $this->actingAs($usuario)
+            ->post(route('eventos.foto.store', $evento), [
+                'foto' => UploadedFile::fake()->image('invasao.jpg', 320, 240),
+            ])
+            ->assertForbidden();
+
+        $this->assertSame($caminho, $evento->fresh()->imagem_caminho);
+        Storage::disk('public')->assertExists($caminho);
+    }
+
+    public function test_excluir_evento_remove_sua_foto(): void
+    {
+        Storage::fake('public');
+        $admin = $this->usuarioAdmin();
+        $evento = Evento::create([...$this->dadosEvento(), 'criado_por_id' => $admin->id]);
+        $caminho = "eventos/{$evento->id}/capa.jpg";
+        Storage::disk('public')->put($caminho, 'foto do evento');
+        $evento->update(['imagem_caminho' => $caminho]);
+
+        $this->actingAs($admin)
+            ->delete(route('eventos.destroy', $evento))
+            ->assertRedirect(route('eventos.index'));
+
+        $this->assertDatabaseMissing('eventos', ['id' => $evento->id]);
+        Storage::disk('public')->assertMissing($caminho);
     }
 
     public function test_admin_consegue_cancelar_evento(): void

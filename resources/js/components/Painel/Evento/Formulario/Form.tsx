@@ -4,7 +4,7 @@ import {
     painelLabelClass,
 } from '@/lib/painelFormFieldClasses';
 import type { Cidade, EventoTipo, User } from '@/types';
-import { type FC } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 
 const OPCOES_HORARIOS = (() => {
     const lista: string[] = [];
@@ -30,6 +30,7 @@ export interface EventoFormValues {
     limite_inscricao_hora: string;
     limite_participantes: string;
     responsavel_id: number | '';
+    foto: File | null;
 }
 
 interface Props {
@@ -37,6 +38,9 @@ interface Props {
     errors: Record<string, string | undefined>;
     responsaveis: User[];
     cidades: Cidade[];
+    imagemUrl?: string | null;
+    removendoFoto?: boolean;
+    onRemoverFoto?: () => void;
     onFieldChange: <K extends keyof EventoFormValues>(
         campo: K,
         valor: EventoFormValues[K],
@@ -48,8 +52,26 @@ const Form: FC<Props> = ({
     errors,
     responsaveis,
     cidades,
+    imagemUrl,
+    removendoFoto,
+    onRemoverFoto,
     onFieldChange,
 }) => {
+    const [fotoPreview, setFotoPreview] = useState<string | null>(imagemUrl ?? null);
+    const fotoInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (!data.foto) {
+            setFotoPreview(imagemUrl ?? null);
+            return;
+        }
+
+        const previewUrl = URL.createObjectURL(data.foto);
+        setFotoPreview(previewUrl);
+
+        return () => URL.revokeObjectURL(previewUrl);
+    }, [data.foto, imagemUrl]);
+
     return (
         <div className="space-y-6">
             <div>
@@ -111,6 +133,60 @@ const Form: FC<Props> = ({
                     <p className="mt-1 text-sm text-red-600">
                         {errors.descricao}
                     </p>
+                ) : null}
+            </div>
+
+            <div>
+                <label htmlFor="foto" className={painelLabelClass}>
+                    Foto do evento
+                </label>
+                {fotoPreview && (
+                    <img
+                        src={fotoPreview}
+                        alt="Preview da foto do evento"
+                        className="mb-3 max-h-80 w-full rounded-xl object-cover"
+                    />
+                )}
+                <input
+                    ref={fotoInputRef}
+                    type="file"
+                    id="foto"
+                    name="foto"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(evento) =>
+                        onFieldChange('foto', evento.target.files?.[0] ?? null)
+                    }
+                    className={painelInputClass}
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                    JPG, PNG ou WebP. Máximo 10 MB.
+                </p>
+                {data.foto && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            onFieldChange('foto', null);
+                            if (fotoInputRef.current) {
+                                fotoInputRef.current.value = '';
+                            }
+                        }}
+                        className="mt-2 text-sm font-medium text-red-600 hover:text-red-700"
+                    >
+                        Desfazer seleção
+                    </button>
+                )}
+                {imagemUrl && onRemoverFoto && (
+                    <button
+                        type="button"
+                        disabled={removendoFoto || Boolean(data.foto)}
+                        onClick={onRemoverFoto}
+                        className="mt-2 block text-sm font-medium text-red-600 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {removendoFoto ? 'Removendo foto...' : 'Remover foto atual'}
+                    </button>
+                )}
+                {errors.foto ? (
+                    <p className="mt-1 text-sm text-red-600">{errors.foto}</p>
                 ) : null}
             </div>
 

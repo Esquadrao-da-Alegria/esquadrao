@@ -9,6 +9,7 @@ use App\Http\Requests\Web\Evento\UpdateRequest;
 use App\Models\Cidade;
 use App\Models\Evento;
 use App\Models\User;
+use App\Services\Evento\Foto\Service as FotoService;
 use App\Services\Evento\PresencaQr\Service as PresencaQrService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -63,13 +64,25 @@ class EventoController extends Controller
         ]);
     }
 
-    public function store(StoreRequest $request)
+    public function store(StoreRequest $request, FotoService $fotoService)
     {
         $validated = $request->validated();
         $inscreverMe = (bool) ($validated['inscrever_me'] ?? false);
+        $foto = $validated['foto'] ?? null;
         unset($validated['inscrever_me']);
+        unset($validated['foto']);
 
         $evento = Evento::create([...$validated, 'status' => 'agendado', 'criado_por_id' => $request->user()->id]);
+
+        if ($foto) {
+            try {
+                $fotoService->salvar($evento, $foto);
+            } catch (\Throwable) {
+                $evento->delete();
+
+                return back()->withErrors(['foto' => 'Não foi possível salvar a foto do evento.'])->withInput();
+            }
+        }
 
         if ($inscreverMe) {
             $evento->participantes()->syncWithoutDetaching([
@@ -120,7 +133,7 @@ class EventoController extends Controller
         ]);
     }
 
-    public function update(UpdateRequest $request, Evento $evento)
+    public function update(UpdateRequest $request, Evento $evento, FotoService $fotoService)
     {
         if (! $evento->estaAgendado()) {
             return redirect()->route('eventos.show', $evento)->with('mensagem_erro', 'Apenas eventos agendados podem ser editados.');
@@ -130,18 +143,35 @@ class EventoController extends Controller
         if ($limite !== null && (int) $limite < $ativos) {
             return back()->withErrors(['limite_participantes' => 'O limite não pode ser menor que os participantes ativos.'])->withInput();
         }
-        $evento->update($request->validated());
+        $validated = $request->validated();
+        $foto = $validated['foto'] ?? null;
+        unset($validated['foto']);
+
+        $evento->update($validated);
+
+        if ($foto) {
+            try {
+                $fotoService->salvar($evento, $foto);
+            } catch (\Throwable) {
+                return back()->withErrors(['foto' => 'Não foi possível salvar a foto do evento.'])->withInput();
+            }
+        }
 
         return redirect()->route('eventos.show', $evento)->with('mensagem_sucesso', 'Evento atualizado com sucesso.');
     }
 
-    public function destroy(Evento $evento)
+    public function destroy(Evento $evento, FotoService $fotoService)
     {
         if ($evento->participantes()->exists()) {
             return back()->with('mensagem_erro', 'Não é possível excluir um evento que possui participantes. Cancele o evento em vez disso.');
         }
 
-        $evento->delete();
+        try {
+            $fotoService->excluir($evento);
+        } catch (\Throwable) {
+            return back()->with('mensagem_erro', 'Não foi possível excluir o evento. Tente novamente.');
+        }
+
         return redirect()->route('eventos.index')->with('mensagem_sucesso', 'Evento excluído com sucesso.');
     }
 
