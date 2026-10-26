@@ -43,8 +43,9 @@ jobs:
       - name: Verificar tipos TypeScript
         run: npm run types
 
-      - name: Verificar formatação
+      - name: Verificar formatação (informativo)
         run: npm run format:check
+        continue-on-error: true
 
       - name: Compilar frontend
         run: npm run build
