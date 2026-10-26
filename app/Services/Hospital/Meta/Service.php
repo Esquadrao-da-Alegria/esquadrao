@@ -465,6 +465,7 @@ class Service
      *     mes: int,
      *     semanas: array<int, int>,
      *     metas_mensais: Collection<int|string, MetaMensalHospital>,
+     *     metas_padrao: Collection<int|string, MetaPadraoHospital>,
      *     metas_semanais: Collection<int|string, Collection<int, MetaSemanalHospital>>,
      *     realizadas: Collection<int, object>
      * }
@@ -496,11 +497,24 @@ class Service
                 ->get());
         }
 
+        $hospitalIdsSemMetaMensal = array_values(array_diff(
+            $hospitalIds,
+            $metasMensais->pluck('hospital_id')->all(),
+        ));
+        $metasPadrao = $hospitalIdsSemMetaMensal === []
+            ? collect()
+            : MetaPadraoHospital::query()
+                ->with('periodos')
+                ->whereIn('hospital_id', $hospitalIdsSemMetaMensal)
+                ->get()
+                ->keyBy('hospital_id');
+
         return [
             'ano'            => $ano,
             'mes'            => $mes,
             'semanas'        => MetaHospitalHelper::numerosSemanasDoMes($ano, $mes),
             'metas_mensais'  => $metasMensais->keyBy('hospital_id'),
+            'metas_padrao'   => $metasPadrao,
             'metas_semanais' => $metasSemanais->groupBy('hospital_id'),
             'realizadas'     => $this->buscarRealizadasAgregadas($hospitalIds, $ano, $mes),
         ];
@@ -512,6 +526,7 @@ class Service
      *     mes: int,
      *     semanas: array<int, int>,
      *     metas_mensais: Collection<int|string, MetaMensalHospital>,
+     *     metas_padrao: Collection<int|string, MetaPadraoHospital>,
      *     metas_semanais: Collection<int|string, Collection<int, MetaSemanalHospital>>,
      *     realizadas: Collection<int, object>
      * }  $contexto
@@ -521,9 +536,7 @@ class Service
     {
         $metasSemanaisHospital = $contexto['metas_semanais']->get($hospital->id, collect());
         $metaMensal            = $contexto['metas_mensais']->get($hospital->id);
-        $metaPadrao = $metaMensal
-            ? null
-            : MetaPadraoHospital::query()->with('periodos')->where('hospital_id', $hospital->id)->first();
+        $metaPadrao            = $metaMensal ? null : $contexto['metas_padrao']->get($hospital->id);
 
         if ($metaPadrao) {
             $metasSemanaisHospital = $metaPadrao->periodos->map(function ($periodo) {

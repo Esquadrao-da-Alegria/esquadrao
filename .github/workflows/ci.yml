@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar PHP
         uses: shivammathur/setup-php@v2
@@ -43,9 +45,19 @@ jobs:
       - name: Verificar tipos TypeScript
         run: npm run types
 
-      - name: Verificar formatação (informativo)
-        run: npm run format:check
-        continue-on-error: true
+      - name: Verificar formatação
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          while IFS= read -r -d '' arquivo; do
+            if git cat-file -e "origin/${BASE_REF}:${arquivo}" 2>/dev/null \
+              && ! git show "origin/${BASE_REF}:${arquivo}" | npx prettier --check --stdin-filepath "$arquivo" >/dev/null; then
+              echo "::warning file=${arquivo}::Arquivo legado fora do padrão de formatação."
+              continue
+            fi
+
+            npx prettier --check "$arquivo"
+          done < <(git diff --name-only -z --diff-filter=ACMR "origin/${BASE_REF}...HEAD" -- resources/)
 
       - name: Compilar frontend
         run: npm run build

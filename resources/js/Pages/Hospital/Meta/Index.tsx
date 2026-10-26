@@ -235,12 +235,13 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
     const errosRef = useRef<HTMLDivElement>(null)
     const [hospitais, setHospitais] = useState<HospitalMeta[]>(hospitaisIniciais)
     const [salvando, setSalvando] = useState(false)
-    const [salvarComoPadrao, setSalvarComoPadrao] = useState(false)
+    const [salvarComoPadraoPorHospital, setSalvarComoPadraoPorHospital] = useState<Record<number, boolean>>({})
 
     const semanas = useMemo(() => numerosSemanas(semanasMes), [semanasMes])
 
     useEffect(() => {
         setHospitais(hospitaisIniciais)
+        setSalvarComoPadraoPorHospital({})
     }, [hospitaisIniciais])
 
     const handleFiltroChange = (campo: 'ano' | 'mes', valor: number) => {
@@ -258,6 +259,10 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
         setHospitais((lista) =>
             lista.map((h) => (h.id === hospitalId ? { ...h, ...atualizacao } : h)),
         )
+    }
+
+    const atualizarSalvarComoPadrao = (hospitalId: number, selecionado: boolean) => {
+        setSalvarComoPadraoPorHospital((lista) => ({ ...lista, [hospitalId]: selecionado }))
     }
 
     const handleMetaMensalChange = (hospitalId: number, valor: string) => {
@@ -371,7 +376,7 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
             meta_mensal: hospital.meta_mensal,
             periodicidade: hospital.periodicidade,
             metas_por_ala: hospital.metas_por_ala,
-            salvar_como_padrao: salvarComoPadrao,
+            salvar_como_padrao: salvarComoPadraoPorHospital[hospital.id] ?? false,
             metas_periodos: hospital.metas_semanais
                 .filter((item) => item.meta !== null && item.meta !== undefined)
                 .map((item) => ({
@@ -558,8 +563,8 @@ const Index: FC<Props> = ({ ano, mes, semanas: semanasMes, hospitais: hospitaisI
                                         <label className="flex items-start gap-2 rounded-xl border border-border bg-muted/15 p-3 text-sm text-muted-foreground">
                                             <input
                                                 type="checkbox"
-                                                checked={salvarComoPadrao}
-                                                onChange={(event) => setSalvarComoPadrao(event.target.checked)}
+                                                checked={salvarComoPadraoPorHospital[hospital.id] ?? false}
+                                                onChange={(event) => atualizarSalvarComoPadrao(hospital.id, event.target.checked)}
                                                 className="mt-0.5 size-4 rounded border-input text-primary focus:ring-ring"
                                             />
                                             <span>
