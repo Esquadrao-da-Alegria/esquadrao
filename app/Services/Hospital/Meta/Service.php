@@ -185,17 +185,17 @@ class Service
             ];
         }
 
-        $metasSemanais = $this->metasPeriodosDoPayload($hospitalPayload);
+        $metasPeriodos = $this->metasPeriodosDoPayload($hospitalPayload);
 
-        if ($metasSemanais === []) {
+        if ($metasPeriodos === []) {
             return null;
         }
 
-        $this->persistirMetasSemanais(
+        $this->persistirMetasPeriodos(
             $hospitalId,
             $ano,
             $mes,
-            $metasSemanais,
+            $metasPeriodos,
             (bool) $hospitalPayload['metas_por_ala'],
             $hospitalPayload['periodicidade'] ?? 'semanal',
         );
@@ -246,42 +246,42 @@ class Service
                 'ala_unidade_id' => $hospitalPayload['metas_por_ala']
                     ? ($metaPeriodo['ala_unidade_id'] ?? null)
                     : null,
-                'periodo' => (int) $metaPeriodo['semana'],
+                'periodo' => (int) $metaPeriodo['periodo'],
                 'quantidade' => (int) $metaPeriodo['quantidade'],
             ]);
         }
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $metasSemanais
+     * @param  array<int, array<string, mixed>>  $metasPeriodos
      */
-    private function persistirMetasSemanais(
+    private function persistirMetasPeriodos(
         int $hospitalId,
         int $ano,
         int $mes,
-        array $metasSemanais,
+        array $metasPeriodos,
         bool $metasPorAla,
         string $periodicidade,
     ): void {
-        foreach ($metasSemanais as $metaSemanal) {
+        foreach ($metasPeriodos as $metaPeriodo) {
             if ($periodicidade === 'semanal') {
                 MetaSemanalHospital::create([
                     'hospital_id'    => $hospitalId,
-                    'ala_unidade_id' => $metasPorAla ? ($metaSemanal['ala_unidade_id'] ?? null) : null,
+                    'ala_unidade_id' => $metasPorAla ? ($metaPeriodo['ala_unidade_id'] ?? null) : null,
                     'ano'            => $ano,
                     'mes'            => $mes,
-                    'semana'         => (int) $metaSemanal['semana'],
-                    'quantidade'     => (int) $metaSemanal['quantidade'],
+                    'semana'         => (int) $metaPeriodo['periodo'],
+                    'quantidade'     => (int) $metaPeriodo['quantidade'],
                 ]);
             }
 
             MetaPeriodoHospital::create([
                 'hospital_id' => $hospitalId,
-                'ala_unidade_id' => $metasPorAla ? ($metaSemanal['ala_unidade_id'] ?? null) : null,
+                'ala_unidade_id' => $metasPorAla ? ($metaPeriodo['ala_unidade_id'] ?? null) : null,
                 'ano' => $ano,
                 'mes' => $mes,
-                'periodo' => (int) $metaSemanal['semana'],
-                'quantidade' => (int) $metaSemanal['quantidade'],
+                'periodo' => (int) $metaPeriodo['periodo'],
+                'quantidade' => (int) $metaPeriodo['quantidade'],
             ]);
         }
     }
@@ -338,21 +338,21 @@ class Service
         }
 
         $metaMensal    = $this->metaMensalDoPayload($hospitalPayload);
-        $metasSemanais = $this->metasPeriodosDoPayload($hospitalPayload);
+        $metasPeriodos = $this->metasPeriodosDoPayload($hospitalPayload);
         $metasPorAla   = (bool) ($hospitalPayload['metas_por_ala'] ?? false);
         $periodicidade = $hospitalPayload['periodicidade'] ?? 'semanal';
 
-        if ($metaMensal === null && $metasSemanais !== []) {
-            return ["{$prefixo}: metas semanais exigem meta mensal preenchida."];
+        if ($metaMensal === null && $metasPeriodos !== []) {
+            return ["{$prefixo}: metas por período exigem meta mensal preenchida."];
         }
 
-        if ($metasSemanais === []) {
+        if ($metasPeriodos === []) {
             return [];
         }
 
         return $this->validarMetasPeriodosDoHospital(
             $hospital,
-            $metasSemanais,
+            $metasPeriodos,
             $metaMensal,
             $metasPorAla,
             $prefixo,
@@ -363,12 +363,12 @@ class Service
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $metasSemanais
+     * @param  array<int, array<string, mixed>>  $metasPeriodos
      * @return array<int, string>
      */
     private function validarMetasPeriodosDoHospital(
         Hospital $hospital,
-        array $metasSemanais,
+        array $metasPeriodos,
         ?int $metaMensal,
         bool $metasPorAla,
         string $prefixo,
@@ -383,24 +383,24 @@ class Service
             ->pluck('periodo')
             ->all();
 
-        foreach ($metasSemanais as $metaSemanal) {
-            $semana = (int) $metaSemanal['semana'];
+        foreach ($metasPeriodos as $metaPeriodo) {
+            $periodo = (int) $metaPeriodo['periodo'];
 
-            if (! in_array($semana, $periodosValidos, true)) {
-                return ["{$prefixo}: período {$semana} inválido para o mês informado."];
+            if (! in_array($periodo, $periodosValidos, true)) {
+                return ["{$prefixo}: período {$periodo} inválido para o mês informado."];
             }
 
-            $alaUnidadeId = $metaSemanal['ala_unidade_id'] ?? null;
-            $chaveSemanal = $metasPorAla
-                ? "{$semana}-{$alaUnidadeId}"
-                : (string) $semana;
+            $alaUnidadeId = $metaPeriodo['ala_unidade_id'] ?? null;
+            $chavePeriodo = $metasPorAla
+                ? "{$periodo}-{$alaUnidadeId}"
+                : (string) $periodo;
 
-            if (isset($chavesPeriodos[$chaveSemanal])) {
+            if (isset($chavesPeriodos[$chavePeriodo])) {
                 return ["{$prefixo}: meta de período duplicada."];
             }
 
-            $chavesPeriodos[$chaveSemanal] = true;
-            $somaPeriodos                  += (int) $metaSemanal['quantidade'];
+            $chavesPeriodos[$chavePeriodo] = true;
+            $somaPeriodos                  += (int) $metaPeriodo['quantidade'];
 
             $erros = array_merge(
                 $erros,
@@ -612,15 +612,15 @@ class Service
     private function metasPeriodosDoPayload(array $hospitalPayload): array
     {
         if (isset($hospitalPayload['metas_periodos'])) {
-            return collect($hospitalPayload['metas_periodos'])
-                ->map(fn (array $meta) => [
-                    ...$meta,
-                    'semana' => $meta['periodo'],
-                ])
-                ->all();
+            return $hospitalPayload['metas_periodos'];
         }
 
-        return $hospitalPayload['metas_semanais'] ?? [];
+        return collect($hospitalPayload['metas_semanais'] ?? [])
+            ->map(fn (array $meta) => [
+                ...$meta,
+                'periodo' => $meta['semana'],
+            ])
+            ->all();
     }
 
     /**
