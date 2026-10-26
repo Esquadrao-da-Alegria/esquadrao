@@ -15,6 +15,7 @@ class MetaMensalHospital extends Model
         'ano',
         'mes',
         'quantidade',
+        'periodicidade',
     ];
 
     protected function casts(): array

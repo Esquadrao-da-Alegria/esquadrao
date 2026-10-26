@@ -154,6 +154,7 @@ class DashboardTest extends TestCase
                     'dashboard.visao_geral' => false,
                     'dashboard.visitas_por_hospital' => true,
                     'dashboard.visitas_por_participante' => false,
+                    'dashboard.participacao_semestral' => false,
                 ]));
 
         $userSemCidade = $this->criarUsuarioComCargo('voluntario');
@@ -166,6 +167,7 @@ class DashboardTest extends TestCase
                     'dashboard.visao_geral' => false,
                     'dashboard.visitas_por_hospital' => false,
                     'dashboard.visitas_por_participante' => false,
+                    'dashboard.participacao_semestral' => false,
                 ]));
 
         $coordenador = $this->criarUsuarioComCargo('coordenador_geral');
@@ -178,6 +180,7 @@ class DashboardTest extends TestCase
                     'dashboard.visao_geral' => true,
                     'dashboard.visitas_por_hospital' => true,
                     'dashboard.visitas_por_participante' => false,
+                    'dashboard.participacao_semestral' => true,
                 ]));
     }
 
