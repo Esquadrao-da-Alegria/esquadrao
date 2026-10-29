@@ -27,6 +27,10 @@ jobs:
             set -e
             export COMPOSER_ALLOW_SUPERUSER=1
 
+            echo "🔒 Atualizando PHP para versão corrigida (CVE-2026-109618 / CVE-2026-109619)..."
+            apt-get update -qq && apt-get upgrade -y php8.4 php8.4-cli php8.4-fpm php8.4-common 2>/dev/null || true
+            echo "✅ Versão PHP após atualização: $(php -v | head -1)"
+
             echo "📦 Iniciando deploy no servidor PROD..."
             cd ${{ secrets.APP_PATH_PRD }}
 
@@ -62,4 +66,5 @@ jobs:
             echo "🔍 Gerando cache de otimização..."
             php artisan optimize
 
+            echo "🔒 Versão PHP em produção: $(php -v | head -1)"
             echo "🚀 Deploy PROD finalizado com sucesso!"
