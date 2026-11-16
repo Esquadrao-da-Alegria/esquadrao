@@ -41,6 +41,7 @@ Este diretório contém a documentação técnica oficial, especificações de n
 |---|---|---|
 | **Voluntários** | Estrutura de dados `User` vs `Voluntario`, fluxo de convites, ativação e inativação. | [`docs/features/volunt%C3%A1rio/spec.md`](file:///home/bprates/Documentos/projetos/esquadrao/docs/features/volunt%C3%A1rio/spec.md) |
 | **Ajuda & Suporte** | Central de ajuda, instruções de uso e perguntas frequentes. | [`docs/features/ajuda/specs.md`](file:///home/bprates/Documentos/projetos/esquadrao/docs/features/ajuda/specs.md) |
+| **Monitoramento** | Saúde da aplicação, Pulse, disponibilidade, alertas e investigação de erros. | [Monitoramento básico](features/monitoramento/specs.md) |
 
 ---
 
