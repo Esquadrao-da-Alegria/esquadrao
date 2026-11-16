@@ -16,6 +16,7 @@
         "intervention/image-laravel": "^4.1",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
+        "laravel/pulse": "^1.0",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
         "spatie/browsershot": "^5.4",
