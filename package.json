@@ -9,7 +9,7 @@
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "lint": "eslint . --fix",
-        "types": "npm run wayfinder:generate && tsc --noEmit"
+        "types": "tsc --noEmit"
     },
     "devDependencies": {
         "@eslint/js": "^9.19.0",

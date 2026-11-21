@@ -40,7 +40,7 @@ jobs:
         run: npm ci
 
       - name: Gerar rotas Wayfinder
-        run: php artisan wayfinder:generate
+        run: npm run wayfinder:generate
 
       - name: Verificar tipos TypeScript
         run: npm run types
