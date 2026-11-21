@@ -12,6 +12,7 @@ Documento de referência sobre **metas mensais com distribuição semanal ou qui
 |-------|-------------|
 | **Meta mensal** | Quantidade opcional de visitas previstas para um hospital em um mês (`metas_mensais_hospitais`). |
 | **Meta de período** | Distribuição opcional da meta mensal, semanal ou quinzenal (`metas_periodos_hospitais`). |
+| **Meta padrão** | Configuração aplicada aos meses sem meta própria (`metas_padrao_hospitais`). |
 | **Realizadas** | Visitas contabilizadas agregadas de `visitas` — status `realizada`, `pendente_relatorio` ou `contabilizada`. |
 | **Liberação de agenda** | Registro por cidade/ano/mês indicando se visitas **hospitalares** podem ser agendadas (`agenda_liberacoes_cidades.liberado`). |
 
@@ -30,6 +31,7 @@ Documento de referência sobre **metas mensais com distribuição semanal ou qui
 8. **Escopo geográfico** — coordenadores locais e diretores configuram apenas hospitais **ativos** da cidade-base. Administradores e coordenadores gerais podem acessar hospitais de outras cidades.
 10. **Apoio ao agendamento** — na agenda, o progresso soma visitas realizadas e agendadas; a meta mensal considera todas as alas. Quando a meta de período é por ala, somente visitas da ala cumprem aquela meta.
 11. **Período de referência na agenda** — o acompanhamento compacto apresenta somente o período atual; para mês futuro, o primeiro com déficit; para mês passado, o último. A legenda explica `S` (semana), `Q` (quinzena) e `M` (mês), sempre como cobertas/meta.
+12. **Meta padrão futura** — ao marcar “Usar como padrão nos próximos meses”, a meta mensal e seus períodos passam a valer nos meses sem configuração própria. Sem meta mensal preenchida, o padrão existente é preservado e a interface exibe um aviso; nunca é substituído silenciosamente por zero.
 
 ---
 

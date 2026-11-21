@@ -109,7 +109,11 @@ class Service
                 }
 
                 if ((bool) ($hospitalPayload['salvar_como_padrao'] ?? false)) {
-                    $this->salvarMetaPadrao($hospitalPayload);
+                    if ($this->metaMensalDoPayload($hospitalPayload) === null) {
+                        session()->flash('mensagem_alerta', 'A meta mensal não foi informada. O padrão existente foi mantido.');
+                    } else {
+                        $this->salvarMetaPadrao($hospitalPayload);
+                    }
                 }
             }
 

@@ -422,6 +422,43 @@ class MetaTest extends TestCase
         $this->assertSame(2, MetaPadraoHospital::query()->firstOrFail()->periodos()->count());
     }
 
+    public function test_mantem_meta_padrao_ao_salvar_sem_meta_mensal(): void
+    {
+        $cidade = $this->criarCidade('Santa Maria');
+        $user = $this->criarUsuarioComCargoCidade('coordenador_local', $cidade->id);
+        $hospital = $this->criarHospital($cidade->id);
+        $padrao = MetaPadraoHospital::query()->create([
+            'hospital_id' => $hospital->id,
+            'quantidade' => 4,
+            'periodicidade' => 'quinzenal',
+            'metas_por_ala' => false,
+        ]);
+        $padrao->periodos()->createMany([
+            ['periodo' => 1, 'quantidade' => 2],
+            ['periodo' => 2, 'quantidade' => 2],
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('hospitais.metas.update', $hospital), [
+                'ano' => 2026,
+                'mes' => 6,
+                'meta_mensal' => null,
+                'periodicidade' => 'semanal',
+                'metas_por_ala' => false,
+                'salvar_como_padrao' => true,
+                'metas_periodos' => [],
+            ])
+            ->assertSessionHas('mensagem_alerta', 'A meta mensal não foi informada. O padrão existente foi mantido.');
+
+        $this->assertDatabaseHas('metas_padrao_hospitais', [
+            'id' => $padrao->id,
+            'quantidade' => 4,
+            'periodicidade' => 'quinzenal',
+            'metas_por_ala' => false,
+        ]);
+        $this->assertSame(2, $padrao->fresh()->periodos()->count());
+    }
+
     public function test_mes_sem_configuracao_propria_exibe_meta_padrao(): void
     {
         $cidade = $this->criarCidade('Santa Maria');
