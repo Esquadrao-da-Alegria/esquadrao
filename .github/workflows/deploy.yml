@@ -44,7 +44,7 @@ jobs:
             php artisan optimize:clear
 
             echo "🔍 Gerando Rotas Wayfinder..."
-            php artisan wayfinder:generate
+            php artisan wayfinder:generate --with-form
 
             echo "🟢 Instalando dependências JS (React/Vite)..."
             npm ci
