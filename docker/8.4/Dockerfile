@@ -1,6 +1,8 @@
 FROM ubuntu:24.04
 
 LABEL maintainer="Taylor Otwell"
+# Requer PHP >= 8.4.27 (CVE-2026-109618 / CVE-2026-109619 — RCE crítico, corrigido em 21/10/2026).
+# Rebuild com --no-cache garante a versão corrigida do PPA ondrej/php.
 
 ARG WWWGROUP
 ARG NODE_VERSION=22
