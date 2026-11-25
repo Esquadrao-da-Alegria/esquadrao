@@ -46,6 +46,15 @@ O dashboard gerencial **Participação semestral** apresenta uma relação de in
 
 Os três tipos seguem o mesmo fluxo geral de agendamento, listagem, inscrição, cancelamento e finalização. Regras exclusivas de presença por QR Code permanecem descritas em `docs/features/eventos/presenca-qr-code/specs.md`.
 
+## Foto do evento
+
+- Cada evento pode ter zero ou uma foto. O campo `eventos.imagem_caminho` armazena o caminho no disco público do Laravel; `imagem_url` disponibiliza a URL para exibição.
+- São aceitos JPG/JPEG, PNG e WebP até 10 MB. O backend converte a imagem para JPEG com qualidade 85 e limita o maior lado a 1200 px sem ampliar imagens menores.
+- Os arquivos ficam em `storage/app/public/eventos/{evento_id}/{uuid}.jpg`. O deploy mantém `storage:link`; backups e migrações de servidor devem incluir `storage/app/public/eventos`.
+- Administradores, responsáveis e criadores podem adicionar, substituir ou remover a foto, independentemente do estado do evento. Outros usuários podem visualizá-la, mas não gerenciá-la.
+- O cadastro e a edição permitem selecionar a foto e ver seu preview. Na edição, não enviar um novo arquivo mantém a foto atual; a remoção está disponível na própria edição e na página de detalhes.
+- A página de detalhes exibe a foto quando existe. Após substituição bem-sucedida, o arquivo anterior é removido; remoção limpa a referência e o arquivo, e exclusão do evento também remove a foto.
+
 ---
 
 ## Arquivos centrais
