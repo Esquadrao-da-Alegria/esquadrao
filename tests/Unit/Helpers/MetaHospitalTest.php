@@ -143,4 +143,30 @@ class MetaHospitalTest extends TestCase
         $this->assertStringContainsString('WHEN DAY(inicio_em) BETWEEN 1 AND 4 THEN 1', $sql);
         $this->assertStringContainsString('WHEN DAY(inicio_em) BETWEEN 26 AND 30 THEN 5', $sql);
     }
+
+    public function test_calcula_quinzenas_com_limites_fechados_no_dia_quinze_e_dezesseis(): void
+    {
+        $periodos = MetaHospital::periodosDoMes(2026, 2, 'quinzenal');
+
+        $this->assertSame([
+            [
+                'periodo'    => 1,
+                'dia_inicio' => 1,
+                'dia_fim'    => 15,
+                'titulo'     => '1ª quinzena',
+                'sigla'      => 'Q',
+            ],
+            [
+                'periodo'    => 2,
+                'dia_inicio' => 16,
+                'dia_fim'    => 28,
+                'titulo'     => '2ª quinzena',
+                'sigla'      => 'Q',
+            ],
+        ], $periodos);
+
+        $this->assertSame(1, MetaHospital::periodoParaDia(2026, 2, 15, 'quinzenal'));
+        $this->assertSame(2, MetaHospital::periodoParaDia(2026, 2, 16, 'quinzenal'));
+        $this->assertSame(2, MetaHospital::periodoParaDia(2026, 2, 28, 'quinzenal'));
+    }
 }

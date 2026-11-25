@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Evento extends Model
 {
@@ -13,8 +14,10 @@ class Evento extends Model
         'titulo', 'tipo', 'descricao', 'local', 'cidade_id', 'data_inicio', 'data_fim', 'limite_inscricao',
         'limite_participantes', 'status', 'responsavel_id', 'criado_por_id',
         'motivo_cancelamento', 'cancelado_em', 'cancelado_por_id',
-        'finalizado_em', 'finalizado_por_id', 'observacoes_finalizacao',
+        'finalizado_em', 'finalizado_por_id', 'observacoes_finalizacao', 'imagem_caminho',
     ];
+
+    protected $appends = ['imagem_url'];
 
     protected function casts(): array
     {
@@ -44,6 +47,11 @@ class Evento extends Model
         return true;
     }
     public function podeRegistrarPresenca(): bool { return ! $this->estaCancelado(); }
+
+    public function getImagemUrlAttribute(): ?string
+    {
+        return $this->imagem_caminho ? Storage::disk('public')->url($this->imagem_caminho) : null;
+    }
 
     public function participantes(): BelongsToMany
     {
